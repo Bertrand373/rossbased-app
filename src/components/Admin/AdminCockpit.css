@@ -117,12 +117,7 @@
   color: #ffffff;
 }
 
-.ac-nav-icon {
-  font-size: 10px;
-  opacity: 0.5;
-}
-
-.ac-nav-btn.active .ac-nav-icon { opacity: 0.8; }
+.ac-nav-btn.active .ac-nav-label { color: #ffffff; }
 
 /* ===== SECTION ===== */
 .ac-section {
@@ -383,7 +378,7 @@
 
 /* ===== SPARKLINE ===== */
 .ac-sparkline-wrap {
-  height: 64px;
+  height: 80px;
   overflow: hidden;
 }
 
@@ -568,30 +563,19 @@
   margin: 0;
 }
 
-.ac-sort {
-  display: flex;
-  gap: 2px;
-  background: rgba(255,255,255,0.025);
-  border-radius: 5px;
-  padding: 2px;
-}
-
-.ac-sort-btn {
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.22);
+.ac-users-hint {
   font-size: 10px;
-  font-weight: 600;
-  padding: 4px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.12s;
+  color: rgba(255,255,255,0.12);
+  font-weight: 500;
 }
 
-.ac-sort-btn.on {
-  background: rgba(255,255,255,0.07);
-  color: rgba(255,255,255,0.65);
+.ac-th-sort {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.12s;
 }
+
+.ac-th-sort:hover { color: rgba(255,255,255,0.5); }
 
 .ac-table-wrap {
   overflow-x: auto;
@@ -906,6 +890,47 @@
   color: rgba(255,255,255,0.15);
 }
 
+/* ===== LIVE ACTIVITY FEED ===== */
+.ac-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.ac-feed-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 5px;
+  background: rgba(255,255,255,0.01);
+}
+
+.ac-feed-item:hover { background: rgba(255,255,255,0.025); }
+
+.ac-feed-user {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  min-width: 100px;
+}
+
+.ac-feed-page {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.3);
+  flex: 1;
+}
+
+.ac-feed-time {
+  font-size: 9px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.15);
+  flex-shrink: 0;
+}
+
 /* ===== EMPTY MESSAGE ===== */
 .ac-empty-msg {
   font-size: 12px;
@@ -926,7 +951,6 @@
   .ac-stat-row { grid-template-columns: repeat(2, 1fr); }
   .ac-act-num { font-size: 20px; }
   .ac-nav-label { font-size: 11px; }
-  .ac-nav-icon { display: none; }
   .ac-users-head { flex-direction: column; align-items: flex-start; gap: 8px; }
   .ac-retention-svg { max-width: 100%; }
   .ac-leader-stat { font-size: 11px; }

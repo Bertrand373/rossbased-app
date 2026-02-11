@@ -21,23 +21,32 @@ const EXPLAIN = {
   danger: { w: 'Which streak day ranges see the most relapses.', y: 'Where to intervene. If Day 8-14 is the spike, push notifications + toolkit prompts there.' },
   triggers: { w: 'Self-reported relapse reasons, ranked.', y: 'If "boredom" is #1, maybe build a boredom-specific toolkit.' },
   retention: { w: 'Of activated users, how many are still active after N days.', y: 'Steep drop = weak first impression. Flat after D7 = strong habit. Flatter = better.' },
+  activity: { w: 'DAU = users active today. WAU = active this week. MAU = active this month.', y: 'Shows how many people actually open the app. If DAU is low but MAU is high, users come back occasionally but not daily.' },
 };
 
 // ============================================================
 // SVG CHART COMPONENTS
 // ============================================================
 
-// Mini sparkline — polyline
-const Sparkline = ({ data, width = 400, height = 64 }) => {
+// Mini sparkline with date labels
+const Sparkline = ({ data, width = 400, height = 80 }) => {
   if (!data?.length) return null;
   const max = Math.max(...data.map(d => d.count), 1);
+  const chartH = height - 18; // leave room for labels
   const step = width / Math.max(data.length - 1, 1);
-  const points = data.map((d, i) => `${i * step},${height - (d.count / max) * (height - 8) - 4}`).join(' ');
-  const areaPoints = `0,${height} ${points} ${(data.length - 1) * step},${height}`;
+  const points = data.map((d, i) => `${i * step},${chartH - (d.count / max) * (chartH - 8) - 4}`).join(' ');
+  const areaPoints = `0,${chartH} ${points} ${(data.length - 1) * step},${chartH}`;
+  // Show first, middle, last date labels
+  const labelIdxs = [0, Math.floor(data.length / 2), data.length - 1];
+  const fmtDate = (d) => { const p = (d._id || d.date || '').split('-'); return p.length === 3 ? `${parseInt(p[1])}/${parseInt(p[2])}` : ''; };
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="ac-sparkline-svg" preserveAspectRatio="none">
       <polygon points={areaPoints} fill="url(#sparkGrad)" />
       <polyline points={points} fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+      <text x="2" y="10" fill="rgba(255,255,255,0.25)" fontSize="9" fontWeight="600">{max}</text>
+      {labelIdxs.filter((v,i,a) => a.indexOf(v) === i).map(idx => (
+        <text key={idx} x={idx * step} y={height} textAnchor={idx === 0 ? 'start' : idx === data.length - 1 ? 'end' : 'middle'} fill="rgba(255,255,255,0.18)" fontSize="8" fontWeight="500">{fmtDate(data[idx])}</text>
+      ))}
       <defs>
         <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="rgba(255,255,255,0.08)" />
@@ -114,7 +123,6 @@ const AdminCockpit = () => {
   const [retention, setRetention] = useState(null);
   const [users, setUsers] = useState(null);
   const [behavior, setBehavior] = useState(null);
-  const [userSort, setUserSort] = useState('recent');
   const [expandedInfo, setExpandedInfo] = useState(null);
   const [lastRefresh, setLastRefresh] = useState(null);
 
@@ -173,16 +181,35 @@ const AdminCockpit = () => {
   // Auto-refresh every 60s for real-time feel
   useEffect(() => {
     if (!verified) return;
-    const interval = setInterval(() => loadAll(userSort), 60000);
+    const interval = setInterval(() => loadAll(), 60000);
     return () => clearInterval(interval);
-  }, [verified, userSort]); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => { if (!loading && tab === 'users') fetchData(`users?sort=${userSort}&limit=50`).then(d => d && setUsers(d)); }, [userSort]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [verified]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Computed
   const stickiness = overview?.dau > 0 && overview?.mau > 0 ? Math.round((overview.dau / overview.mau) * 100) : 0;
   const d7Rate = retention?.retention?.d7?.rate || 0;
   const activationRate = retention?.activationRate || overview?.logRate || 0;
   const premiumRate = overview?.premiumRate || 0;
+
+  // Column sort state
+  const [sortCol, setSortCol] = useState('joined');
+  const [sortDir, setSortDir] = useState('desc');
+  const handleColSort = (col) => {
+    if (sortCol === col) { setSortDir(sortDir === 'desc' ? 'asc' : 'desc'); }
+    else { setSortCol(col); setSortDir('desc'); }
+  };
+  const sortedUsers = users?.users ? [...users.users].sort((a, b) => {
+    const dir = sortDir === 'desc' ? -1 : 1;
+    const map = {
+      user: () => (a.username || '').localeCompare(b.username || '') * dir,
+      streak: () => ((a.currentStreak || 0) - (b.currentStreak || 0)) * dir,
+      logs: () => ((a.totalLogs || 0) - (b.totalLogs || 0)) * dir,
+      ai: () => ((a.aiMessages || 0) - (b.aiMessages || 0)) * dir,
+      joined: () => (new Date(a.joinedAt || 0) - new Date(b.joinedAt || 0)) * dir,
+      active: () => (new Date(a.lastActive || 0) - new Date(b.lastActive || 0)) * dir,
+    };
+    return (map[sortCol] || map.joined)();
+  }) : [];
 
   const health = (metric, val) => {
     const thresholds = { activation: [40, 25], d7: [40, 25], premium: [10, 5], stickiness: [40, 20] };
@@ -208,9 +235,9 @@ const AdminCockpit = () => {
     );
   };
 
-  const formatDate = d => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }) : '\u2014';
+  const formatDate = d => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }) : '—';
   const timeAgo = d => {
-    if (!d) return '\u2014';
+    if (!d) return '—';
     const m = Math.floor((Date.now() - new Date(d).getTime()) / 60000);
     if (m < 60) return `${m}m`;
     const h = Math.floor(m / 60);
@@ -265,7 +292,7 @@ const AdminCockpit = () => {
             })()}
           </div>
         </div>
-        <button className="ac-refresh" onClick={() => loadAll(userSort)}>
+        <button className="ac-refresh" onClick={() => loadAll()}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
         </button>
       </div>
@@ -273,14 +300,13 @@ const AdminCockpit = () => {
       {/* ===== NAV ===== */}
       <div className="ac-nav">
         {[
-          { id: 'dashboard', icon: '\u25A0', label: 'Dashboard' },
-          { id: 'intelligence', icon: '\u25C6', label: 'Intelligence' },
-          { id: 'behavior', icon: '\u25E8', label: 'Behavior' },
-          { id: 'users', icon: '\u25CB', label: 'Users' },
-          { id: 'oracle', icon: '\u2726', label: 'Oracle' },
+          { id: 'dashboard', label: 'Dashboard' },
+          { id: 'intelligence', label: 'Intel' },
+          { id: 'behavior', label: 'Behavior' },
+          { id: 'users', label: 'Users' },
+          { id: 'oracle', label: 'Oracle' },
         ].map(t => (
           <button key={t.id} className={`ac-nav-btn ${tab === t.id ? 'active' : ''}`} onClick={() => setTab(t.id)}>
-            <span className="ac-nav-icon">{t.icon}</span>
             <span className="ac-nav-label">{t.label}</span>
           </button>
         ))}
@@ -294,10 +320,10 @@ const AdminCockpit = () => {
           {/* Critical 4 */}
           <div className="ac-c4">
             {[
-              { id: 'activation', rank: '01', val: `${activationRate}%`, label: 'Activation', detail: `${retention?.totalWithData || 0} of ${overview.totalUsers} signed up \u2192 logged`, metric: activationRate },
+              { id: 'activation', rank: '01', val: `${activationRate}%`, label: 'Activation', detail: `${retention?.totalWithData || 0} of ${overview.totalUsers} signed up → logged`, metric: activationRate },
               { id: 'd7', rank: '02', val: `${d7Rate}%`, label: 'D7 Retention', detail: `${retention?.retention?.d7?.count || 0} still active after 7d`, metric: d7Rate },
               { id: 'premium', rank: '03', val: `${premiumRate}%`, label: 'Access Rate', detail: `${overview.premiumUsers} of ${overview.totalUsers} with active access`, metric: premiumRate },
-              { id: 'stickiness', rank: '04', val: stickiness > 0 ? `${stickiness}%` : '\u2014', label: 'DAU / MAU', detail: `${overview.dau} daily \u00F7 ${overview.mau} monthly`, metric: stickiness },
+              { id: 'stickiness', rank: '04', val: stickiness > 0 ? `${stickiness}%` : '—', label: 'DAU / MAU', detail: `${overview.dau} daily ÷ ${overview.mau} monthly`, metric: stickiness },
             ].map(c => (
               <div key={c.id} className={`ac-c4-card ac-h-${health(c.id, c.metric)}`}>
                 <div className="ac-c4-top"><span className="ac-c4-rank">{c.rank}</span><Info id={c.id} /></div>
@@ -320,7 +346,11 @@ const AdminCockpit = () => {
           {/* Activity + Signup Trend */}
           <div className="ac-row-2">
             <div className="ac-card ac-card-compact">
-              <h3 className="ac-card-title-sm">Active Users</h3>
+              <div className="ac-card-title-row">
+                <h3 className="ac-card-title-sm">Active Users</h3>
+                <Info id="activity" />
+              </div>
+              <Tip id="activity" />
               <div className="ac-activity">
                 {[{ v: overview.dau, l: 'DAU' }, { v: overview.wau, l: 'WAU' }, { v: overview.mau, l: 'MAU' }].map((a, i) => (
                   <div key={i} className="ac-act-item">
@@ -348,7 +378,7 @@ const AdminCockpit = () => {
           {/* Sparkline */}
           {overview.signupTrend?.length > 1 && (
             <div className="ac-card">
-              <h3 className="ac-card-title-sm">Signups \u00B7 30 Days</h3>
+              <h3 className="ac-card-title-sm">Signups · 30 Days</h3>
               <div className="ac-sparkline-wrap">
                 <Sparkline data={overview.signupTrend} />
               </div>
@@ -416,7 +446,7 @@ const AdminCockpit = () => {
               { l: 'Avg Streak', v: `${streaks.averageStreak}d` },
               { l: 'Total Relapses', v: streaks.totalRelapses },
               { l: 'Avg Before Fail', v: `${streaks.avgStreakBeforeRelapse}d` },
-              { l: 'Top Streak', v: streaks.topStreaks?.[0] ? `${streaks.topStreaks[0].longest}d` : '\u2014', accent: true },
+              { l: 'Top Streak', v: streaks.topStreaks?.[0] ? `${streaks.topStreaks[0].longest}d` : '—', accent: true },
             ].map((s, i) => (
               <div key={i} className={`ac-mini-stat ${s.accent ? 'accent' : ''}`}>
                 <span className="ac-ms-val">{s.v}</span>
@@ -482,8 +512,8 @@ const AdminCockpit = () => {
                 {[
                   { l: 'Views Today', v: behavior.viewsToday },
                   { l: 'Sessions (7d)', v: behavior.totalSessions },
-                  { l: 'Avg Duration', v: behavior.avgDuration > 0 ? `${behavior.avgDuration}m` : '\u2014' },
-                  { l: 'Pages / Session', v: behavior.avgPages > 0 ? behavior.avgPages : '\u2014' },
+                  { l: 'Avg Duration', v: behavior.avgDuration > 0 ? `${behavior.avgDuration}m` : '—' },
+                  { l: 'Pages / Session', v: behavior.avgPages > 0 ? behavior.avgPages : '—' },
                 ].map((s, i) => (
                   <div key={i} className="ac-mini-stat">
                     <span className="ac-ms-val">{s.v}</span>
@@ -504,7 +534,7 @@ const AdminCockpit = () => {
                   }))} labelKey="page" valueKey="views" />
                   <div className="ac-page-legend">
                     {behavior.topPages.slice(0, 5).map((p, i) => (
-                      <span key={i} className="ac-page-users">{p.page === '/' ? 'Tracker' : p.page.replace(/^\//, '')} \u2014 {p.users} users</span>
+                      <span key={i} className="ac-page-users">{p.page === '/' ? 'Tracker' : p.page.replace(/^\//, '')} — {p.users} users</span>
                     ))}
                   </div>
                 </div>
@@ -513,7 +543,7 @@ const AdminCockpit = () => {
               {/* Activity Trend */}
               {behavior.dailyTrend?.length > 1 && (
                 <div className="ac-card">
-                  <h3 className="ac-card-title-sm">Page Views \u00B7 14 Days</h3>
+                  <h3 className="ac-card-title-sm">Page Views · 14 Days</h3>
                   <div className="ac-sparkline-wrap">
                     <Sparkline data={behavior.dailyTrend} />
                   </div>
@@ -547,6 +577,28 @@ const AdminCockpit = () => {
                   <p className="ac-empty-msg">No page view data yet. Data will appear once users visit the app after this update is deployed.</p>
                 </div>
               )}
+
+              {/* Recent Activity Feed */}
+              {behavior.recentActivity?.length > 0 && (
+                <div className="ac-card">
+                  <h3 className="ac-card-title-sm">Live Activity</h3>
+                  <div className="ac-feed">
+                    {behavior.recentActivity.map((a, i) => {
+                      const pageName = a.page === '/' ? 'Tracker' : a.page.replace(/^\//, '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                      const t = new Date(a.time);
+                      const mins = Math.floor((Date.now() - t.getTime()) / 60000);
+                      const timeStr = mins < 1 ? 'just now' : mins < 60 ? `${mins}m ago` : mins < 1440 ? `${Math.floor(mins/60)}h ago` : `${Math.floor(mins/1440)}d ago`;
+                      return (
+                        <div key={i} className="ac-feed-item">
+                          <span className="ac-feed-user">{a.user}</span>
+                          <span className="ac-feed-page">{pageName}</span>
+                          <span className="ac-feed-time">{timeStr}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </>
           ) : (
             <div className="ac-card">
@@ -562,19 +614,27 @@ const AdminCockpit = () => {
           <div className="ac-card">
             <div className="ac-users-head">
               <h3>{users.total} Users</h3>
-              <div className="ac-sort">
-                {['recent', 'active', 'streak'].map(s => (
-                  <button key={s} className={`ac-sort-btn ${userSort === s ? 'on' : ''}`} onClick={() => setUserSort(s)}>
-                    {s === 'recent' ? 'Newest' : s === 'active' ? 'Active' : 'Streak'}
-                  </button>
-                ))}
-              </div>
+              <span className="ac-users-hint">Click columns to sort</span>
             </div>
             <div className="ac-table-wrap">
               <table className="ac-table">
-                <thead><tr><th>User</th><th>Streak</th><th>Logs</th><th>AI</th><th>Sub</th><th>Joined</th><th>Active</th></tr></thead>
+                <thead><tr>
+                  {[
+                    { id: 'user', label: 'User' },
+                    { id: 'streak', label: 'Streak' },
+                    { id: 'logs', label: 'Logs' },
+                    { id: 'ai', label: 'AI' },
+                    { id: 'sub', label: 'Sub', noSort: true },
+                    { id: 'joined', label: 'Joined' },
+                    { id: 'active', label: 'Active' },
+                  ].map(col => (
+                    <th key={col.id} className={col.noSort ? '' : 'ac-th-sort'} onClick={() => !col.noSort && handleColSort(col.id)}>
+                      {col.label}{sortCol === col.id ? (sortDir === 'desc' ? ' ↓' : ' ↑') : ''}
+                    </th>
+                  ))}
+                </tr></thead>
                 <tbody>
-                  {users.users.map((u, i) => (
+                  {sortedUsers.map((u, i) => (
                     <tr key={i}>
                       <td><span className="ac-uname">{u.username}</span>{u.discord && <span className="ac-udiscord">{u.discord}</span>}</td>
                       <td><span className="ac-streak-pill">{u.currentStreak}d</span></td>
@@ -585,7 +645,7 @@ const AdminCockpit = () => {
                         u.subStatus === 'active' ? 'PRO' :
                         u.subStatus === 'trial' ? 'TRIAL' :
                         u.subStatus === 'canceled' ? 'END' :
-                        u.subStatus === 'expired' ? 'EXP' : '\u2014'
+                        u.subStatus === 'expired' ? 'EXP' : '—'
                       }</span></td>
                       <td className="ac-dim">{formatDate(u.joinedAt)}</td>
                       <td className="ac-dim">{(() => {

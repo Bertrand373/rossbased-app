@@ -31,6 +31,9 @@ const adminCheck = (req, res, next) => {
 const getDateRange = (days) => new Date(Date.now() - days * 86400000);
 const startOfDay = (date) => { const d = new Date(date); d.setHours(0,0,0,0); return d; };
 
+// Exclude admin accounts from user-facing metrics
+const adminFilter = { username: { $not: /^ross/i } };
+
 // GET /api/analytics/overview
 router.get('/overview', adminCheck, async (req, res) => {
   try {
@@ -40,21 +43,30 @@ router.get('/overview', adminCheck, async (req, res) => {
     const thirtyDaysAgo = getDateRange(30);
     const prevThirtyDays = getDateRange(60);
 
-    const totalUsers = await User.countDocuments();
+    const totalUsers = await User.countDocuments(adminFilter);
     const premiumUsers = await User.countDocuments({ 
+      ...adminFilter,
       'subscription.status': { $in: ['grandfathered', 'active', 'trial', 'canceled'] } 
     });
-    const signupsToday = await User.countDocuments({ createdAt: { $gte: today } });
-    const signupsThisWeek = await User.countDocuments({ createdAt: { $gte: sevenDaysAgo } });
-    const signupsThisMonth = await User.countDocuments({ createdAt: { $gte: thirtyDaysAgo } });
-    const signupsPrevMonth = await User.countDocuments({ createdAt: { $gte: prevThirtyDays, $lt: thirtyDaysAgo } });
-    const dauCount = await User.countDocuments({ lastSeen: { $gte: today } });
-    const wauCount = await User.countDocuments({ lastSeen: { $gte: sevenDaysAgo } });
-    const mauCount = await User.countDocuments({ lastSeen: { $gte: thirtyDaysAgo } });
-    const usersWhoLogged = await User.countDocuments({ 'benefitTracking.0': { $exists: true } });
+    const signupsToday = await User.countDocuments({ ...adminFilter, createdAt: { $gte: today } });
+    const signupsThisWeek = await User.countDocuments({ ...adminFilter, createdAt: { $gte: sevenDaysAgo } });
+    const signupsThisMonth = await User.countDocuments({ ...adminFilter, createdAt: { $gte: thirtyDaysAgo } });
+    const signupsPrevMonth = await User.countDocuments({ ...adminFilter, createdAt: { $gte: prevThirtyDays, $lt: thirtyDaysAgo } });
     
-    // Ghost users = signed up but zero engagement (no logs, no AI, no urges, no emotional tracking)
+    // DAU/WAU/MAU — use lastSeen if available, fall back to updatedAt
+    const activeQuery = (since) => ({
+      ...adminFilter,
+      $or: [{ lastSeen: { $gte: since } }, { updatedAt: { $gte: since } }]
+    });
+    const dauCount = await User.countDocuments(activeQuery(today));
+    const wauCount = await User.countDocuments(activeQuery(sevenDaysAgo));
+    const mauCount = await User.countDocuments(activeQuery(thirtyDaysAgo));
+    
+    const usersWhoLogged = await User.countDocuments({ ...adminFilter, 'benefitTracking.0': { $exists: true } });
+    
+    // Ghost users = signed up but zero engagement
     const engagedUsers = await User.countDocuments({
+      ...adminFilter,
       $or: [
         { 'benefitTracking.0': { $exists: true } },
         { 'urgeLog.0': { $exists: true } },
@@ -65,7 +77,7 @@ router.get('/overview', adminCheck, async (req, res) => {
     const ghostUsers = totalUsers - engagedUsers;
 
     const signupTrend = await User.aggregate([
-      { $match: { createdAt: { $gte: thirtyDaysAgo } } },
+      { $match: { ...adminFilter, createdAt: { $gte: thirtyDaysAgo } } },
       { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } }, count: { $sum: 1 } } },
       { $sort: { _id: 1 } }
     ]);
@@ -285,19 +297,21 @@ router.get('/behavior', adminCheck, async (req, res) => {
     const sevenDaysAgo = getDateRange(7);
     const fourteenDaysAgo = getDateRange(14);
     const thirtyDaysAgo = getDateRange(30);
+    
+    const pvFilter = { userId: { $not: /^ross/i } };
 
     // Top pages (last 30 days)
     const topPages = await PageView.aggregate([
-      { $match: { timestamp: { $gte: thirtyDaysAgo } } },
+      { $match: { ...pvFilter, timestamp: { $gte: thirtyDaysAgo } } },
       { $group: { _id: '$page', views: { $sum: 1 }, uniqueUsers: { $addToSet: '$userId' } } },
       { $project: { page: '$_id', views: 1, users: { $size: '$uniqueUsers' }, _id: 0 } },
       { $sort: { views: -1 } },
       { $limit: 15 }
     ]);
 
-    // Session stats (last 7 days) — group by sessionId, calc duration
+    // Session stats (last 7 days)
     const sessions = await PageView.aggregate([
-      { $match: { timestamp: { $gte: sevenDaysAgo } } },
+      { $match: { ...pvFilter, timestamp: { $gte: sevenDaysAgo } } },
       { $sort: { timestamp: 1 } },
       { $group: {
         _id: '$sessionId',
@@ -324,23 +338,27 @@ router.get('/behavior', adminCheck, async (req, res) => {
       : 0;
 
     // Counts
-    const viewsToday = await PageView.countDocuments({ timestamp: { $gte: today } });
-    const viewsThisWeek = await PageView.countDocuments({ timestamp: { $gte: sevenDaysAgo } });
+    const viewsToday = await PageView.countDocuments({ ...pvFilter, timestamp: { $gte: today } });
+    const viewsThisWeek = await PageView.countDocuments({ ...pvFilter, timestamp: { $gte: sevenDaysAgo } });
 
     // Daily trend (last 14 days)
     const dailyTrend = await PageView.aggregate([
-      { $match: { timestamp: { $gte: fourteenDaysAgo } } },
+      { $match: { ...pvFilter, timestamp: { $gte: fourteenDaysAgo } } },
       { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$timestamp' } }, count: { $sum: 1 } } },
       { $sort: { _id: 1 } }
     ]);
 
     // Active hours (what hour of day gets most views)
     const hourlyActivity = await PageView.aggregate([
-      { $match: { timestamp: { $gte: thirtyDaysAgo } } },
+      { $match: { ...pvFilter, timestamp: { $gte: thirtyDaysAgo } } },
       { $group: { _id: { $hour: '$timestamp' }, count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       { $limit: 24 }
     ]);
+
+    // Recent activity feed — last 30 page views with user info
+    const recentActivity = await PageView.find(pvFilter)
+      .sort({ timestamp: -1 }).limit(30).lean();
 
     res.json({
       topPages,
@@ -350,7 +368,10 @@ router.get('/behavior', adminCheck, async (req, res) => {
       viewsToday,
       viewsThisWeek,
       dailyTrend,
-      hourlyActivity: hourlyActivity.map(h => ({ hour: h._id, views: h.count }))
+      hourlyActivity: hourlyActivity.map(h => ({ hour: h._id, views: h.count })),
+      recentActivity: recentActivity.map(a => ({
+        user: a.userId, page: a.page, time: a.timestamp
+      }))
     });
   } catch (error) {
     console.error('Analytics behavior error:', error);
