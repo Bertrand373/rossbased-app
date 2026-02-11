@@ -261,7 +261,7 @@
   cursor: pointer;
   transition: color 150ms ease;
   -webkit-tap-highlight-color: transparent;
-  margin-bottom: 12px;
+  margin-top: 12px;
 }
 
 .share-modal-close:hover {

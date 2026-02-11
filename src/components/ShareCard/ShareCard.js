@@ -199,10 +199,6 @@ const ShareCard = ({ userData, isVisible = true }) => {
               </div>
             </div>
             
-            <button className="share-modal-close" onClick={closePreview}>
-              Cancel
-            </button>
-            
             <button 
               className="share-modal-btn" 
               onClick={handleShare}
@@ -216,6 +212,10 @@ const ShareCard = ({ userData, isVisible = true }) => {
                   <span>Share</span>
                 </>
               )}
+            </button>
+            
+            <button className="share-modal-close" onClick={closePreview}>
+              Cancel
             </button>
           </div>
         </div>
