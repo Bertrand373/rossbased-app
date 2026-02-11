@@ -44,6 +44,14 @@
   letter-spacing: -0.01em;
 }
 
+.mp-context {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin: 10px 0 0 0;
+  line-height: 1.4;
+  font-style: italic;
+}
+
 /* =============================================================================
    AUDIO PLAYER
    ============================================================================= */
@@ -379,6 +387,108 @@
   font-size: 0.8125rem;
   color: var(--text-tertiary);
   line-height: 1.5;
+}
+
+/* =============================================================================
+   FIRST-PLAY EXPLAINER MODAL
+   ============================================================================= */
+
+.mp-explainer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+  animation: fadeIn 200ms ease;
+}
+
+.mp-explainer {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  animation: fadeInUp 300ms ease;
+}
+
+.mp-explainer-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+.mp-explainer-items {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.mp-explainer-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.mp-explainer-num {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  font-feature-settings: 'tnum' 1;
+  flex-shrink: 0;
+  width: 20px;
+  padding-top: 2px;
+}
+
+.mp-explainer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mp-explainer-heading {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.mp-explainer-text {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.mp-explainer-btn {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--text);
+  background: var(--text);
+  color: var(--background);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  letter-spacing: -0.01em;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mp-explainer-btn:hover {
+  opacity: 0.9;
+}
+
+.mp-explainer-btn:active {
+  transform: scale(0.98);
 }
 
 /* =============================================================================
