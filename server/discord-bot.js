@@ -8,6 +8,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 const { logIfRelevant, generateWeeklyInsight, getPulseStats } = require('./services/oracleInsight');
 const KnowledgeChunk = require('./models/KnowledgeChunk');
+const OracleUsage = require('./models/OracleUsage');
 const { randomUUID } = require('crypto');
 
 // ============================================================
@@ -505,38 +506,43 @@ async function autoIngestMessage(msg, channelName) {
 // HELPERS
 // ============================================================
 
-// Check if user is rate limited
-const isRateLimited = (userId) => {
+// Check if user is rate limited (persisted to MongoDB — survives restarts)
+const isRateLimited = async (userId) => {
   const now = Date.now();
   
-  // Cooldown check
+  // Cooldown check (in-memory is fine for seconds-level cooldown)
   const lastMessage = USER_COOLDOWNS.get(userId);
   if (lastMessage && (now - lastMessage) < COOLDOWN_MS) {
     return { limited: true, reason: 'cooldown', remaining: Math.ceil((COOLDOWN_MS - (now - lastMessage)) / 1000) };
   }
   
-  // Daily limit check
-  const today = new Date().toDateString();
-  const userDaily = DAILY_USAGE.get(userId);
-  if (userDaily && userDaily.date === today && userDaily.count >= MAX_DAILY_PER_USER) {
-    return { limited: true, reason: 'daily' };
+  // Daily limit check (persisted to MongoDB — survives server restarts)
+  const today = new Date().toISOString().split('T')[0];
+  try {
+    const usage = await OracleUsage.findOne({ discordUserId: userId, date: today });
+    if (usage && usage.count >= MAX_DAILY_PER_USER) {
+      return { limited: true, reason: 'daily' };
+    }
+  } catch (err) {
+    console.error('Rate limit DB check failed, allowing through:', err);
   }
   
   return { limited: false };
 };
 
-// Record usage
-const recordUsage = (userId) => {
+// Record usage (persisted to MongoDB)
+const recordUsage = async (userId) => {
   USER_COOLDOWNS.set(userId, Date.now());
   
-  const today = new Date().toDateString();
-  const userDaily = DAILY_USAGE.get(userId) || { date: today, count: 0 };
-  
-  if (userDaily.date !== today) {
-    DAILY_USAGE.set(userId, { date: today, count: 1 });
-  } else {
-    userDaily.count++;
-    DAILY_USAGE.set(userId, userDaily);
+  const today = new Date().toISOString().split('T')[0];
+  try {
+    await OracleUsage.findOneAndUpdate(
+      { discordUserId: userId, date: today },
+      { $inc: { count: 1 } },
+      { upsert: true, new: true }
+    );
+  } catch (err) {
+    console.error('Failed to record Oracle usage:', err);
   }
 };
 
@@ -813,15 +819,29 @@ client.on('messageCreate', async (message) => {
     content = 'Hello';
   }
   
-  // Rate limit check
-  const rateLimited = isRateLimited(message.author.id);
+  // Ignore junk messages (dots, single chars, gibberish)
+  // Strips punctuation/whitespace, checks if anything real remains
+  const realContent = content.replace(/[^a-zA-Z0-9\u00C0-\u024F\u0400-\u04FF\u0600-\u06FF\u4E00-\u9FFF\uAC00-\uD7AF]/g, '');
+  if (realContent.length < 2) {
+    return; // Silent ignore — don't waste API calls on ".", "!", "..." etc.
+  }
+  
+  // Rate limit check (persisted to MongoDB)
+  const rateLimited = await isRateLimited(message.author.id);
   if (rateLimited.limited) {
     if (rateLimited.reason === 'cooldown') {
       // Silent ignore for cooldown
       return;
     }
     if (rateLimited.reason === 'daily') {
-      await message.reply({ embeds: [buildOracleEmbed('You\'ve reached the daily limit. Come back tomorrow.')] });
+      const dailyLimitMessages = [
+        'You\'ve drawn enough from the well today. Let what you\'ve received settle. Return tomorrow.',
+        'The Oracle has spoken enough for one day. Sit with what you\'ve been given.',
+        'Ten exchanges is the boundary. Integration matters more than accumulation. Tomorrow.',
+        'Enough for today. Real growth happens between the conversations, not during them.',
+      ];
+      const limitMsg = dailyLimitMessages[Math.floor(Math.random() * dailyLimitMessages.length)];
+      await message.reply({ embeds: [buildOracleEmbed(limitMsg)] });
       return;
     }
   }
@@ -853,13 +873,16 @@ client.on('messageCreate', async (message) => {
     const truncated = truncateResponse(reply);
     
     // Record usage first so we can show remaining
-    recordUsage(message.author.id);
+    await recordUsage(message.author.id);
     
     // Build embed with optional remaining count
     const embed = buildOracleEmbed(truncated);
-    const today = new Date().toDateString();
-    const userDaily = DAILY_USAGE.get(message.author.id);
-    const used = (userDaily && userDaily.date === today) ? userDaily.count : 0;
+    const todayStr = new Date().toISOString().split('T')[0];
+    let used = 0;
+    try {
+      const usage = await OracleUsage.findOne({ discordUserId: message.author.id, date: todayStr });
+      if (usage) used = usage.count;
+    } catch (err) { /* silent */ }
     const remaining = MAX_DAILY_PER_USER - used;
     
     if (remaining <= 5 && remaining > 0) {
