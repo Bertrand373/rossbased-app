@@ -906,12 +906,6 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             
             <div className="ut-actions">
               <button 
-                className="ut-btn-ghost"
-                onClick={resetSession}
-              >
-                Start New Session
-              </button>
-              <button 
                 className="ut-btn-primary"
                 onClick={() => {
                   logTrigger();
@@ -919,6 +913,12 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
                 }}
               >
                 Complete Session
+              </button>
+              <button 
+                className="ut-btn-ghost"
+                onClick={resetSession}
+              >
+                Start New Session
               </button>
             </div>
           </>
@@ -975,11 +975,11 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             <div className="ut-modal-footer">
               {!breathingActive ? (
                 <>
-                  <button className="ut-btn-ghost" onClick={() => setShowBreathingModal(false)}>
-                    Cancel
-                  </button>
                   <button className="ut-btn-primary" onClick={startBreathing}>
                     Start
+                  </button>
+                  <button className="ut-btn-ghost" onClick={() => setShowBreathingModal(false)}>
+                    Cancel
                   </button>
                 </>
               ) : (
@@ -1124,11 +1124,11 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             <div className="ut-modal-footer">
               {!orbitActive ? (
                 <>
-                  <button className="ut-btn-ghost" onClick={() => setShowOrbitModal(false)}>
-                    Cancel
-                  </button>
                   <button className="ut-btn-primary" onClick={startOrbit}>
                     Begin
+                  </button>
+                  <button className="ut-btn-ghost" onClick={() => setShowOrbitModal(false)}>
+                    Cancel
                   </button>
                 </>
               ) : (
@@ -1175,14 +1175,14 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             </div>
 
             <div className="ut-modal-footer">
+              <button className="ut-btn-primary" onClick={advanceGrounding}>
+                {groundingStep < GROUNDING_STEPS.length - 1 ? 'Next' : 'Complete'}
+              </button>
               <button className="ut-btn-ghost" onClick={() => {
                 setShowGroundingModal(false);
                 setGroundingStep(0);
               }}>
                 Cancel
-              </button>
-              <button className="ut-btn-primary" onClick={advanceGrounding}>
-                {groundingStep < GROUNDING_STEPS.length - 1 ? 'Next' : 'Complete'}
               </button>
             </div>
           </div>
@@ -1239,11 +1239,11 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
             <div className="ut-modal-footer">
               {!coldActive ? (
                 <>
-                  <button className="ut-btn-ghost" onClick={() => setShowColdModal(false)}>
-                    Cancel
-                  </button>
                   <button className="ut-btn-primary" onClick={startCold}>
                     Start Timer
+                  </button>
+                  <button className="ut-btn-ghost" onClick={() => setShowColdModal(false)}>
+                    Cancel
                   </button>
                 </>
               ) : (

@@ -620,8 +620,8 @@ const Profile = ({
 
             {/* Save/Cancel buttons - only visible when editing, stacked */}
             <div className={`section-actions ${isEditingProfile ? 'visible' : ''}`}>
-              <button className="btn-ghost" onClick={handleCancelEdit}>Cancel</button>
               <button className="btn-primary" onClick={handleProfileUpdate}>Save Changes</button>
+              <button className="btn-ghost" onClick={handleCancelEdit}>Cancel</button>
             </div>
 
             {/* Leaderboard Toggle - Outside edit mode, instant-save */}
@@ -1086,8 +1086,8 @@ const Profile = ({
             </div>
 
             <div className="modal-actions">
-              <button className="btn-ghost" onClick={() => setShowFeedbackModal(false)}>Cancel</button>
               <button className="btn-primary" onClick={handleFeedbackSubmit}>Submit</button>
+              <button className="btn-ghost" onClick={() => setShowFeedbackModal(false)}>Cancel</button>
             </div>
           </div>
         </div>
@@ -1100,8 +1100,8 @@ const Profile = ({
             <h2>Export Data</h2>
             <p>Download all your tracking data including streak history, journal entries, and settings.</p>
             <div className="confirm-actions">
-              <button className="btn-ghost" onClick={() => setShowExportModal(false)}>Cancel</button>
               <button className="btn-primary" onClick={handleDataExport}>Download</button>
+              <button className="btn-ghost" onClick={() => setShowExportModal(false)}>Cancel</button>
             </div>
           </div>
         </div>
@@ -1128,6 +1128,13 @@ const Profile = ({
             
             <div className="confirm-actions">
               <button 
+                className="btn-danger" 
+                onClick={handleAccountDeletion}
+                disabled={deleteConfirmText !== 'DELETE'}
+              >
+                Delete Account
+              </button>
+              <button 
                 className="btn-ghost" 
                 onClick={() => {
                   setShowDeleteConfirm(false);
@@ -1135,13 +1142,6 @@ const Profile = ({
                 }}
               >
                 Cancel
-              </button>
-              <button 
-                className="btn-danger" 
-                onClick={handleAccountDeletion}
-                disabled={deleteConfirmText !== 'DELETE'}
-              >
-                Delete Account
               </button>
             </div>
           </div>

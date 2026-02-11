@@ -649,8 +649,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             <h2>Reset Streak?</h2>
             <p className="modal-text">This will reset your current streak to 0. Your history and benefits data will be kept.</p>
             <div className="modal-buttons">
-              <button className="btn-ghost" onClick={() => setShowResetStreakModal(false)}>Cancel</button>
               <button className="btn-danger" onClick={confirmResetStreak}>Reset Streak</button>
+              <button className="btn-ghost" onClick={() => setShowResetStreakModal(false)}>Cancel</button>
             </div>
           </div>
         </div>
@@ -663,8 +663,8 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
             <h2>Reset All Data?</h2>
             <p className="modal-text">This will permanently delete all progress data including streaks, benefits, and milestones. This cannot be undone.</p>
             <div className="modal-buttons">
-              <button className="btn-ghost" onClick={() => setShowResetAllModal(false)}>Cancel</button>
               <button className="btn-danger" onClick={confirmResetAll}>Reset All</button>
+              <button className="btn-ghost" onClick={() => setShowResetAllModal(false)}>Cancel</button>
             </div>
           </div>
         </div>
