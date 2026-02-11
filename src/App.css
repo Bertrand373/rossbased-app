@@ -123,12 +123,25 @@ h4 { font-size: 0.875rem; }
   z-index: 9999;
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* When app is ready, fade out and remove from interaction */
+.app-loading-screen.app-loading-done {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .app-loading-icon {
   width: 64px;
   height: 64px;
-  opacity: 0.8;
+  animation: icon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes icon-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.95); }
 }
 
 @media (max-width: 480px) {

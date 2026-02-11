@@ -414,51 +414,57 @@ function App() {
   const currentTheme = localStorage.getItem('titantrack-theme') || 'dark';
   const loadingIcon = currentTheme === 'light' ? '/icon-192-black.png' : '/icon-192.png';
 
-  // Loading screen - icon only, no text
-  // Shows until BOTH data is loaded AND minimum display time has passed
-  if (isLoading || isRefreshLoading || !minLoadingComplete || (isLoggedIn && subLoading)) {
-    return (
-      <div className="app-loading-screen">
+  // App ready = all loading complete AND subscription status resolved
+  // Uses subscriptionStatus.reason instead of subLoading to avoid race conditions
+  // reason starts as 'loading' and only changes once when the real status arrives
+  const appReady = !isLoading && !isRefreshLoading && minLoadingComplete && 
+    (!isLoggedIn || subscriptionStatus.reason !== 'loading');
+
+  return (
+    <>
+      {/* Loading screen - ALWAYS in DOM, hidden via CSS class. 
+          Never unmounts = no animation restart = no jumps */}
+      <div className={`app-loading-screen ${appReady ? 'app-loading-done' : ''}`}>
         <img 
           src={loadingIcon}
           alt="" 
           className="app-loading-icon"
         />
       </div>
-    );
-  }
-
-  return (
-    <ThemeProvider>
-      <AppContent 
-        isLoggedIn={isLoggedIn}
-        userData={userData}
-        isPremium={isPremium}
-        updateUserData={updateUserData}
-        setGoal={setGoal}
-        cancelGoal={cancelGoal}
-        logout={logout}
-        handleLogin={handleLogin}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        shouldNavigateToTracker={shouldNavigateToTracker}
-        setShouldNavigateToTracker={setShouldNavigateToTracker}
-        showAIChat={showAIChat}
-        setShowAIChat={setShowAIChat}
-        isMobile={isMobile}
-        hasSubscription={hasSubscription}
-        isGrandfathered={isGrandfathered}
-        isTrial={isTrial}
-        trialDaysLeft={trialDaysLeft}
-        subLoading={subLoading}
-        hasUsedTrial={hasUsedTrial}
-        subscriptionStatus={subscriptionStatus}
-        startTrial={startTrial}
-        createCheckout={createCheckout}
-        openPortal={openPortal}
-        refreshSubscription={refreshSubscription}
-      />
-    </ThemeProvider>
+      
+      {appReady && (
+      <ThemeProvider>
+        <AppContent 
+          isLoggedIn={isLoggedIn}
+          userData={userData}
+          isPremium={isPremium}
+          updateUserData={updateUserData}
+          setGoal={setGoal}
+          cancelGoal={cancelGoal}
+          logout={logout}
+          handleLogin={handleLogin}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          shouldNavigateToTracker={shouldNavigateToTracker}
+          setShouldNavigateToTracker={setShouldNavigateToTracker}
+          showAIChat={showAIChat}
+          setShowAIChat={setShowAIChat}
+          isMobile={isMobile}
+          hasSubscription={hasSubscription}
+          isGrandfathered={isGrandfathered}
+          isTrial={isTrial}
+          trialDaysLeft={trialDaysLeft}
+          subLoading={subLoading}
+          hasUsedTrial={hasUsedTrial}
+          subscriptionStatus={subscriptionStatus}
+          startTrial={startTrial}
+          createCheckout={createCheckout}
+          openPortal={openPortal}
+          refreshSubscription={refreshSubscription}
+        />
+      </ThemeProvider>
+      )}
+    </>
   );
 }
 
