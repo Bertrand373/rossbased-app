@@ -149,6 +149,23 @@ h4 { font-size: 0.875rem; }
   }
 }
 
+/* Subscription status loading - prevents tracker flash before paywall */
+.sub-loading-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9000;
+  background: var(--background);
+}
+
+.sub-loading-icon {
+  width: 56px;
+  height: 56px;
+  animation: icon-pulse 2s ease-in-out infinite;
+}
+
 /* ============================================================
    HEADER
    ============================================================ */

@@ -570,6 +570,13 @@ function AppContent({
 
         {isLoggedIn ? (
           <>
+            {/* Loading overlay - covers everything while subscription status loads */}
+            {subLoading && (
+              <div className="sub-loading-screen">
+                <img src="/icon-192.png" alt="" className="sub-loading-icon" />
+              </div>
+            )}
+            
             {/* PAYWALL: Show if user has no active subscription */}
             {!subLoading && !hasSubscription && (
               <PaywallScreen 
