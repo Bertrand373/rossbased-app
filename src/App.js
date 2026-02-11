@@ -414,25 +414,30 @@ function App() {
   const currentTheme = localStorage.getItem('titantrack-theme') || 'dark';
   const loadingIcon = currentTheme === 'light' ? '/icon-192-black.png' : '/icon-192.png';
 
-  // App ready = all loading complete AND subscription status resolved
-  // Uses subscriptionStatus.reason instead of subLoading to avoid race conditions
-  // reason starts as 'loading' and only changes once when the real status arrives
+  // Detect auth callback — loading screen must stay up during entire OAuth flow
+  const isAuthCallback = window.location.pathname.startsWith('/auth/');
+
+  // App ready = everything resolved. One flag, one transition.
   const appReady = !isLoading && !isRefreshLoading && minLoadingComplete && 
-    (!isLoggedIn || subscriptionStatus.reason !== 'loading');
+    (!isLoggedIn || subscriptionStatus.reason !== 'loading') &&
+    !isAuthCallback;
+
+  // Remove index.html #initial-loader immediately — React takes over.
+  // One clean handoff at mount, then zero remounts, zero jumps after.
+  useEffect(() => {
+    const loader = document.getElementById('initial-loader');
+    if (loader && loader.parentNode) {
+      loader.parentNode.removeChild(loader);
+    }
+  }, []);
 
   return (
     <>
-      {/* Loading screen - ALWAYS in DOM, hidden via CSS class. 
-          Never unmounts = no animation restart = no jumps */}
+      {/* ONE loading screen. Always in DOM. Never remounts. CSS fade when ready. */}
       <div className={`app-loading-screen ${appReady ? 'app-loading-done' : ''}`}>
-        <img 
-          src={loadingIcon}
-          alt="" 
-          className="app-loading-icon"
-        />
+        <img src={loadingIcon} alt="" className="app-loading-icon" />
       </div>
-      
-      {appReady && (
+
       <ThemeProvider>
         <AppContent 
           isLoggedIn={isLoggedIn}
@@ -463,7 +468,6 @@ function App() {
           refreshSubscription={refreshSubscription}
         />
       </ThemeProvider>
-      )}
     </>
   );
 }

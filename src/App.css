@@ -107,7 +107,7 @@ h4 { font-size: 0.875rem; }
 }
 
 /* ============================================================
-   LOADING SCREEN
+   LOADING SCREEN — Persistent. Never unmounts. CSS toggles only.
    ============================================================ */
 
 .app-loading-screen {
@@ -123,19 +123,18 @@ h4 { font-size: 0.875rem; }
   z-index: 9999;
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
-  opacity: 1;
   transition: opacity 0.3s ease;
 }
 
-/* When app is ready, fade out and remove from interaction */
+/* Fade out when app is ready — pointer-events: none so content beneath is interactive */
 .app-loading-screen.app-loading-done {
   opacity: 0;
   pointer-events: none;
 }
 
 .app-loading-icon {
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   animation: icon-pulse 2s ease-in-out infinite;
 }
 
@@ -146,8 +145,8 @@ h4 { font-size: 0.875rem; }
 
 @media (max-width: 480px) {
   .app-loading-icon {
-    width: 56px;
-    height: 56px;
+    width: 40px;
+    height: 40px;
   }
 }
 
