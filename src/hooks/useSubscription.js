@@ -31,6 +31,11 @@ export const useSubscription = (isLoggedIn) => {
       return;
     }
     
+    // CRITICAL: Set loading TRUE before fetch starts
+    // Without this, login transition leaves subLoading=false
+    // and hasPremium=true (default), causing tracker flash
+    setIsLoading(true);
+    
     const token = localStorage.getItem('token');
     if (!token) {
       setIsLoading(false);
@@ -123,11 +128,14 @@ export const useSubscription = (isLoggedIn) => {
         throw new Error(error.error || 'Failed to create checkout');
       }
       
-      const { url } = await response.json();
+      const data = await response.json();
       
       // Redirect to Stripe Checkout
-      window.location.href = url;
-      return url;
+      if (data.url) {
+        window.location.href = data.url;
+      }
+      
+      return data;
     } catch (error) {
       console.error('Checkout error:', error);
       return null;
@@ -135,7 +143,7 @@ export const useSubscription = (isLoggedIn) => {
   }, []);
 
   // ============================================
-  // OPEN CUSTOMER PORTAL (manage billing)
+  // OPEN BILLING PORTAL
   // ============================================
   const openPortal = useCallback(async () => {
     const token = localStorage.getItem('token');
@@ -152,12 +160,16 @@ export const useSubscription = (isLoggedIn) => {
       
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to open portal');
+        throw new Error(error.error || 'Failed to open billing portal');
       }
       
-      const { url } = await response.json();
-      window.location.href = url;
-      return url;
+      const data = await response.json();
+      
+      if (data.url) {
+        window.location.href = data.url;
+      }
+      
+      return data;
     } catch (error) {
       console.error('Portal error:', error);
       return null;
@@ -165,11 +177,11 @@ export const useSubscription = (isLoggedIn) => {
   }, []);
 
   // ============================================
-  // LINK DISCORD (for grandfather claim)
+  // LINK DISCORD ACCOUNT
   // ============================================
   const linkDiscord = useCallback(async (code) => {
     const token = localStorage.getItem('token');
-    if (!token) return null;
+    if (!token) throw new Error('Not authenticated');
     
     try {
       const response = await fetch(`${API_URL}/api/discord/link`, {

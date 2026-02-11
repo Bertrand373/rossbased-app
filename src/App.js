@@ -570,19 +570,8 @@ function AppContent({
 
         {isLoggedIn ? (
           <>
-            {/* Discord link callback - must be available during paywall */}
-            <Routes>
-              <Route path="/auth/discord/link-callback" element={
-                <DiscordLinkCallback onLinkComplete={() => refreshSubscription()} />
-              } />
-            </Routes>
-            
-            {/* Gate ALL app content behind subscription check */}
-            {subLoading ? (
-              <div className="sub-loading-screen">
-                <img src="/icon-192.png" alt="" className="sub-loading-icon" />
-              </div>
-            ) : !hasSubscription ? (
+            {/* PAYWALL: Show if user has no active subscription */}
+            {!hasSubscription && (
               <PaywallScreen 
                 userData={userData}
                 subscriptionStatus={subscriptionStatus}
@@ -595,8 +584,8 @@ function AppContent({
                   window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=identify%20email`;
                 }}
               />
-            ) : (
-            <>
+            )}
+            
             <header className="app-header">
               <div className="logo-container">
                 <img src={trackerLogo} alt="TitanTrack" className="app-logo" />
@@ -681,12 +670,13 @@ function AppContent({
                   <Route path="/admin" element={
                     <AdminCockpit />
                   } />
+                  <Route path="/auth/discord/link-callback" element={
+                    <DiscordLinkCallback onLinkComplete={() => refreshSubscription()} />
+                  } />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </div>
             </main>
-            </>
-            )}
           </>
         ) : (
           <Routes>
