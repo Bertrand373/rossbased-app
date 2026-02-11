@@ -106,49 +106,8 @@ h4 { font-size: 0.875rem; }
   to { opacity: 1; }
 }
 
-/* ============================================================
-   LOADING SCREEN — Persistent. Never unmounts. CSS toggles only.
-   ============================================================ */
-
-.app-loading-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--background);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  transition: opacity 0.3s ease;
-}
-
-/* Fade out when app is ready — pointer-events: none so content beneath is interactive */
-.app-loading-screen.app-loading-done {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.app-loading-icon {
-  width: 48px;
-  height: 48px;
-  animation: icon-pulse 2s ease-in-out infinite;
-}
-
-@keyframes icon-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.95); }
-}
-
-@media (max-width: 480px) {
-  .app-loading-icon {
-    width: 40px;
-    height: 40px;
-  }
-}
+/* Loading screen is handled entirely by #initial-loader in index.html.
+   React controls its fade-out via App.js useEffect. */
 
 /* ============================================================
    HEADER

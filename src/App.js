@@ -410,11 +410,7 @@ function App() {
     return success;
   };
 
-  // Get current theme for loading screen icon
-  const currentTheme = localStorage.getItem('titantrack-theme') || 'dark';
-  const loadingIcon = currentTheme === 'light' ? '/icon-192-black.png' : '/icon-192.png';
-
-  // Detect auth callback — loading screen must stay up during entire OAuth flow
+  // Detect auth callback — loading must stay up during entire OAuth flow
   const isAuthCallback = window.location.pathname.startsWith('/auth/');
 
   // App ready = everything resolved. One flag, one transition.
@@ -422,53 +418,53 @@ function App() {
     (!isLoggedIn || subscriptionStatus.reason !== 'loading') &&
     !isAuthCallback;
 
-  // Remove index.html #initial-loader immediately — React takes over.
-  // One clean handoff at mount, then zero remounts, zero jumps after.
+  // Control the SINGLE loading icon — the one from index.html.
+  // React never renders its own. Zero handoffs. Zero animation phase mismatches.
   useEffect(() => {
     const loader = document.getElementById('initial-loader');
-    if (loader && loader.parentNode) {
-      loader.parentNode.removeChild(loader);
+    if (!loader) return;
+    
+    if (appReady) {
+      loader.style.transition = 'opacity 0.3s ease';
+      loader.style.opacity = '0';
+      loader.style.pointerEvents = 'none';
+      setTimeout(() => {
+        if (loader.parentNode) loader.parentNode.removeChild(loader);
+      }, 300);
     }
-  }, []);
+  }, [appReady]);
 
   return (
-    <>
-      {/* ONE loading screen. Always in DOM. Never remounts. CSS fade when ready. */}
-      <div className={`app-loading-screen ${appReady ? 'app-loading-done' : ''}`}>
-        <img src={loadingIcon} alt="" className="app-loading-icon" />
-      </div>
-
-      <ThemeProvider>
-        <AppContent 
-          isLoggedIn={isLoggedIn}
-          userData={userData}
-          isPremium={isPremium}
-          updateUserData={updateUserData}
-          setGoal={setGoal}
-          cancelGoal={cancelGoal}
-          logout={logout}
-          handleLogin={handleLogin}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          shouldNavigateToTracker={shouldNavigateToTracker}
-          setShouldNavigateToTracker={setShouldNavigateToTracker}
-          showAIChat={showAIChat}
-          setShowAIChat={setShowAIChat}
-          isMobile={isMobile}
-          hasSubscription={hasSubscription}
-          isGrandfathered={isGrandfathered}
-          isTrial={isTrial}
-          trialDaysLeft={trialDaysLeft}
-          subLoading={subLoading}
-          hasUsedTrial={hasUsedTrial}
-          subscriptionStatus={subscriptionStatus}
-          startTrial={startTrial}
-          createCheckout={createCheckout}
-          openPortal={openPortal}
-          refreshSubscription={refreshSubscription}
-        />
-      </ThemeProvider>
-    </>
+    <ThemeProvider>
+      <AppContent 
+        isLoggedIn={isLoggedIn}
+        userData={userData}
+        isPremium={isPremium}
+        updateUserData={updateUserData}
+        setGoal={setGoal}
+        cancelGoal={cancelGoal}
+        logout={logout}
+        handleLogin={handleLogin}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        shouldNavigateToTracker={shouldNavigateToTracker}
+        setShouldNavigateToTracker={setShouldNavigateToTracker}
+        showAIChat={showAIChat}
+        setShowAIChat={setShowAIChat}
+        isMobile={isMobile}
+        hasSubscription={hasSubscription}
+        isGrandfathered={isGrandfathered}
+        isTrial={isTrial}
+        trialDaysLeft={trialDaysLeft}
+        subLoading={subLoading}
+        hasUsedTrial={hasUsedTrial}
+        subscriptionStatus={subscriptionStatus}
+        startTrial={startTrial}
+        createCheckout={createCheckout}
+        openPortal={openPortal}
+        refreshSubscription={refreshSubscription}
+      />
+    </ThemeProvider>
   );
 }
 

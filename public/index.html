@@ -198,27 +198,9 @@
         }
       }, { passive: false });
       
-      // Loader removal
-      window.addEventListener('DOMContentLoaded', function() {
-        var loader = document.getElementById('initial-loader');
-        var root = document.getElementById('root');
-        
-        function checkForContent() {
-          if (root && root.children.length > 0) {
-            if (loader && loader.parentNode) {
-              loader.style.opacity = '0';
-              loader.style.transition = 'opacity 200ms ease';
-              setTimeout(function() {
-                if (loader.parentNode) loader.parentNode.removeChild(loader);
-              }, 200);
-            }
-          } else {
-            setTimeout(checkForContent, 10);
-          }
-        }
-        
-        checkForContent();
-      });
+      // Loader removal is handled by React (App.js useEffect)
+      // React fades out #initial-loader when app is fully ready
+      // (auth complete, subscription resolved, data loaded)
     </script>
   </body>
 </html>
