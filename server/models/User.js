@@ -39,6 +39,15 @@ const userSchema = new mongoose.Schema({
     mentalClarity: Number, 
     emotionalProcessing: Number 
   }],
+  emotionalLog: [{ 
+    date: Date, 
+    day: Number, 
+    phase: Number, 
+    anxiety: Number, 
+    mood: Number, 
+    clarity: Number, 
+    processing: Number 
+  }],
   streakHistory: [{ 
     id: Number, 
     start: Date, 
