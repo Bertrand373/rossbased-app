@@ -149,7 +149,7 @@ h4 { font-size: 0.875rem; }
   }
 }
 
-/* Subscription status loading - prevents tracker flash before paywall */
+/* Subscription status loading - blocks tracker from rendering */
 .sub-loading-screen {
   position: fixed;
   inset: 0;
@@ -157,7 +157,11 @@ h4 { font-size: 0.875rem; }
   align-items: center;
   justify-content: center;
   z-index: 9000;
-  background: var(--background);
+  background: #000000;
+}
+
+[data-theme="light"] .sub-loading-screen {
+  background: #ffffff;
 }
 
 .sub-loading-icon {

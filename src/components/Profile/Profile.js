@@ -727,14 +727,24 @@ const Profile = ({
               
               <div className="billing-status">
                 <span className="billing-label">Status</span>
-                <span className={`billing-value ${isGrandfathered || (isPremium && !isTrial) ? 'active' : isTrial ? 'trial' : 'inactive'}`}>
+                <span className={`billing-value ${
+                  isGrandfathered ? 'active' 
+                  : (subscriptionStatus?.subscription?.status === 'canceled' || subscriptionStatus?.subscription?.cancelAtPeriodEnd) ? 'inactive'
+                  : (isPremium && !isTrial) ? 'active' 
+                  : isTrial ? 'trial' 
+                  : 'inactive'
+                }`}>
                   {isGrandfathered 
                     ? 'Lifetime Access' 
                     : isTrial 
                       ? `Free Trial (${trialDaysLeft} day${trialDaysLeft !== 1 ? 's' : ''} left)`
-                      : isPremium 
-                        ? 'Premium' 
-                        : 'Inactive'
+                      : (subscriptionStatus?.subscription?.status === 'canceled' || subscriptionStatus?.subscription?.cancelAtPeriodEnd)
+                        ? `Cancels ${subscriptionStatus?.subscription?.currentPeriodEnd 
+                            ? new Date(subscriptionStatus.subscription.currentPeriodEnd).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                            : 'soon'}`
+                        : isPremium 
+                          ? 'Premium' 
+                          : 'Free'
                   }
                 </span>
               </div>
@@ -742,6 +752,12 @@ const Profile = ({
               {isGrandfathered && (
                 <div className="billing-note">
                   OG Discord member. Lifetime premium. No billing required.
+                </div>
+              )}
+
+              {(subscriptionStatus?.subscription?.status === 'canceled' || subscriptionStatus?.subscription?.cancelAtPeriodEnd) && isPremium && (
+                <div className="billing-note">
+                  You still have access until your billing period ends. Resubscribe anytime.
                 </div>
               )}
 
