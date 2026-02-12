@@ -161,6 +161,28 @@ const AIChat = ({ isLoggedIn, isOpen, onClose }) => {
       // Auto-detect user's timezone
       const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+      // Push latest ML risk snapshot to backend (for Oracle context)
+      try {
+        const riskData = localStorage.getItem('titantrack_ml_prediction');
+        if (riskData) {
+          const parsed = JSON.parse(riskData);
+          // Extract username from JWT token (guaranteed to exist since we already have token)
+          let username = null;
+          try { username = JSON.parse(atob(token.split('.')[1])).username; } catch (e) { /* silent */ }
+          if (username && parsed.riskScore !== undefined) {
+            fetch(`${API_URL}/api/user/${username}/ml-risk`, {
+              method: 'PUT',
+              headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                riskScore: parsed.riskScore,
+                riskLevel: parsed.riskLevel || 'unknown',
+                topFactors: parsed.topFactors || []
+              })
+            }).catch(() => {}); // Fire and forget
+          }
+        }
+      } catch (e) { /* silent */ }
+
       const response = await fetch(`${API_URL}/api/ai/chat/stream`, {
         method: 'POST',
         headers: {

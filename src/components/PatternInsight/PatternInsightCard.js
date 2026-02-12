@@ -59,6 +59,17 @@ const PatternInsightCard = ({ userData, onVisibilityChange }) => {
 
       const prediction = await mlPredictionService.predict(userData);
       
+      // Always save latest prediction to localStorage for Oracle context bridging (Layer 5)
+      // AIChat.js reads this before each Oracle call and pushes to backend
+      try {
+        localStorage.setItem('titantrack_ml_prediction', JSON.stringify({
+          riskScore: prediction.riskScore / 100, // Normalize to 0-1 for backend
+          riskLevel: prediction.riskScore >= 70 ? 'high' : prediction.riskScore >= 50 ? 'elevated' : prediction.riskScore >= 30 ? 'moderate' : 'low',
+          topFactors: Object.keys(prediction.factors || {}).slice(0, 5),
+          timestamp: Date.now()
+        }));
+      } catch (e) { /* silent */ }
+      
       // Show for elevated risk (50%+)
       if (prediction.riskScore < 50) {
         return;

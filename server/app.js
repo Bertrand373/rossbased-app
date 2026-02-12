@@ -24,6 +24,7 @@ const knowledgeRoutes = require('./routes/knowledgeRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const { initializeSchedulers } = require('./services/notificationScheduler');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
+const { getCommunityPulse } = require('./services/communityPulse');
 const stripeRoutes = require('./routes/stripeRoutes');
 const discordLinkRoutes = require('./routes/discordLink');
 const { expireStaleTrials, expireStaleCanceled } = require('./middleware/subscriptionMiddleware');
@@ -91,6 +92,83 @@ mongoose.connect(mongoUri, {
           console.error('Subscription cleanup error:', e);
         }
       }, 60 * 60 * 1000); // Every hour
+
+      // ============================================
+      // ORACLE OUTCOME MEASUREMENT (runs every 4 hours)
+      // Checks outcomes that are past their 48h measurement window
+      // ============================================
+      setInterval(async () => {
+        try {
+          const OracleOutcome = require('./models/OracleOutcome');
+          const pendingOutcomes = await OracleOutcome.find({
+            'outcome.measured': false,
+            measureAt: { $lte: new Date() }
+          }).limit(50); // Process 50 at a time
+
+          for (const outcome of pendingOutcomes) {
+            try {
+              const user = await User.findOne({ username: outcome.username });
+              if (!user) {
+                await OracleOutcome.deleteOne({ _id: outcome._id });
+                continue;
+              }
+
+              // Compute current streak
+              let currentStreak = user.currentStreak || 0;
+              if (user.startDate) {
+                const start = new Date(user.startDate);
+                start.setHours(0, 0, 0, 0);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                currentStreak = Math.max(1, Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1);
+              }
+
+              // Get current benefit levels
+              const currentBenefit = user.benefitTracking && user.benefitTracking.length > 0
+                ? [...user.benefitTracking].sort((a, b) => new Date(b.date) - new Date(a.date))[0]
+                : null;
+
+              // Check for urges in the measurement window
+              const urgesSinceThen = (user.urgeLog || []).filter(u => 
+                new Date(u.date) > outcome.createdAt
+              );
+              const hadUrge = urgesSinceThen.length > 0;
+              const overcameUrge = hadUrge ? urgesSinceThen.every(u => u.overcame) : null;
+
+              // Calculate benefit deltas
+              let benefitDelta = null;
+              if (currentBenefit && outcome.snapshot.benefitLevels) {
+                benefitDelta = {
+                  energy: (currentBenefit.energy || 0) - (outcome.snapshot.benefitLevels.energy || 0),
+                  focus: (currentBenefit.focus || 0) - (outcome.snapshot.benefitLevels.focus || 0),
+                  confidence: (currentBenefit.confidence || 0) - (outcome.snapshot.benefitLevels.confidence || 0)
+                };
+              }
+
+              // Save the measured outcome
+              outcome.outcome = {
+                measured: true,
+                measuredAt: new Date(),
+                streakDay: currentStreak,
+                streakMaintained: currentStreak >= outcome.snapshot.streakDay,
+                benefitDelta,
+                hadUrge,
+                overcameUrge
+              };
+              await outcome.save();
+
+            } catch (innerErr) {
+              console.error('Outcome measurement error for', outcome.username, innerErr.message);
+            }
+          }
+
+          if (pendingOutcomes.length > 0) {
+            console.log(`🔮 Measured ${pendingOutcomes.length} Oracle outcomes`);
+          }
+        } catch (err) {
+          console.error('Oracle outcome job error:', err.message);
+        }
+      }, 4 * 60 * 60 * 1000); // Every 4 hours
     } catch (error) {
       console.error('Failed to initialize schedulers:', error);
     }
@@ -750,6 +828,45 @@ function buildOracleContext(user, timezone) {
     }
   }
 
+  // --- ORACLE MEMORY (past conversation observations) ---
+  if (user.oracleNotes && user.oracleNotes.length > 0) {
+    const recentNotes = [...user.oracleNotes]
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, 10);
+    
+    if (recentNotes.length > 0) {
+      lines.push('');
+      lines.push('YOUR PAST OBSERVATIONS ABOUT THIS USER (from previous conversations):');
+      recentNotes.forEach(n => {
+        const daysAgo = Math.floor((new Date() - new Date(n.date)) / (1000 * 60 * 60 * 24));
+        const timeLabel = daysAgo === 0 ? 'today' : daysAgo === 1 ? 'yesterday' : `${daysAgo} days ago`;
+        const dayLabel = n.streakDay ? ` (Day ${n.streakDay})` : '';
+        lines.push(`- [${timeLabel}${dayLabel}] ${n.note}`);
+      });
+      lines.push('Use these observations naturally. Never say "according to my notes" or "I recall." Just know things and reference them when relevant.');
+    }
+  }
+
+  // --- OUTCOME PATTERNS (injected once sufficient data exists) ---
+  // TODO: Aggregate measured OracleOutcome documents to inject patterns like:
+  // "Users at your streak phase who dealt with urges via cold exposure: 82% maintained streak"
+  // Requires ~100+ measured outcomes to be statistically meaningful
+
+  // --- ML RISK PREDICTION ---
+  if (user.mlRiskSnapshot && user.mlRiskSnapshot.updatedAt) {
+    const hoursAgo = Math.floor((new Date() - new Date(user.mlRiskSnapshot.updatedAt)) / (1000 * 60 * 60));
+    if (hoursAgo < 24) { // Only inject if recent
+      const rs = user.mlRiskSnapshot;
+      lines.push(`ML relapse risk prediction (${hoursAgo}h ago): ${rs.riskLevel} (${Math.round((rs.riskScore || 0) * 100)}%).`);
+      if (rs.topFactors && rs.topFactors.length > 0) {
+        lines.push(`Top risk factors: ${rs.topFactors.join(', ')}.`);
+      }
+      if (rs.riskLevel === 'elevated' || rs.riskLevel === 'high') {
+        lines.push(`User may be in a vulnerable state. Be direct and grounding if they seem off.`);
+      }
+    }
+  }
+
   // --- USER GOAL ---
   if (user.goal && user.goal.targetDays) {
     const daysRemaining = user.goal.targetDays - streak;
@@ -810,6 +927,9 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
 
     // Build deep user context from their data
     const userContext = buildOracleContext(user, userTimezone);
+    
+    // Inject community pulse (async, cached — adds ~0ms after first fetch)
+    const communityPulse = await getCommunityPulse();
 
     const systemPrompt = `You are The Oracle, the AI guide within TitanTrack.
 
@@ -911,7 +1031,11 @@ When in doubt, shorter. Say what needs to be said. Stop.
 
     // RAG: Retrieve relevant knowledge
     const ragContext = await retrieveKnowledge(message, { limit: 5, maxTokens: 2000 });
-    const systemWithKnowledge = systemPrompt + ragContext;
+    // Inject community pulse between system prompt and RAG context
+    const communityContext = communityPulse 
+      ? `\n\nCOMMUNITY PULSE (what the broader TitanTrack community is experiencing right now):\n${communityPulse}\nUse this awareness naturally. You can reference community patterns when relevant ("you're not alone in this — several practitioners are hitting the same wall right now"). Never name specific members.\n`
+      : '';
+    const systemWithKnowledge = systemPrompt + communityContext + ragContext;
 
     // Set up SSE headers
     res.setHeader('Content-Type', 'text/event-stream');
@@ -929,8 +1053,11 @@ When in doubt, shorter. Say what needs to be said. Stop.
     // Small delay helper for natural pacing
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+    let fullResponse = '';
+
     for await (const event of stream) {
       if (event.type === 'content_block_delta' && event.delta?.text) {
+        fullResponse += event.delta.text;
         res.write(`data: ${JSON.stringify({ type: 'content', text: event.delta.text })}\n\n`);
         // Natural pacing - 35ms delay matches Claude's organic typing feel
         await delay(35);
@@ -949,6 +1076,153 @@ When in doubt, shorter. Say what needs to be said. Stop.
         }
       }
     );
+
+    // --- ORACLE MEMORY: Generate observation note (fire-and-forget) ---
+    // Uses Haiku for speed and cost. Runs async — does NOT block the user.
+    (async () => {
+      try {
+        // Skip very short messages (greetings, "thanks", etc.)
+        if (message.trim().split(/\s+/).length < 4) return;
+
+        const noteResponse = await anthropic.messages.create({
+          model: 'claude-3-5-haiku-20241022',
+          max_tokens: 150,
+          system: `You are generating a private observation note for an AI guide called "The Oracle." This note is for YOUR future reference only — the user will never see it.
+
+Write 1-2 sentences capturing:
+- What the user asked about or was struggling with
+- Any pattern you noticed (emotional state, recurring theme, mindset)
+- What guidance was given
+
+Be concise and factual. No fluff. Clinical shorthand.
+
+Examples:
+"User asked about flatline on day 34. Showed anxiety about loss of motivation. Guided toward understanding it as neural recalibration, not regression."
+"Asked about wet dream impact on streak. Second time asking about wet dreams. Reassured not a relapse, explained spermatogenesis cycle reset."
+"Venting about urges after seeing ex on social media. Emotional trigger, not physical. Recommended transmutation through cold exposure."`,
+          messages: [{
+            role: 'user',
+            content: `User message: "${message}"\n\nOracle response: "${fullResponse.substring(0, 500)}"\n\nUser is on Day ${user.currentStreak || 0}. Generate observation note.`
+          }]
+        });
+
+        const noteText = noteResponse.content[0]?.text?.trim();
+        if (!noteText || noteText.length < 10) return;
+
+        // Compute real-time streak for the note
+        let noteStreakDay = user.currentStreak || 0;
+        if (user.startDate) {
+          const start = new Date(user.startDate);
+          start.setHours(0, 0, 0, 0);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          noteStreakDay = Math.max(1, Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1);
+        }
+
+        // Save note, cap at 20 (single atomic MongoDB operation)
+        await User.findOneAndUpdate(
+          { username: req.user.username },
+          {
+            $push: {
+              oracleNotes: {
+                $each: [{ date: new Date(), streakDay: noteStreakDay, note: noteText }],
+                $sort: { date: -1 },
+                $slice: 20
+              }
+            }
+          }
+        );
+
+        console.log(`🔮 Oracle memory saved for ${req.user.username} (Day ${noteStreakDay})`);
+
+        // --- OUTCOME TRACKING: Snapshot user state for 48h comparison ---
+        const OracleOutcome = require('./models/OracleOutcome');
+        
+        // Get most recent benefit entry
+        const recentBenefit = user.benefitTracking && user.benefitTracking.length > 0
+          ? [...user.benefitTracking].sort((a, b) => new Date(b.date) - new Date(a.date))[0]
+          : null;
+        
+        // Get most recent urge
+        const recentUrge = user.urgeLog && user.urgeLog.length > 0
+          ? [...user.urgeLog].sort((a, b) => new Date(b.date) - new Date(a.date))[0]
+          : null;
+        const hadRecentUrge = recentUrge 
+          ? (new Date() - new Date(recentUrge.date)) < 48 * 60 * 60 * 1000
+          : false;
+
+        // Determine conversation topic from the note
+        const topicKeywords = ['flatline', 'urge', 'relapse', 'wet dream', 'transmutation', 
+          'meditation', 'energy', 'confidence', 'motivation', 'flatline', 'anxiety'];
+        const detectedTopic = topicKeywords.find(t => 
+          message.toLowerCase().includes(t) || noteText.toLowerCase().includes(t)
+        ) || 'general';
+
+        await OracleOutcome.create({
+          username: req.user.username,
+          snapshot: {
+            streakDay: noteStreakDay,
+            phase: noteStreakDay <= 14 ? 'adaptation' : noteStreakDay <= 45 ? 'processing' :
+                   noteStreakDay <= 90 ? 'expansion' : noteStreakDay <= 180 ? 'integration' : 'mastery',
+            benefitLevels: recentBenefit ? {
+              energy: recentBenefit.energy,
+              focus: recentBenefit.focus,
+              confidence: recentBenefit.confidence
+            } : null,
+            hadRecentUrge,
+            urgeIntensity: hadRecentUrge ? recentUrge.intensity : null,
+            topic: detectedTopic
+          },
+          oracleNote: noteText,
+          measureAt: new Date(Date.now() + 48 * 60 * 60 * 1000) // 48 hours from now
+        });
+
+        // --- KNOWLEDGE EVOLUTION: Distill strong Oracle responses ---
+        // Only for substantive responses on deep topics (100+ words)
+        const responseWordCount = fullResponse.trim().split(/\s+/).length;
+        const deepTopicKeywords = ['spermatogenesis', 'chrism', 'transmutation', 'kundalini',
+          'pineal', 'flatline', 'electromagnetic', 'ojas', 'jing', 'consciousness',
+          'meditation', 'breathwork', 'chakra', 'third eye'];
+        const isDeepTopic = deepTopicKeywords.some(k => 
+          fullResponse.toLowerCase().includes(k) || message.toLowerCase().includes(k)
+        );
+
+        if (responseWordCount >= 100 && isDeepTopic) {
+          try {
+            const KnowledgeChunk = require('./models/KnowledgeChunk');
+            const { randomUUID } = require('crypto');
+            
+            // Check we haven't already saved something very similar recently
+            const recentChunks = await KnowledgeChunk.find({
+              'source.type': 'text',
+              'source.name': 'oracle-generated',
+              createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
+            }).countDocuments();
+            
+            if (recentChunks < 5) { // Max 5 oracle-generated chunks per day
+              await KnowledgeChunk.create({
+                content: fullResponse.substring(0, 2000),
+                source: { type: 'text', name: 'oracle-generated' },
+                category: detectedTopic === 'transmutation' ? 'transmutation' :
+                         detectedTopic === 'energy' ? 'kundalini' : 'general',
+                chunkIndex: 0,
+                parentId: `oracle-${randomUUID()}`,
+                keywords: [detectedTopic, 'oracle-insight'],
+                tokenEstimate: Math.ceil(responseWordCount * 1.3),
+                enabled: true,
+                author: 'The Oracle'
+              });
+              console.log(`📚 Oracle knowledge chunk saved (${detectedTopic})`);
+            }
+          } catch (kbErr) {
+            console.error('Knowledge evolution error (non-blocking):', kbErr.message);
+          }
+        }
+
+      } catch (noteErr) {
+        console.error('Oracle memory note error (non-blocking):', noteErr.message);
+      }
+    })();
 
     // Calculate remaining
     let messagesRemaining;
@@ -1269,6 +1543,84 @@ app.post('/api/feedback', async (req, res) => {
   } else {
     console.error('❌ All Discord attempts failed:', result);
     res.status(500).json({ error: 'Failed to send feedback' });
+  }
+});
+
+// ============================================
+// ML RISK SNAPSHOT (Layer 5 — Predictive Bridging)
+// Save ML risk snapshot (called by frontend when prediction updates)
+// ============================================
+app.put('/api/user/:username/ml-risk', authenticate, async (req, res) => {
+  try {
+    const { riskScore, riskLevel, topFactors } = req.body;
+    await User.findOneAndUpdate(
+      { username: req.params.username },
+      { $set: { mlRiskSnapshot: { riskScore, riskLevel, topFactors, updatedAt: new Date() } } }
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to save risk snapshot' });
+  }
+});
+
+// ============================================
+// ORACLE VOICE REFINEMENT (Layer 6 — admin only)
+// Analyzes recent Oracle conversations to detect AI patterns
+// ============================================
+app.post('/api/admin/oracle-voice-review', authenticate, async (req, res) => {
+  // Admin check
+  if (req.user.username !== 'rossbased' && req.user.username !== 'ross') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+
+  try {
+    // Pull recent Oracle notes across all users (anonymized)
+    const usersWithNotes = await User.find(
+      { 'oracleNotes.0': { $exists: true } },
+      { oracleNotes: 1, _id: 0 }
+    ).limit(50).lean();
+
+    const allNotes = usersWithNotes
+      .flatMap(u => u.oracleNotes || [])
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, 100)
+      .map(n => n.note);
+
+    if (allNotes.length < 20) {
+      return res.json({ message: 'Need at least 20 Oracle notes for meaningful analysis', noteCount: allNotes.length });
+    }
+
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: `You are reviewing conversation summaries from an AI called "The Oracle" to identify moments where it fell into generic AI patterns. The Oracle should sound like a perceptive spiritual teacher — calm, direct, slightly unsettling in its accuracy. Never sycophantic, never generic.
+
+Analyze the patterns in these conversation summaries and identify:
+1. Repeated phrases or structures the Oracle uses too often
+2. Topics where the Oracle gives generic advice instead of personalized insight
+3. Moments where the Oracle sounds like a chatbot instead of a teacher
+4. Specific new anti-pattern rules that should be added to the system prompt
+
+Be brutally specific. Give exact phrases to ban and exact alternatives.`,
+      messages: [{
+        role: 'user',
+        content: `Here are ${allNotes.length} recent Oracle conversation summaries (anonymized):\n\n${allNotes.join('\n\n')}\n\nGenerate your voice refinement report.`
+      }]
+    });
+
+    const report = response.content[0].text;
+    
+    res.json({
+      noteCount: allNotes.length,
+      userCount: usersWithNotes.length,
+      report,
+      instruction: 'Review this report. Add any valuable anti-patterns to the Oracle system prompt manually.'
+    });
+
+    console.log(`🔮 Voice refinement report generated from ${allNotes.length} notes`);
+  } catch (err) {
+    console.error('Voice refinement error:', err);
+    res.status(500).json({ error: 'Failed to generate report' });
   }
 });
 

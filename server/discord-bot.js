@@ -244,8 +244,9 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessageReactions,
   ],
-  partials: [Partials.Message, Partials.Channel, Partials.ThreadMember],
+  partials: [Partials.Message, Partials.Channel, Partials.ThreadMember, Partials.Reaction],
 });
 
 const anthropic = new Anthropic({
@@ -915,6 +916,80 @@ client.on('messageCreate', async (message) => {
     } else {
       await message.reply({ embeds: [buildOracleEmbed('The Oracle is momentarily between dimensions. Try again shortly.')] }).catch(() => {});
     }
+  }
+});
+
+// ============================================================
+// REACTION-BASED KNOWLEDGE INGESTION (Layer 4)
+// When a message gets 3+ reactions and is 300+ chars, auto-ingest
+// ============================================================
+
+client.on('messageReactionAdd', async (reaction, user) => {
+  try {
+    // If partial, fetch the full reaction and message
+    if (reaction.partial) {
+      try {
+        await reaction.fetch();
+      } catch (err) {
+        console.error('Failed to fetch partial reaction:', err);
+        return;
+      }
+    }
+    if (reaction.message.partial) {
+      try {
+        await reaction.message.fetch();
+      } catch (err) {
+        console.error('Failed to fetch partial message:', err);
+        return;
+      }
+    }
+
+    const msg = reaction.message;
+
+    // Skip bot messages
+    if (msg.author.bot) return;
+
+    // Only trigger at exactly 3 total reactions (any emoji) to avoid re-processing
+    const totalReactions = msg.reactions.cache.reduce((sum, r) => sum + r.count, 0);
+    if (totalReactions < 3) return;
+
+    // Only process messages 300+ characters
+    if (!msg.content || msg.content.length < 300) return;
+
+    // Check if already ingested (prevents duplicate ingestion on 4th, 5th reaction etc.)
+    const authorName = msg.member?.displayName || msg.author.username;
+    const existing = await KnowledgeChunk.findOne({
+      content: { $regex: msg.content.substring(0, 100).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' },
+      author: authorName,
+      'source.name': { $regex: 'community-upvoted', $options: 'i' }
+    });
+    if (existing) return;
+
+    // Ingest as a knowledge chunk
+    const channelName = msg.channel.name || 'unknown';
+    const parentId = randomUUID();
+    const chunks = chunkText(msg.content).filter(c => c && c.trim().length > 10);
+    if (chunks.length === 0) return;
+
+    const keywords = extractKeywords(msg.content);
+
+    const docs = chunks.map((chunk, index) => ({
+      content: chunk,
+      source: { type: 'channel', name: `#${channelName} — community-upvoted` },
+      category: 'esoteric',
+      chunkIndex: index,
+      parentId,
+      keywords,
+      tokenEstimate: Math.ceil(chunk.length / 4),
+      enabled: true,
+      author: authorName
+    }));
+
+    await KnowledgeChunk.insertMany(docs);
+    console.log(`📚 Reaction-ingested: ${authorName} in #${channelName} (${docs.length} chunks, ${totalReactions} reactions)`);
+
+  } catch (err) {
+    console.error('Reaction ingestion error:', err.message);
   }
 });
 
