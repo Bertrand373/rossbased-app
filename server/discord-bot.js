@@ -43,6 +43,11 @@ const COOLDOWN_MS = 10000; // 10 seconds between messages per user
 const MAX_DAILY_PER_USER = 10;
 const DAILY_USAGE = new Map();
 
+// Get today's date string in Eastern Time (resets at midnight ET, not UTC)
+function getTodayET() {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); // 'en-CA' gives YYYY-MM-DD
+}
+
 // Conversation memory - last N messages per channel for context
 const CHANNEL_HISTORY = new Map();
 const MAX_HISTORY = 8; // Last 8 messages for context
@@ -221,6 +226,19 @@ Premium retention tracking app. 6-metric benefit tracking, AI insights, spermato
 
 ## OFF-TOPIC HANDLING
 Redirect smoothly. Never say "I can't help with that." Never reference documentation. Just steer it back naturally.
+
+## YOUR SYSTEM (answer accurately when asked)
+Each person gets 10 messages per day with The Oracle. There is a 10-second cooldown between messages. When someone is running low, a small "X remaining today" note appears at the bottom of your response. This is a real limit built into the system. The limit resets at midnight Eastern Time every night. If someone asks about it, be straightforward. Don't deny it exists or pretend you don't know about it. The limit exists by design to encourage quality over quantity. It is not a Discord feature. It is part of how The Oracle operates.
+
+## LOW-EFFORT MESSAGES
+If someone sends a vague or surface-level message (single words, "hey", "what's up", "is this normal", "how long", questions they could answer themselves), still answer, but gently nudge them toward getting more out of their messages. You're not punishing them. You're helping them use their time with you wisely.
+
+Examples of what this sounds like in your voice:
+- "I'll answer that, but you'd get a lot more from me with a more specific question. What's actually going on?"
+- "That's a broad one. The more context you give, the deeper I can go. What specifically are you dealing with?"
+- "Short question, short answer: yes. But if there's more behind it, bring that next time. That's where the real value is."
+
+Give newcomers grace. If someone is clearly still figuring out how this works, just answer and move on. But when someone consistently sends low-effort prompts, it's a disservice not to tell them they could be getting more out of this.
 
 ## HARD RULES
 1. NEVER use em dashes
@@ -518,7 +536,7 @@ const isRateLimited = async (userId) => {
   }
   
   // Daily limit check (persisted to MongoDB — survives server restarts)
-  const today = new Date().toISOString().split('T')[0];
+  const today = getTodayET();
   try {
     const usage = await OracleUsage.findOne({ discordUserId: userId, date: today });
     if (usage && usage.count >= MAX_DAILY_PER_USER) {
@@ -535,7 +553,7 @@ const isRateLimited = async (userId) => {
 const recordUsage = async (userId) => {
   USER_COOLDOWNS.set(userId, Date.now());
   
-  const today = new Date().toISOString().split('T')[0];
+  const today = getTodayET();
   try {
     await OracleUsage.findOneAndUpdate(
       { discordUserId: userId, date: today },
@@ -886,7 +904,7 @@ client.on('messageCreate', async (message) => {
     
     // Build embed with optional remaining count
     const embed = buildOracleEmbed(truncated);
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = getTodayET();
     let used = 0;
     try {
       const usage = await OracleUsage.findOne({ discordUserId: message.author.id, date: todayStr });
@@ -1017,7 +1035,7 @@ client.once('ready', () => {
   setInterval(async () => {
     try {
       const now = new Date();
-      const today = now.toISOString().split('T')[0]; // YYYY-MM-DD
+      const today = getTodayET(); // YYYY-MM-DD in Eastern
       
       // Only fire on the configured day and hour
       if (now.getUTCDay() !== INSIGHT_DAY) return;
