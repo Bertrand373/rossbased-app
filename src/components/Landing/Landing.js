@@ -1,17 +1,37 @@
 // Landing.js - TITANTRACK MODERN MINIMAL
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Landing.css';
 import AuthModal from '../Auth/AuthModal';
 import trackerLogo from '../../assets/trackerapplogo-white.png';
 
 const Landing = ({ onLogin }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const featuresRef = useRef(null);
 
   const handleLoginSuccess = async (username, password, isGoogleAuth) => {
     const result = await onLogin(username, password, isGoogleAuth);
     if (!result) setShowAuthModal(false);
     return result;
   };
+
+  // Scroll-triggered stagger animation for features
+  useEffect(() => {
+    const section = featuresRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          section.classList.add('landing-features-visible');
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="landing">
@@ -43,28 +63,10 @@ const Landing = ({ onLogin }) => {
         </button>
         
         <p className="landing-trial-note">7 days free. No credit card.</p>
-        
-        {/* Stats - meaningful to the practitioner */}
-        <div className="landing-stats">
-          <div className="landing-stat">
-            <span className="landing-stat-value">On-device AI</span>
-            <span className="landing-stat-label">Your patterns never leave your phone</span>
-          </div>
-          <div className="landing-stat-divider" />
-          <div className="landing-stat">
-            <span className="landing-stat-value">6 metrics</span>
-            <span className="landing-stat-label">Track what retention actually changes</span>
-          </div>
-          <div className="landing-stat-divider" />
-          <div className="landing-stat">
-            <span className="landing-stat-value">Prediction</span>
-            <span className="landing-stat-label">Know your risk before urges hit</span>
-          </div>
-        </div>
       </main>
       
-      {/* Features - why this exists */}
-      <section className="landing-features">
+      {/* Features - scroll-triggered stagger */}
+      <section className="landing-features" ref={featuresRef}>
         <div className="landing-feature">
           <div className="landing-feature-number">01</div>
           <div className="landing-feature-content">
@@ -86,6 +88,14 @@ const Landing = ({ onLogin }) => {
           <div className="landing-feature-content">
             <h3>Crisis tools</h3>
             <p>Breathing protocols and intervention techniques for when it matters most.</p>
+          </div>
+        </div>
+        
+        <div className="landing-feature">
+          <div className="landing-feature-number">04</div>
+          <div className="landing-feature-content">
+            <h3>Private by design</h3>
+            <p>ML runs on your device. Your data never touches our servers.</p>
           </div>
         </div>
       </section>

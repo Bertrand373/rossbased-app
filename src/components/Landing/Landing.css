@@ -84,60 +84,33 @@
   transform: translateY(0);
 }
 
-/* Stats section */
-.landing-stats {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-  margin-top: 64px;
-  padding-top: 32px;
-}
-
-.landing-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.landing-stat-value {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #ffffff;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-.landing-stat-label {
-  font-size: 0.75rem;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.4);
-  letter-spacing: 0.02em;
-}
-
-.landing-stat-divider {
-  width: 1px;
-  height: 32px;
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
 /* Features section */
 .landing-features {
   display: flex;
   justify-content: center;
-  gap: 64px;
-  padding: 48px 24px;
+  gap: 48px;
+  padding: 64px 24px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   position: relative;
   z-index: 1;
 }
 
+/* Individual features - hidden until scroll triggers */
 .landing-feature {
   display: flex;
   align-items: flex-start;
   gap: 16px;
   max-width: 200px;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 500ms ease, transform 500ms ease;
 }
+
+/* Stagger delays — triggered by parent class */
+.landing-features-visible .landing-feature:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0ms; }
+.landing-features-visible .landing-feature:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 150ms; }
+.landing-features-visible .landing-feature:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 300ms; }
+.landing-features-visible .landing-feature:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 450ms; }
 
 .landing-feature-number {
   font-size: 0.75rem;
@@ -243,15 +216,19 @@
 /* Tablet */
 @media (max-width: 1024px) {
   .landing-features {
-    gap: 48px;
+    gap: 32px;
+    flex-wrap: wrap;
+    max-width: 600px;
+    margin: 0 auto;
   }
   
   .landing-feature {
-    max-width: 180px;
+    max-width: 220px;
+    flex: 1 1 40%;
   }
 }
 
-/* Mobile - flex: 0.5 reduces the expanding gap */
+/* Mobile */
 @media (max-width: 768px) {
   .landing-main {
     flex: none;
@@ -280,25 +257,6 @@
     max-width: 280px;
   }
   
-  .landing-stats {
-    gap: 24px;
-    margin-top: 40px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  
-  .landing-stat-value {
-    font-size: 0.8125rem;
-  }
-  
-  .landing-stat-label {
-    font-size: 0.6875rem;
-  }
-  
-  .landing-stat-divider {
-    height: 24px;
-  }
-  
   .landing-features {
     flex-direction: column;
     gap: 24px;
@@ -309,6 +267,7 @@
   .landing-feature {
     max-width: 280px;
     width: 100%;
+    flex: none;
   }
   
   .landing-feature-content h3 {
@@ -349,19 +308,6 @@
     border-radius: 6px;
   }
   
-  .landing-stats {
-    gap: 16px;
-    margin-top: 32px;
-  }
-  
-  .landing-stat-divider {
-    display: none;
-  }
-  
-  .landing-stat {
-    min-width: 80px;
-  }
-  
   .landing-features {
     gap: 20px;
     padding: 24px 20px;
@@ -393,13 +339,9 @@
     padding: 12px 24px;
     font-size: 0.8125rem;
   }
-  
-  .landing-stats {
-    margin-top: 28px;
-  }
 }
 
-/* Landscape mobile - prevent awkward layout */
+/* Landscape mobile */
 @media (max-height: 600px) and (orientation: landscape) {
   .landing-main {
     flex: none;
@@ -413,10 +355,6 @@
   
   .landing-tagline {
     margin-bottom: 24px;
-  }
-  
-  .landing-stats {
-    margin-top: 32px;
   }
   
   .landing-features {
@@ -451,16 +389,6 @@
   opacity: 0;
 }
 
-.landing-stats {
-  animation: fadeInUp 600ms ease 300ms forwards;
-  opacity: 0;
-}
-
-.landing-features {
-  animation: fadeInUp 600ms ease 400ms forwards;
-  opacity: 0;
-}
-
 .landing-trial-note {
   animation: fadeInUp 600ms ease 250ms forwards;
   opacity: 0;
@@ -481,12 +409,16 @@
   .landing-logo-container,
   .landing-tagline,
   .landing-cta,
-  .landing-stats,
-  .landing-features,
   .landing-trial-note,
   .landing-pricing,
   .landing-footer {
     animation: none;
     opacity: 1;
+  }
+  
+  .landing-feature {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
