@@ -513,11 +513,19 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         </div>
 
         {/* Average display - Hero number like Tracker */}
-        <div className="average-block">
-          <span className="average-num">{calculateAverage(safeUserData, selectedMetric, timeRange, isPremium)}</span>
-          <span className="average-suffix">/10</span>
-        </div>
-        <p className="average-label">{selectedMetric} {getTimeRangeDisplayText(timeRange)}</p>
+        {(() => {
+          const avg = calculateAverage(safeUserData, selectedMetric, timeRange, isPremium);
+          const hasValue = avg !== 'N/A';
+          return (
+            <>
+              <div className="average-block">
+                <span className="average-num">{hasValue ? avg : '—'}</span>
+                {hasValue && <span className="average-suffix">/10</span>}
+              </div>
+              <p className="average-label">{selectedMetric} {getTimeRangeDisplayText(timeRange)}</p>
+            </>
+          );
+        })()}
 
         {/* Chart */}
         <div className="chart-box">

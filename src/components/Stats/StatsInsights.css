@@ -409,7 +409,7 @@
   padding: 16px;
   background: transparent;
   border: none;
-  border-radius: 0;
+  border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all 150ms ease;
   -webkit-tap-highlight-color: transparent;

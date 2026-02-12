@@ -1399,7 +1399,7 @@
 }
 
 .billing-value.active {
-  color: #22c55e;
+  color: var(--status-current);
 }
 
 .billing-value.trial {
