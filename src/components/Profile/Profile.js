@@ -596,15 +596,37 @@ const Profile = ({
             </div>
 
             <div className="form-group">
-              <label>Discord Username</label>
-              <input
-                type="text"
-                value={discordUsername}
-                onChange={(e) => setDiscordUsername(e.target.value)}
-                disabled={!isEditingProfile}
-                placeholder="@username"
-              />
-              <span className="form-hint">Found in Discord → Settings → username</span>
+              <label>Discord</label>
+              {userData?.discordId ? (
+                <div className="discord-linked-row">
+                  <span className="discord-linked-name">@{userData.discordUsername || userData.discordDisplayName || 'Connected'}</span>
+                  <span className="discord-linked-badge">✓ Linked</span>
+                </div>
+              ) : (
+                <>
+                  <input
+                    type="text"
+                    value={discordUsername}
+                    onChange={(e) => setDiscordUsername(e.target.value)}
+                    disabled={!isEditingProfile}
+                    placeholder="@username"
+                  />
+                  <button 
+                    type="button"
+                    className="discord-link-btn"
+                    onClick={() => {
+                      const clientId = process.env.REACT_APP_DISCORD_CLIENT_ID;
+                      const redirectUri = encodeURIComponent(
+                        window.location.origin + '/auth/discord/link-callback'
+                      );
+                      window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=identify%20email`;
+                    }}
+                  >
+                    Link Discord Account
+                  </button>
+                  <span className="form-hint">Link your Discord to verify founder status for lifetime access</span>
+                </>
+              )}
             </div>
 
             <div className="form-group">
