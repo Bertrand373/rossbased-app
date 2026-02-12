@@ -22,11 +22,14 @@ const Landing = ({ onLogin }) => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          section.classList.add('landing-features-visible');
+          // Delay so page entrance animations finish first
+          setTimeout(() => {
+            section.classList.add('landing-features-visible');
+          }, 400);
           observer.disconnect();
         }
       },
-      { threshold: 0.15 }
+      { threshold: 0.1 }
     );
 
     observer.observe(section);
@@ -59,7 +62,7 @@ const Landing = ({ onLogin }) => {
           className="landing-cta"
           onClick={() => setShowAuthModal(true)}
         >
-          Start Free Trial
+          Get Started
         </button>
         
         <p className="landing-trial-note">7 days free. No credit card.</p>

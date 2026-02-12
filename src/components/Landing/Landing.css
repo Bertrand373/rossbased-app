@@ -103,14 +103,14 @@
   max-width: 200px;
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity 500ms ease, transform 500ms ease;
+  transition: opacity 600ms ease, transform 600ms ease;
 }
 
 /* Stagger delays — triggered by parent class */
 .landing-features-visible .landing-feature:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0ms; }
-.landing-features-visible .landing-feature:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 150ms; }
-.landing-features-visible .landing-feature:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 300ms; }
-.landing-features-visible .landing-feature:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 450ms; }
+.landing-features-visible .landing-feature:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 200ms; }
+.landing-features-visible .landing-feature:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 400ms; }
+.landing-features-visible .landing-feature:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 600ms; }
 
 .landing-feature-number {
   font-size: 0.75rem;
