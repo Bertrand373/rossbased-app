@@ -153,17 +153,9 @@ const DiscordCallback = ({ onLogin }) => {
     );
   }
 
-  // Loading state - Icon only, identical to main app loading screen
-  return (
-    <div style={styles.container}>
-      <img 
-        src={iconSrc} 
-        alt="" 
-        style={styles.icon}
-      />
-      <style>{keyframes}</style>
-    </div>
-  );
+  // Loading state - invisible. The index.html #initial-loader handles the visible icon.
+  // Rendering our own icon here causes two overlapping pulse animations out of phase.
+  return null;
 };
 
 // Keyframes matching App.css exactly
