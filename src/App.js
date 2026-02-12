@@ -543,9 +543,7 @@ function AppContent({
         toastOptions={{
           duration: 2500,
           style: {
-            background: 'rgba(255, 255, 255, 0.06)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
+            background: '#1a1a1a',
             border: '1px solid rgba(255, 255, 255, 0.08)',
             borderRadius: '12px',
             color: '#ffffff',
@@ -562,8 +560,8 @@ function AppContent({
           error: {
             duration: 3500,
             style: {
-              background: 'rgba(255, 59, 48, 0.08)',
-              border: '1px solid rgba(255, 59, 48, 0.12)',
+              background: '#1a1a1a',
+              border: '1px solid rgba(255, 59, 48, 0.15)',
             },
             icon: <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ff3b30', flexShrink: 0 }} />,
           },

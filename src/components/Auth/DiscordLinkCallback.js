@@ -2,7 +2,7 @@
 // Handles the OAuth redirect when a user links their Discord from Profile
 // Sends the code to /api/discord/link and refreshes subscription state
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
@@ -12,13 +12,18 @@ const DiscordLinkCallback = ({ onLinkComplete }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState('processing');
+  const hasAttempted = useRef(false); // Prevent double-fire from StrictMode
   
   useEffect(() => {
+    // Guard: only run once
+    if (hasAttempted.current) return;
+    hasAttempted.current = true;
+    
     const code = searchParams.get('code');
     
     if (!code) {
       setStatus('error');
-      toast.error('Discord linking failed - no code received');
+      toast.error('Discord linking failed — no code received');
       setTimeout(() => navigate('/profile', { replace: true }), 1500);
       return;
     }
@@ -64,12 +69,13 @@ const DiscordLinkCallback = ({ onLinkComplete }) => {
         console.error('Discord link error:', error);
         setStatus('error');
         toast.error(error.message || 'Failed to link Discord');
+        // Always redirect back to profile on error — don't leave user stuck
         setTimeout(() => navigate('/profile', { replace: true }), 2000);
       }
     };
     
     linkDiscord();
-  }, [searchParams, navigate, onLinkComplete]);
+  }, []); // Empty deps — runs once, guarded by ref
   
   // Simple loading state - uses existing app loading pattern
   const currentTheme = localStorage.getItem('titantrack-theme') || 'dark';
