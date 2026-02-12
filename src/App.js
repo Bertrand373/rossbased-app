@@ -156,6 +156,17 @@ const HeaderNavigation = () => {
   );
 };
 
+// Oracle floating button - hidden on admin and when chat is open
+const OracleButton = ({ showAIChat, setShowAIChat }) => {
+  const location = useLocation();
+  if (showAIChat || location.pathname === '/admin') return null;
+  return (
+    <button className="oracle-float-btn" onClick={() => setShowAIChat(true)} aria-label="Open The Oracle">
+      <img src="/The_Oracle.png" alt="" />
+    </button>
+  );
+};
+
 // Static view controller - prevents scroll on fixed-content views
 const StaticViewManager = () => {
   const location = useLocation();
@@ -619,12 +630,8 @@ function AppContent({
               suppress={!hasSubscription || subLoading}
             />
             
-            {/* Floating Oracle Eye - Bottom right above nav */}
-            {!showAIChat && (
-              <button className="oracle-float-btn" onClick={() => setShowAIChat(true)} aria-label="Open The Oracle">
-                <img src="/The_Oracle.png" alt="" />
-              </button>
-            )}
+            {/* Floating Oracle Eye - hidden on admin */}
+            <OracleButton showAIChat={showAIChat} setShowAIChat={setShowAIChat} />
             
             {/* AI Chat - Now triggered by floating Oracle eye */}
             <AIChat 

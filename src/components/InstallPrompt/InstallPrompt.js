@@ -215,12 +215,16 @@ const InstallPrompt = ({
   const platformLabel = platformInfo.platform === 'ios' ? 'Safari' : 
                         platformInfo.platform === 'android' ? 'Chrome' : 'Browser';
   
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+  const appIcon = currentTheme === 'light' ? '/icon-192-black.png' : '/icon-192.png';
+  
   return (
     <div className="install-overlay" onClick={handleClose}>
       <div className="install-modal" onClick={e => e.stopPropagation()}>
         
         {/* Header */}
         <div className="install-header">
+          <img src={appIcon} alt="" className="install-app-icon" />
           <h2>Install TitanTrack</h2>
           <p>Add to your home screen for the full experience</p>
         </div>
