@@ -123,7 +123,7 @@ const PaywallScreen = ({
         {/* Discord grandfather prompt */}
         {!hasDiscord && (
           <div className="paywall-discord">
-            <p>Were you in our Discord before Feb 17?</p>
+            <p>Were you in our Discord before Feb 17, 2026?</p>
             <button 
               className="paywall-discord-link"
               onClick={onLinkDiscord}
