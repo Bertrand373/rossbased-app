@@ -897,11 +897,10 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         week.push(
           <div key={i} className={cellClasses} onClick={() => openDayInfo(currentDay)}>
             <span className="day-number">{format(currentDay, 'd')}</span>
-            {/* Data indicators - top right: dash = benefits, dot = journal */}
-            <div className="day-data-indicators">
-              {dayTracking.hasBenefits && <span className="day-benefits-dash"></span>}
-              {dayTracking.hasJournal && <span className="day-journal-dot"></span>}
-            </div>
+            {/* Data indicator - single dash if day has any tracked data */}
+            {(dayTracking.hasBenefits || dayTracking.hasJournal) && (
+              <span className="day-data-dash"></span>
+            )}
             {/* Moon phase indicator - only on significant phases */}
             {isMoonDay && (
               <span 
@@ -979,10 +978,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           
           {/* Bottom indicators */}
           <div className="week-day-indicators">
-            {/* Data indicators: dash = benefits, dot = journal */}
+            {/* Data indicator - single dash if day has any tracked data */}
             <div className="week-data-indicators">
-              {dayTracking.hasBenefits && <span className="week-benefits-dash"></span>}
-              {dayTracking.hasJournal && <span className="week-journal-dot"></span>}
+              {(dayTracking.hasBenefits || dayTracking.hasJournal) && (
+                <span className="week-data-dash"></span>
+              )}
             </div>
             {/* Status indicator */}
             <div className="week-status-indicator">
@@ -1054,12 +1054,8 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
           <span>Wet Dream</span>
         </div>
         <div className="legend-item">
-          <span className="legend-indicator benefits"></span>
-          <span>Benefits</span>
-        </div>
-        <div className="legend-item">
-          <span className="legend-indicator journal"></span>
-          <span>Journal</span>
+          <span className="legend-indicator tracked"></span>
+          <span>Tracked</span>
         </div>
       </div>
 

@@ -189,24 +189,14 @@
 .calendar-legend-minimal .legend-dot.relapse { background-color: var(--status-relapse); }
 .calendar-legend-minimal .legend-dot.wet-dream { background-color: var(--status-wetdream); }
 
-/* Legend data indicators - match day cell shapes */
-.calendar-legend-minimal .legend-indicator {
-  flex-shrink: 0;
-  opacity: 0.7;
-}
-
-.calendar-legend-minimal .legend-indicator.benefits {
+/* Legend data indicator - single tracked dash */
+.calendar-legend-minimal .legend-indicator.tracked {
   width: 10px;
   height: 3px;
   background: var(--text);
   border-radius: 1.5px;
-}
-
-.calendar-legend-minimal .legend-indicator.journal {
-  width: 5px;
-  height: 5px;
-  background: var(--text);
-  border-radius: 50%;
+  flex-shrink: 0;
+  opacity: 0.5;
 }
 
 /* =============================================================================
@@ -391,32 +381,18 @@
 }
 
 /* =============================================================================
-   DATA INDICATORS - Top right: dash = benefits, dot = journal
+   DATA INDICATOR - Single dash for tracked data (benefits or journal)
    ============================================================================= */
 
-.day-data-indicators {
+.day-data-dash {
   position: absolute;
   top: 4px;
   right: 4px;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-
-.day-benefits-dash {
   width: 8px;
   height: 3px;
   background: var(--text);
   border-radius: 1.5px;
-  opacity: 0.6;
-}
-
-.day-journal-dot {
-  width: 4px;
-  height: 4px;
-  background: var(--text);
-  border-radius: 50%;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 /* Hide old indicator styles */
@@ -692,26 +668,17 @@
   border-top: 1px solid var(--border-subtle);
 }
 
-/* Week data indicators - dash = benefits, dot = journal */
+/* Week data indicator - single dash for tracked data */
 .week-data-indicators {
   display: flex;
   align-items: center;
-  gap: 6px;
 }
 
-.week-benefits-dash {
+.week-data-dash {
   width: 10px;
   height: 3px;
   background: var(--text);
   border-radius: 1.5px;
-  opacity: 0.5;
-}
-
-.week-journal-dot {
-  width: 5px;
-  height: 5px;
-  background: var(--text);
-  border-radius: 50%;
   opacity: 0.5;
 }
 
@@ -762,8 +729,9 @@
   .week-day-cell.relapse::after,
   .week-day-cell.wet-dream::after {
     top: 4px;
-    left: 50%;
-    transform: translateX(-50%);
+    right: 16px;
+    left: auto;
+    transform: none;
     width: 80px;
     height: 3px;
   }
@@ -809,14 +777,9 @@
     align-items: center;
   }
   
-  .week-benefits-dash {
+  .week-data-dash {
     width: 8px;
     height: 2px;
-  }
-  
-  .week-journal-dot {
-    width: 4px;
-    height: 4px;
   }
   
   .week-status-indicator {
@@ -892,14 +855,9 @@
     height: 2px;
   }
   
-  .calendar-legend-minimal .legend-indicator.benefits {
+  .calendar-legend-minimal .legend-indicator.tracked {
     width: 8px;
     height: 2px;
-  }
-  
-  .calendar-legend-minimal .legend-indicator.journal {
-    width: 4px;
-    height: 4px;
   }
   
   /* Calendar grid - maximum width usage */
@@ -942,20 +900,11 @@
     top: 2px;
   }
   
-  .day-data-indicators {
+  .day-data-dash {
     top: 2px;
     right: 2px;
-    gap: 2px;
-  }
-  
-  .day-benefits-dash {
     width: 6px;
     height: 2px;
-  }
-  
-  .day-journal-dot {
-    width: 3px;
-    height: 3px;
   }
   
   /* Moon indicator mobile adjustments */
@@ -990,8 +939,9 @@
   .week-day-cell.relapse::after,
   .week-day-cell.wet-dream::after {
     top: 4px;
-    left: 50%;
-    transform: translateX(-50%);
+    right: 16px;
+    left: auto;
+    transform: none;
     width: 70px;
     height: 2px;
   }
@@ -1028,14 +978,9 @@
     min-width: 38px;
   }
   
-  .week-benefits-dash {
+  .week-data-dash {
     width: 7px;
     height: 2px;
-  }
-  
-  .week-journal-dot {
-    width: 3px;
-    height: 3px;
   }
   
   .week-status-dot {
@@ -1147,14 +1092,9 @@
     height: 3px;
   }
   
-  .calendar-legend-minimal .legend-indicator.benefits {
+  .calendar-legend-minimal .legend-indicator.tracked {
     width: 12px;
     height: 3px;
-  }
-  
-  .calendar-legend-minimal .legend-indicator.journal {
-    width: 6px;
-    height: 6px;
   }
   
   /* Month view - larger cells on desktop */
@@ -1193,20 +1133,11 @@
     top: 8px;
   }
   
-  .day-data-indicators {
+  .day-data-dash {
     top: 8px;
     right: 8px;
-    gap: 4px;
-  }
-  
-  .day-benefits-dash {
     width: 10px;
     height: 3px;
-  }
-  
-  .day-journal-dot {
-    width: 5px;
-    height: 5px;
   }
   
   /* Moon indicator desktop */
@@ -1286,14 +1217,9 @@
     padding-top: 14px;
   }
   
-  .week-benefits-dash {
+  .week-data-dash {
     width: 12px;
     height: 3px;
-  }
-  
-  .week-journal-dot {
-    width: 6px;
-    height: 6px;
   }
   
   .week-status-dot {
