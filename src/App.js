@@ -585,8 +585,23 @@ function AppContent({
 
         {isLoggedIn ? (
           <>
+            {/* SUBSCRIPTION GATE: Show loading icon until sub status is known */}
+            {(subLoading || subscriptionStatus.reason === 'loading') && (
+              <div style={{ 
+                position: 'fixed', inset: 0, zIndex: 9999, 
+                background: '#000', 
+                display: 'flex', alignItems: 'center', justifyContent: 'center' 
+              }}>
+                <img 
+                  src="/tt-icon-white.png" 
+                  alt="" 
+                  style={{ width: 48, height: 48, opacity: 0.25, animation: 'pulse 2s ease-in-out infinite' }} 
+                />
+              </div>
+            )}
+            
             {/* PAYWALL: Show if user has no active subscription */}
-            {!hasSubscription && (
+            {!subLoading && !hasSubscription && (
               <PaywallScreen 
                 userData={userData}
                 subscriptionStatus={subscriptionStatus}
