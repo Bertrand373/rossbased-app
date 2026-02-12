@@ -682,24 +682,6 @@
   opacity: 0.5;
 }
 
-.week-status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-left: auto;
-}
-
-.week-status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-}
-
-.week-status-dot.current-streak { background-color: var(--status-current); }
-.week-status-dot.former-streak { background-color: var(--status-former); }
-.week-status-dot.relapse { background-color: var(--status-relapse); }
-.week-status-dot.wet-dream { background-color: var(--status-wetdream); }
-
 /* =============================================================================
    RESPONSIVE - Tablet
    ============================================================================= */
@@ -728,12 +710,12 @@
   .week-day-cell.former-streak::after,
   .week-day-cell.relapse::after,
   .week-day-cell.wet-dream::after {
-    top: 4px;
+    top: 50%;
+    transform: translateY(-50%);
     right: 16px;
     left: auto;
-    transform: none;
-    width: 80px;
-    height: 3px;
+    width: 3px;
+    height: 24px;
   }
   
   .week-day-name {
@@ -780,15 +762,6 @@
   .week-data-dash {
     width: 8px;
     height: 2px;
-  }
-  
-  .week-status-indicator {
-    margin-left: 0;
-  }
-  
-  .week-status-dot {
-    width: 5px;
-    height: 5px;
   }
   
   /* Moon indicator in tablet week view */
@@ -938,12 +911,12 @@
   .week-day-cell.former-streak::after,
   .week-day-cell.relapse::after,
   .week-day-cell.wet-dream::after {
-    top: 4px;
-    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 14px;
     left: auto;
-    transform: none;
-    width: 70px;
-    height: 2px;
+    width: 2px;
+    height: 20px;
   }
   
   .week-day-header {
@@ -981,11 +954,6 @@
   .week-data-dash {
     width: 7px;
     height: 2px;
-  }
-  
-  .week-status-dot {
-    width: 4px;
-    height: 4px;
   }
   
   .week-moon-indicator .moon-icon {
@@ -1220,11 +1188,6 @@
   .week-data-dash {
     width: 12px;
     height: 3px;
-  }
-  
-  .week-status-dot {
-    width: 7px;
-    height: 7px;
   }
   
   .week-moon-indicator .moon-icon {

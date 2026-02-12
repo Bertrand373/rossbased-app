@@ -976,20 +976,12 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             ))}
           </div>
           
-          {/* Bottom indicators */}
+          {/* Bottom indicators - tracked data only */}
           <div className="week-day-indicators">
-            {/* Data indicator - single dash if day has any tracked data */}
             <div className="week-data-indicators">
               {(dayTracking.hasBenefits || dayTracking.hasJournal) && (
                 <span className="week-data-dash"></span>
               )}
-            </div>
-            {/* Status indicator */}
-            <div className="week-status-indicator">
-              {dayStatus?.type === 'current-streak' && <span className="week-status-dot current-streak"></span>}
-              {dayStatus?.type === 'former-streak' && <span className="week-status-dot former-streak"></span>}
-              {dayStatus?.type === 'relapse' && <span className="week-status-dot relapse"></span>}
-              {wetDream && <span className="week-status-dot wet-dream"></span>}
             </div>
           </div>
         </div>
