@@ -330,6 +330,41 @@
   height: 100% !important;
 }
 
+/* Chart Empty State */
+.chart-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.chart-empty-icon {
+  width: 40px;
+  height: 40px;
+  opacity: 0.08;
+  margin-bottom: 4px;
+  user-select: none;
+  pointer-events: none;
+}
+
+[data-theme="light"] .chart-empty-icon {
+  filter: invert(1);
+}
+
+.chart-empty-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.chart-empty-sub {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
 /* =============================================================================
    SHARE CARD
    ============================================================================= */

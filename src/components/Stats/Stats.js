@@ -524,7 +524,13 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
           {(() => {
             const chartData = getChartData();
             const hasData = chartData.datasets[0].data.some(v => v !== null);
-            if (!hasData) return <p className="chart-empty">Start tracking to see your progress</p>;
+            if (!hasData) return (
+              <div className="chart-empty">
+                <img src="/icon-192.png" alt="" className="chart-empty-icon" />
+                <span className="chart-empty-title">No data yet</span>
+                <span className="chart-empty-sub">Check in daily to see your trends</span>
+              </div>
+            );
             return <Line ref={chartRef} data={chartData} options={chartOptions} />;
           })()}
         </div>
