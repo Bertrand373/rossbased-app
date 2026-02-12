@@ -118,6 +118,7 @@ const InstallPrompt = ({
   triggerAfterVisits = 3,
   currentCheckIns = 0,
   forceShow = false,
+  suppress = false,
   onClose,
   onInstalled
 }) => {
@@ -205,7 +206,7 @@ const InstallPrompt = ({
   };
   
   // Don't render if conditions not met
-  if (!isVisible || !platformInfo || platformInfo.isStandalone) {
+  if (!isVisible || !platformInfo || platformInfo.isStandalone || suppress) {
     return null;
   }
   

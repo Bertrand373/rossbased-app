@@ -611,11 +611,12 @@ function AppContent({
               />
             )}
             
-            {/* PWA Install Prompt - shows after first check-in or 3rd visit */}
+            {/* PWA Install Prompt - only when user has full access and nothing is overlaying */}
             <InstallPrompt 
               triggerAfterCheckIns={1}
               triggerAfterVisits={3}
               currentCheckIns={userData?.totalCheckIns || 0}
+              suppress={!hasSubscription || subLoading}
             />
             
             {/* Floating Oracle Eye - Bottom right above nav */}
