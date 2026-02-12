@@ -7,9 +7,10 @@ import trackerLogo from '../../assets/trackerapplogo-white.png';
 const Landing = ({ onLogin }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  const handleLoginSuccess = async (username, password) => {
-    setShowAuthModal(false);
-    return await onLogin(username, password);
+  const handleLoginSuccess = async (username, password, isGoogleAuth) => {
+    const result = await onLogin(username, password, isGoogleAuth);
+    if (!result) setShowAuthModal(false);
+    return result;
   };
 
   return (
