@@ -468,18 +468,44 @@ app.get('/api/discord/verify/:discordUsername', async (req, res) => {
 // This is what makes the in-app Oracle uncanny.
 // It sees patterns the user hasn't noticed yet.
 // ============================================
-function buildOracleContext(user) {
+function buildOracleContext(user, timezone) {
   const lines = [];
-  const streak = user.currentStreak || 0;
-  const longest = user.longestStreak || 0;
   const relapses = user.relapseCount || 0;
   const wetDreams = user.wetDreamCount || 0;
+  const userTz = timezone || 'UTC';
+
+  // --- COMPUTE REAL-TIME STREAK FROM START DATE ---
+  // NEVER trust stored currentStreak — it's only updated when user saves data.
+  // The frontend computes from startDate every render. Oracle must do the same.
+  let streak = user.currentStreak || 0;
+  if (user.startDate) {
+    const now = new Date();
+    const userNow = new Date(now.toLocaleString('en-US', { timeZone: userTz }));
+    const start = new Date(user.startDate);
+    const userStart = new Date(start.toLocaleString('en-US', { timeZone: userTz }));
+    userNow.setHours(0, 0, 0, 0);
+    userStart.setHours(0, 0, 0, 0);
+    const diffDays = Math.floor((userNow - userStart) / (1000 * 60 * 60 * 24));
+    streak = Math.max(1, diffDays + 1);
+  }
+
+  // Longest streak should never be less than current computed streak
+  const longest = Math.max(user.longestStreak || 0, streak);
+
+  // --- TODAY'S DATE (so Oracle can do date math) ---
+  const todayStr = new Date().toLocaleDateString('en-US', { 
+    timeZone: userTz, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' 
+  });
+  lines.push(`Today's date: ${todayStr}.`);
 
   // --- CORE STATS ---
   lines.push(`Current streak: ${streak} days.`);
   lines.push(`Longest streak: ${longest} days.`);
   lines.push(`Total relapses: ${relapses}.`);
   lines.push(`Wet dreams: ${wetDreams}.`);
+  if (user.startDate) {
+    lines.push(`Streak start date: ${new Date(user.startDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}.`);
+  }
 
   // --- SPERMATOGENESIS CYCLE POSITION ---
   if (streak > 0) {
@@ -724,6 +750,16 @@ function buildOracleContext(user) {
     }
   }
 
+  // --- USER GOAL ---
+  if (user.goal && user.goal.targetDays) {
+    const daysRemaining = user.goal.targetDays - streak;
+    if (daysRemaining > 0) {
+      lines.push(`Active goal: Day ${user.goal.targetDays}. ${daysRemaining} days remaining.`);
+    } else {
+      lines.push(`Achieved goal of Day ${user.goal.targetDays}. Currently ${Math.abs(daysRemaining)} days beyond it.`);
+    }
+  }
+
   return lines.join('\n');
 }
 
@@ -773,7 +809,7 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     }
 
     // Build deep user context from their data
-    const userContext = buildOracleContext(user);
+    const userContext = buildOracleContext(user, userTimezone);
 
     const systemPrompt = `You are The Oracle, the AI guide within TitanTrack.
 
