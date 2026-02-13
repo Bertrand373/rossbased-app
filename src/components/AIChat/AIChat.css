@@ -43,7 +43,7 @@
   flex-direction: column;
   transform: translateY(100%);
   transition: transform 300ms ease;
-  pointer-events: auto;
+  pointer-events: none;
   
   /* Safe area handling */
   padding-bottom: env(safe-area-inset-bottom, 0);
@@ -51,6 +51,7 @@
 
 .ai-chat-panel.open {
   transform: translateY(0);
+  pointer-events: auto;
 }
 
 /* Desktop styling — centered modal, not a side widget */
