@@ -9,6 +9,7 @@ const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 const { logIfRelevant, generateWeeklyInsight, getPulseStats } = require('./services/oracleInsight');
 const KnowledgeChunk = require('./models/KnowledgeChunk');
 const OracleUsage = require('./models/OracleUsage');
+const User = require('./models/User');
 const { randomUUID } = require('crypto');
 
 // ============================================================
@@ -886,7 +887,66 @@ client.on('messageCreate', async (message) => {
     
     // RAG: Retrieve relevant knowledge
     const ragContext = await retrieveKnowledge(content, { limit: 5, maxTokens: 2000 });
-    const systemWithKnowledge = SYSTEM_PROMPT + ragContext;
+    
+    // --- LINKED USER CONTEXT ---
+    // Check if this Discord user has a linked TitanTrack account
+    let linkedUser = null;
+    let personalContext = '';
+    try {
+      linkedUser = await User.findOne({ discordId: message.author.id });
+      if (linkedUser && linkedUser.discordOracleSync !== false) {
+        const lines = [];
+        
+        // Streak info
+        let currentStreak = linkedUser.currentStreak || 0;
+        if (linkedUser.startDate) {
+          const start = new Date(linkedUser.startDate);
+          start.setHours(0, 0, 0, 0);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          currentStreak = Math.max(1, Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1);
+        }
+        lines.push(`This user has a linked TitanTrack account. Current streak: Day ${currentStreak}.`);
+        
+        // Oracle memory notes
+        if (linkedUser.oracleNotes && linkedUser.oracleNotes.length > 0) {
+          const recentNotes = [...linkedUser.oracleNotes]
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 10);
+          lines.push('Past observations about this user:');
+          recentNotes.forEach(n => lines.push(`- [Day ${n.streakDay}] ${n.note}`));
+        }
+        
+        // ML risk snapshot
+        if (linkedUser.mlRiskSnapshot && linkedUser.mlRiskSnapshot.updatedAt) {
+          const hoursAgo = Math.floor((new Date() - new Date(linkedUser.mlRiskSnapshot.updatedAt)) / (1000 * 60 * 60));
+          if (hoursAgo < 24) {
+            const rs = linkedUser.mlRiskSnapshot;
+            lines.push(`ML relapse risk (${hoursAgo}h ago): ${rs.riskLevel} (${Math.round((rs.riskScore || 0) * 100)}%).`);
+            if (rs.topFactors && rs.topFactors.length > 0) {
+              lines.push(`Risk factors: ${rs.topFactors.join(', ')}.`);
+            }
+          }
+        }
+        
+        // Recent benefit levels
+        if (linkedUser.benefitTracking && linkedUser.benefitTracking.length > 0) {
+          const latest = [...linkedUser.benefitTracking].sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+          if (latest) {
+            const metrics = ['energy', 'focus', 'confidence'].filter(m => latest[m] != null);
+            if (metrics.length > 0) {
+              lines.push(`Latest benefits: ${metrics.map(m => `${m} ${latest[m]}/10`).join(', ')}.`);
+            }
+          }
+        }
+        
+        personalContext = '\n\n--- LINKED USER CONTEXT (private, never reveal raw data) ---\n' + lines.join('\n') + '\nUse this awareness naturally. Never say "your TitanTrack data shows" or reference the app explicitly unless they bring it up.\n---\n';
+      }
+    } catch (lookupErr) {
+      // Silent — proceed without personalization
+    }
+    
+    const systemWithKnowledge = SYSTEM_PROMPT + personalContext + ragContext;
     
     // Call Claude
     const response = await anthropic.messages.create({
@@ -924,6 +984,50 @@ client.on('messageCreate', async (message) => {
     addToHistory(message.channel.id, 'assistant', truncated);
     
     console.log(`🔮 Oracle responded to ${username} in #${channelName} [${maxTokens} max tokens]`);
+    
+    // --- LINKED USER: Generate memory note (fire-and-forget) ---
+    if (linkedUser && linkedUser.discordOracleSync !== false && content.trim().split(/\s+/).length >= 4) {
+      (async () => {
+        try {
+          const noteResponse = await anthropic.messages.create({
+            model: 'claude-3-5-haiku-20241022',
+            max_tokens: 100,
+            system: 'You are a silent observer. Given a user message and an AI response, write 1-2 sentences capturing what this reveals about the user\'s current state, mindset, or journey. Be specific, not generic. Write in third person. Never start with "The user". Just the observation.',
+            messages: [{
+              role: 'user',
+              content: `User (Day ${linkedUser.currentStreak || 0}, Discord): "${content}"\n\nOracle response: "${truncated.substring(0, 500)}"`
+            }]
+          });
+          
+          const note = noteResponse.content[0].text.trim();
+          if (note.length > 10 && note.length < 300) {
+            let currentStreak = linkedUser.currentStreak || 0;
+            if (linkedUser.startDate) {
+              const start = new Date(linkedUser.startDate);
+              start.setHours(0, 0, 0, 0);
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              currentStreak = Math.max(1, Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1);
+            }
+            
+            await User.findOneAndUpdate(
+              { _id: linkedUser._id },
+              {
+                $push: {
+                  oracleNotes: {
+                    $each: [{ date: new Date(), streakDay: currentStreak, note, source: 'discord' }],
+                    $sort: { date: -1 },
+                    $slice: 20
+                  }
+                }
+              }
+            );
+          }
+        } catch (noteErr) {
+          // Silent — never block or fail for memory notes
+        }
+      })();
+    }
     
   } catch (error) {
     console.error('Oracle error:', error);
@@ -1106,3 +1210,6 @@ if (!ANTHROPIC_API_KEY) {
 }
 
 client.login(DISCORD_TOKEN);
+
+// Export client for cross-module access (e.g., milestone DMs from app.js)
+module.exports = { client };

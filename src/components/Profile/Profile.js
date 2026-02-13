@@ -38,6 +38,7 @@ const Profile = ({
   const [email, setEmail] = useState(userData.email || '');
   const [discordUsername, setDiscordUsername] = useState(userData.discordUsername || '');
   const [showOnLeaderboard, setShowOnLeaderboard] = useState(userData.showOnLeaderboard || false);
+  const [discordOracleSync, setDiscordOracleSync] = useState(userData.discordOracleSync !== false); // default ON
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   
   // Birth date for Energy Almanac (numerology, zodiac calculations)
@@ -405,6 +406,13 @@ const Profile = ({
     toast.success('Saved', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
   };
 
+  const handleOracleSyncToggle = () => {
+    const newValue = !discordOracleSync;
+    setDiscordOracleSync(newValue);
+    updateUserData({ discordOracleSync: newValue });
+    toast.success(newValue ? 'Oracle sync enabled' : 'Oracle sync disabled', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
+  };
+
   const handleFeedbackSubmit = async () => {
     if (!feedbackSubject.trim() || !feedbackMessage.trim()) {
       toast.error('Please fill in both fields');
@@ -694,6 +702,23 @@ const Profile = ({
               <div className="rank-display rank-disabled">
                 <span className="rank-label">Your Position</span>
                 <span className="rank-value">Enable leaderboard to see rank</span>
+              </div>
+            )}
+
+            {/* Oracle Sync Toggle - Only visible when Discord is linked */}
+            {userData?.discordId && (
+              <div className="toggle-row">
+                <div className="toggle-text">
+                  <span className="toggle-label">Oracle Sync</span>
+                  <span className="toggle-desc">Oracle remembers you across app & Discord</span>
+                </div>
+                <button 
+                  className={`toggle-switch ${discordOracleSync ? 'active' : ''}`}
+                  onClick={handleOracleSyncToggle}
+                  aria-label="Toggle Oracle Discord sync"
+                >
+                  <span className="toggle-knob" />
+                </button>
               </div>
             )}
 

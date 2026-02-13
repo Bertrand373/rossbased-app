@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   discordId: String,
   discordAvatar: String,
   discordDisplayName: String, // What people see in Discord (global_name)
+  discordOracleSync: { type: Boolean, default: true }, // Oracle shares context across app & Discord
   startDate: Date,
   
   // NEW: Birth date for Energy Almanac calculations (numerology, Chinese zodiac)
@@ -88,7 +89,8 @@ const userSchema = new mongoose.Schema({
   oracleNotes: [{
     date: { type: Date, default: Date.now },
     streakDay: Number,
-    note: { type: String, maxlength: 500 }
+    note: { type: String, maxlength: 500 },
+    source: { type: String, enum: ['app', 'discord'], default: 'app' }
   }],
 
   // ML Risk Snapshot - latest prediction from frontend TensorFlow model

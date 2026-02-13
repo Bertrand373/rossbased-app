@@ -165,6 +165,29 @@ mongoose.connect(mongoUri, {
           if (pendingOutcomes.length > 0) {
             console.log(`🔮 Measured ${pendingOutcomes.length} Oracle outcomes`);
           }
+
+          // --- LAYER 2 MILESTONE: Notify Ross when 100+ outcomes are ready ---
+          try {
+            const totalMeasured = await OracleOutcome.countDocuments({ 'outcome.measured': true });
+            const milestoneNotified = global._outcomesMilestoneNotified || false;
+            if (totalMeasured >= 100 && !milestoneNotified) {
+              global._outcomesMilestoneNotified = true;
+              console.log('🔮 MILESTONE: 100+ Oracle outcomes measured — ready for pattern aggregation');
+              // DM Ross on Discord via the bot
+              try {
+                const discordBot = require('./discord-bot');
+                if (discordBot.client && discordBot.client.isReady()) {
+                  const rossUser = await discordBot.client.users.fetch(process.env.ROSS_DISCORD_ID || '').catch(() => null);
+                  if (rossUser) {
+                    await rossUser.send(`🔮 **Oracle Layer 2 Milestone**\n\n${totalMeasured} conversation outcomes have been measured. The data is ready for pattern aggregation.\n\nAsk Claude to write the aggregation query for buildOracleContext().`);
+                    console.log('📩 Milestone DM sent to Ross');
+                  }
+                }
+              } catch (dmErr) {
+                console.log('Could not DM milestone (non-blocking):', dmErr.message);
+              }
+            }
+          } catch (countErr) { /* silent */ }
         } catch (err) {
           console.error('Oracle outcome job error:', err.message);
         }
@@ -1125,7 +1148,7 @@ Examples:
           {
             $push: {
               oracleNotes: {
-                $each: [{ date: new Date(), streakDay: noteStreakDay, note: noteText }],
+                $each: [{ date: new Date(), streakDay: noteStreakDay, note: noteText, source: 'app' }],
                 $sort: { date: -1 },
                 $slice: 20
               }
