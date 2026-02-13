@@ -928,7 +928,7 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     
     const BETA_DAILY_LIMIT = 5;
     const FREE_LIFETIME_LIMIT = 3;
-    const PREMIUM_DAILY_LIMIT = 15;
+    const PREMIUM_DAILY_LIMIT = 25;
 
     // Check limits
     if (isBetaPeriod && currentCount >= BETA_DAILY_LIMIT) {
