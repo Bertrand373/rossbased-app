@@ -379,4 +379,191 @@ router.get('/behavior', adminCheck, async (req, res) => {
   }
 });
 
+// GET /api/analytics/checkins — check-in frequency, streaks, depth, drop-off
+router.get('/checkins', adminCheck, async (req, res) => {
+  try {
+    const now = new Date();
+    const sevenDaysAgo = getDateRange(7);
+    const thirtyDaysAgo = getDateRange(30);
+
+    // Pull all users with any check-in data
+    const users = await User.find({
+      ...adminFilter,
+      $or: [
+        { 'benefitTracking.0': { $exists: true } },
+        { 'emotionalTracking.0': { $exists: true } }
+      ]
+    }, 'benefitTracking emotionalTracking currentStreak startDate createdAt').lean();
+
+    // ── FREQUENCY ──
+    // Who logged in last 7d vs 30d
+    let benefit7d = 0, benefit30d = 0, emotional7d = 0, emotional30d = 0;
+    let totalBenefitLogs7d = 0, totalEmotionalLogs7d = 0;
+
+    users.forEach(u => {
+      const bLogs = (u.benefitTracking || []);
+      const eLogs = (u.emotionalTracking || []);
+      const bRecent7 = bLogs.filter(l => new Date(l.date) >= sevenDaysAgo);
+      const bRecent30 = bLogs.filter(l => new Date(l.date) >= thirtyDaysAgo);
+      const eRecent7 = eLogs.filter(l => new Date(l.date) >= sevenDaysAgo);
+      const eRecent30 = eLogs.filter(l => new Date(l.date) >= thirtyDaysAgo);
+      if (bRecent7.length > 0) { benefit7d++; totalBenefitLogs7d += bRecent7.length; }
+      if (bRecent30.length > 0) benefit30d++;
+      if (eRecent7.length > 0) { emotional7d++; totalEmotionalLogs7d += eRecent7.length; }
+      if (eRecent30.length > 0) emotional30d++;
+    });
+
+    // ── CHECK-IN STREAKS ──
+    // For each user, calculate longest consecutive-day logging streak for benefits
+    const streakDistribution = { '1': 0, '2-3': 0, '4-7': 0, '8-14': 0, '15-30': 0, '30+': 0 };
+    const allConsecStreaks = [];
+
+    users.forEach(u => {
+      const dates = (u.benefitTracking || [])
+        .map(l => new Date(l.date).toISOString().split('T')[0])
+        .filter((v, i, a) => a.indexOf(v) === i) // unique dates
+        .sort();
+      if (dates.length === 0) return;
+
+      let maxConsec = 1, current = 1;
+      for (let i = 1; i < dates.length; i++) {
+        const prev = new Date(dates[i - 1]);
+        const curr = new Date(dates[i]);
+        const diff = Math.round((curr - prev) / 86400000);
+        if (diff === 1) { current++; maxConsec = Math.max(maxConsec, current); }
+        else { current = 1; }
+      }
+      maxConsec = Math.max(maxConsec, current);
+      allConsecStreaks.push(maxConsec);
+
+      // Bucket
+      if (maxConsec === 1) streakDistribution['1']++;
+      else if (maxConsec <= 3) streakDistribution['2-3']++;
+      else if (maxConsec <= 7) streakDistribution['4-7']++;
+      else if (maxConsec <= 14) streakDistribution['8-14']++;
+      else if (maxConsec <= 30) streakDistribution['15-30']++;
+      else streakDistribution['30+']++;
+    });
+
+    const avgConsecStreak = allConsecStreaks.length > 0
+      ? Math.round((allConsecStreaks.reduce((s, v) => s + v, 0) / allConsecStreaks.length) * 10) / 10
+      : 0;
+
+    // ── CHECK-IN DEPTH (variance) ──
+    // Are users moving sliders or just slamming 5s?
+    let lowVariance = 0, medVariance = 0, highVariance = 0;
+    const allVariances = [];
+
+    users.forEach(u => {
+      const logs = u.benefitTracking || [];
+      if (logs.length < 3) return;
+
+      // Look at last 14 entries for this user
+      const recent = logs.slice(-14);
+      const metrics = ['confidence', 'energy', 'focus', 'aura', 'sleep', 'workout'];
+      const values = [];
+      recent.forEach(log => {
+        metrics.forEach(m => { if (log[m] !== undefined) values.push(log[m]); });
+      });
+
+      if (values.length < 6) return;
+      const mean = values.reduce((s, v) => s + v, 0) / values.length;
+      const variance = values.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / values.length;
+      const stdDev = Math.sqrt(variance);
+      allVariances.push(stdDev);
+
+      if (stdDev < 0.5) lowVariance++;      // slamming same numbers
+      else if (stdDev < 1.5) medVariance++;  // moderate variation
+      else highVariance++;                    // thoughtful tracking
+    });
+
+    const avgVariance = allVariances.length > 0
+      ? Math.round((allVariances.reduce((s, v) => s + v, 0) / allVariances.length) * 100) / 100
+      : 0;
+
+    // ── DROP-OFF TIMING ──
+    // At what streak day do users stop checking in?
+    // Compare: user's current streak vs days since their last check-in
+    const dropOffBuckets = { '1-7': 0, '8-14': 0, '15-30': 0, '31-60': 0, '61-90': 0, '90+': 0 };
+    let activeCheckers = 0, staleCheckers = 0;
+
+    users.forEach(u => {
+      const logs = u.benefitTracking || [];
+      if (logs.length === 0) return;
+
+      const lastLog = new Date(Math.max(...logs.map(l => new Date(l.date).getTime())));
+      const daysSinceLast = Math.floor((now - lastLog) / 86400000);
+
+      if (daysSinceLast <= 3) {
+        activeCheckers++;
+      } else {
+        staleCheckers++;
+        // What streak day were they on when they stopped?
+        // Approximate: their total logs gives a rough "they were active for N days"
+        const activeDays = logs.length;
+        const bucket = activeDays <= 7 ? '1-7' : activeDays <= 14 ? '8-14' :
+          activeDays <= 30 ? '15-30' : activeDays <= 60 ? '31-60' :
+          activeDays <= 90 ? '61-90' : '90+';
+        dropOffBuckets[bucket]++;
+      }
+    });
+
+    // ── DAILY LOG TREND (last 14 days) ──
+    const dailyLogTrend = [];
+    for (let i = 13; i >= 0; i--) {
+      const dayStart = new Date(now);
+      dayStart.setDate(dayStart.getDate() - i);
+      dayStart.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(dayStart);
+      dayEnd.setDate(dayEnd.getDate() + 1);
+      const dateStr = dayStart.toISOString().split('T')[0];
+
+      let benefitCount = 0, emotionalCount = 0;
+      users.forEach(u => {
+        (u.benefitTracking || []).forEach(l => {
+          const d = new Date(l.date);
+          if (d >= dayStart && d < dayEnd) benefitCount++;
+        });
+        (u.emotionalTracking || []).forEach(l => {
+          const d = new Date(l.date);
+          if (d >= dayStart && d < dayEnd) emotionalCount++;
+        });
+      });
+      dailyLogTrend.push({ _id: dateStr, benefits: benefitCount, emotional: emotionalCount, count: benefitCount + emotionalCount });
+    }
+
+    res.json({
+      totalCheckInUsers: users.length,
+      frequency: {
+        benefit: { active7d: benefit7d, active30d: benefit30d, logsThisWeek: totalBenefitLogs7d },
+        emotional: { active7d: emotional7d, active30d: emotional30d, logsThisWeek: totalEmotionalLogs7d },
+        avgBenefitLogsPerWeek: benefit7d > 0 ? Math.round((totalBenefitLogs7d / benefit7d) * 10) / 10 : 0,
+        avgEmotionalLogsPerWeek: emotional7d > 0 ? Math.round((totalEmotionalLogs7d / emotional7d) * 10) / 10 : 0
+      },
+      streaks: {
+        distribution: Object.entries(streakDistribution).map(([range, count]) => ({ range, count })),
+        avgConsecutive: avgConsecStreak,
+        totalTracked: allConsecStreaks.length
+      },
+      depth: {
+        low: lowVariance,
+        medium: medVariance,
+        high: highVariance,
+        avgStdDev: avgVariance,
+        totalAnalyzed: allVariances.length
+      },
+      dropOff: {
+        activeCheckers,
+        staleCheckers,
+        buckets: Object.entries(dropOffBuckets).map(([range, count]) => ({ range, count })),
+        staleRate: users.length > 0 ? Math.round((staleCheckers / users.length) * 100) : 0
+      },
+      dailyLogTrend
+    });
+  } catch (error) {
+    console.error('Analytics checkins error:', error);
+    res.status(500).json({ error: 'Failed to load check-in data' });
+  }
+});
+
 module.exports = router;

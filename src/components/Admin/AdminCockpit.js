@@ -123,6 +123,7 @@ const AdminCockpit = () => {
   const [retention, setRetention] = useState(null);
   const [users, setUsers] = useState(null);
   const [behavior, setBehavior] = useState(null);
+  const [checkins, setCheckins] = useState(null);
   const [expandedInfo, setExpandedInfo] = useState(null);
   const [lastRefresh, setLastRefresh] = useState(null);
 
@@ -161,10 +162,10 @@ const AdminCockpit = () => {
 
   const loadAll = useCallback(async (sort = 'recent') => {
     setLoading(true);
-    const [o, e, s, r, u, b] = await Promise.all([
+    const [o, e, s, r, u, b, ci] = await Promise.all([
       fetchData('overview'), fetchData('engagement'), fetchData('streaks'),
       fetchData('retention'), fetchData(`users?sort=${sort}&limit=50`),
-      fetchData('behavior')
+      fetchData('behavior'), fetchData('checkins')
     ]);
     if (o) setOverview(o);
     if (e) setEngagement(e);
@@ -172,6 +173,7 @@ const AdminCockpit = () => {
     if (r) setRetention(r);
     if (u) setUsers(u);
     if (b) setBehavior(b);
+    if (ci) setCheckins(ci);
     setLastRefresh(new Date());
     setLoading(false);
   }, [fetchData]);
@@ -302,6 +304,7 @@ const AdminCockpit = () => {
         {[
           { id: 'dashboard', label: 'Dashboard' },
           { id: 'intelligence', label: 'Intel' },
+          { id: 'checkins', label: 'Check-ins' },
           { id: 'behavior', label: 'Behavior' },
           { id: 'users', label: 'Users' },
           { id: 'oracle', label: 'Oracle' },
@@ -603,6 +606,173 @@ const AdminCockpit = () => {
           ) : (
             <div className="ac-card">
               <p className="ac-empty-msg">Loading behavior data...</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ===== CHECK-INS ===== */}
+      {tab === 'checkins' && (
+        <div className="ac-section">
+          {checkins ? (
+            <>
+              <p className="ac-intro">Are users actually checking in? How often, how thoughtfully, and when they stop. This determines whether Oracle teaching features are worth building.</p>
+
+              {/* Headline Stats */}
+              <div className="ac-stat-row">
+                {[
+                  { l: 'Active 7d', v: checkins.frequency.benefit.active7d, sub: 'benefit loggers' },
+                  { l: 'Active 7d', v: checkins.frequency.emotional.active7d, sub: 'emotional loggers' },
+                  { l: 'Avg Streak', v: `${checkins.streaks.avgConsecutive}d`, sub: 'consecutive days' },
+                  { l: 'Stale Rate', v: `${checkins.dropOff.staleRate}%`, sub: `${checkins.dropOff.staleCheckers} stopped`, accent: checkins.dropOff.staleRate > 60 },
+                ].map((s, i) => (
+                  <div key={i} className={`ac-mini-stat ${s.accent ? 'warn' : ''}`}>
+                    <span className="ac-ms-val">{s.v}</span>
+                    <span className="ac-ms-label">{s.l}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Frequency Breakdown */}
+              <div className="ac-row-2">
+                <div className="ac-card ac-card-compact">
+                  <h3 className="ac-card-title-sm">Benefit Check-ins</h3>
+                  <div className="ac-ci-freq">
+                    <div className="ac-ci-freq-row">
+                      <span className="ac-ci-freq-label">Active this week</span>
+                      <span className="ac-ci-freq-val">{checkins.frequency.benefit.active7d}</span>
+                    </div>
+                    <div className="ac-ci-freq-row">
+                      <span className="ac-ci-freq-label">Active this month</span>
+                      <span className="ac-ci-freq-val">{checkins.frequency.benefit.active30d}</span>
+                    </div>
+                    <div className="ac-ci-freq-row">
+                      <span className="ac-ci-freq-label">Logs this week</span>
+                      <span className="ac-ci-freq-val">{checkins.frequency.benefit.logsThisWeek}</span>
+                    </div>
+                    <div className="ac-ci-freq-row">
+                      <span className="ac-ci-freq-label">Avg logs/user/wk</span>
+                      <span className="ac-ci-freq-val">{checkins.frequency.avgBenefitLogsPerWeek}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="ac-card ac-card-compact">
+                  <h3 className="ac-card-title-sm">Emotional Check-ins</h3>
+                  <div className="ac-ci-freq">
+                    <div className="ac-ci-freq-row">
+                      <span className="ac-ci-freq-label">Active this week</span>
+                      <span className="ac-ci-freq-val">{checkins.frequency.emotional.active7d}</span>
+                    </div>
+                    <div className="ac-ci-freq-row">
+                      <span className="ac-ci-freq-label">Active this month</span>
+                      <span className="ac-ci-freq-val">{checkins.frequency.emotional.active30d}</span>
+                    </div>
+                    <div className="ac-ci-freq-row">
+                      <span className="ac-ci-freq-label">Logs this week</span>
+                      <span className="ac-ci-freq-val">{checkins.frequency.emotional.logsThisWeek}</span>
+                    </div>
+                    <div className="ac-ci-freq-row">
+                      <span className="ac-ci-freq-label">Avg logs/user/wk</span>
+                      <span className="ac-ci-freq-val">{checkins.frequency.avgEmotionalLogsPerWeek}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Daily Log Trend */}
+              {checkins.dailyLogTrend?.length > 1 && (
+                <div className="ac-card">
+                  <h3 className="ac-card-title-sm">Daily Check-ins · 14 Days</h3>
+                  <div className="ac-ci-trend">
+                    {checkins.dailyLogTrend.map((d, i) => {
+                      const maxVal = Math.max(...checkins.dailyLogTrend.map(x => x.count), 1);
+                      const bH = maxVal > 0 ? (d.benefits / maxVal) * 100 : 0;
+                      const eH = maxVal > 0 ? (d.emotional / maxVal) * 100 : 0;
+                      const dateLabel = d._id.split('-').slice(1).map(Number).join('/');
+                      return (
+                        <div key={i} className="ac-ci-trend-bar" title={`${dateLabel}: ${d.benefits} benefit, ${d.emotional} emotional`}>
+                          <div className="ac-ci-trend-stack">
+                            <div className="ac-ci-trend-fill benefit" style={{ height: `${Math.max(bH, d.benefits > 0 ? 4 : 0)}%` }} />
+                            <div className="ac-ci-trend-fill emotional" style={{ height: `${Math.max(eH, d.emotional > 0 ? 4 : 0)}%` }} />
+                          </div>
+                          {(i === 0 || i === 6 || i === 13) && <span className="ac-ci-trend-label">{dateLabel}</span>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="ac-ci-legend">
+                    <span className="ac-ci-legend-item"><span className="ac-ci-dot benefit" />Benefits</span>
+                    <span className="ac-ci-legend-item"><span className="ac-ci-dot emotional" />Emotional</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Consecutive Day Streaks */}
+              <div className="ac-card">
+                <h3 className="ac-card-title-sm">Logging Streak Distribution</h3>
+                <p className="ac-card-sub">Longest consecutive days each user has logged ({checkins.streaks.totalTracked} users)</p>
+                <HBar data={checkins.streaks.distribution.filter(d => d.count > 0)} labelKey="range" valueKey="count" />
+              </div>
+
+              {/* Check-in Depth */}
+              <div className="ac-card">
+                <h3 className="ac-card-title-sm">Check-in Quality</h3>
+                <p className="ac-card-sub">Are users moving sliders thoughtfully or slamming defaults? ({checkins.depth.totalAnalyzed} users with 3+ logs)</p>
+                {checkins.depth.totalAnalyzed > 0 ? (
+                  <div className="ac-ci-depth">
+                    {[
+                      { label: 'Going through motions', count: checkins.depth.low, desc: 'Near-zero variation in scores', color: 'low' },
+                      { label: 'Moderate effort', count: checkins.depth.medium, desc: 'Some slider movement', color: 'med' },
+                      { label: 'Thoughtful tracking', count: checkins.depth.high, desc: 'Meaningful daily variation', color: 'high' },
+                    ].map((d, i) => {
+                      const pct = checkins.depth.totalAnalyzed > 0 ? Math.round((d.count / checkins.depth.totalAnalyzed) * 100) : 0;
+                      return (
+                        <div key={i} className="ac-ci-depth-row">
+                          <div className="ac-ci-depth-top">
+                            <span className="ac-ci-depth-label">{d.label}</span>
+                            <span className="ac-ci-depth-pct">{pct}%</span>
+                          </div>
+                          <div className="ac-ci-depth-bar">
+                            <div className={`ac-ci-depth-fill ${d.color}`} style={{ width: `${Math.max(pct, 2)}%` }} />
+                          </div>
+                          <div className="ac-ci-depth-meta">
+                            <span>{d.count} users</span>
+                            <span>{d.desc}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="ac-empty-msg">Need more data. At least 3 logs per user required.</p>
+                )}
+              </div>
+
+              {/* Drop-off */}
+              <div className="ac-row-2">
+                <div className="ac-card ac-card-compact">
+                  <h3 className="ac-card-title-sm">Still Active</h3>
+                  <span className="ac-big-num">{checkins.dropOff.activeCheckers}</span>
+                  <span className="ac-big-sub">logged in the last 3 days</span>
+                </div>
+                <div className="ac-card ac-card-compact">
+                  <h3 className="ac-card-title-sm">Gone Quiet</h3>
+                  <span className="ac-big-num dim">{checkins.dropOff.staleCheckers}</span>
+                  <span className="ac-big-sub">haven't logged in 3+ days</span>
+                </div>
+              </div>
+
+              {checkins.dropOff.buckets?.filter(b => b.count > 0).length > 0 && (
+                <div className="ac-card">
+                  <h3 className="ac-card-title-sm">Where They Dropped Off</h3>
+                  <p className="ac-card-sub">How many logs users had before going silent</p>
+                  <HBar data={checkins.dropOff.buckets.filter(b => b.count > 0)} labelKey="range" valueKey="count" />
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="ac-card">
+              <p className="ac-empty-msg">Loading check-in data...</p>
             </div>
           )}
         </div>
