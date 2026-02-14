@@ -20,20 +20,20 @@ firebase.initializeApp(firebaseConfig);
 // Initialize Firebase Messaging
 const messaging = firebase.messaging();
 
-// Handle background messages
+// Handle background messages (data-only — single source of notification display)
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message:', payload);
 
-  // Use server-sent values, clean fallbacks without emojis
-  const notificationTitle = payload.notification?.title || 'TitanTrack';
+  const data = payload.data || {};
+  const notificationTitle = data.title || 'TitanTrack';
   const notificationOptions = {
-    body: payload.notification?.body || 'You have a new notification',
-    icon: payload.notification?.icon || '/icon-192.png',
-    badge: '/icon-192.png',
+    body: data.body || 'You have a new notification',
+    icon: data.icon || '/icon-192.png',
+    badge: data.badge || '/icon-192.png',
     vibrate: [200, 100, 200],
     data: {
-      url: payload.data?.url || '/',
-      ...payload.data
+      url: data.url || '/',
+      type: data.type || ''
     },
     tag: 'titantrack-notification',
     requireInteraction: false

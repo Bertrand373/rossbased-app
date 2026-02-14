@@ -270,28 +270,19 @@ async function sendNotification(fcmToken, notificationType, customData = {}) {
       return { success: false, error: `Unknown notification type: ${notificationType}` };
     }
 
-    // Prepare message
+    // Prepare message - DATA ONLY (no top-level notification key)
+    // This prevents Firebase from auto-displaying a duplicate notification
     const message = {
       token: fcmToken,
-      notification: {
-        title: template.title,
-        body: template.body
-      },
       data: {
-        ...template.data,
+        title: template.title,
+        body: template.body,
+        icon: '/icon-192.png',
+        badge: '/icon-192.png',
+        url: template.data?.url || '/',
+        type: template.data?.type || '',
         ...customData,
         timestamp: Date.now().toString()
-      },
-      webpush: {
-        fcmOptions: {
-          link: template.data.url
-        },
-        notification: {
-          icon: '/icon-192.png',
-          badge: '/icon-192.png',
-          vibrate: [200, 100, 200],
-          requireInteraction: false
-        }
       }
     };
 

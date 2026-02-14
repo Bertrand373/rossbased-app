@@ -36,9 +36,9 @@ export const useNotifications = () => {
       
       // Show notification when app is in foreground
       if (Notification.permission === 'granted') {
-        const notificationTitle = payload.notification?.title || 'TitanTrack';
+        const notificationTitle = payload.notification?.title || payload.data?.title || 'TitanTrack';
         const notificationOptions = {
-          body: payload.notification?.body || 'New notification',
+          body: payload.notification?.body || payload.data?.body || 'New notification',
           icon: '/icon-192.png',
           badge: '/icon-192.png',
           data: payload.data
