@@ -1595,7 +1595,7 @@ app.put('/api/user/:username/ml-risk', authenticate, async (req, res) => {
 // GET /api/admin/oracle-health
 // ============================================
 app.get('/api/admin/oracle-health', authenticate, async (req, res) => {
-  if (req.user.username !== 'rossbased' && req.user.username !== 'ross') {
+  if (req.user.username.toLowerCase() !== 'rossbased' && req.user.username.toLowerCase() !== 'ross') {
     return res.status(403).json({ error: 'Admin only' });
   }
 
@@ -1730,7 +1730,7 @@ app.get('/api/admin/oracle-health', authenticate, async (req, res) => {
 // ============================================
 app.post('/api/admin/oracle-voice-review', authenticate, async (req, res) => {
   // Admin check
-  if (req.user.username !== 'rossbased' && req.user.username !== 'ross') {
+  if (req.user.username.toLowerCase() !== 'rossbased' && req.user.username.toLowerCase() !== 'ross') {
     return res.status(403).json({ error: 'Admin only' });
   }
 
