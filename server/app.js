@@ -1590,6 +1590,141 @@ app.put('/api/user/:username/ml-risk', authenticate, async (req, res) => {
 });
 
 // ============================================
+// ============================================
+// ORACLE SYNC HEALTH DASHBOARD (admin cockpit)
+// GET /api/admin/oracle-health
+// ============================================
+app.get('/api/admin/oracle-health', authenticate, async (req, res) => {
+  if (req.user.username !== 'rossbased' && req.user.username !== 'ross') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+
+  try {
+    const now = new Date();
+    const oneDayAgo = new Date(now - 24 * 60 * 60 * 1000);
+    const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+
+    // --- LINKED USERS ---
+    const totalUsers = await User.countDocuments({});
+    const linkedDiscord = await User.countDocuments({ discordId: { $exists: true, $ne: null, $ne: '' } });
+    const syncEnabled = await User.countDocuments({ discordId: { $exists: true, $ne: null, $ne: '' }, discordOracleSync: { $ne: false } });
+    const syncDisabled = linkedDiscord - syncEnabled;
+
+    // --- MEMORY NOTES ---
+    const usersWithNotes = await User.find(
+      { 'oracleNotes.0': { $exists: true } },
+      { oracleNotes: 1, username: 1, discordId: 1 }
+    ).lean();
+
+    let totalNotes = 0;
+    let appNotes = 0;
+    let discordNotes = 0;
+    let notes24h = 0;
+    let notes7d = 0;
+    let discordNotes24h = 0;
+    let appNotes24h = 0;
+    let crossPlatformUsers = 0;
+    const recentNotes = [];
+
+    usersWithNotes.forEach(u => {
+      const notes = u.oracleNotes || [];
+      totalNotes += notes.length;
+      
+      let hasApp = false;
+      let hasDiscord = false;
+      
+      notes.forEach(n => {
+        if (n.source === 'discord') {
+          discordNotes++;
+          hasDiscord = true;
+        } else {
+          appNotes++;
+          hasApp = true;
+        }
+        
+        const noteDate = new Date(n.date);
+        if (noteDate > oneDayAgo) {
+          notes24h++;
+          if (n.source === 'discord') discordNotes24h++;
+          else appNotes24h++;
+        }
+        if (noteDate > sevenDaysAgo) notes7d++;
+      });
+
+      if (hasApp && hasDiscord) crossPlatformUsers++;
+
+      // Collect 10 most recent notes for preview
+      notes.forEach(n => {
+        recentNotes.push({
+          user: u.username,
+          linked: !!u.discordId,
+          source: n.source || 'app',
+          note: n.note?.substring(0, 120) + (n.note?.length > 120 ? '...' : ''),
+          date: n.date,
+          streakDay: n.streakDay
+        });
+      });
+    });
+
+    recentNotes.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // --- ML RISK SNAPSHOTS ---
+    const usersWithML = await User.countDocuments({ 
+      'mlRiskSnapshot.timestamp': { $exists: true, $gt: oneDayAgo } 
+    });
+
+    // --- OUTCOME TRACKING (Layer 2) ---
+    const OracleOutcome = require('./models/OracleOutcome');
+    const totalOutcomes = await OracleOutcome.countDocuments({});
+    const measuredOutcomes = await OracleOutcome.countDocuments({ 'outcome.measured': true });
+
+    // --- COMMUNITY PULSE ---
+    const { getCommunityPulse } = require('./services/communityPulse');
+    const pulse = await getCommunityPulse();
+
+    res.json({
+      timestamp: now.toISOString(),
+      users: {
+        total: totalUsers,
+        discordLinked: linkedDiscord,
+        syncEnabled,
+        syncDisabled,
+        crossPlatformActive: crossPlatformUsers
+      },
+      memoryNotes: {
+        total: totalNotes,
+        bySource: { app: appNotes, discord: discordNotes },
+        last24h: { total: notes24h, app: appNotes24h, discord: discordNotes24h },
+        last7d: notes7d,
+        usersWithNotes: usersWithNotes.length
+      },
+      mlRisk: {
+        freshSnapshots: usersWithML,
+        description: 'Users with ML risk snapshot updated in last 24h'
+      },
+      outcomes: {
+        total: totalOutcomes,
+        measured: measuredOutcomes,
+        readyForAggregation: measuredOutcomes >= 100
+      },
+      communityPulse: {
+        active: !!pulse,
+        preview: pulse ? pulse.substring(0, 200) + '...' : 'No pulse data yet'
+      },
+      recentNotes: recentNotes.slice(0, 15),
+      health: {
+        bridgeWorking: discordNotes > 0,
+        notesFlowing: notes24h > 0,
+        syncStatus: discordNotes > 0 ? '🟢 LIVE' : linkedDiscord > 0 ? '🟡 LINKED BUT NO DISCORD NOTES YET' : '🔴 NO LINKED USERS'
+      }
+    });
+  } catch (err) {
+    console.error('Oracle health check error:', err);
+    res.status(500).json({ error: 'Health check failed', details: err.message });
+  }
+});
+
+// ============================================
 // ORACLE VOICE REFINEMENT (Layer 6 — admin only)
 // Analyzes recent Oracle conversations to detect AI patterns
 // ============================================

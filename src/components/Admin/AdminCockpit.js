@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import KnowledgeBase from './KnowledgeBase';
+import OracleHealth from './OracleHealth';
 import './AdminCockpit.css';
 
 const API = process.env.REACT_APP_API || process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
@@ -832,9 +833,10 @@ const AdminCockpit = () => {
         </div>
       )}
 
-      {/* ===== ORACLE (Knowledge Base) ===== */}
+      {/* ===== ORACLE (Health + Knowledge Base) ===== */}
       {tab === 'oracle' && (
         <div className="ac-oracle-wrap">
+          <OracleHealth />
           <KnowledgeBase />
         </div>
       )}
