@@ -439,3 +439,87 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* =============================================================================
+   LIGHT THEME OVERRIDES
+   ============================================================================= */
+
+[data-theme="light"] .oh-container { border-bottom-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .oh-title { color: #000000; }
+
+[data-theme="light"] .oh-refresh {
+  background: rgba(0,0,0,0.03);
+  border-color: rgba(0,0,0,0.08);
+  color: rgba(0,0,0,0.35);
+}
+[data-theme="light"] .oh-refresh:hover {
+  background: rgba(0,0,0,0.06);
+  color: rgba(0,0,0,0.5);
+}
+
+/* Stats grid */
+[data-theme="light"] .oh-stat {
+  background: rgba(0,0,0,0.02);
+  border-color: rgba(0,0,0,0.06);
+}
+[data-theme="light"] .oh-stat-val { color: rgba(0,0,0,0.8); }
+[data-theme="light"] .oh-stat-label { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .oh-stat-sub { color: rgba(0,0,0,0.15); }
+
+/* Cards */
+[data-theme="light"] .oh-card {
+  background: rgba(0,0,0,0.02);
+  border-color: rgba(0,0,0,0.06);
+}
+[data-theme="light"] .oh-card-head h3 { color: rgba(0,0,0,0.75); }
+[data-theme="light"] .oh-card-count { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .oh-card-title-sm { color: rgba(0,0,0,0.5); }
+
+/* Notes stats */
+[data-theme="light"] .oh-notes-stat { background: rgba(0,0,0,0.02); }
+[data-theme="light"] .oh-notes-num { color: rgba(0,0,0,0.7); }
+[data-theme="light"] .oh-notes-label { color: rgba(0,0,0,0.25); }
+
+/* Source bar */
+[data-theme="light"] .oh-source-bar { background: rgba(0,0,0,0.04); }
+[data-theme="light"] .oh-source-fill.app { background: rgba(0,0,0,0.15); }
+[data-theme="light"] .oh-source-item { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .oh-source-dot.app { background: rgba(0,0,0,0.2); }
+
+/* Big numbers */
+[data-theme="light"] .oh-big-num { color: rgba(0,0,0,0.8); }
+[data-theme="light"] .oh-big-sub { color: rgba(0,0,0,0.2); }
+
+/* Pulse */
+[data-theme="light"] .oh-pulse-preview { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .oh-pulse-status.off { color: rgba(0,0,0,0.25); }
+
+/* Notes list */
+[data-theme="light"] .oh-toggle-arrow { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .oh-note-row {
+  background: rgba(0,0,0,0.02);
+  border-color: rgba(0,0,0,0.05);
+}
+[data-theme="light"] .oh-note-user { color: rgba(0,0,0,0.6); }
+[data-theme="light"] .oh-note-source.app {
+  color: rgba(0,0,0,0.35);
+  background: rgba(0,0,0,0.05);
+}
+[data-theme="light"] .oh-note-day {
+  color: rgba(0,0,0,0.25);
+  background: rgba(0,0,0,0.04);
+}
+[data-theme="light"] .oh-note-text { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .oh-note-time { color: rgba(0,0,0,0.15); }
+
+/* Loading / Error */
+[data-theme="light"] .oh-loading { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .oh-loading-spinner {
+  border-color: rgba(0,0,0,0.06);
+  border-top-color: rgba(0,0,0,0.25);
+}
+[data-theme="light"] .oh-error {
+  background: rgba(239,68,68,0.06);
+  border-color: rgba(239,68,68,0.15);
+  color: rgba(220,38,38,0.8);
+}

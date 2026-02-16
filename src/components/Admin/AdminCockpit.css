@@ -1138,3 +1138,218 @@
   .ac-c4 { grid-template-columns: 1fr; }
   .ac-activity { flex-direction: column; gap: 8px; }
 }
+
+/* =============================================================================
+   LIGHT THEME OVERRIDES
+   ============================================================================= */
+
+[data-theme="light"] .ac-title { color: #000000; }
+[data-theme="light"] .ac-updated { color: rgba(0,0,0,0.2); }
+[data-theme="light"] .ac-live-badge { color: rgba(34,197,94,0.8); }
+
+[data-theme="light"] .ac-refresh {
+  background: rgba(0,0,0,0.03);
+  border-color: rgba(0,0,0,0.08);
+  color: rgba(0,0,0,0.35);
+}
+[data-theme="light"] .ac-refresh:hover {
+  background: rgba(0,0,0,0.06);
+  color: rgba(0,0,0,0.6);
+}
+
+/* Nav */
+[data-theme="light"] .ac-nav {
+  background: rgba(0,0,0,0.02);
+  border-color: rgba(0,0,0,0.06);
+}
+[data-theme="light"] .ac-nav-btn { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .ac-nav-btn:hover { color: rgba(0,0,0,0.5); }
+[data-theme="light"] .ac-nav-btn.active {
+  background: rgba(0,0,0,0.06);
+  color: #000000;
+}
+[data-theme="light"] .ac-nav-btn.active .ac-nav-label { color: #000000; }
+
+/* Section */
+[data-theme="light"] .ac-intro { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .ac-q-inline {
+  background: rgba(0,0,0,0.06);
+  color: rgba(0,0,0,0.35);
+}
+
+/* Critical 4 cards */
+[data-theme="light"] .ac-c4-card {
+  background: rgba(0,0,0,0.015);
+  border-color: rgba(0,0,0,0.06);
+}
+[data-theme="light"] .ac-c4-card:hover {
+  background: rgba(0,0,0,0.025);
+  border-color: rgba(0,0,0,0.1);
+}
+[data-theme="light"] .ac-c4-rank { color: rgba(0,0,0,0.1); }
+[data-theme="light"] .ac-c4-val { color: rgba(0,0,0,0.85); }
+[data-theme="light"] .ac-c4-label { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .ac-c4-detail { color: rgba(0,0,0,0.15); }
+
+/* Info toggle + tip */
+[data-theme="light"] .ac-info {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.08);
+  color: rgba(0,0,0,0.2);
+}
+[data-theme="light"] .ac-info:hover,
+[data-theme="light"] .ac-info.on {
+  background: rgba(0,0,0,0.08);
+  color: rgba(0,0,0,0.5);
+  border-color: rgba(0,0,0,0.15);
+}
+[data-theme="light"] .ac-tip {
+  background: rgba(0,0,0,0.025);
+  border-color: rgba(0,0,0,0.06);
+}
+[data-theme="light"] .ac-tip-what { color: rgba(0,0,0,0.55); }
+[data-theme="light"] .ac-tip-why { color: rgba(0,0,0,0.35); }
+
+/* Cards */
+[data-theme="light"] .ac-card {
+  background: rgba(0,0,0,0.02);
+  border-color: rgba(0,0,0,0.06);
+}
+[data-theme="light"] .ac-card-head h3 { color: rgba(0,0,0,0.75); }
+[data-theme="light"] .ac-card-sub { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .ac-card-title-sm { color: rgba(0,0,0,0.5); }
+
+/* Horizontal bars */
+[data-theme="light"] .ac-hbar-label { color: rgba(0,0,0,0.5); }
+[data-theme="light"] .ac-hbar-val { color: rgba(0,0,0,0.55); }
+[data-theme="light"] .ac-hbar-track { background: rgba(0,0,0,0.04); }
+[data-theme="light"] .ac-hbar-fill { background: rgba(0,0,0,0.12); }
+
+/* Features */
+[data-theme="light"] .ac-feat-name { color: rgba(0,0,0,0.6); }
+[data-theme="light"] .ac-feat-pct { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .ac-feat-bar { background: rgba(0,0,0,0.04); }
+[data-theme="light"] .ac-feat-fill { background: rgba(0,0,0,0.12); }
+[data-theme="light"] .ac-feat-meta { color: rgba(0,0,0,0.2); }
+
+/* Activity */
+[data-theme="light"] .ac-act-num { color: rgba(0,0,0,0.85); }
+[data-theme="light"] .ac-act-label { color: rgba(0,0,0,0.25); }
+
+/* Growth */
+[data-theme="light"] .ac-growth-badge {
+  background: rgba(0,0,0,0.04);
+  color: rgba(0,0,0,0.35);
+}
+[data-theme="light"] .ac-growth-nums { color: rgba(0,0,0,0.35); }
+
+/* Mini stats */
+[data-theme="light"] .ac-mini-stat {
+  background: rgba(0,0,0,0.02);
+  border-color: rgba(0,0,0,0.06);
+}
+[data-theme="light"] .ac-mini-stat.accent { border-color: rgba(0,0,0,0.12); }
+[data-theme="light"] .ac-ms-val { color: rgba(0,0,0,0.8); }
+[data-theme="light"] .ac-ms-label { color: rgba(0,0,0,0.3); }
+
+/* Sparkline */
+[data-theme="light"] .ac-hour-bar { background: rgba(0,0,0,0.12); }
+[data-theme="light"] .ac-hour-label { color: rgba(0,0,0,0.2); }
+
+/* Leaders */
+[data-theme="light"] .ac-leader { background: rgba(0,0,0,0.015); }
+[data-theme="light"] .ac-leader.first { background: rgba(0,0,0,0.04); }
+[data-theme="light"] .ac-leader-rank { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .ac-leader.first .ac-leader-rank { color: rgba(0,0,0,0.5); }
+[data-theme="light"] .ac-leader-name { color: rgba(0,0,0,0.6); }
+[data-theme="light"] .ac-leader-stat { color: rgba(0,0,0,0.4); }
+
+/* Feed */
+[data-theme="light"] .ac-feed-item { background: rgba(0,0,0,0.01); }
+[data-theme="light"] .ac-feed-item:hover { background: rgba(0,0,0,0.03); }
+[data-theme="light"] .ac-feed-user { color: rgba(0,0,0,0.55); }
+[data-theme="light"] .ac-feed-page { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .ac-feed-time { color: rgba(0,0,0,0.2); }
+
+/* Users table */
+[data-theme="light"] .ac-users-head h3 { color: rgba(0,0,0,0.7); }
+[data-theme="light"] .ac-users-hint { color: rgba(0,0,0,0.15); }
+[data-theme="light"] .ac-th-sort:hover { color: rgba(0,0,0,0.5); }
+[data-theme="light"] .ac-table th {
+  color: rgba(0,0,0,0.25);
+  border-bottom-color: rgba(0,0,0,0.06);
+}
+[data-theme="light"] .ac-table td {
+  color: rgba(0,0,0,0.4);
+  border-bottom-color: rgba(0,0,0,0.04);
+}
+[data-theme="light"] .ac-table tbody tr:hover { background: rgba(0,0,0,0.02); }
+[data-theme="light"] .ac-uname { color: rgba(0,0,0,0.65); }
+[data-theme="light"] .ac-udiscord { color: rgba(0,0,0,0.2); }
+[data-theme="light"] .ac-streak-pill {
+  background: rgba(0,0,0,0.05);
+  color: rgba(0,0,0,0.5);
+}
+[data-theme="light"] .ac-sub-badge {
+  background: rgba(0,0,0,0.03);
+  color: rgba(0,0,0,0.2);
+}
+[data-theme="light"] .ac-dot { background: rgba(0,0,0,0.08); }
+[data-theme="light"] .ac-dot.on { background: rgba(0,0,0,0.45); }
+[data-theme="light"] .ac-dim { color: rgba(0,0,0,0.2); }
+
+/* Big numbers */
+[data-theme="light"] .ac-big-num { color: rgba(0,0,0,0.8); }
+[data-theme="light"] .ac-big-num.dim { color: rgba(0,0,0,0.2); }
+[data-theme="light"] .ac-big-sub { color: rgba(0,0,0,0.2); }
+
+/* Page legend */
+[data-theme="light"] .ac-page-legend { border-top-color: rgba(0,0,0,0.05); }
+[data-theme="light"] .ac-page-users { color: rgba(0,0,0,0.25); }
+
+/* Check-in tab */
+[data-theme="light"] .ac-ci-freq-row { border-bottom-color: rgba(0,0,0,0.04); }
+[data-theme="light"] .ac-ci-freq-label { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .ac-ci-freq-val { color: rgba(0,0,0,0.75); }
+[data-theme="light"] .ac-ci-trend-fill.benefit { background: rgba(0,0,0,0.15); }
+[data-theme="light"] .ac-ci-trend-label { color: rgba(0,0,0,0.2); }
+[data-theme="light"] .ac-ci-legend { border-top-color: rgba(0,0,0,0.05); }
+[data-theme="light"] .ac-ci-legend-item { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .ac-ci-dot.benefit { background: rgba(0,0,0,0.15); }
+[data-theme="light"] .ac-ci-depth-label { color: rgba(0,0,0,0.55); }
+[data-theme="light"] .ac-ci-depth-pct { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .ac-ci-depth-bar { background: rgba(0,0,0,0.04); }
+[data-theme="light"] .ac-ci-depth-meta { color: rgba(0,0,0,0.2); }
+
+/* Empty message */
+[data-theme="light"] .ac-empty-msg { color: rgba(0,0,0,0.2); }
+
+/* Password gate */
+[data-theme="light"] .ac-gate-icon { color: rgba(0,0,0,0.1); }
+[data-theme="light"] .ac-gate-title { color: #000000; }
+[data-theme="light"] .ac-gate-sub { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .ac-gate-input {
+  background: rgba(0,0,0,0.03);
+  border-color: rgba(0,0,0,0.1);
+  color: #000000;
+}
+[data-theme="light"] .ac-gate-input:focus { border-color: rgba(0,0,0,0.2); }
+[data-theme="light"] .ac-gate-input::placeholder { color: rgba(0,0,0,0.2); }
+[data-theme="light"] .ac-gate-btn {
+  background: rgba(0,0,0,0.06);
+  border-color: rgba(0,0,0,0.1);
+  color: rgba(0,0,0,0.7);
+}
+[data-theme="light"] .ac-gate-btn:hover {
+  background: rgba(0,0,0,0.1);
+  color: #000000;
+}
+
+/* Loading / Error */
+[data-theme="light"] .ac-loading { color: rgba(0,0,0,0.2); }
+[data-theme="light"] .ac-loader { background: rgba(0,0,0,0.04); }
+[data-theme="light"] .ac-loader::after { background: rgba(0,0,0,0.15); }
+[data-theme="light"] .ac-error { color: rgba(239,68,68,0.6); }
+
+/* Warning state */
+[data-theme="light"] .ac-mini-stat.warn { border-color: rgba(239,68,68,0.2); }

@@ -577,3 +577,158 @@
     flex-wrap: wrap;
   }
 }
+
+/* =============================================================================
+   LIGHT THEME OVERRIDES
+   ============================================================================= */
+
+[data-theme="light"] .kb-container { color: #000000; }
+[data-theme="light"] .kb-header h1 { color: #000000; }
+
+[data-theme="light"] .kb-badge {
+  color: rgba(184,134,11,0.7);
+  background: rgba(184,134,11,0.06);
+  border-color: rgba(184,134,11,0.12);
+}
+
+/* Loading */
+[data-theme="light"] .kb-loading { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .kb-loading-spinner {
+  border-color: rgba(0,0,0,0.08);
+  border-top-color: rgba(0,0,0,0.3);
+}
+
+/* Stats */
+[data-theme="light"] .kb-stat {
+  background: rgba(0,0,0,0.02);
+  border-color: rgba(0,0,0,0.06);
+}
+[data-theme="light"] .kb-stat-number { color: #000000; }
+[data-theme="light"] .kb-stat-label { color: rgba(0,0,0,0.35); }
+
+/* Upload section */
+[data-theme="light"] .kb-upload-section {
+  background: rgba(0,0,0,0.015);
+  border-color: rgba(0,0,0,0.06);
+}
+
+/* Tabs */
+[data-theme="light"] .kb-tabs { border-bottom-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .kb-tab { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .kb-tab:hover { color: rgba(0,0,0,0.6); }
+[data-theme="light"] .kb-tab.active {
+  color: #000000;
+  border-bottom-color: rgba(184,134,11,0.6);
+}
+
+/* Forms */
+[data-theme="light"] .kb-input,
+[data-theme="light"] .kb-select,
+[data-theme="light"] .kb-textarea {
+  background: rgba(0,0,0,0.03);
+  border-color: rgba(0,0,0,0.1);
+  color: #000000;
+}
+[data-theme="light"] .kb-input:focus,
+[data-theme="light"] .kb-select:focus,
+[data-theme="light"] .kb-textarea:focus {
+  border-color: rgba(0,0,0,0.2);
+}
+[data-theme="light"] .kb-input::placeholder,
+[data-theme="light"] .kb-textarea::placeholder {
+  color: rgba(0,0,0,0.25);
+}
+[data-theme="light"] .kb-select option {
+  background: #ffffff;
+  color: #000000;
+}
+[data-theme="light"] .kb-char-count { color: rgba(0,0,0,0.25); }
+
+/* File input */
+[data-theme="light"] .kb-file-label {
+  background: rgba(0,0,0,0.02);
+  border-color: rgba(0,0,0,0.1);
+  color: rgba(0,0,0,0.35);
+}
+[data-theme="light"] .kb-file-label:hover { border-color: rgba(0,0,0,0.2); }
+[data-theme="light"] .kb-file-label.has-file {
+  border-color: rgba(184,134,11,0.25);
+  color: rgba(0,0,0,0.7);
+}
+
+/* Status banner */
+[data-theme="light"] .kb-status-uploading {
+  background: rgba(184,134,11,0.06);
+  border-color: rgba(184,134,11,0.12);
+  color: rgba(184,134,11,0.9);
+}
+[data-theme="light"] .kb-status-spinner {
+  border-color: rgba(184,134,11,0.15);
+  border-top-color: rgba(184,134,11,0.7);
+}
+[data-theme="light"] .kb-processing { background: rgba(0,0,0,0.03); }
+
+/* Documents */
+[data-theme="light"] .kb-documents-header h2 { color: #000000; }
+[data-theme="light"] .kb-doc-count {
+  color: rgba(0,0,0,0.35);
+  background: rgba(0,0,0,0.05);
+}
+
+/* Empty state */
+[data-theme="light"] .kb-empty { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .kb-empty-hint { color: rgba(0,0,0,0.2) !important; }
+
+/* Document list */
+[data-theme="light"] .kb-doc {
+  background: rgba(0,0,0,0.015);
+  border-color: rgba(0,0,0,0.06);
+}
+[data-theme="light"] .kb-doc-name { color: #000000; }
+[data-theme="light"] .kb-doc-meta { color: rgba(0,0,0,0.3); }
+
+[data-theme="light"] .kb-cat-select {
+  background: rgba(0,0,0,0.03);
+  border-color: rgba(0,0,0,0.08);
+  color: rgba(0,0,0,0.5);
+}
+[data-theme="light"] .kb-cat-select option {
+  background: #ffffff;
+  color: #000000;
+}
+
+[data-theme="light"] .kb-toggle.on {
+  background: rgba(34,197,94,0.1);
+  color: #16a34a;
+}
+[data-theme="light"] .kb-toggle.off {
+  background: rgba(0,0,0,0.04);
+  color: rgba(0,0,0,0.3);
+}
+
+[data-theme="light"] .kb-remove {
+  border-color: rgba(0,0,0,0.08);
+  color: rgba(0,0,0,0.25);
+}
+[data-theme="light"] .kb-remove:hover {
+  border-color: rgba(220,38,38,0.3);
+  color: rgba(220,38,38,0.7);
+}
+
+[data-theme="light"] .kb-confirm-yes {
+  background: rgba(220,38,38,0.1);
+  border-color: rgba(220,38,38,0.25);
+  color: #dc2626;
+}
+[data-theme="light"] .kb-confirm-no {
+  background: rgba(0,0,0,0.03);
+  border-color: rgba(0,0,0,0.08);
+  color: rgba(0,0,0,0.35);
+}
+
+/* Auth error */
+[data-theme="light"] .kb-auth-error {
+  background: rgba(220,38,38,0.06);
+  border-color: rgba(220,38,38,0.12);
+  color: rgba(220,38,38,0.8);
+}
