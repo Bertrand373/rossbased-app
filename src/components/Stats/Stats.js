@@ -337,20 +337,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
     const data = rawData.datasets[0].data;
     const pointRadii = data.map((value, index) => {
       if (value === null) return 0;
-      
-      const firstValidIndex = data.findIndex(v => v !== null);
-      let lastValidIndex = -1;
-      for (let i = data.length - 1; i >= 0; i--) {
-        if (data[i] !== null) {
-          lastValidIndex = i;
-          break;
-        }
-      }
-      
-      if (index === firstValidIndex || index === lastValidIndex) {
-        return 5;
-      }
-      return 0;
+      return 4;
     });
     
     return {
@@ -368,6 +355,7 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
         pointHoverRadius: 6,
         pointHoverBackgroundColor: lineColor,
         pointHoverBorderColor: pointBorderColor,
+        spanGaps: false,
       }]
     };
   }, [safeUserData, selectedMetric, timeRange, isDarkTheme]);
@@ -386,9 +374,27 @@ const Stats = ({ userData, isPremium, updateUserData }) => {
 
   const confirmResetStreak = async () => {
     try {
+      const now = new Date();
+      const history = [...(safeUserData.streakHistory || [])];
+      
+      // Close out the active streak (reason: 'reset', NOT 'relapse')
+      const activeIdx = history.findIndex(s => s.start && !s.end);
+      if (activeIdx !== -1) {
+        history[activeIdx] = { 
+          ...history[activeIdx], 
+          end: now, 
+          days: safeUserData.currentStreak || 0, 
+          reason: 'reset' 
+        };
+      }
+      
+      // Start a fresh streak
+      history.push({ start: now, end: null, days: 0 });
+      
       await updateUserData({
         currentStreak: 0,
-        startDate: new Date()
+        startDate: now,
+        streakHistory: history
       });
       setShowResetStreakModal(false);
       toast.success('Streak reset');
