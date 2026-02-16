@@ -351,6 +351,11 @@ const MindProgram = ({ isPremium }) => {
           {/* Audio Player */}
           <div className="mp-player">
             <div className="mp-player-main">
+              <img 
+                src="/images/based30-cover.png" 
+                alt="Based30" 
+                className="mp-album-art"
+              />
               <button
                 className={`mp-play-btn ${isPlaying ? 'active' : ''}`}
                 onClick={handlePlay}
