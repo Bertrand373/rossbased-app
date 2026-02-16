@@ -1080,11 +1080,14 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
       })()}
 
       {/* ================================================================
-          DAY INFO MODAL - UNIFIED STRUCTURE FOR ALL DAYS
-          Always uses header/content/footer for consistent scrolling
+          DAY INFO + EDIT DAY - SHARED OVERLAY
+          Single overlay stays mounted during transitions, no flash
           ================================================================ */}
-      {dayInfoModal && selectedDate && (
+      {(dayInfoModal || editDayModal) && selectedDate && (
         <div className="calendar-overlay">
+          
+          {/* DAY INFO MODAL */}
+          {dayInfoModal && (
           <div className="calendar-modal calendar-day-info has-scrollable-content" onClick={e => e.stopPropagation()}>
             
             {(() => {
@@ -1153,6 +1156,36 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
               );
             })()}
           </div>
+          )}
+
+          {/* EDIT DAY MODAL */}
+          {editDayModal && (
+          <div className={`calendar-modal calendar-edit-day ${showTriggerSelection ? 'has-trigger-selection' : ''}`} onClick={e => e.stopPropagation()}>
+            
+            <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
+            {getEditSubtitle() && <p>{getEditSubtitle()}</p>}
+
+            {renderEditContent()}
+
+            <div className="calendar-actions">
+              {!showTriggerSelection && getEditOptions().type !== 'future' && (
+                <button className="calendar-btn-back" onClick={backToDayInfo}>
+                  Back
+                </button>
+              )}
+              {showTriggerSelection && (
+                <button className="calendar-btn-back" onClick={() => {
+                  setShowTriggerSelection(false);
+                  setEditingExistingTrigger(false);
+                  setSelectedTrigger('');
+                }}>
+                  Back
+                </button>
+              )}
+            </div>
+          </div>
+          )}
+
         </div>
       )}
 
@@ -1199,38 +1232,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
                 </>
               );
             })()}
-          </div>
-        </div>
-      )}
-
-      {/* ================================================================
-          EDIT DAY MODAL - Context-aware
-          ================================================================ */}
-      {editDayModal && selectedDate && (
-        <div className="calendar-overlay">
-          <div className={`calendar-modal calendar-edit-day ${showTriggerSelection ? 'has-trigger-selection' : ''}`} onClick={e => e.stopPropagation()}>
-            
-            <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
-            {getEditSubtitle() && <p>{getEditSubtitle()}</p>}
-
-            {renderEditContent()}
-
-            <div className="calendar-actions">
-              {!showTriggerSelection && getEditOptions().type !== 'future' && (
-                <button className="calendar-btn-back" onClick={backToDayInfo}>
-                  Back
-                </button>
-              )}
-              {showTriggerSelection && (
-                <button className="calendar-btn-back" onClick={() => {
-                  setShowTriggerSelection(false);
-                  setEditingExistingTrigger(false);
-                  setSelectedTrigger('');
-                }}>
-                  Back
-                </button>
-              )}
-            </div>
           </div>
         </div>
       )}
