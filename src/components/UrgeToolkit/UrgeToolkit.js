@@ -640,7 +640,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   return (
     <div className="urge-toolkit">
       {/* Mind Program — Always visible at top */}
-      <MindProgram isPremium={isPremium} />
+      <MindProgram isPremium={isPremium} userData={userData} updateUserData={updateUserData} />
 
       {/* Peak State Recording — shows most recent during crisis */}
       {userData.peakRecordings && userData.peakRecordings.length > 0 && (() => {

@@ -98,7 +98,7 @@ const Landing = ({ onLogin }) => {
           <div className="landing-feature-number">04</div>
           <div className="landing-feature-content">
             <h3>Private by design</h3>
-            <p>ML runs on your device. Your data never touches our servers.</p>
+            <p>ML runs on your device. Your data is encrypted and never sold.</p>
           </div>
         </div>
       </section>
@@ -116,7 +116,7 @@ const Landing = ({ onLogin }) => {
       
       {/* Footer */}
       <footer className="landing-footer">
-        <p>All data encrypted. ML runs on your device. We never see your patterns.</p>
+        <p>All data encrypted. ML runs on your device. We never sell your data.</p>
       </footer>
       
       {/* Auth Modal */}

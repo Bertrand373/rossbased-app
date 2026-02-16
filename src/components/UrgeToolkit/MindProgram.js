@@ -15,9 +15,9 @@ import './MindProgram.css';
 // Option B: Serve from Render backend → `${process.env.REACT_APP_API_URL}/audio/based30.mp3`
 const AUDIO_SRC = '/audio/based30.mp3';
 
-const STORAGE_KEY = 'titantrack_mindprogram';
 const EXPLAINER_KEY = 'titantrack_mp_explained';
 const TOTAL_NIGHTS = 30;
+const LEGACY_STORAGE_KEY = 'titantrack_mindprogram';
 
 // ============================================================
 // HELPERS
@@ -32,31 +32,37 @@ const getDefaultData = () => ({
   isComplete: false
 });
 
-const loadProgress = () => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) return { ...getDefaultData(), ...JSON.parse(stored) };
-  } catch (e) {
-    console.warn('MindProgram: Could not load progress', e);
-  }
-  return getDefaultData();
-};
-
-const saveProgress = (data) => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch (e) {
-    console.warn('MindProgram: Could not save progress', e);
-  }
-};
-
 // ============================================================
 // COMPONENT
 // ============================================================
 
-const MindProgram = ({ isPremium }) => {
+const MindProgram = ({ isPremium, userData, updateUserData }) => {
+  // Initialize from server data, with one-time localStorage migration
+  const getInitialProgress = () => {
+    const serverData = userData?.mindProgram;
+    if (serverData && serverData.nightsCompleted > 0) {
+      return { ...getDefaultData(), ...serverData };
+    }
+    
+    // Migration: check localStorage for existing progress
+    try {
+      const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (legacy) {
+        const parsed = { ...getDefaultData(), ...JSON.parse(legacy) };
+        // Migrate to server and clean up localStorage
+        if (updateUserData && parsed.nightsCompleted > 0) {
+          updateUserData({ mindProgram: parsed });
+          localStorage.removeItem(LEGACY_STORAGE_KEY);
+        }
+        return parsed;
+      }
+    } catch (e) {}
+    
+    return serverData ? { ...getDefaultData(), ...serverData } : getDefaultData();
+  };
+
   // Progress state
-  const [progress, setProgress] = useState(loadProgress);
+  const [progress, setProgress] = useState(getInitialProgress);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showWhatItDoes, setShowWhatItDoes] = useState(false);
   const [showExplainer, setShowExplainer] = useState(false);
@@ -75,6 +81,14 @@ const MindProgram = ({ isPremium }) => {
   const todayString = getTodayString();
   const alreadyConfirmedToday = progress.lastConfirmedDate === todayString;
   const progressPercent = (progress.nightsCompleted / TOTAL_NIGHTS) * 100;
+
+  // Sync from server when userData changes (cross-device)
+  useEffect(() => {
+    const serverData = userData?.mindProgram;
+    if (serverData && serverData.nightsCompleted > progress.nightsCompleted) {
+      setProgress({ ...getDefaultData(), ...serverData });
+    }
+  }, [userData?.mindProgram]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ============================================================
   // MEDIA SESSION (Lock screen controls + metadata)
@@ -242,21 +256,21 @@ const MindProgram = ({ isPremium }) => {
     };
 
     setProgress(updated);
-    saveProgress(updated);
+    updateUserData({ mindProgram: updated });
 
     if (isNowComplete) {
       toast.success('Based30 complete — 30 nights');
     } else {
       toast.success(`Night ${newNights} logged`);
     }
-  }, [progress, alreadyConfirmedToday, todayString]);
+  }, [progress, alreadyConfirmedToday, todayString, updateUserData]);
 
   const handleRestart = useCallback(() => {
     const fresh = getDefaultData();
     setProgress(fresh);
-    saveProgress(fresh);
+    updateUserData({ mindProgram: fresh });
     toast.success('Program restarted');
-  }, []);
+  }, [updateUserData]);
 
   // ============================================================
   // FORMAT HELPERS
