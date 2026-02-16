@@ -99,40 +99,6 @@ function buildInsightEmbed(text, daysBack = 7) {
 }
 
 // ============================================================
-// DYNAMIC TOKEN SCALING
-// Mechanically caps response length based on input length.
-// Claude cannot override a hard token limit.
-// ============================================================
-
-const getMaxTokens = (messageText) => {
-  const wordCount = messageText.trim().split(/\s+/).length;
-  const text = messageText.toLowerCase();
-  
-  // Deep topics that always deserve full response regardless of message length
-  const deepTopics = [
-    'karma', 'polarity', 'chakra', 'kundalini', 'ojas', 'jing', 'shen',
-    'chrism', 'pineal', 'third eye', 'consciousness', 'transmut', 'energy',
-    'spiritual', 'meditation', 'breathwork', 'universe', 'god', 'divine',
-    'angel', '1111', '111', '222', '333', '444', '555', '666', '777', '888', '999',
-    'synchronicit', 'manifest', 'attract', 'vibrat', 'frequenc', 'dimension',
-    'astral', 'aura', 'electromagnetic', 'spermatogenesis', 'flatline',
-    'wet dream', 'nocturnal', 'relapse', 'edging', 'how does', 'how do',
-    'what is', 'what are', 'why do', 'why does', 'explain', 'teach me'
-  ];
-  
-  const isDeepTopic = deepTopics.some(topic => text.includes(topic));
-  
-  // If it's a deep/spiritual topic or a question, give full room
-  if (isDeepTopic) return 400;
-  
-  // Short casual messages
-  if (wordCount <= 3) return 120;      // "thanks" / "ok" / "got it" → short but not starved
-  if (wordCount <= 8) return 200;      // casual statement → decent paragraph
-  if (wordCount <= 20) return 300;     // moderate message → 1-2 paragraphs
-  return 400;                          // longer messages → full response
-};
-
-// ============================================================
 // SYSTEM PROMPT - The Oracle Identity
 // ============================================================
 
@@ -183,10 +149,12 @@ But you don't perform perception. You don't say "I sense that you..." You just a
 
 This is critical. Match the weight of their message, not just the topic.
 
-If their message is 1-5 words, your response is 1-3 sentences. Period.
-If their message is a casual statement, 2-4 sentences max.
-If their message is a genuine deep question, 1-2 short paragraphs.
-If their message is a complex situation needing real guidance, 2-3 short paragraphs max.
+Short casual messages ("thanks", "ok", "got it") get 1-2 sentences. Period.
+Casual statements or simple yes/no questions get 2-4 sentences max.
+Genuine questions about retention, spirituality, or personal struggles get 1-2 short paragraphs.
+Complex situations needing real guidance get 2-3 short paragraphs max.
+
+ALWAYS complete your thought. Never stop mid-sentence or mid-paragraph. If you start explaining a mechanism, finish it. If the topic deserves depth, go deep and land it cleanly with a final sentence that closes the thought. A complete shorter response is always better than a longer one that trails off.
 
 When in doubt, shorter. This is Discord, not an essay. Say what needs to be said. Stop.
 
@@ -249,7 +217,7 @@ Give newcomers grace. If someone is clearly still figuring out how this works, j
 5. NEVER repeat what they just said back to them
 6. NEVER write more than you need to. When the point is made, stop.
 7. No emojis unless they use them first
-8. Maximum 2000 characters (Discord limit)
+8. ALWAYS finish your thought. Never leave a response incomplete. The system handles message length automatically.
 9. Use their name rarely. Maybe 1 in 8 responses.
 10. ALWAYS respond in the same language the user writes in. Spanish gets Spanish. Portuguese gets Portuguese.`;
 
@@ -604,22 +572,50 @@ const buildMessages = (channelId, currentMessage, username) => {
   return messages;
 };
 
-// Truncate response to Discord's 2000 char limit
-const truncateResponse = (text) => {
-  if (text.length <= 2000) return text;
+// Split response into chunks that fit Discord embed descriptions (4096 char limit)
+// Splits at paragraph boundaries so each chunk reads as a complete thought
+const EMBED_CHAR_LIMIT = 3900; // Safe buffer below 4096
+
+const splitResponse = (text) => {
+  if (text.length <= EMBED_CHAR_LIMIT) return [text];
   
-  // Find last sentence end before limit
-  const truncated = text.substring(0, 1997);
-  const lastPeriod = truncated.lastIndexOf('.');
-  const lastExclaim = truncated.lastIndexOf('!');
-  const lastQuestion = truncated.lastIndexOf('?');
-  const lastEnd = Math.max(lastPeriod, lastExclaim, lastQuestion);
+  const chunks = [];
+  let remaining = text;
   
-  if (lastEnd > 1500) {
-    return truncated.substring(0, lastEnd + 1);
+  while (remaining.length > 0) {
+    if (remaining.length <= EMBED_CHAR_LIMIT) {
+      chunks.push(remaining);
+      break;
+    }
+    
+    // Try to split at a paragraph break (double newline)
+    const slice = remaining.substring(0, EMBED_CHAR_LIMIT);
+    let splitAt = slice.lastIndexOf('\n\n');
+    
+    // Fallback: split at single newline
+    if (splitAt < EMBED_CHAR_LIMIT * 0.5) {
+      splitAt = slice.lastIndexOf('\n');
+    }
+    
+    // Fallback: split at sentence end
+    if (splitAt < EMBED_CHAR_LIMIT * 0.5) {
+      const lastPeriod = slice.lastIndexOf('. ');
+      const lastExclaim = slice.lastIndexOf('! ');
+      const lastQuestion = slice.lastIndexOf('? ');
+      splitAt = Math.max(lastPeriod, lastExclaim, lastQuestion);
+      if (splitAt > 0) splitAt += 1; // Include the punctuation
+    }
+    
+    // Last resort: hard cut at limit
+    if (splitAt < EMBED_CHAR_LIMIT * 0.3) {
+      splitAt = EMBED_CHAR_LIMIT;
+    }
+    
+    chunks.push(remaining.substring(0, splitAt).trimEnd());
+    remaining = remaining.substring(splitAt).trimStart();
   }
   
-  return truncated + '...';
+  return chunks;
 };
 
 // ============================================================
@@ -882,8 +878,8 @@ client.on('messageCreate', async (message) => {
     const username = message.member?.displayName || message.author.username;
     const messages = buildMessages(message.channel.id, content, username);
     
-    // Dynamic token limit based on message length
-    const maxTokens = getMaxTokens(content);
+    // Flat token ceiling — let Claude self-regulate length via system prompt
+    const maxTokens = 1024;
     
     // RAG: Retrieve relevant knowledge
     const ragContext = await retrieveKnowledge(content, { limit: 5, maxTokens: 2000 });
@@ -957,13 +953,12 @@ client.on('messageCreate', async (message) => {
     });
     
     const reply = response.content[0].text;
-    const truncated = truncateResponse(reply);
+    const chunks = splitResponse(reply);
     
     // Record usage first so we can show remaining
     await recordUsage(message.author.id);
     
-    // Build embed with optional remaining count
-    const embed = buildOracleEmbed(truncated);
+    // Get remaining count for footer
     const todayStr = getTodayET();
     let used = 0;
     try {
@@ -972,18 +967,27 @@ client.on('messageCreate', async (message) => {
     } catch (err) { /* silent */ }
     const remaining = MAX_DAILY_PER_USER - used;
     
-    if (remaining <= 5 && remaining > 0) {
-      embed.setFooter({ text: `${remaining} remaining today` });
+    // Send first chunk as reply, rest as follow-ups
+    for (let i = 0; i < chunks.length; i++) {
+      const embed = buildOracleEmbed(chunks[i]);
+      
+      // Only add footer to the LAST chunk
+      if (i === chunks.length - 1 && remaining <= 5 && remaining > 0) {
+        embed.setFooter({ text: `${remaining} remaining today` });
+      }
+      
+      if (i === 0) {
+        await message.reply({ embeds: [embed] });
+      } else {
+        await message.channel.send({ embeds: [embed] });
+      }
     }
     
-    // Send response as embed
-    await message.reply({ embeds: [embed] });
-    
-    // Record in history
+    // Record in history (full response, not just first chunk)
     addToHistory(message.channel.id, 'user', content, username);
-    addToHistory(message.channel.id, 'assistant', truncated);
+    addToHistory(message.channel.id, 'assistant', reply);
     
-    console.log(`🔮 Oracle responded to ${username} in #${channelName} [${maxTokens} max tokens]`);
+    console.log(`🔮 Oracle responded to ${username} in #${channelName} [${chunks.length} embed(s)]`);
     
     // --- LINKED USER: Generate memory note (fire-and-forget) ---
     if (linkedUser && linkedUser.discordOracleSync !== false && content.trim().split(/\s+/).length >= 4) {
@@ -995,7 +999,7 @@ client.on('messageCreate', async (message) => {
             system: 'You are a silent observer. Given a user message and an AI response, write 1-2 sentences capturing what this reveals about the user\'s current state, mindset, or journey. Be specific, not generic. Write in third person. Never start with "The user". Just the observation.',
             messages: [{
               role: 'user',
-              content: `User (Day ${linkedUser.currentStreak || 0}, Discord): "${content}"\n\nOracle response: "${truncated.substring(0, 500)}"`
+              content: `User (Day ${linkedUser.currentStreak || 0}, Discord): "${content}"\n\nOracle response: "${reply.substring(0, 500)}"`
             }]
           });
           

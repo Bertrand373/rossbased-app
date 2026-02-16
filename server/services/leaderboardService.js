@@ -312,7 +312,7 @@ async function postCtaToDiscord() {
     const ctaPayload = {
       embeds: [{
         color: 0x000000,
-        description: `"Don't count the days."\n\nThen how do you know what day 30 feels like? Day 90? The flatlines?\n\nYou tracked. We all did. That's how you learned.\n\n**[titantrack.app](https://titantrack.app)**\n\n*Free lifetime access for Discord members who joined before Feb 17*`
+        description: `You already know the benefits are real. You've felt them.\n\nBut feeling it and seeing the full pattern are two different things.\n\n**[titantrack.app](https://titantrack.app)**\n\n*Free lifetime access for Discord members who joined before February 17th, 2026.*`
       }]
     };
     
