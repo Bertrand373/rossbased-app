@@ -36,6 +36,9 @@ const Tracker = ({ userData, updateUserData }) => {
     anxiety: 5, mood: 5, clarity: 5, processing: 5
   });
   
+  // Track if user touched any emotional slider (prevents logging defaults as real data)
+  const [emotionalTouched, setEmotionalTouched] = useState(false);
+  
   // Live clock state - updates every minute
   const [currentTime, setCurrentTime] = useState(new Date());
   
@@ -77,6 +80,10 @@ const Tracker = ({ userData, updateUserData }) => {
         clarity: existing.clarity || 5,
         processing: existing.processing || 5
       });
+      // If this entry already has emotional data, mark as touched
+      if (typeof existing.anxiety === 'number') {
+        setEmotionalTouched(true);
+      }
     }
   }, [userData.benefitTracking, currentTime]);
 
@@ -219,6 +226,11 @@ const Tracker = ({ userData, updateUserData }) => {
     const newValue = parseInt(value);
     setBenefits(prev => ({ ...prev, [key]: newValue }));
     
+    // Mark emotional sliders as touched if user interacts with one
+    if (['anxiety', 'mood', 'clarity', 'processing'].includes(key)) {
+      setEmotionalTouched(true);
+    }
+    
     // Update fill bar visually - use ((value - 1) / 9) to match slider thumb position
     // Range is 1-10, so value 1 = 0% fill, value 10 = 100% fill
     if (fillRefs.current[key]) {
@@ -234,9 +246,21 @@ const Tracker = ({ userData, updateUserData }) => {
       format(new Date(b.date), 'yyyy-MM-dd') === today
     );
     
+    // Only include emotional fields if user actually touched them
     const entry = { 
       date: new Date(), 
-      ...benefits,
+      energy: benefits.energy,
+      focus: benefits.focus,
+      confidence: benefits.confidence,
+      aura: benefits.aura,
+      sleep: benefits.sleep,
+      workout: benefits.workout,
+      ...(emotionalTouched ? {
+        anxiety: benefits.anxiety,
+        mood: benefits.mood,
+        clarity: benefits.clarity,
+        processing: benefits.processing
+      } : {}),
       streakDay: streak 
     };
     
