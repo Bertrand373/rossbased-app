@@ -277,8 +277,8 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   };
 
   const showEditFromInfo = () => {
-    setDayInfoModal(false);
     setEditDayModal(true);
+    setDayInfoModal(false);
     setSelectedTrigger('');
     setShowTriggerSelection(false);
     setEditingExistingTrigger(false);
@@ -292,11 +292,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   };
 
   const backToDayInfo = () => {
+    setDayInfoModal(true);
     setEditDayModal(false);
     setShowTriggerSelection(false);
     setEditingExistingTrigger(false);
     setSelectedTrigger('');
-    setDayInfoModal(true);
   };
 
   // Moon detail modal handlers
