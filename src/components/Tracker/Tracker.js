@@ -40,6 +40,10 @@ const Tracker = ({ userData, updateUserData }) => {
   // Track if user touched any emotional slider (prevents logging defaults as real data)
   const [emotionalTouched, setEmotionalTouched] = useState(false);
   
+  // Peak State Recording — prompt after high benefit logs
+  const [showPeakPrompt, setShowPeakPrompt] = useState(false);
+  const [peakMessage, setPeakMessage] = useState('');
+  
   // Live clock state - updates every minute
   const [currentTime, setCurrentTime] = useState(new Date());
   
@@ -275,6 +279,13 @@ const Tracker = ({ userData, updateUserData }) => {
     setShowBenefits(false);
     toast.success('Benefits logged.');
     
+    // Peak State Detection — average of 6 core benefits ≥ 7 triggers prompt
+    const coreAvg = (benefits.energy + benefits.focus + benefits.confidence + benefits.aura + benefits.sleep + benefits.workout) / 6;
+    if (coreAvg >= 7) {
+      // Small delay so benefits modal closes first
+      setTimeout(() => setShowPeakPrompt(true), 400);
+    }
+    
     // Track with Mixpanel
     trackDailyLog(benefits, streak);
   };
@@ -283,6 +294,24 @@ const Tracker = ({ userData, updateUserData }) => {
   const handlePatternAlertVisibilityChange = useCallback((isShowing) => {
     setIsPatternAlertShowing(isShowing);
   }, []);
+
+  // Save Peak State Recording
+  const savePeakRecording = () => {
+    if (!peakMessage.trim()) return;
+    
+    const recordings = userData.peakRecordings || [];
+    recordings.push({
+      message: peakMessage.trim(),
+      date: new Date(),
+      streakDay: streak,
+      avgScore: Math.round(((benefits.energy + benefits.focus + benefits.confidence + benefits.aura + benefits.sleep + benefits.workout) / 6) * 10) / 10
+    });
+    
+    updateUserData({ peakRecordings: recordings });
+    setShowPeakPrompt(false);
+    setPeakMessage('');
+    toast.success('Transmission recorded.');
+  };
 
   // Show date picker if no start date set
   if (showDatePicker) {
@@ -383,6 +412,47 @@ const Tracker = ({ userData, updateUserData }) => {
             <div className="benefits-actions">
               <button className="btn-primary" onClick={saveBenefits}>Save</button>
               <button className="btn-ghost" onClick={() => setShowBenefits(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Peak State Recording Prompt */}
+      {showPeakPrompt && (
+        <div className="overlay">
+          <div className="peak-prompt" onClick={e => e.stopPropagation()}>
+            <div className="peak-prompt-header">
+              <span className="peak-prompt-signal">PEAK STATE DETECTED</span>
+              <h2 className="peak-prompt-title">Leave a transmission</h2>
+              <p className="peak-prompt-desc">Record a message for when the noise returns. Your future self will see this during moments of weakness.</p>
+            </div>
+            
+            <textarea
+              className="peak-prompt-input"
+              placeholder="Write to your future self..."
+              value={peakMessage}
+              onChange={e => setPeakMessage(e.target.value)}
+              maxLength={500}
+              rows={4}
+              autoFocus
+            />
+            
+            <div className="peak-prompt-meta">
+              <span>Day {streak}</span>
+              <span>{peakMessage.length}/500</span>
+            </div>
+            
+            <div className="peak-prompt-actions">
+              <button 
+                className="btn-primary" 
+                onClick={savePeakRecording}
+                disabled={!peakMessage.trim()}
+              >
+                Save Transmission
+              </button>
+              <button className="btn-ghost" onClick={() => { setShowPeakPrompt(false); setPeakMessage(''); }}>
+                Skip
+              </button>
             </div>
           </div>
         </div>

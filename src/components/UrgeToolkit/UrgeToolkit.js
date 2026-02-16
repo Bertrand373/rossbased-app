@@ -642,6 +642,18 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
       {/* Mind Program — Always visible at top */}
       <MindProgram isPremium={isPremium} />
 
+      {/* Peak State Recording — shows most recent during crisis */}
+      {userData.peakRecordings && userData.peakRecordings.length > 0 && (() => {
+        const latest = userData.peakRecordings[userData.peakRecordings.length - 1];
+        return (
+          <div className="ut-peak-recording">
+            <div className="ut-peak-signal">YOUR TRANSMISSION</div>
+            <div className="ut-peak-meta">Day {latest.streakDay} · {new Date(latest.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+            <p className="ut-peak-message">{latest.message}</p>
+          </div>
+        );
+      })()}
+
       {/* Urge Intervention Section */}
       <div className="ut-intervention-label">URGE INTERVENTION</div>
 

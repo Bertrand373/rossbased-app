@@ -86,7 +86,10 @@ const MindProgram = ({ isPremium }) => {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: 'Based30',
       artist: 'TitanTrack',
-      album: 'Mind Program'
+      album: 'Mind Program',
+      artwork: [
+        { src: '/images/based30-cover.png', sizes: '512x512', type: 'image/png' }
+      ]
     });
 
     navigator.mediaSession.setActionHandler('play', () => {

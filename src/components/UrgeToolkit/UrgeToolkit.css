@@ -961,3 +961,41 @@
   .ut-modal-title { font-size: 1.5rem; }
   .ut-modal-timer { font-size: 3.5rem; }
 }
+
+/* =============================================================================
+   PEAK STATE RECORDING — Displayed during crisis
+   ============================================================================= */
+
+.ut-peak-recording {
+  width: 100%;
+  padding: 24px 0;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border-subtle);
+  text-align: center;
+  animation: fadeInUp 500ms ease forwards;
+  opacity: 0;
+}
+
+.ut-peak-signal {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: #c8a84e;
+  margin-bottom: 6px;
+}
+
+.ut-peak-meta {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  font-feature-settings: 'tnum' 1;
+  margin-bottom: 16px;
+}
+
+.ut-peak-message {
+  font-size: 1rem;
+  color: var(--text);
+  line-height: 1.6;
+  margin: 0;
+  font-style: italic;
+  letter-spacing: -0.01em;
+}
