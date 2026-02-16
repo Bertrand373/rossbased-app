@@ -280,10 +280,18 @@ const Tracker = ({ userData, updateUserData }) => {
     toast.success('Benefits logged.');
     
     // Peak State Detection — average of 6 core benefits ≥ 7 triggers prompt
+    // Throttle: only show if no recordings exist OR most recent is 7+ days old
     const coreAvg = (benefits.energy + benefits.focus + benefits.confidence + benefits.aura + benefits.sleep + benefits.workout) / 6;
     if (coreAvg >= 7) {
-      // Small delay so benefits modal closes first
-      setTimeout(() => setShowPeakPrompt(true), 400);
+      const recordings = userData.peakRecordings || [];
+      const lastRecording = recordings.length > 0 ? recordings[recordings.length - 1] : null;
+      const daysSinceLast = lastRecording 
+        ? Math.floor((Date.now() - new Date(lastRecording.date).getTime()) / (1000 * 60 * 60 * 24)) 
+        : Infinity;
+      
+      if (daysSinceLast >= 7) {
+        setTimeout(() => setShowPeakPrompt(true), 400);
+      }
     }
     
     // Track with Mixpanel

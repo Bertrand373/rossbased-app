@@ -186,6 +186,8 @@ const MindProgram = ({ isPremium }) => {
     if (audioRef.current) {
       setDuration(audioRef.current.duration);
       setAudioLoaded(true);
+      // Set recommended volume (works on desktop/Android, iOS ignores gracefully)
+      try { audioRef.current.volume = 0.3; } catch (e) {}
     }
   }, []);
 
@@ -402,6 +404,8 @@ const MindProgram = ({ isPremium }) => {
                 <span className="mp-toggle-knob" />
               </button>
             </div>
+
+            <span className="mp-volume-rec">Set phone volume to 20–30% before sleeping</span>
 
             {audioError && (
               <span className="mp-audio-error">Audio file not available</span>

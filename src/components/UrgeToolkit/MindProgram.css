@@ -232,6 +232,15 @@
   padding: 4px 0;
 }
 
+/* Volume recommendation */
+.mp-volume-rec {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  text-align: center;
+  display: block;
+  padding: 4px 0 0;
+}
+
 /* =============================================================================
    30-NIGHT TRACKER
    ============================================================================= */

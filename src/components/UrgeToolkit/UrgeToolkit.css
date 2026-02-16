@@ -980,7 +980,7 @@
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.12em;
-  color: #c8a84e;
+  color: var(--text-muted);
   margin-bottom: 6px;
 }
 
