@@ -561,6 +561,31 @@
   box-shadow: none !important;
 }
 
+/* Emotional section divider inside benefits modal */
+.benefits-section-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0 0 0;
+}
+
+.benefits-section-divider::before,
+.benefits-section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.benefits-section-divider span {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
 .benefits-actions {
   display: flex;
   flex-direction: column;

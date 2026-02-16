@@ -2,7 +2,6 @@
 // Matches Landing/Tracker/Stats aesthetic
 // UPDATED: Analysis tab focused on ONE powerful insight - emotional trajectory
 import React, { useState, useEffect } from 'react';
-import toast from 'react-hot-toast';
 import './EmotionalTimeline.css';
 import { FaCheck, FaExclamationTriangle } from 'react-icons/fa';
 
@@ -13,16 +12,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
   const [activeTab, setActiveTab] = useState('journey');
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  
-  // Check-in state
-  const [emotions, setEmotions] = useState({
-    anxiety: 5,
-    mood: 5,
-    clarity: 5,
-    processing: 5
-  });
-  const [hasLoggedToday, setHasLoggedToday] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
 
   // Lock body scroll when modal is open
   useBodyScrollLock(showModal);
@@ -256,24 +245,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
   const progress = getProgress();
 
-  // Check if logged today - load existing values
-  useEffect(() => {
-    if (userData?.emotionalLog) {
-      const today = new Date().toDateString();
-      const lastLog = userData.emotionalLog[userData.emotionalLog.length - 1];
-      if (lastLog && new Date(lastLog.date).toDateString() === today) {
-        setHasLoggedToday(true);
-        setIsEditing(false);
-        setEmotions({
-          anxiety: lastLog.anxiety || 5,
-          mood: lastLog.mood || 5,
-          clarity: lastLog.clarity || 5,
-          processing: lastLog.processing || 5
-        });
-      }
-    }
-  }, [userData]);
-
   // Lock scroll on Analysis tab (fixed content)
   useEffect(() => {
     if (activeTab === 'analysis') {
@@ -288,9 +259,11 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
   // ANALYSIS - Focused trajectory calculation
   // ============================================================
   const calculateTrajectory = () => {
-    const log = userData?.emotionalLog || [];
+    // Read emotional data from benefit tracking entries
+    const allBenefits = userData?.benefitTracking || [];
+    const log = allBenefits.filter(b => typeof b.anxiety === 'number');
     
-    // Need at least 7 check-ins for meaningful comparison
+    // Need at least 7 entries with emotional data
     if (log.length < 7) {
       return { 
         hasData: false, 
@@ -381,99 +354,15 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
   const analysis = calculateTrajectory();
 
-  // Save check-in (first time)
-  const handleSave = async () => {
-    if (hasLoggedToday) return;
-
-    const entry = {
-      date: new Date().toISOString(),
-      day: currentDay,
-      phase: currentPhase?.id || 1,
-      ...emotions
-    };
-
-    try {
-      const existingLog = userData?.emotionalLog || [];
-      await updateUserData({
-        emotionalLog: [...existingLog, entry]
-      });
-      setHasLoggedToday(true);
-      setIsEditing(false);
-      toast.success('Check-in saved');
-    } catch (error) {
-      toast.error('Failed to save');
-    }
-  };
-
-  // Update check-in (editing existing)
-  const handleUpdate = async () => {
-    if (!hasLoggedToday || !isEditing) return;
-
-    try {
-      const existingLog = userData?.emotionalLog || [];
-      const today = new Date().toDateString();
-      
-      const updatedLog = existingLog.map(entry => {
-        if (new Date(entry.date).toDateString() === today) {
-          return { ...entry, ...emotions };
-        }
-        return entry;
-      });
-
-      await updateUserData({ emotionalLog: updatedLog });
-      setIsEditing(false);
-      toast.success('Check-in updated');
-    } catch (error) {
-      toast.error('Failed to update');
-    }
-  };
-
-  // Handle button click
-  const handleButtonClick = () => {
-    if (!hasLoggedToday) {
-      handleSave();
-    } else if (!isEditing) {
-      setIsEditing(true);
-    } else {
-      handleUpdate();
-    }
-  };
-
-  // Get button text based on state
-  const getButtonText = () => {
-    if (!hasLoggedToday) return 'Save Check-in';
-    if (isEditing) return 'Update Check-in';
-    return 'Logged Today ✓';
-  };
-
-  // Get button class based on state
-  const getButtonClass = () => {
-    if (!hasLoggedToday) return 'et-save-btn';
-    if (isEditing) return 'et-save-btn';
-    return 'et-save-btn logged';
-  };
-
-  // Determine if sliders should be interactive
-  const slidersInteractive = !hasLoggedToday || isEditing;
-
   // Open phase modal
   const openPhase = (phase) => {
     setSelectedPhase(phase);
     setShowModal(true);
   };
 
-  // Slider items
-  const sliderItems = [
-    { key: 'anxiety', label: 'Anxiety Level', desc: '1 = calm, 10 = severe' },
-    { key: 'mood', label: 'Mood Stability', desc: '1 = volatile, 10 = stable' },
-    { key: 'clarity', label: 'Mental Clarity', desc: '1 = foggy, 10 = sharp' },
-    { key: 'processing', label: 'Emotional Processing', desc: '1 = blocked, 10 = flowing' }
-  ];
-
-  // Tab items
+  // Tab items - Journey and Analysis only
   const tabs = [
     { key: 'journey', label: 'Journey' },
-    { key: 'checkin', label: 'Check-in' },
     { key: 'analysis', label: 'Analysis' }
   ];
 
@@ -545,53 +434,6 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
         </div>
       )}
 
-      {/* Check-in Tab */}
-      {activeTab === 'checkin' && (
-        <div className="et-checkin">
-          <div className="et-checkin-header">Daily Check-in</div>
-          
-          <div className="et-sliders">
-            {sliderItems.map(({ key, label, desc }) => (
-              <div 
-                key={key} 
-                className={`et-slider-group ${!slidersInteractive ? 'view-mode' : ''}`}
-              >
-                <div className="et-slider-header">
-                  <span className="et-slider-label">{label}</span>
-                  <span className="et-slider-value">{emotions[key]}/10</span>
-                </div>
-                <div className="et-slider-wrap">
-                  <div 
-                    className="et-slider-fill" 
-                    style={{ width: `${((emotions[key] - 1) / 9) * 100}%` }}
-                  />
-                  <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value={emotions[key]}
-                    onChange={(e) => setEmotions(prev => ({ 
-                      ...prev, 
-                      [key]: parseInt(e.target.value) 
-                    }))}
-                    className="et-slider"
-                    disabled={!slidersInteractive}
-                  />
-                </div>
-                <span className="et-slider-desc">{desc}</span>
-              </div>
-            ))}
-          </div>
-
-          <button 
-            className={getButtonClass()}
-            onClick={handleButtonClick}
-          >
-            {getButtonText()}
-          </button>
-        </div>
-      )}
-
       {/* Analysis Tab - ONE powerful insight */}
       {activeTab === 'analysis' && (
         <div className="et-analysis">
@@ -603,9 +445,9 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
             <div className="insight-card-content">
               {!analysis.hasData ? (
                 <div className="insight-empty">
-                  <p className="empty-message">{analysis.checkIns}/{analysis.needed} check-ins</p>
+                  <p className="empty-message">{analysis.checkIns}/{analysis.needed} logs</p>
                   <p className="empty-context">
-                    {analysis.needed - analysis.checkIns} more to unlock your emotional trajectory
+                    Log how you feel in the Tracker to build your emotional trajectory
                   </p>
                 </div>
               ) : (

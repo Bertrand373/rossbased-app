@@ -32,7 +32,8 @@ const Tracker = ({ userData, updateUserData }) => {
   const [isPatternAlertShowing, setIsPatternAlertShowing] = useState(false);
   
   const [benefits, setBenefits] = useState({ 
-    energy: 5, focus: 5, confidence: 5, aura: 5, sleep: 5, workout: 5 
+    energy: 5, focus: 5, confidence: 5, aura: 5, sleep: 5, workout: 5,
+    anxiety: 5, mood: 5, clarity: 5, processing: 5
   });
   
   // Live clock state - updates every minute
@@ -70,7 +71,11 @@ const Tracker = ({ userData, updateUserData }) => {
         confidence: existing.confidence || 5,
         aura: existing.aura || 5,
         sleep: existing.sleep || 5,
-        workout: existing.workout || 5
+        workout: existing.workout || 5,
+        anxiety: existing.anxiety || 5,
+        mood: existing.mood || 5,
+        clarity: existing.clarity || 5,
+        processing: existing.processing || 5
       });
     }
   }, [userData.benefitTracking, currentTime]);
@@ -201,6 +206,14 @@ const Tracker = ({ userData, updateUserData }) => {
     { key: 'workout', label: 'Workout', desc: 'Physical performance and recovery' }
   ];
 
+  // Emotional state sliders (optional, saves alongside benefits)
+  const emotionalList = [
+    { key: 'anxiety', label: 'Anxiety', desc: '1 = calm · 10 = severe' },
+    { key: 'mood', label: 'Mood', desc: '1 = volatile · 10 = stable' },
+    { key: 'clarity', label: 'Clarity', desc: '1 = foggy · 10 = sharp' },
+    { key: 'processing', label: 'Processing', desc: '1 = blocked · 10 = flowing' }
+  ];
+
   // Handle benefit change
   const handleBenefitChange = useCallback((key, value) => {
     const newValue = parseInt(value);
@@ -288,6 +301,35 @@ const Tracker = ({ userData, updateUserData }) => {
             
             <div className="benefits-list">
               {benefitsList.map(({ key, label, desc }) => (
+                <div key={key} className="benefit-row">
+                  <div className="benefit-info">
+                    <span>{label}</span>
+                    <span className="benefit-num">{benefits[key]}/10</span>
+                  </div>
+                  <div className="benefit-slider">
+                    <div 
+                      className="benefit-fill" 
+                      ref={el => fillRefs.current[key] = el}
+                      style={{ width: `${((benefits[key] - 1) / 9) * 100}%` }}
+                    />
+                    <input
+                      type="range"
+                      min="1"
+                      max="10"
+                      value={benefits[key]}
+                      onChange={e => handleBenefitChange(key, e.target.value)}
+                    />
+                  </div>
+                  <span className="benefit-desc">{desc}</span>
+                </div>
+              ))}
+
+              {/* Emotional State - optional */}
+              <div className="benefits-section-divider">
+                <span>How You Feel</span>
+              </div>
+
+              {emotionalList.map(({ key, label, desc }) => (
                 <div key={key} className="benefit-row">
                   <div className="benefit-info">
                     <span>{label}</span>
