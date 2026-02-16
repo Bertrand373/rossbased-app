@@ -10,6 +10,7 @@ import DatePicker from '../Shared/DatePicker';
 import PatternInsightCard from '../PatternInsight/PatternInsightCard';
 import EnergyAlmanac from '../EnergyAlmanac/EnergyAlmanac';
 import OnboardingGuide from '../OnboardingGuide/OnboardingGuide';
+import DailyQuote from '../DailyQuote/DailyQuote';
 
 // NEW: Import InterventionService for ML feedback loop
 import interventionService from '../../services/InterventionService';
@@ -477,6 +478,9 @@ const Tracker = ({ userData, updateUserData }) => {
           {todayLogged ? 'Logged Today ✓' : 'Log Today'}
         </button>
       </footer>
+
+      {/* Daily Quote - visual floor */}
+      <DailyQuote />
       
     </div>
   );

@@ -100,7 +100,7 @@
 .tracker-footer {
   margin-top: 40px;
   padding: 0;
-  max-width: 360px;
+  max-width: 340px;
   width: 100%;
   animation: fadeInUp 500ms ease 100ms forwards;
   opacity: 0;
