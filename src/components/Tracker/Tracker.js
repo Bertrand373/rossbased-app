@@ -188,7 +188,7 @@ const Tracker = ({ userData, updateUserData }) => {
 
     setShowResetConfirm(false);
     setShowStreakOptions(false);
-    toast('Streak reset. New journey begins.', { icon: '🔄' });
+    toast.success('Streak reset. New journey begins.');
     
     // Track with Mixpanel
     trackStreakReset(streak);
@@ -201,7 +201,7 @@ const Tracker = ({ userData, updateUserData }) => {
     updateUserData({ wetDreams });
     setShowResetConfirm(false);
     setShowStreakOptions(false);
-    toast('Wet dream logged.', { icon: '📝' });
+    toast.success('Wet dream logged.');
   };
 
   // Benefits list for modal
@@ -273,7 +273,7 @@ const Tracker = ({ userData, updateUserData }) => {
     
     updateUserData({ benefitTracking: existing });
     setShowBenefits(false);
-    toast('Benefits logged.', { icon: '✓' });
+    toast.success('Benefits logged.');
     
     // Track with Mixpanel
     trackDailyLog(benefits, streak);
