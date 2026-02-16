@@ -273,6 +273,7 @@ const Tracker = ({ userData, updateUserData }) => {
     
     updateUserData({ benefitTracking: existing });
     setShowBenefits(false);
+    toast('Benefits logged.', { icon: '✓' });
     
     // Track with Mixpanel
     trackDailyLog(benefits, streak);
