@@ -1056,6 +1056,29 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
         {viewMode === 'month' ? renderMonthView() : renderWeekView()}
       </div>
 
+      {/* Moon Phase - Month view only, tappable quick-reference */}
+      {viewMode === 'month' && (() => {
+        const lunar = getLunarData(new Date());
+        const synodicMonth = 29.53058867;
+        const cycleDayRaw = lunar.lunarAge;
+        const cycleDay = Math.ceil(cycleDayRaw) || 1;
+        const cycleTotal = Math.round(synodicMonth);
+        return (
+          <div 
+            className="calendar-moon-phase"
+            onClick={(e) => openMoonDetail(new Date(), e)}
+          >
+            <span className="calendar-moon-phase-emoji">
+              <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={48} />
+            </span>
+            <span className="calendar-moon-phase-name">{lunar.label}</span>
+            <span className="calendar-moon-phase-meta">
+              Day {cycleDay}/{cycleTotal} · {lunar.illumination}% illumination
+            </span>
+          </div>
+        );
+      })()}
+
       {/* ================================================================
           DAY INFO MODAL - UNIFIED STRUCTURE FOR ALL DAYS
           Always uses header/content/footer for consistent scrolling

@@ -19,7 +19,8 @@
 /* Content wrapper - wider on desktop */
 .calendar-container > .calendar-header-minimal,
 .calendar-container > .calendar-legend-minimal,
-.calendar-container > .calendar-main-section {
+.calendar-container > .calendar-main-section,
+.calendar-container > .calendar-moon-phase {
   width: 100%;
   max-width: 900px;
 }
@@ -209,6 +210,53 @@
   flex-direction: column;
   position: relative;
   z-index: 1;
+}
+
+/* =============================================================================
+   MOON PHASE - Below grid, month view only
+   ============================================================================= */
+
+.calendar-moon-phase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-subtle);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 150ms ease;
+  position: relative;
+  z-index: 1;
+  animation: fadeInUp 500ms ease 100ms forwards;
+  opacity: 0;
+}
+
+.calendar-moon-phase:hover {
+  opacity: 0.7;
+}
+
+.calendar-moon-phase:active {
+  opacity: 0.5;
+}
+
+.calendar-moon-phase-emoji {
+  line-height: 1;
+}
+
+.calendar-moon-phase-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+}
+
+.calendar-moon-phase-meta {
+  font-size: 0.6875rem;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  letter-spacing: 0.02em;
 }
 
 /* =============================================================================
