@@ -942,7 +942,10 @@ client.on('messageCreate', async (message) => {
       // Silent — proceed without personalization
     }
     
-    const systemWithKnowledge = SYSTEM_PROMPT + personalContext + ragContext;
+    // Inject current date so Oracle has temporal awareness
+    const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'America/New_York' });
+    const dateContext = `\n\n## CURRENT DATE\nToday is ${currentDate}. You are always aware of the current date. Use this for accurate responses about zodiac years, lunar cycles, calendar events, seasonal patterns, and time-based milestones. Never guess dates or seasons. You know exactly what day it is.\n`;
+    const systemWithKnowledge = SYSTEM_PROMPT + dateContext + personalContext + ragContext;
     
     // Call Claude
     const response = await anthropic.messages.create({

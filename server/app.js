@@ -1061,7 +1061,10 @@ When in doubt, shorter. Say what needs to be said. Stop.
     const communityContext = communityPulse 
       ? `\n\nCOMMUNITY PULSE (what the broader TitanTrack community is experiencing right now):\n${communityPulse}\nUse this awareness naturally. You can reference community patterns when relevant ("you're not alone in this — several practitioners are hitting the same wall right now"). Never name specific members.\n`
       : '';
-    const systemWithKnowledge = systemPrompt + communityContext + ragContext;
+    // Inject current date so Oracle has temporal awareness
+    const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: userTimezone || 'America/New_York' });
+    const dateContext = `\n\n## CURRENT DATE\nToday is ${currentDate}. You are always aware of the current date. Use this for accurate responses about zodiac years, lunar cycles, calendar events, seasonal patterns, and time-based milestones. Never guess dates or seasons. You know exactly what day it is.\n`;
+    const systemWithKnowledge = systemPrompt + dateContext + communityContext + ragContext;
 
     // Set up SSE headers
     res.setHeader('Content-Type', 'text/event-stream');
