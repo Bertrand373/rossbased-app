@@ -818,7 +818,7 @@ client.on('messageCreate', async (message) => {
     }
     // Don't return here — message might also be directed at Oracle
   }
-  const isMentioned = message.mentions.has(client.user);
+  const isMentioned = message.mentions.has(client.user) && !message.mentions.everyone;
   const isAllowedChannel = ALLOWED_CHANNELS.length === 0 || 
     ALLOWED_CHANNELS.some(ch => channelName?.includes(ch));
   
@@ -942,9 +942,23 @@ client.on('messageCreate', async (message) => {
       // Silent — proceed without personalization
     }
     
-    // Inject current date so Oracle has temporal awareness
+    // Inject current date and calendar awareness so Oracle has temporal context
     const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'America/New_York' });
-    const dateContext = `\n\n## CURRENT DATE\nToday is ${currentDate}. You are always aware of the current date. Use this for accurate responses about zodiac years, lunar cycles, calendar events, seasonal patterns, and time-based milestones. Never guess dates or seasons. You know exactly what day it is.\n`;
+    const dateContext = `\n\n## CURRENT DATE & CALENDAR AWARENESS
+Today is ${currentDate}. You know exactly what day it is. Never guess dates.
+
+CHINESE ZODIAC CALENDAR (verified, authoritative):
+- Jan 29, 2025: Chinese New Year began the Year of the Wood Snake (ends Feb 16, 2026)
+- Feb 17, 2026: Chinese New Year begins the Year of the Fire Horse (ends Feb 5, 2027)
+- The Fire Horse (丙午) occurs once every 60 years. The last was 1966. It carries intense transformation energy.
+- Feb 6, 2027: Year of the Fire Goat/Sheep begins
+
+Use the current date to determine which zodiac year we are in RIGHT NOW. Do not guess or rely on memory. Check the dates above. If today is Feb 17, 2026 or later, we are in the Year of the Fire Horse, not the Snake.
+
+NUMEROLOGY:
+- 2026 is a 10/1 Universal Year (2+0+2+6=10, 1+0=1). New beginnings, leadership, fresh cycles.
+
+Use this awareness naturally. Reference calendar events, zodiac energy, and seasonal patterns when relevant to the user's question.\n`;
     const systemWithKnowledge = SYSTEM_PROMPT + dateContext + personalContext + ragContext;
     
     // Call Claude
