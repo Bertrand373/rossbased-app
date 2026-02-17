@@ -450,6 +450,12 @@ const MindProgram = ({ isPremium, userData, updateUserData }) => {
                   ? `Night ${progress.nightsCompleted} confirmed`
                   : 'I listened last night'}
               </button>
+
+              {progress.nightsCompleted > 0 && (
+                <button className="mp-reset-link" onClick={handleRestart}>
+                  Reset progress
+                </button>
+              )}
             </div>
           ) : (
             <div className="mp-complete">

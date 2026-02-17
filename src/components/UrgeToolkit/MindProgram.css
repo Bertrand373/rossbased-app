@@ -332,6 +332,27 @@
   transform: none;
 }
 
+/* Reset link — subtle, doesn't encourage quitting */
+.mp-reset-link {
+  display: block;
+  width: 100%;
+  padding: 12px 0 0;
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  font-weight: 400;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mp-reset-link:hover {
+  color: var(--text-muted);
+}
+
 /* =============================================================================
    COMPLETION STATE
    ============================================================================= */
