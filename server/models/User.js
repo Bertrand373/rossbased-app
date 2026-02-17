@@ -29,7 +29,12 @@ const userSchema = new mongoose.Schema({
     confidence: Number, 
     aura: Number, 
     sleep: Number, 
-    workout: Number 
+    workout: Number,
+    anxiety: Number,
+    mood: Number,
+    clarity: Number,
+    processing: Number,
+    streakDay: Number
   }],
   emotionalTracking: [{ 
     date: Date, 
@@ -189,6 +194,22 @@ const userSchema = new mongoose.Schema({
     generatedAt: { type: Date },
     forStreak: { type: Number, default: 0 },
     phase: { type: String, default: '' }
+  },
+  
+  // Peak State Recordings — messages from peak states shown during crisis
+  peakRecordings: [{
+    message: String,
+    date: Date,
+    streakDay: Number,
+    avgScore: Number
+  }],
+  
+  // Mind Program (Based30) — 30-night subliminal audio progress
+  mindProgram: {
+    nightsCompleted: { type: Number, default: 0 },
+    startDate: { type: String, default: null },
+    lastConfirmedDate: { type: String, default: null },
+    isComplete: { type: Boolean, default: false }
   }
   
 }, {
