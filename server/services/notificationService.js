@@ -160,18 +160,19 @@ async function shouldSendNotification(username, notificationType) {
 
 // ============================================================================
 // NOTIFICATION TEMPLATES - Discreet, mature, non-embarrassing
+// iOS/Android shows app name automatically, so titles should be descriptive not "TitanTrack"
 // ============================================================================
 const notificationTemplates = {
   // DAILY REMINDER
   daily_reminder: {
-    title: 'TitanTrack',
+    title: 'Daily Check-In',
     body: 'Log your day.',
     data: { url: '/', type: 'daily_reminder' }
   },
   
   // WEEKLY MOTIVATIONAL (Monday)
   motivational: {
-    title: 'TitanTrack',
+    title: 'New Week',
     body: 'New week. Stay locked in.',
     data: { url: '/', type: 'motivational' }
   },
@@ -215,38 +216,38 @@ const notificationTemplates = {
   
   // ENCOURAGEMENT - Subtle, respectful
   encouragement_morning: {
-    title: 'TitanTrack',
+    title: 'Good Morning',
     body: 'New day. Stay focused.',
     data: { url: '/', type: 'encouragement' }
   },
   encouragement_evening: {
-    title: 'TitanTrack',
+    title: 'Evening Check',
     body: 'End of day. How\'d you hold up?',
     data: { url: '/', type: 'encouragement' }
   },
   
   // URGE SUPPORT - Calm, grounding
   urge_high_risk: {
-    title: 'TitanTrack',
+    title: 'Stay Strong',
     body: 'Breathe. This will pass.',
     data: { url: '/emergency', type: 'urge_warning' }
   },
   urge_medium_risk: {
-    title: 'TitanTrack',
+    title: 'Stay Focused',
     body: 'Take a moment. Refocus.',
     data: { url: '/emergency', type: 'urge_warning' }
   },
   
   // STREAK REMINDER
   streak_save: {
-    title: 'TitanTrack',
+    title: 'Reminder',
     body: 'You know what to do.',
     data: { url: '/stats', type: 'streak_reminder' }
   },
   
   // WEEKLY PROGRESS
   weekly_progress: {
-    title: 'TitanTrack',
+    title: 'Weekly Summary',
     body: 'Your weekly summary is ready.',
     data: { url: '/stats', type: 'weekly_progress' }
   }
