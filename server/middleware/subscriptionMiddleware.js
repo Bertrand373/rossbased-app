@@ -97,7 +97,7 @@ const startFreeTrial = async (user) => {
   };
   user.isPremium = true;
   
-  await user.save();
+  await user.save({ validateModifiedOnly: true });
   console.log(`✅ Free trial started for ${user.username}, expires ${trialEnd.toISOString()}`);
   
   return user;
@@ -116,7 +116,7 @@ const grantGrandfatherAccess = async (user, reason = 'discord_og') => {
   };
   user.isPremium = true;
   
-  await user.save();
+  await user.save({ validateModifiedOnly: true });
   console.log(`✅ Grandfather access granted to ${user.username} (${reason})`);
   
   return user;

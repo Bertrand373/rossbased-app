@@ -197,7 +197,7 @@ router.put('/preferences', async (req, res) => {
     };
     
     user.notificationPreferences = preferences;
-    await user.save();
+    await user.save({ validateModifiedOnly: true });
     
     console.log(`✅ Updated notification preferences for: ${username} (timezone: ${preferences.timezone})`);
     res.json({ 
@@ -249,7 +249,7 @@ router.post('/notification-preferences/:username', async (req, res) => {
     };
     
     user.notificationPreferences = preferences;
-    await user.save();
+    await user.save({ validateModifiedOnly: true });
     
     // Also update FCM token in subscription if provided
     if (fcmToken) {

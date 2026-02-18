@@ -274,7 +274,7 @@ router.get('/', async (req, res) => {
       forStreak: currentStreak,
       phase: getPhaseFromStreak(currentStreak)
     };
-    await user.save();
+    await user.save({ validateModifiedOnly: true });
 
     console.log(`✅ Transmission generated and cached for ${user.username}`);
 
@@ -360,7 +360,7 @@ router.post('/regenerate', async (req, res) => {
       forStreak: currentStreak,
       phase: getPhaseFromStreak(currentStreak)
     };
-    await user.save();
+    await user.save({ validateModifiedOnly: true });
 
     res.json({
       transmission: transmissionText,
@@ -483,7 +483,7 @@ Generate the synthesis now.`;
       generatedAt: new Date(),
       forStreak: streakDays
     };
-    await user.save();
+    await user.save({ validateModifiedOnly: true });
 
     console.log(`✅ Synthesis generated for ${user.username}`);
     res.json({ synthesis: synthesisText, cached: false });

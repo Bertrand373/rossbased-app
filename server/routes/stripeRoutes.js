@@ -250,7 +250,7 @@ router.post('/webhook', async (req, res) => {
         };
         user.isPremium = true;
         
-        await user.save();
+        await user.save({ validateModifiedOnly: true });
         console.log(`✅ Subscription activated for ${username} (${plan})`);
         break;
       }
@@ -296,7 +296,7 @@ router.post('/webhook', async (req, res) => {
         };
         user.isPremium = ['active', 'trial'].includes(status);
         
-        await user.save();
+        await user.save({ validateModifiedOnly: true });
         console.log(`🔄 Subscription updated for ${username}: ${status}`);
         break;
       }
@@ -321,7 +321,7 @@ router.post('/webhook', async (req, res) => {
         };
         user.isPremium = false;
         
-        await user.save();
+        await user.save({ validateModifiedOnly: true });
         console.log(`❌ Subscription ended for ${username}`);
         break;
       }
@@ -338,7 +338,7 @@ router.post('/webhook', async (req, res) => {
         if (user.subscription?.status !== 'grandfathered') {
           user.subscription.status = 'active';
           user.isPremium = true;
-          await user.save();
+          await user.save({ validateModifiedOnly: true });
           console.log(`💰 Invoice paid, premium confirmed for ${user.username}`);
         }
         break;
