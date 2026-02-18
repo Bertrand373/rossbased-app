@@ -507,7 +507,7 @@ function AppContent({
 }) {
   // Derive effective premium status from subscription system
   // This is what ALL child components use to gate premium features
-  const effectivePremium = hasSubscription || isPremium;
+  const effectivePremium = hasSubscription;
   
   const { theme } = useTheme();
   
