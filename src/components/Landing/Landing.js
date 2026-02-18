@@ -65,7 +65,7 @@ const Landing = ({ onLogin }) => {
           Get Started
         </button>
         
-        <p className="landing-trial-note">7 days free. No credit card.</p>
+        <p className="landing-trial-note">7 days free. Cancel anytime.</p>
       </main>
       
       {/* Features - scroll-triggered stagger */}

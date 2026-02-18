@@ -117,7 +117,11 @@ const PaywallScreen = ({
           onClick={handleCheckout}
           disabled={isProcessing}
         >
-          {isProcessing ? 'Processing...' : `Continue — $${selectedPlan === 'yearly' ? '62/yr' : '8/mo'}`}
+          {isProcessing ? 'Processing...' : 
+            reason === 'no_subscription' 
+              ? 'Start 7-Day Free Trial' 
+              : `Continue — $${selectedPlan === 'yearly' ? '62/yr' : '8/mo'}`
+          }
         </button>
         
         {/* Discord grandfather prompt */}
@@ -135,7 +139,10 @@ const PaywallScreen = ({
         
         {/* Legal */}
         <p className="paywall-legal">
-          Cancel anytime. Secure payment via Stripe.
+          {reason === 'no_subscription' 
+            ? 'Card required. Not charged until trial ends. Cancel anytime.'
+            : 'Cancel anytime. Secure payment via Stripe.'
+          }
         </p>
         
         <button className="paywall-signout" onClick={() => {

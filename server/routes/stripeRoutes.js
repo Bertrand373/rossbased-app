@@ -8,7 +8,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { 
   checkPremiumAccess, 
-  startFreeTrial,
   expireStaleTrials,
   expireStaleCanceled
 } = require('../middleware/subscriptionMiddleware');
@@ -78,39 +77,6 @@ router.get('/status', authenticate, async (req, res) => {
   } catch (error) {
     console.error('Subscription status error:', error);
     res.status(500).json({ error: 'Failed to get subscription status' });
-  }
-});
-
-// ============================================
-// START FREE TRIAL
-// ============================================
-router.post('/start-trial', authenticate, async (req, res) => {
-  try {
-    const user = await User.findOne({ username: req.user.username });
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    // Don't allow trial if user already had one or is grandfathered
-    const sub = user.subscription || {};
-    if (sub.status === 'grandfathered') {
-      return res.json({ success: true, message: 'Already have lifetime access' });
-    }
-    if (sub.trialStartDate) {
-      return res.status(400).json({ error: 'Trial already used' });
-    }
-    
-    await startFreeTrial(user);
-    
-    const accessInfo = checkPremiumAccess(user);
-    res.json({ 
-      success: true, 
-      message: 'Free trial started',
-      ...accessInfo
-    });
-  } catch (error) {
-    console.error('Start trial error:', error);
-    res.status(500).json({ error: 'Failed to start trial' });
   }
 });
 
