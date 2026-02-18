@@ -1319,7 +1319,7 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
     
     const BETA_DAILY_LIMIT = 5;
     const FREE_LIFETIME_LIMIT = 3;
-    const PREMIUM_DAILY_LIMIT = 15;
+    const PREMIUM_DAILY_LIMIT = 25;
 
     let messagesUsed, messagesLimit, messagesRemaining;
 
@@ -1371,7 +1371,7 @@ app.get('/api/ai-usage/:username', authenticate, async (req, res) => {
     
     const BETA_DAILY_LIMIT = 5;
     const FREE_LIFETIME_LIMIT = 3;
-    const PREMIUM_DAILY_LIMIT = 15;
+    const PREMIUM_DAILY_LIMIT = 25;
 
     let messagesUsed, messagesLimit, messagesRemaining, resetsAt;
 
