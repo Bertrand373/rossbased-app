@@ -18,7 +18,7 @@ import interventionService from '../../services/InterventionService';
 // Mixpanel Analytics
 import { trackDailyLog, trackStreakReset } from '../../utils/mixpanel';
 
-const Tracker = ({ userData, updateUserData }) => {
+const Tracker = ({ userData, updateUserData, isPremium }) => {
   // FIXED: Only show date picker if user has completed onboarding but hasn't set date
   const [showDatePicker, setShowDatePicker] = useState(!userData.startDate && userData.hasSeenOnboarding);
   const [showBenefits, setShowBenefits] = useState(false);
@@ -26,8 +26,15 @@ const Tracker = ({ userData, updateUserData }) => {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [resetType, setResetType] = useState(null);
   
-  // FIXED: Show onboarding for ANY new user who hasn't seen it
-  const [showOnboarding, setShowOnboarding] = useState(!userData.hasSeenOnboarding);
+  // Onboarding starts hidden — only shows after user clears the paywall
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  
+  // Only trigger onboarding AFTER user has cleared the paywall
+  useEffect(() => {
+    if (!userData.hasSeenOnboarding && isPremium) {
+      setShowOnboarding(true);
+    }
+  }, [isPremium, userData.hasSeenOnboarding]);
   
   // NEW: Track if PatternInsightCard is showing (for mutual exclusion with EnergyAlmanac)
   const [isPatternAlertShowing, setIsPatternAlertShowing] = useState(false);
