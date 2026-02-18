@@ -45,7 +45,7 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
         : '.nav-link[href="/urge-toolkit"]',
       title: 'Crisis toolkit ready',
       message: 'When urges hit, breathing exercises and emergency protocols are one tap away.',
-      position: 'top',
+      position: isMobile ? 'top' : 'bottom',
       padding: 8
     },
     {
