@@ -16,9 +16,13 @@ const PaywallScreen = ({
   
   // Reset processing state if user navigates back from Stripe
   useEffect(() => {
-    const handleFocus = () => setIsProcessing(false);
-    window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
+    const reset = () => setIsProcessing(false);
+    window.addEventListener('focus', reset);
+    window.addEventListener('pageshow', reset);
+    return () => {
+      window.removeEventListener('focus', reset);
+      window.removeEventListener('pageshow', reset);
+    };
   }, []);
   
   const streakCount = userData?.currentStreak || 0;
