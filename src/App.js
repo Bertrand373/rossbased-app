@@ -377,7 +377,6 @@ function App() {
     isLoading: subLoading,
     hasUsedTrial,
     subscriptionStatus,
-    startTrial,
     createCheckout,
     openPortal,
     fetchStatus: refreshSubscription
@@ -470,7 +469,6 @@ function App() {
         subLoading={subLoading}
         hasUsedTrial={hasUsedTrial}
         subscriptionStatus={subscriptionStatus}
-        startTrial={startTrial}
         createCheckout={createCheckout}
         openPortal={openPortal}
         refreshSubscription={refreshSubscription}
@@ -503,7 +501,6 @@ function AppContent({
   subLoading,
   hasUsedTrial,
   subscriptionStatus,
-  startTrial,
   createCheckout,
   openPortal,
   refreshSubscription
