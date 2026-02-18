@@ -74,7 +74,7 @@ router.post('/google', async (req, res) => {
     } else if (!user.googleId) {
       // Link Google to existing account
       user.googleId = googleId;
-      await user.save();
+      await user.save({ validateModifiedOnly: true });
       console.log('Linked Google to existing user:', user.username);
     }
 

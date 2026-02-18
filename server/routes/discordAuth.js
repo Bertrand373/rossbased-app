@@ -160,7 +160,7 @@ router.post('/discord', async (req, res) => {
       user.discordUsername = discordUser.username;
       user.discordDisplayName = discordUser.global_name || discordUser.username;
       user.discordAvatar = discordUser.avatar || null;
-      await user.save();
+      await user.save({ validateModifiedOnly: true });
       console.log('Updated Discord info for user:', user.username);
     }
 

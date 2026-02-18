@@ -108,7 +108,7 @@ router.post('/link', authenticate, async (req, res) => {
     user.discordUsername = discordUser.username;
     user.discordDisplayName = discordUser.global_name || discordUser.username;
     user.discordAvatar = discordUser.avatar || null;
-    await user.save();
+    await user.save({ validateModifiedOnly: true });
     
     console.log(`🔗 Discord linked for ${user.username}: ${discordUser.username} (${discordUser.id})`);
     
