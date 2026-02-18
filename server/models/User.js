@@ -94,7 +94,7 @@ const userSchema = new mongoose.Schema({
   oracleNotes: [{
     date: { type: Date, default: Date.now },
     streakDay: Number,
-    note: { type: String, maxlength: 500 },
+    note: { type: String, maxlength: 2000 },
     source: { type: String, enum: ['app', 'discord'], default: 'app' }
   }],
 
