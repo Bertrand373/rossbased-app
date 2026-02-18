@@ -107,13 +107,13 @@ const Tracker = ({ userData, updateUserData }) => {
 
   // FIXED: Handle onboarding complete - show date picker if needed
   const handleOnboardingComplete = () => {
-    setShowOnboarding(false);
-    updateUserData({ hasSeenOnboarding: true });
-    
-    // If new user hasn't set date yet, show date picker after onboarding
+    // Set date picker BEFORE hiding onboarding to prevent flash
     if (!userData.startDate) {
       setShowDatePicker(true);
     }
+    setShowOnboarding(false);
+    // Defer API call so it doesn't break React's state batching
+    setTimeout(() => updateUserData({ hasSeenOnboarding: true }), 0);
   };
 
   // Handle onboarding trigger for date picker
