@@ -348,7 +348,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     <div className="tracker">
       
       {/* Onboarding Guide - First time only */}
-      {showOnboarding && (
+      {showOnboarding && isPremium && (
         <OnboardingGuide 
           onComplete={handleOnboardingComplete}
           onTriggerDatePicker={handleOnboardingDateTrigger}
