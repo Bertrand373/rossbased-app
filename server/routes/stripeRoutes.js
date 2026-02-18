@@ -390,47 +390,4 @@ router.post('/cleanup', async (req, res) => {
   }
 });
 
-// ============================================
-// TEST ENDPOINTS - Remove before going live
-// ============================================
-
-// Force-expire a user's trial (for testing paywall)
-router.post('/test/expire', async (req, res) => {
-  try {
-    const { username } = req.body;
-    if (!username) return res.status(400).json({ error: 'Username required' });
-    
-    const user = await User.findOne({ username });
-    if (!user) return res.status(404).json({ error: 'User not found' });
-    
-    user.subscription.status = 'expired';
-    user.subscription.trialEndDate = new Date(Date.now() - 1000); // Set to past
-    await user.save();
-    
-    res.json({ success: true, message: `${username} subscription set to expired` });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Reset a user back to active trial (undo the expire)
-router.post('/test/reset-trial', async (req, res) => {
-  try {
-    const { username } = req.body;
-    if (!username) return res.status(400).json({ error: 'Username required' });
-    
-    const user = await User.findOne({ username });
-    if (!user) return res.status(404).json({ error: 'User not found' });
-    
-    user.subscription.status = 'trial';
-    user.subscription.trialStartDate = new Date();
-    user.subscription.trialEndDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    await user.save();
-    
-    res.json({ success: true, message: `${username} reset to active 7-day trial` });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 module.exports = router;

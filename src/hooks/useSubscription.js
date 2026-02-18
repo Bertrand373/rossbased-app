@@ -77,36 +77,6 @@ export const useSubscription = (isLoggedIn) => {
   }, [fetchStatus]);
 
   // ============================================
-  // START FREE TRIAL
-  // ============================================
-  const startTrial = useCallback(async () => {
-    const token = localStorage.getItem('token');
-    if (!token) return false;
-    
-    try {
-      const response = await fetch(`${API_URL}/api/stripe/start-trial`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to start trial');
-      }
-      
-      const data = await response.json();
-      setSubscriptionStatus(data);
-      return true;
-    } catch (error) {
-      console.error('Start trial error:', error);
-      return false;
-    }
-  }, []);
-
-  // ============================================
   // CREATE CHECKOUT SESSION (redirect to Stripe)
   // ============================================
   const createCheckout = useCallback(async (plan = 'monthly') => {
@@ -237,7 +207,6 @@ export const useSubscription = (isLoggedIn) => {
     
     // Actions
     fetchStatus,
-    startTrial,
     createCheckout,
     openPortal,
     linkDiscord
