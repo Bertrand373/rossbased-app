@@ -20,6 +20,11 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   const [googleLoaded, setGoogleLoaded] = useState(false);
   const [googleButtonRendered, setGoogleButtonRendered] = useState(false);
   
+  // Forgot password state
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotSuccess, setForgotSuccess] = useState(false);
+  
   const googleButtonRef = useRef(null);
   
   useBodyScrollLock(true);
@@ -128,6 +133,12 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
     if (error) setError('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [username, email, password, confirmPassword]);
+
+  // Clear forgot password error when user types
+  useEffect(() => {
+    if (error && showForgotPassword) setError('');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [forgotEmail]);
   
   const validateUsername = (username) => {
     const trimmed = username.trim();
@@ -223,6 +234,44 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
       setIsLoading(false);
     }
   };
+
+  // Forgot password submit handler
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+
+    if (!forgotEmail.trim()) {
+      setError('Please enter your email');
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(forgotEmail.trim())) {
+      setError('Please enter a valid email');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch(`${API_URL}/api/auth/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail.trim() })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to send reset email');
+      }
+
+      setForgotSuccess(true);
+    } catch (err) {
+      setError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   const handleSocialLogin = (provider) => {
     if (isLoading) return;
@@ -262,6 +311,14 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
     }
   };
 
+  // Exit forgot password and go back to login
+  const exitForgotPassword = () => {
+    setShowForgotPassword(false);
+    setForgotEmail('');
+    setForgotSuccess(false);
+    setError('');
+  };
+
   // Hidden Google button - ALWAYS rendered to prevent layout issues during OAuth
   const hiddenGoogleButton = (
     <div 
@@ -271,7 +328,7 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
     />
   );
 
-  if (isLoading) {
+  if (isLoading && !showForgotPassword) {
     return (
       <div className="auth-overlay">
         {hiddenGoogleButton}
@@ -287,12 +344,93 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
       </div>
     );
   }
+
+  // =============================================
+  // FORGOT PASSWORD VIEW
+  // =============================================
+  if (showForgotPassword) {
+    return (
+      <div className="auth-overlay" onClick={handleOverlayClick}>
+        {hiddenGoogleButton}
+        <div className="auth-modal" onClick={e => e.stopPropagation()}>
+
+          <div className="auth-brand">
+            <img src="/icon-192.png" alt="" className="auth-brand-icon" />
+          </div>
+
+          <div className="auth-header">
+            <h2>{forgotSuccess ? 'Check your email' : 'Forgot password'}</h2>
+            <p>
+              {forgotSuccess 
+                ? 'If an account exists with that email, a reset link has been sent. Check your inbox and spam folder.'
+                : 'Enter the email you signed up with and we\'ll send you a reset link.'
+              }
+            </p>
+          </div>
+
+          {error && (
+            <div className="auth-error">{error}</div>
+          )}
+
+          {!forgotSuccess ? (
+            <form className="auth-form" onSubmit={handleForgotPassword}>
+              <div className="auth-field">
+                <label htmlFor="forgot-email">Email</label>
+                <input
+                  id="forgot-email"
+                  type="email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  autoComplete="email"
+                  autoCapitalize="off"
+                  autoFocus
+                  disabled={isLoading}
+                />
+              </div>
+
+              <button type="submit" className="auth-submit" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <FaSpinner className="auth-spinner" />
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <span>Send reset link</span>
+                )}
+              </button>
+            </form>
+          ) : null}
+
+          <div className="auth-footer">
+            <p>
+              <button 
+                type="button" 
+                className="auth-switch" 
+                onClick={exitForgotPassword}
+                disabled={isLoading}
+              >
+                Back to sign in
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
   
+  // =============================================
+  // MAIN AUTH VIEW (LOGIN / SIGNUP)
+  // =============================================
   return (
     <div className="auth-overlay" onClick={handleOverlayClick}>
       {hiddenGoogleButton}
       <div className="auth-modal" onClick={e => e.stopPropagation()}>
         
+        <div className="auth-brand">
+          <img src="/icon-192.png" alt="" className="auth-brand-icon" />
+        </div>
+
         <div className="auth-header">
           <h2>{isLogin ? 'Welcome back' : 'Create account'}</h2>
           <p>{isLogin ? 'Sign in to continue your journey' : 'Start tracking your progress today'}</p>
@@ -312,7 +450,7 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
             disabled={!googleLoaded || isLoading}
           >
             <FcGoogle />
-            <span>Continue with Google</span>
+            <span>Google</span>
           </button>
           
           <button
@@ -322,7 +460,7 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
             disabled={isLoading}
           >
             <BsDiscord />
-            <span>Continue with Discord</span>
+            <span>Discord</span>
           </button>
         </div>
         
@@ -373,6 +511,22 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
               disabled={isLoading}
             />
           </div>
+
+          {/* Forgot password link - login mode only */}
+          {isLogin && (
+            <div className="auth-forgot-row">
+              <button
+                type="button"
+                className="auth-forgot-link"
+                onClick={() => {
+                  setShowForgotPassword(true);
+                  setError('');
+                }}
+              >
+                Forgot password?
+              </button>
+            </div>
+          )}
           
           {!isLogin && (
             <div className="auth-field">

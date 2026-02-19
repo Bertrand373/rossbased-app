@@ -115,12 +115,29 @@
 }
 
 /* =============================================================================
+   BRAND ICON - Centered above header
+   ============================================================================= */
+
+.auth-brand {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.auth-brand-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+/* =============================================================================
    HEADER - Centered, clean typography
    ============================================================================= */
 
 .auth-header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 28px;
 }
 
 .auth-header h2 {
@@ -145,23 +162,23 @@
 
 .auth-social {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 10px;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .auth-social-btn {
-  width: 100%;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 16px 24px;
+  gap: 8px;
+  padding: 14px 12px;
   background-color: transparent;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   color: #ffffff;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
@@ -209,7 +226,7 @@
 .auth-divider {
   position: relative;
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .auth-divider::before {
@@ -256,7 +273,7 @@
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .auth-field {
@@ -307,7 +324,7 @@
   gap: 10px;
   width: 100%;
   padding: 16px 24px;
-  margin-top: 12px;
+  margin-top: 8px;
   background-color: #ffffff;
   border: none;
   border-radius: 12px;
@@ -349,7 +366,7 @@
 
 .auth-footer {
   text-align: center;
-  margin-top: 40px;
+  margin-top: 28px;
 }
 
 .auth-footer p {
@@ -425,9 +442,19 @@
   .auth-modal {
     max-width: 100%;
   }
+
+  .auth-brand {
+    margin-bottom: 16px;
+  }
+
+  .auth-brand-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+  }
   
   .auth-header {
-    margin-bottom: 32px;
+    margin-bottom: 24px;
   }
   
   .auth-header h2 {
@@ -439,33 +466,33 @@
   }
   
   .auth-social {
-    margin-bottom: 28px;
+    margin-bottom: 20px;
   }
   
   .auth-social-btn {
-    padding: 16px 20px;
-    font-size: 0.875rem;
+    padding: 14px 10px;
+    font-size: 0.8125rem;
   }
   
   .auth-divider {
-    margin-bottom: 28px;
+    margin-bottom: 20px;
   }
   
   .auth-form {
-    gap: 18px;
+    gap: 14px;
   }
   
   .auth-field input {
-    padding: 16px;
+    padding: 14px;
   }
   
   .auth-submit {
-    padding: 16px 20px;
+    padding: 14px 20px;
     font-size: 0.9375rem;
   }
   
   .auth-footer {
-    margin-top: 32px;
+    margin-top: 24px;
   }
   
   .auth-footer p {
@@ -499,8 +526,9 @@
   }
   
   .auth-social-btn {
-    padding: 14px 16px;
+    padding: 12px 8px;
     border-radius: 10px;
+    font-size: 0.75rem;
   }
   
   .auth-field input {
@@ -524,25 +552,34 @@
     justify-content: flex-start;
     padding-top: max(16px, env(safe-area-inset-top));
   }
+
+  .auth-brand {
+    margin-bottom: 16px;
+  }
+
+  .auth-brand-icon {
+    width: 32px;
+    height: 32px;
+  }
   
   .auth-header {
     margin-bottom: 24px;
   }
   
   .auth-social {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
   }
   
   .auth-divider {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
   }
   
   .auth-form {
-    gap: 14px;
+    gap: 12px;
   }
   
   .auth-footer {
-    margin-top: 24px;
+    margin-top: 20px;
   }
 }
 
@@ -551,6 +588,33 @@
   .auth-modal {
     max-width: 360px;
   }
+}
+
+/* =============================================================================
+   FORGOT PASSWORD LINK
+   ============================================================================= */
+
+.auth-forgot-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -8px;
+}
+
+.auth-forgot-link {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.auth-forgot-link:hover {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* Reduced motion */
