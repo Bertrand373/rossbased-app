@@ -114,25 +114,6 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   // Lock body scroll when any modal is open
   useBodyScrollLock(dayInfoModal || editDayModal || moonDetailModal);
 
-  // Lock scroll on Month view mobile only (fixed content), allow scroll on Week view and desktop
-  useEffect(() => {
-    const handleScrollLock = () => {
-      const isMobile = window.innerWidth <= 1024;
-      if (viewMode === 'month' && isMobile) {
-        document.body.classList.add('static-view');
-      } else {
-        document.body.classList.remove('static-view');
-      }
-    };
-    
-    handleScrollLock();
-    window.addEventListener('resize', handleScrollLock);
-    
-    return () => {
-      document.body.classList.remove('static-view');
-      window.removeEventListener('resize', handleScrollLock);
-    };
-  }, [viewMode]);
 
   // Get trigger options from unified constants (Calendar shows ALL triggers)
   const triggerOptions = getAllTriggers().map(t => ({
