@@ -238,7 +238,8 @@ const LogoutRedirect = ({ isLoggedIn }) => {
     const isAuthCallback = location.pathname.startsWith('/auth/');
     
     // If user is logged out and not on root or auth callback, redirect to root
-    if (!isLoggedIn && location.pathname !== '/' && !isAuthCallback) {
+    const isPublicRoute = location.pathname === '/reset-password';
+    if (!isLoggedIn && location.pathname !== '/' && !isAuthCallback && !isPublicRoute) {
       navigate('/', { replace: true });
     }
   }, [isLoggedIn, location.pathname, navigate]);
