@@ -219,10 +219,10 @@
 .prediction-actions .btn-primary {
   width: 100%;
   padding: 16px 24px;
-  background-color: #ffffff;
-  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  color: #000000;
+  color: #ffffff;
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -232,7 +232,7 @@
 }
 
 .prediction-actions .btn-primary:hover {
-  background-color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .prediction-actions .btn-primary:active {
@@ -332,12 +332,13 @@
 }
 
 [data-theme="light"] .prediction-actions .btn-primary {
-  background-color: #000000;
-  color: #ffffff;
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #000000;
 }
 
 [data-theme="light"] .prediction-actions .btn-primary:hover {
-  background-color: rgba(0, 0, 0, 0.85);
+  border-color: rgba(0, 0, 0, 0.25);
 }
 
 [data-theme="light"] .prediction-actions .btn-ghost {

@@ -290,14 +290,14 @@
 .paywall-cta {
   width: 100%;
   padding: 16px 24px;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   font-size: 1rem;
   font-weight: 600;
   font-family: inherit;
   letter-spacing: -0.01em;
   cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.2s ease, transform 0.2s ease;
   margin-bottom: 16px;
   animation: pwFadeIn 600ms ease 500ms forwards;
   opacity: 0;
@@ -305,18 +305,23 @@
 
 [data-theme="dark"] .paywall-cta,
 .paywall-cta {
-  background: #ffffff;
-  color: #000000;
-}
-
-[data-theme="light"] .paywall-cta {
-  background: #000000;
+  background: rgba(255, 255, 255, 0.06);
   color: #ffffff;
 }
 
+[data-theme="light"] .paywall-cta {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #000000;
+}
+
 .paywall-cta:hover:not(:disabled) {
-  opacity: 0.9;
+  border-color: rgba(255, 255, 255, 0.3);
   transform: translateY(-1px);
+}
+
+[data-theme="light"] .paywall-cta:hover:not(:disabled) {
+  border-color: rgba(0, 0, 0, 0.3);
 }
 
 .paywall-cta:active:not(:disabled) {

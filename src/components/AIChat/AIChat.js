@@ -408,8 +408,8 @@ const AIChat = ({ isLoggedIn, isOpen, onClose }) => {
                 <h2>Clear chat history?</h2>
                 <p className="modal-text">This will delete all messages in this conversation.</p>
                 <div className="modal-buttons">
-                  <button className="btn-ghost" onClick={() => setShowClearConfirm(false)}>Cancel</button>
                   <button className="btn-danger" onClick={handleClearChat}>Clear</button>
+                  <button className="btn-ghost" onClick={() => setShowClearConfirm(false)}>Cancel</button>
                 </div>
               </div>
             </div>

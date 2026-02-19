@@ -1,13 +1,12 @@
 // src/components/Auth/DiscordCallback.js
 import React, { useEffect, useState, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { trackLogin, trackSignup } from '../../utils/mixpanel';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
 const DiscordCallback = ({ onLogin }) => {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const [error, setError] = useState('');
   const hasProcessed = useRef(false);
 
@@ -57,8 +56,8 @@ const DiscordCallback = ({ onLogin }) => {
       // Call onLogin
       await onLogin(data.username, null, true);
       
-      // Navigate with replace
-      navigate('/', { replace: true });
+      // Full reload to ensure clean state after OAuth
+      window.location.href = '/';
     } catch (err) {
       console.error('Discord auth error:', err);
       setError(err.message || 'Discord sign-in failed');
@@ -116,7 +115,7 @@ const DiscordCallback = ({ onLogin }) => {
       padding: '14px 32px',
       backgroundColor: isLight ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)',
       border: `1px solid ${isLight ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.15)'}`,
-      borderRadius: '8px',
+      borderRadius: '12px',
       color: isLight ? '#000000' : '#fff',
       fontSize: '0.875rem',
       fontWeight: '500',
@@ -142,7 +141,7 @@ const DiscordCallback = ({ onLogin }) => {
           <h2 style={styles.errorTitle}>Authentication Error</h2>
           <p style={styles.errorText}>{error}</p>
           <button 
-            onClick={() => navigate('/')}
+            onClick={() => window.location.href = '/'}
             style={styles.button}
           >
             Go Back

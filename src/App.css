@@ -396,11 +396,12 @@ h4 { font-size: 0.875rem; }
 }
 
 .btn-primary {
-  background-color: var(--text);
-  color: var(--background);
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
+  color: var(--text);
 }
 
-.btn-primary:hover { opacity: 0.9; }
+.btn-primary:hover { border-color: rgba(255, 255, 255, 0.25); }
 
 .btn-secondary {
   background-color: var(--surface-overlay);
