@@ -462,22 +462,22 @@
 .calendar-btn-primary {
   width: 100%;
   padding: 16px 24px;
-  background: var(--text);
-  border: none;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  color: var(--background);
+  color: var(--text);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: opacity 150ms ease;
+  transition: border-color 150ms ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
 }
 
-.calendar-btn-primary:hover { opacity: 0.9; }
+.calendar-btn-primary:hover { border-color: rgba(255, 255, 255, 0.25); }
 
 .calendar-btn-ghost {
   width: 100%;
@@ -709,12 +709,12 @@
   font-family: inherit;
   cursor: pointer;
   transition: all 150ms ease;
-  border: none;
-  background: var(--text);
-  color: var(--background);
+  border: 1px solid var(--border);
+  background: var(--surface-overlay);
+  color: var(--text);
 }
 
-.calendar-trigger-confirm:hover:not(:disabled) { opacity: 0.9; }
+.calendar-trigger-confirm:hover:not(:disabled) { border-color: rgba(255, 255, 255, 0.25); }
 .calendar-trigger-confirm:active:not(:disabled) { transform: scale(0.98); }
 .calendar-trigger-confirm:disabled { opacity: 0.3; cursor: not-allowed; }
 
@@ -838,7 +838,7 @@
   .calendar-trigger-confirm { padding: 14px 20px; font-size: 0.875rem; }
   .calendar-journal-textarea { min-height: 80px; padding: 14px; font-size: 0.8125rem; }
   .calendar-save-btn, .calendar-cancel-btn { padding: 12px 20px; font-size: 0.8125rem; }
-  .calendar-btn-primary, .calendar-btn-ghost, .calendar-btn-back { padding: 14px 20px; font-size: 0.875rem; border-radius: 10px; }
+  .calendar-btn-primary, .calendar-btn-ghost, .calendar-btn-back { padding: 14px 20px; font-size: 0.875rem; border-radius: 12px; }
 }
 
 @media (min-width: 1024px) {
