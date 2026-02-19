@@ -68,7 +68,7 @@
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   background: var(--surface-overlay);
   color: var(--text);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   cursor: pointer;
   transition: all 200ms ease;
@@ -76,7 +76,7 @@
 }
 
 .landing-cta:hover {
-  opacity: 0.9;
+  border-color: rgba(255, 255, 255, 0.3);
   transform: translateY(-2px);
 }
 
