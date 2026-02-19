@@ -6,6 +6,8 @@ const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 const { format, addDays } = require('date-fns');
 const Anthropic = require('@anthropic-ai/sdk');
+const crypto = require('crypto');
+const { Resend } = require('resend');
 
 // CRITICAL: Load environment variables FIRST, before any other imports that need them
 dotenv.config();
@@ -43,6 +45,9 @@ const {
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
+
+// Initialize Resend client for password reset emails
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const app = express();
 
@@ -1812,6 +1817,116 @@ Be brutally specific. Give exact phrases to ban and exact alternatives.`,
   } catch (err) {
     console.error('Voice refinement error:', err);
     res.status(500).json({ error: 'Failed to generate report' });
+  }
+});
+
+// ============================================
+// PASSWORD RESET ENDPOINTS
+// ============================================
+
+// Step 1: User submits email → generate token, send reset email
+app.post('/api/auth/forgot-password', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email || !email.trim()) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
+  try {
+    const user = await User.findOne({ email: { $regex: new RegExp(`^${email.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } });
+
+    // Always return success even if no user found (prevents email enumeration)
+    if (!user) {
+      console.log('Forgot password - no user found for email:', email);
+      return res.json({ message: 'If an account exists with that email, a reset link has been sent.' });
+    }
+
+    // Check if this is a Google/Discord-only account (no password set)
+    if (!user.password && (user.googleId || user.discordId)) {
+      console.log('Forgot password - OAuth-only account:', email);
+      return res.json({ message: 'If an account exists with that email, a reset link has been sent.' });
+    }
+
+    // Generate secure random token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+
+    // Store token on user document
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = resetExpires;
+    await user.save();
+
+    // Build reset URL
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://titantrack.app' 
+      : 'http://localhost:3000';
+    const resetUrl = `${baseUrl}/reset-password?token=${resetToken}`;
+
+    // Send email via Resend
+    await resend.emails.send({
+      from: 'TitanTrack <noreply@titantrack.app>',
+      to: email.trim(),
+      subject: 'Reset Your Password',
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 24px; background-color: #000000; color: #ffffff;">
+          <h2 style="font-size: 1.25rem; font-weight: 500; margin: 0 0 16px 0; color: #ffffff;">Password Reset</h2>
+          <p style="font-size: 0.9375rem; color: rgba(255,255,255,0.6); line-height: 1.6; margin: 0 0 24px 0;">
+            You requested a password reset for your TitanTrack account. Click the button below to set a new password. This link expires in 1 hour.
+          </p>
+          <a href="${resetUrl}" style="display: inline-block; padding: 14px 28px; background-color: #ffffff; color: #000000; font-size: 0.9375rem; font-weight: 600; text-decoration: none; border-radius: 10px;">
+            Reset Password
+          </a>
+          <p style="font-size: 0.8125rem; color: rgba(255,255,255,0.3); line-height: 1.5; margin: 32px 0 0 0;">
+            If you didn't request this, ignore this email. Your password won't change.
+          </p>
+        </div>
+      `
+    });
+
+    console.log('Password reset email sent to:', email);
+    res.json({ message: 'If an account exists with that email, a reset link has been sent.' });
+
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    res.status(500).json({ error: 'Failed to process request. Please try again.' });
+  }
+});
+
+// Step 2: User clicks link, submits new password with token
+app.post('/api/auth/reset-password', async (req, res) => {
+  const { token, password } = req.body;
+
+  if (!token || !password) {
+    return res.status(400).json({ error: 'Token and password are required' });
+  }
+
+  if (password.length < 4) {
+    return res.status(400).json({ error: 'Password must be at least 4 characters' });
+  }
+
+  try {
+    // Find user with valid (non-expired) token
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: 'This reset link is invalid or has expired. Please request a new one.' });
+    }
+
+    // Update password and clear reset fields
+    user.password = password;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    await user.save();
+
+    console.log('Password reset successful for user:', user.username);
+    res.json({ message: 'Password has been reset successfully.' });
+
+  } catch (err) {
+    console.error('Reset password error:', err);
+    res.status(500).json({ error: 'Failed to reset password. Please try again.' });
   }
 });
 

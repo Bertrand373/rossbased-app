@@ -109,6 +109,10 @@ const userSchema = new mongoose.Schema({
   // Theme preference
   theme: { type: String, enum: ['dark', 'light'], default: 'dark' },
   
+  // Password Reset
+  resetPasswordToken: { type: String, default: null },
+  resetPasswordExpires: { type: Date, default: null },
+  
   // ============================================
   // SUBSCRIPTION & PAYMENT SYSTEM
   // ============================================

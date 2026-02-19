@@ -23,6 +23,7 @@ import PredictionDisplay from './components/PredictionDisplay/PredictionDisplay'
 // Shared components
 import AuthModal from './components/Auth/AuthModal';
 import DiscordCallback from './components/Auth/DiscordCallback';
+import ResetPassword from './components/Auth/ResetPassword';
 import MobileNavigation from './components/Navigation/MobileNavigation';
 import InstallPrompt from './components/InstallPrompt/InstallPrompt';
 import AIChat from './components/AIChat/AIChat';
@@ -682,6 +683,7 @@ function AppContent({
                   <Route path="/auth/discord/link-callback" element={
                     <DiscordLinkCallback onLinkComplete={() => refreshSubscription()} />
                   } />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </div>
@@ -693,6 +695,7 @@ function AppContent({
             <Route path="/auth/discord/link-callback" element={
               <DiscordLinkCallback onLinkComplete={() => refreshSubscription()} />
             } />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="*" element={<Landing onLogin={handleLogin} />} />
           </Routes>
         )}
