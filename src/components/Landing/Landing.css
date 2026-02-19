@@ -66,17 +66,17 @@
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  background-color: #ffffff;
-  color: #000000;
-  border: none;
-  border-radius: 8px;
+  background: var(--surface-overlay);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
   cursor: pointer;
   transition: all 200ms ease;
   letter-spacing: 0.01em;
 }
 
 .landing-cta:hover {
-  background-color: rgba(255, 255, 255, 0.9);
+  opacity: 0.9;
   transform: translateY(-2px);
 }
 
@@ -305,7 +305,6 @@
   
   .landing-cta {
     padding: 14px 32px;
-    border-radius: 6px;
   }
   
   .landing-features {
