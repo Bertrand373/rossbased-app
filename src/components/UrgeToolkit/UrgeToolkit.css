@@ -593,10 +593,10 @@
 .ut-btn-primary {
   width: 100%;
   padding: 16px 24px;
-  background: var(--text);
-  border: none;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  color: var(--background);
+  color: var(--text);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -605,7 +605,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.ut-btn-primary:hover { opacity: 0.9; }
+.ut-btn-primary:hover { border-color: rgba(255, 255, 255, 0.25); }
 .ut-btn-primary:active { transform: scale(0.98); }
 
 .ut-btn-ghost {

@@ -441,18 +441,18 @@
 .stats-page .btn-primary {
   width: 100%;
   padding: 16px 24px;
-  background-color: var(--text);
-  border: none;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  color: var(--background);
+  color: var(--text);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: opacity 150ms ease, transform 150ms ease;
+  transition: border-color 150ms ease, transform 150ms ease;
 }
 
-.stats-page .btn-primary:hover { opacity: 0.9; }
+.stats-page .btn-primary:hover { border-color: rgba(255, 255, 255, 0.25); }
 .stats-page .btn-primary:active { transform: scale(0.98); }
 
 .stats-page .btn-ghost {
@@ -692,7 +692,7 @@
   .stats-page .modal h2 { font-size: 1.25rem; }
   .modal-text { font-size: 0.875rem; margin-bottom: 32px; }
   .modal-buttons .btn-danger, .modal-buttons .btn-ghost { padding: 14px 20px; font-size: 0.875rem; }
-  .stats-page .btn-primary, .stats-page .btn-ghost, .stats-page .btn-danger { padding: 14px 20px; font-size: 0.875rem; border-radius: 10px; }
+  .stats-page .btn-primary, .stats-page .btn-ghost, .stats-page .btn-danger { padding: 14px 20px; font-size: 0.875rem; border-radius: 12px; }
 }
 
 @media (max-width: 360px) {

@@ -292,14 +292,14 @@
   transition: width 400ms ease;
 }
 
-/* Confirm button — PRIMARY inverted style */
+/* Confirm button — dark rectangle style */
 .mp-confirm-btn {
   width: 100%;
   padding: 14px 20px;
-  border-radius: 8px;
-  border: 1px solid var(--text);
-  background: var(--text);
-  color: var(--background);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-overlay);
+  color: var(--text);
   font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
@@ -310,7 +310,7 @@
 }
 
 .mp-confirm-btn:hover {
-  opacity: 0.9;
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .mp-confirm-btn:active {
@@ -524,9 +524,9 @@
   width: 100%;
   padding: 16px 24px;
   border-radius: 12px;
-  border: none;
-  background: var(--text);
-  color: var(--background);
+  border: 1px solid var(--border);
+  background: var(--surface-overlay);
+  color: var(--text);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -536,7 +536,7 @@
 }
 
 .mp-explainer-btn:hover {
-  opacity: 0.9;
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .mp-explainer-btn:active {
