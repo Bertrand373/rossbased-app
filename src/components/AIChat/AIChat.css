@@ -304,6 +304,17 @@
   padding: 0;
 }
 
+/* Oracle markdown typography */
+.ai-chat-message.assistant .ai-chat-message-content strong {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ai-chat-message.assistant .ai-chat-message-content em {
+  font-style: italic;
+  opacity: 0.85;
+}
+
 .ai-chat-message-content {
   font-size: 0.9375rem;
   line-height: 1.6;

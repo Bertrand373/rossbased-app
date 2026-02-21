@@ -14,6 +14,37 @@ const CHAT_HISTORY_KEY = 'titantrack_ai_chat_history';
 const MAX_STORED_MESSAGES = 50;
 const MAX_CONTEXT_MESSAGES = 10; // Send last 10 to Claude
 
+// Lightweight markdown renderer for Oracle responses
+// Handles **bold**, *italic*, preserves line breaks via pre-wrap
+const renderMarkdown = (text) => {
+  if (!text) return text;
+  
+  const parts = [];
+  // Bold first (**), then italic (*) — alternation order matters
+  const regex = /\*\*(.+?)\*\*|\*(.+?)\*/gs;
+  let lastIndex = 0;
+  let match;
+  let key = 0;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    if (match[1]) {
+      parts.push(<strong key={`b${key++}`}>{match[1]}</strong>);
+    } else if (match[2]) {
+      parts.push(<em key={`i${key++}`}>{match[2]}</em>);
+    }
+    lastIndex = regex.lastIndex;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : text;
+};
+
 const AIChat = ({ isLoggedIn, isOpen, onClose }) => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
@@ -419,7 +450,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose }) => {
                   <div className="ai-chat-message-row">
                     <img src="/The_Oracle.png" alt="" className="ai-chat-avatar" />
                     <div className="ai-chat-message-content">
-                      {msg.content}
+                      {renderMarkdown(msg.content)}
                     </div>
                   </div>
                 ) : (
@@ -436,7 +467,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose }) => {
                 <div className="ai-chat-message-row">
                   <img src="/The_Oracle.png" alt="" className="ai-chat-avatar" />
                   <div className="ai-chat-message-content streaming">
-                    {streamingText}
+                    {renderMarkdown(streamingText)}
                     <span className="ai-chat-cursor" />
                   </div>
                 </div>
