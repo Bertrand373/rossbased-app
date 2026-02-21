@@ -97,19 +97,19 @@
 .date-actions .btn-primary {
   width: 100%;
   padding: 16px 24px;
-  background-color: var(--text);
-  border: none;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  color: var(--background);
+  color: var(--text);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: opacity 150ms ease;
+  transition: border-color 150ms ease;
 }
 
 .date-actions .btn-primary:hover {
-  opacity: 0.9;
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .date-actions .btn-ghost {

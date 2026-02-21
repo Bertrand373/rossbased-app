@@ -234,11 +234,11 @@ function PredictionDisplay({ userData }) {
         <div className="prediction-actions">
           {riskScore >= 50 ? (
             <>
-              <button className="btn-ghost" onClick={handleDismiss}>
-                I'm fine
-              </button>
               <button className="btn-primary" onClick={handleStruggling}>
                 I'm struggling
+              </button>
+              <button className="btn-ghost" onClick={handleDismiss}>
+                I'm fine
               </button>
             </>
           ) : (

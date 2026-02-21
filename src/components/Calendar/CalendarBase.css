@@ -197,7 +197,7 @@
   background: var(--text);
   border-radius: 1.5px;
   flex-shrink: 0;
-  opacity: 0.5;
+  opacity: 0.85;
 }
 
 /* =============================================================================
@@ -440,7 +440,7 @@
   height: 3px;
   background: var(--text);
   border-radius: 1.5px;
-  opacity: 0.5;
+  opacity: 0.85;
 }
 
 /* Hide old indicator styles */
@@ -727,7 +727,7 @@
   height: 3px;
   background: var(--text);
   border-radius: 1.5px;
-  opacity: 0.5;
+  opacity: 0.85;
 }
 
 /* =============================================================================

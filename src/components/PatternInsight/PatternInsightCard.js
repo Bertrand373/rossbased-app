@@ -2,6 +2,7 @@
 // Ambient AI pattern awareness - floating minimal design
 // Integrated with InterventionService for outcome tracking
 // UPDATED: Added onVisibilityChange callback for mutual exclusion with DailyTransmission
+// UPDATED: sessionStorage caching to prevent almanac flash on tab switches
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -24,7 +25,6 @@ const PatternInsightCard = ({ userData, onVisibilityChange }) => {
   // Notify parent of visibility changes
   useEffect(() => {
     if (onVisibilityChange) {
-      // Card is "showing" if it has insight, is visible, and not dismissed
       const isShowing = insight && isVisible && !isDismissed;
       onVisibilityChange(isShowing);
     }
@@ -35,6 +35,8 @@ const PatternInsightCard = ({ userData, onVisibilityChange }) => {
     const dismissedToday = sessionStorage.getItem('pattern_insight_dismissed');
     if (dismissedToday) {
       setIsDismissed(true);
+      // Clear the active flag since it's dismissed
+      sessionStorage.removeItem('pattern_alert_active');
       return;
     }
 
@@ -46,60 +48,58 @@ const PatternInsightCard = ({ userData, onVisibilityChange }) => {
     try {
       await mlPredictionService.initialize();
       
+      // Only show if model has been trained or has seeded data
       const modelInfo = mlPredictionService.getModelInfo();
-      
-      // Check if model is trained OR if we have seeded training data (for testing)
       const trainingHistory = localStorage.getItem('ml_training_history');
       const hasSeededData = trainingHistory && JSON.parse(trainingHistory).lastTrained;
-      
-      // Only show if model is actually trained or we have test data
       if (!modelInfo?.isReady && !hasSeededData) {
         return;
       }
 
       const prediction = await mlPredictionService.predict(userData);
       
-      // Always save latest prediction to localStorage for Oracle context bridging (Layer 5)
-      // AIChat.js reads this before each Oracle call and pushes to backend
       try {
         localStorage.setItem('titantrack_ml_prediction', JSON.stringify({
-          riskScore: prediction.riskScore / 100, // Normalize to 0-1 for backend
+          riskScore: prediction.riskScore / 100,
           riskLevel: prediction.riskScore >= 70 ? 'high' : prediction.riskScore >= 50 ? 'elevated' : prediction.riskScore >= 30 ? 'moderate' : 'low',
           topFactors: Object.keys(prediction.factors || {}).slice(0, 5),
           timestamp: Date.now()
         }));
       } catch (e) { /* silent */ }
       
-      // Show for elevated risk (50%+)
+      // Only show card for elevated risk (50%+)
       if (prediction.riskScore < 50) {
+        sessionStorage.removeItem('pattern_alert_active');
         return;
       }
 
       setInsight(prediction);
       
-      // Create intervention when alert is shown
-      // This tracks that the user was shown an alert
+      // Cache that the alert is active — prevents almanac flash on tab switches
+      sessionStorage.setItem('pattern_alert_active', 'true');
+      
       interventionIdRef.current = interventionService.createIntervention(prediction);
 
-      // Animate in after a short delay
-      setTimeout(() => setIsVisible(true), 500);
+      // Show immediately — no delay
+      setIsVisible(true);
 
     } catch (error) {
       console.error('Pattern insight check error:', error);
+      sessionStorage.removeItem('pattern_alert_active');
     }
   };
 
   const handleDismiss = () => {
-    // Record that user dismissed/ignored the alert
     if (interventionIdRef.current) {
       interventionService.recordResponse(interventionIdRef.current, 'dismissed');
     }
     
-    // Phase 1: Start collapse animation
     setIsVisible(false);
     setIsDismissing(true);
     
-    // Phase 2: Remove from DOM after animation completes
+    // Clear the active flag and set dismissed flag
+    sessionStorage.removeItem('pattern_alert_active');
+    
     setTimeout(() => {
       setIsDismissed(true);
       sessionStorage.setItem('pattern_insight_dismissed', 'true');
@@ -107,7 +107,6 @@ const PatternInsightCard = ({ userData, onVisibilityChange }) => {
   };
 
   const handleViewInsights = () => {
-    // Pass the prediction data AND intervention ID
     navigate('/urge-prediction', { 
       state: { 
         prediction: insight,
@@ -116,7 +115,6 @@ const PatternInsightCard = ({ userData, onVisibilityChange }) => {
     });
   };
 
-  // Don't render if dismissed or no insight
   if (isDismissed || !insight) {
     return null;
   }

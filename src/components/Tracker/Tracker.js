@@ -36,8 +36,11 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
   }, [isPremium, userData.hasSeenOnboarding]);
   
-  // NEW: Track if PatternInsightCard is showing (for mutual exclusion with EnergyAlmanac)
-  const [isPatternAlertShowing, setIsPatternAlertShowing] = useState(false);
+  // FIXED: Initialize from sessionStorage to prevent almanac flash on tab switches
+  const [isPatternAlertShowing, setIsPatternAlertShowing] = useState(
+    sessionStorage.getItem('pattern_alert_active') === 'true' && 
+    sessionStorage.getItem('pattern_insight_dismissed') !== 'true'
+  );
   
   const [benefits, setBenefits] = useState({ 
     energy: 5, focus: 5, confidence: 5, aura: 5, sleep: 5, workout: 5,
@@ -355,13 +358,6 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         />
       )}
       
-      {/* AI Pattern Insight - ambient, non-intrusive */}
-      {/* NEW: Passes visibility change callback for mutual exclusion */}
-      <PatternInsightCard 
-        userData={userData} 
-        onVisibilityChange={handlePatternAlertVisibilityChange}
-      />
-      
       {/* Benefits Modal */}
       {showBenefits && (
         <div className="overlay">
@@ -536,6 +532,11 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
       
       {/* Main - Centers in remaining space */}
       <main className="tracker-main">
+        {/* AI Pattern Insight - inside tracker-main so it's always visible */}
+        <PatternInsightCard 
+          userData={userData} 
+          onVisibilityChange={handlePatternAlertVisibilityChange}
+        />
         <p className="date">
           {format(currentTime, 'EEEE, MMMM d')}
           <span className="time-separator">·</span>

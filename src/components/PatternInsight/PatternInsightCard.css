@@ -15,8 +15,8 @@
   /* Spacing from content below */
   margin-bottom: 32px;
   
-  /* For smooth collapse animation */
-  max-height: 200px;
+  /* TEMP: Increased from 200px to fit message + buttons */
+  max-height: 400px;
   overflow: hidden;
   
   /* Animation - fade and slide down */
