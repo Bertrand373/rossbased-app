@@ -36,6 +36,19 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
     }
   }, [isPremium, userData.hasSeenOnboarding]);
   
+  // Deferred login toast — fires after route swap has settled
+  // (OAuth redirects cause full page reload → route tree swap eats toasts fired during login)
+  useEffect(() => {
+    const msg = sessionStorage.getItem('login_toast');
+    if (msg) {
+      const duration = parseInt(sessionStorage.getItem('login_toast_duration') || '2500', 10);
+      sessionStorage.removeItem('login_toast');
+      sessionStorage.removeItem('login_toast_duration');
+      // Small delay ensures Toaster is fully mounted and visible
+      setTimeout(() => toast.success(msg, { duration }), 300);
+    }
+  }, []);
+  
   // FIXED: Initialize from sessionStorage to prevent almanac flash on tab switches
   const [isPatternAlertShowing, setIsPatternAlertShowing] = useState(
     sessionStorage.getItem('pattern_alert_active') === 'true' && 

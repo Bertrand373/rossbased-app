@@ -373,14 +373,16 @@ export const useUserData = () => {
       
       setIsLoading(false);
       
-      // Detect new signup: account created within last 2 minutes
+      // Defer toast to Tracker mount — prevents toast being killed by route tree swap
+      // (Discord/Google OAuth causes full page redirect → fresh app boot → route swap eats the toast)
       const isNewSignup = processed.createdAt && 
         (Date.now() - new Date(processed.createdAt).getTime()) < 2 * 60 * 1000;
       
       if (isNewSignup) {
-        toast.success('Welcome to TitanTrack. 7 days full access.', { duration: 4000 });
+        sessionStorage.setItem('login_toast', 'Welcome to TitanTrack. 7 days full access.');
+        sessionStorage.setItem('login_toast_duration', '4000');
       } else {
-        toast.success(`Welcome, ${processed.username}!`);
+        sessionStorage.setItem('login_toast', `Welcome, ${processed.username}!`);
       }
       
       return true;
