@@ -1,5 +1,6 @@
 /* src/components/Subscription/PaywallScreen.css */
-/* Premium paywall - TitanTrack definitive */
+/* Premium paywall — always black, conversion-optimized */
+/* No theme awareness. This is a controlled sales environment. */
 
 /* =============================================================================
    CONTAINER
@@ -17,15 +18,7 @@
   padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-}
-
-[data-theme="dark"] .paywall,
-.paywall {
   background: #000000;
-}
-
-[data-theme="light"] .paywall {
-  background: #ffffff;
 }
 
 .paywall-content {
@@ -53,17 +46,14 @@
   opacity: 0.85;
 }
 
-[data-theme="light"] .paywall-icon {
-  filter: invert(1);
-}
-
 /* =============================================================================
-   HEADLINE
+   HEADLINE — weight 500 matches landing
    ============================================================================= */
 
 .paywall-headline {
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: 500;
+  color: #ffffff;
   letter-spacing: -0.03em;
   line-height: 1.1;
   margin: 0 0 8px 0;
@@ -71,42 +61,25 @@
   opacity: 0;
 }
 
-[data-theme="dark"] .paywall-headline,
-.paywall-headline {
-  color: #ffffff;
-}
-
-[data-theme="light"] .paywall-headline {
-  color: #000000;
-}
-
 .paywall-subheadline {
   font-size: 1rem;
   font-weight: 400;
+  color: rgba(255, 255, 255, 0.45);
   line-height: 1.5;
   margin: 0 0 40px 0;
   opacity: 0;
   animation: pwFadeIn 600ms ease 200ms forwards;
 }
 
-[data-theme="dark"] .paywall-subheadline,
-.paywall-subheadline {
-  color: rgba(255, 255, 255, 0.45);
-}
-
-[data-theme="light"] .paywall-subheadline {
-  color: rgba(0, 0, 0, 0.45);
-}
-
 /* =============================================================================
-   FEATURES — thin line bullets, editorial style
+   FEATURES — thin line bullets, 3 items max
    ============================================================================= */
 
 .paywall-features {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
   margin-bottom: 40px;
   text-align: left;
   animation: pwFadeIn 600ms ease 300ms forwards;
@@ -116,18 +89,10 @@
 .paywall-feature {
   font-size: 0.875rem;
   font-weight: 400;
+  color: rgba(255, 255, 255, 0.6);
   padding-left: 24px;
   position: relative;
   line-height: 1.4;
-}
-
-[data-theme="dark"] .paywall-feature,
-.paywall-feature {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-[data-theme="light"] .paywall-feature {
-  color: rgba(0, 0, 0, 0.6);
 }
 
 .paywall-feature::before {
@@ -137,19 +102,11 @@
   top: 50%;
   width: 12px;
   height: 1px;
-}
-
-[data-theme="dark"] .paywall-feature::before,
-.paywall-feature::before {
   background: rgba(255, 255, 255, 0.2);
 }
 
-[data-theme="light"] .paywall-feature::before {
-  background: rgba(0, 0, 0, 0.15);
-}
-
 /* =============================================================================
-   PLAN CARDS — equal top padding, badge sits in reserved space
+   PLAN CARDS — 16px radius, landing-matched
    ============================================================================= */
 
 .paywall-plans {
@@ -164,7 +121,7 @@
 .paywall-plan {
   flex: 1;
   padding: 32px 16px 20px;
-  border-radius: 12px;
+  border-radius: 16px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -173,125 +130,83 @@
   transition: border-color 0.2s ease, background 0.2s ease;
   position: relative;
   font-family: inherit;
-}
-
-[data-theme="dark"] .paywall-plan,
-.paywall-plan {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-[data-theme="light"] .paywall-plan {
-  background: rgba(0, 0, 0, 0.02);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-[data-theme="dark"] .paywall-plan.selected,
 .paywall-plan.selected {
   border-color: rgba(255, 255, 255, 0.5);
   background: rgba(255, 255, 255, 0.05);
 }
 
-[data-theme="light"] .paywall-plan.selected {
-  border-color: rgba(0, 0, 0, 0.4);
-  background: rgba(0, 0, 0, 0.04);
+/* Annual card — subtle gold tint like landing pricing */
+.paywall-plan.featured {
+  border-color: rgba(255, 221, 0, 0.2);
+  background: rgba(255, 221, 0, 0.03);
 }
 
-/* Badge — centered in the reserved top padding */
+.paywall-plan.featured.selected {
+  border-color: rgba(255, 221, 0, 0.35);
+  background: rgba(255, 221, 0, 0.05);
+}
+
+/* Badge — solid gold, matches landing BEST VALUE */
 .plan-badge {
   position: absolute;
-  top: 8px;
+  top: -10px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 0.55rem;
-  font-weight: 600;
+  font-size: 0.625rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 2px 8px;
-  border-radius: 3px;
+  letter-spacing: 0.08em;
+  padding: 3px 10px;
+  border-radius: 6px;
   white-space: nowrap;
-}
-
-[data-theme="dark"] .plan-badge,
-.plan-badge {
-  color: rgba(255, 221, 0, 0.5);
-  background: rgba(255, 221, 0, 0.06);
-}
-
-[data-theme="light"] .plan-badge {
-  color: rgba(184, 134, 11, 0.7);
-  background: rgba(184, 134, 11, 0.06);
+  color: #000000;
+  background: rgba(255, 221, 0, 0.7);
 }
 
 .plan-label {
   font-size: 0.75rem;
   font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
 
-[data-theme="dark"] .plan-label,
-.plan-label {
-  color: rgba(255, 255, 255, 0.4);
-}
-
-[data-theme="light"] .plan-label {
-  color: rgba(0, 0, 0, 0.4);
-}
-
 .plan-price {
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-top: 2px;
-}
-
-[data-theme="dark"] .plan-price,
-.plan-price {
+  font-size: 2rem;
+  font-weight: 500;
   color: #ffffff;
-}
-
-[data-theme="light"] .plan-price {
-  color: #000000;
+  letter-spacing: -0.03em;
+  margin-top: 2px;
+  font-feature-settings: 'tnum' 1;
 }
 
 .plan-period {
   font-size: 0.875rem;
   font-weight: 400;
-}
-
-[data-theme="dark"] .plan-period,
-.plan-period {
   color: rgba(255, 255, 255, 0.4);
-}
-
-[data-theme="light"] .plan-period {
-  color: rgba(0, 0, 0, 0.4);
 }
 
 .plan-monthly {
   font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.3);
   margin-top: 2px;
 }
 
-[data-theme="dark"] .plan-monthly,
-.plan-monthly {
-  color: rgba(255, 255, 255, 0.3);
-}
-
-[data-theme="light"] .plan-monthly {
-  color: rgba(0, 0, 0, 0.3);
-}
-
 /* =============================================================================
-   CTA BUTTON
+   CTA BUTTON — ghost style matching landing
    ============================================================================= */
 
 .paywall-cta {
   width: 100%;
   padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
+  color: #ffffff;
   font-size: 1rem;
   font-weight: 600;
   font-family: inherit;
@@ -303,25 +218,9 @@
   opacity: 0;
 }
 
-[data-theme="dark"] .paywall-cta,
-.paywall-cta {
-  background: rgba(255, 255, 255, 0.06);
-  color: #ffffff;
-}
-
-[data-theme="light"] .paywall-cta {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.15);
-  color: #000000;
-}
-
 .paywall-cta:hover:not(:disabled) {
   border-color: rgba(255, 255, 255, 0.3);
   transform: translateY(-1px);
-}
-
-[data-theme="light"] .paywall-cta:hover:not(:disabled) {
-  border-color: rgba(0, 0, 0, 0.3);
 }
 
 .paywall-cta:active:not(:disabled) {
@@ -343,29 +242,13 @@
   padding-top: 24px;
   width: 100%;
   text-align: center;
-}
-
-[data-theme="dark"] .paywall-discord,
-.paywall-discord {
   border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-[data-theme="light"] .paywall-discord {
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .paywall-discord p {
   font-size: 0.8rem;
-  margin: 0 0 8px 0;
-}
-
-[data-theme="dark"] .paywall-discord p,
-.paywall-discord p {
   color: rgba(255, 255, 255, 0.35);
-}
-
-[data-theme="light"] .paywall-discord p {
-  color: rgba(0, 0, 0, 0.35);
+  margin: 0 0 8px 0;
 }
 
 .paywall-discord-link {
@@ -373,20 +256,12 @@
   border: none;
   font-size: 0.85rem;
   font-family: inherit;
+  color: rgba(255, 255, 255, 0.55);
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 3px;
   padding: 0;
   transition: opacity 150ms ease;
-}
-
-[data-theme="dark"] .paywall-discord-link,
-.paywall-discord-link {
-  color: rgba(255, 255, 255, 0.55);
-}
-
-[data-theme="light"] .paywall-discord-link {
-  color: rgba(0, 0, 0, 0.55);
 }
 
 .paywall-discord-link:hover {
@@ -399,16 +274,8 @@
 
 .paywall-legal {
   font-size: 0.7rem;
-  margin: 0;
-}
-
-[data-theme="dark"] .paywall-legal,
-.paywall-legal {
   color: rgba(255, 255, 255, 0.2);
-}
-
-[data-theme="light"] .paywall-legal {
-  color: rgba(0, 0, 0, 0.2);
+  margin: 0;
 }
 
 .paywall-signout {
@@ -416,19 +283,11 @@
   border: none;
   font-size: 0.75rem;
   font-family: inherit;
+  color: rgba(255, 255, 255, 0.2);
   cursor: pointer;
   padding: 12px;
   margin-top: 8px;
   transition: opacity 150ms ease;
-}
-
-[data-theme="dark"] .paywall-signout,
-.paywall-signout {
-  color: rgba(255, 255, 255, 0.2);
-}
-
-[data-theme="light"] .paywall-signout {
-  color: rgba(0, 0, 0, 0.2);
 }
 
 .paywall-signout:hover {
@@ -486,6 +345,6 @@
   }
   
   .plan-price {
-    font-size: 1.3rem;
+    font-size: 1.75rem;
   }
 }

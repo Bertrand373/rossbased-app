@@ -111,9 +111,7 @@ const PaywallScreen = ({
         <div className="paywall-features">
           <div className="paywall-feature">Know your risk before urges hit</div>
           <div className="paywall-feature">See what retention is actually changing in you</div>
-          <div className="paywall-feature">Rewire your mind in 30 days</div>
           <div className="paywall-feature">AI that learns your patterns, not someone else's</div>
-          <div className="paywall-feature">Break the cycle when it matters most</div>
         </div>
         
         {/* Plan selector */}
@@ -127,7 +125,7 @@ const PaywallScreen = ({
           </button>
           
           <button 
-            className={`paywall-plan ${selectedPlan === 'yearly' ? 'selected' : ''}`}
+            className={`paywall-plan featured ${selectedPlan === 'yearly' ? 'selected' : ''}`}
             onClick={() => setSelectedPlan('yearly')}
           >
             <span className="plan-badge">Save 35%</span>
