@@ -93,11 +93,12 @@
 }
 
 .calendar-modal-header h3 {
-  margin: 0 0 24px 0;
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: var(--text);
-  letter-spacing: -0.02em;
+  margin: 0 0 16px 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 /* =============================================================================
@@ -145,11 +146,12 @@
 .calendar-day-info { text-align: center; }
 
 .calendar-day-info > h3 {
-  margin: 0 0 24px 0;
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: var(--text);
-  letter-spacing: -0.02em;
+  margin: 0 0 16px 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 /* =============================================================================
@@ -168,9 +170,9 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 24px;
+  padding: 14px 28px;
   border-radius: 100px;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 500;
   background: var(--surface-overlay);
   color: var(--text-secondary);
@@ -291,10 +293,14 @@
    JOURNAL SECTION
    ============================================================================= */
 
-.calendar-journal { text-align: left; }
+.calendar-journal {
+  text-align: left;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-subtle);
+}
 
 .calendar-journal h4 {
-  margin: 0 0 20px 0;
+  margin: 0 0 16px 0;
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-muted);
@@ -303,50 +309,10 @@
   text-transform: uppercase;
 }
 
-.calendar-journal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.calendar-journal-header h4 { margin: 0; }
-
-.calendar-action-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text-secondary);
-  font-size: 0.75rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 150ms ease;
-}
-
-.calendar-action-btn:hover {
-  border-color: var(--border-prominent);
-  color: var(--text);
-}
-
-.calendar-journal-entry {
-  padding: 16px;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  background: var(--surface-overlay);
-  border-radius: 12px;
-  white-space: pre-wrap;
-}
-
 .calendar-journal-editing {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .calendar-journal-textarea {
@@ -373,67 +339,72 @@
 
 .calendar-journal-actions {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
-.calendar-save-btn {
-  width: 100%;
-  padding: 14px 24px;
-  background: transparent;
+.calendar-journal-save {
+  flex: 1;
+  padding: 10px 16px;
+  background: var(--surface-overlay);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 8px;
   color: var(--text-secondary);
-  font-size: 0.9375rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
   transition: all 150ms ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
 }
 
-.calendar-save-btn:hover {
+.calendar-journal-save:hover {
   border-color: var(--border-prominent);
   color: var(--text);
 }
 
-.calendar-cancel-btn {
-  width: 100%;
-  padding: 14px 24px;
+.calendar-journal-cancel {
+  flex: 1;
+  padding: 10px 16px;
   background: transparent;
   border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   color: var(--text-muted);
-  font-size: 0.9375rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   transition: color 150ms ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
 }
 
-.calendar-cancel-btn:hover { color: var(--text); }
+.calendar-journal-cancel:hover { color: var(--text-secondary); }
+
+.calendar-journal-entry {
+  padding: 16px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  background: var(--surface-overlay);
+  border-radius: 12px;
+  white-space: pre-wrap;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.calendar-journal-entry:hover {
+  background: var(--border);
+}
 
 /* Journal Empty State */
 .calendar-journal-empty {
   padding: 24px;
   text-align: center;
-  margin-bottom: 16px;
+  cursor: pointer;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  transition: border-color 150ms ease;
 }
 
-.calendar-journal-empty h4 {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin: 0 0 8px 0;
-  text-transform: none;
-  letter-spacing: normal;
+.calendar-journal-empty:hover {
+  border-color: var(--border-prominent);
 }
 
 .calendar-journal-empty p {
@@ -441,11 +412,6 @@
   color: var(--text-muted);
   line-height: 1.5;
   margin: 0;
-}
-
-.calendar-journal-start {
-  display: flex;
-  justify-content: center;
 }
 
 /* =============================================================================
@@ -527,10 +493,11 @@
 
 .calendar-edit-day h3 {
   margin: 0 0 8px 0;
-  font-size: 1.5rem;
-  font-weight: 500;
-  color: var(--text);
-  letter-spacing: -0.02em;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .calendar-edit-day p {
@@ -810,23 +777,20 @@
 @media (max-width: 768px) {
   .calendar-modal { max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 24px); }
   .calendar-modal.calendar-edit-day.has-trigger-selection { height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 24px); }
-  .calendar-modal-header h3, .calendar-day-info h3, .calendar-edit-day h3 { font-size: 1.375rem; }
-  .calendar-status-badge { padding: 10px 20px; font-size: 0.8125rem; }
+  .calendar-modal-header h3, .calendar-day-info h3, .calendar-edit-day h3 { font-size: 0.6875rem; }
+  .calendar-status-badge { padding: 12px 24px; font-size: 0.875rem; }
   .calendar-benefit-label { font-size: 0.8125rem; min-width: 90px; }
   .calendar-benefit-value { width: 28px; height: 28px; min-width: 28px; font-size: 0.875rem; }
   .calendar-option-btn { padding: 14px 20px; font-size: 0.875rem; }
   .calendar-trigger { padding: 12px 0; font-size: 0.8125rem; }
-  .calendar-journal-header { flex-direction: column; align-items: stretch; gap: 12px; }
-  .calendar-journal-header h4 { text-align: center; }
-  .calendar-action-btn { align-self: center; }
   .calendar-journal-textarea { min-height: 100px; }
   .calendar-actions { margin-top: 32px; }
   .calendar-btn-primary, .calendar-btn-ghost, .calendar-btn-back { padding: 14px 20px; font-size: 0.875rem; }
 }
 
 @media (max-width: 480px) {
-  .calendar-modal-header h3, .calendar-day-info h3, .calendar-edit-day h3 { font-size: 1.25rem; }
-  .calendar-status-badge { padding: 8px 16px; font-size: 0.75rem; }
+  .calendar-modal-header h3, .calendar-day-info h3, .calendar-edit-day h3 { font-size: 0.6875rem; }
+  .calendar-status-badge { padding: 10px 20px; font-size: 0.8125rem; }
   .calendar-benefits h4, .calendar-journal h4 { font-size: 0.6875rem; }
   .calendar-benefit-row { gap: 12px; }
   .calendar-benefit-label { font-size: 0.75rem; min-width: 80px; }
@@ -837,14 +801,14 @@
   .calendar-trigger-actions { padding-top: 20px; }
   .calendar-trigger-confirm { padding: 14px 20px; font-size: 0.875rem; }
   .calendar-journal-textarea { min-height: 80px; padding: 14px; font-size: 0.8125rem; }
-  .calendar-save-btn, .calendar-cancel-btn { padding: 12px 20px; font-size: 0.8125rem; }
+  .calendar-journal-save, .calendar-journal-cancel { padding: 10px 14px; font-size: 0.75rem; }
   .calendar-btn-primary, .calendar-btn-ghost, .calendar-btn-back { padding: 14px 20px; font-size: 0.875rem; border-radius: 12px; }
 }
 
 @media (min-width: 1024px) {
   .calendar-modal { max-width: 360px; }
   .calendar-modal.calendar-edit-day.has-trigger-selection { max-height: 700px; height: auto; }
-  .calendar-modal-header h3, .calendar-day-info h3, .calendar-edit-day h3 { font-size: 1.625rem; }
+  .calendar-modal-header h3, .calendar-day-info h3, .calendar-edit-day h3 { font-size: 0.6875rem; }
   .calendar-status-badge { padding: 14px 28px; font-size: 0.9375rem; }
   .calendar-status-badge .status-dot { width: 9px; height: 9px; }
   .calendar-benefits h4, .calendar-journal h4 { font-size: 0.8125rem; }

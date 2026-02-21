@@ -398,14 +398,7 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
   // Render helper for journal section (used in both sticky and non-sticky layouts)
   const renderJournalSection = () => (
     <div className="calendar-journal">
-      <div className="calendar-journal-header">
-        <h4>Journal</h4>
-        {!isEditingNote && noteText && (
-          <button className="calendar-action-btn" onClick={startEditingNote}>
-            Edit
-          </button>
-        )}
-      </div>
+      <h4>Journal</h4>
       
       {isEditingNote ? (
         <div className="calendar-journal-editing">
@@ -415,30 +408,25 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
             onChange={(e) => setNoteText(e.target.value)}
             placeholder="What's on your mind?"
             rows="4"
+            autoFocus
           />
           <div className="calendar-journal-actions">
-            <button className="calendar-save-btn" onClick={saveNote}>
+            <button className="calendar-journal-save" onClick={saveNote}>
               Save
             </button>
-            <button className="calendar-cancel-btn" onClick={cancelEditingNote}>
+            <button className="calendar-journal-cancel" onClick={cancelEditingNote}>
               Cancel
             </button>
           </div>
         </div>
       ) : noteText ? (
-        <div className="calendar-journal-entry">{noteText}</div>
+        <div className="calendar-journal-entry" onClick={startEditingNote}>
+          {noteText}
+        </div>
       ) : (
-        <>
-          <div className="calendar-journal-empty">
-            <h4>What's on your mind?</h4>
-            <p>Journaling helps track patterns and maintain accountability on your journey.</p>
-          </div>
-          <div className="calendar-journal-start">
-            <button className="calendar-action-btn" onClick={startEditingNote}>
-              Add Entry
-            </button>
-          </div>
-        </>
+        <div className="calendar-journal-empty" onClick={startEditingNote}>
+          <p>Tap to add a journal entry</p>
+        </div>
       )}
     </div>
   );
