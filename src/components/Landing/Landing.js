@@ -6,6 +6,7 @@ import trackerLogo from '../../assets/trackerapplogo-white.png';
 
 const Landing = ({ onLogin }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [headerSolid, setHeaderSolid] = useState(false);
   const featuresRef = useRef(null);
   const problemRef = useRef(null);
   const testimonialRef = useRef(null);
@@ -19,6 +20,15 @@ const Landing = ({ onLogin }) => {
   };
 
   const openAuth = () => setShowAuthModal(true);
+
+  // Sticky header — solid background after scrolling past hero
+  useEffect(() => {
+    const handleScroll = () => {
+      setHeaderSolid(window.scrollY > 60);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Scroll-triggered animations
   useEffect(() => {
@@ -43,6 +53,14 @@ const Landing = ({ onLogin }) => {
   return (
     <div className="landing">
       <div className="landing-bg" />
+
+      {/* Sticky header — logo + sign in for returning users */}
+      <header className={`landing-header${headerSolid ? ' header-solid' : ''}`}>
+        <img src={trackerLogo} alt="TitanTrack" className="landing-header-logo" />
+        <button className="landing-sign-in" onClick={openAuth}>
+          Sign in
+        </button>
+      </header>
 
       {/* ============================================================
           HERO — Logo, headline, video, CTA

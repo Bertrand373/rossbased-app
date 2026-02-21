@@ -29,6 +29,61 @@
   z-index: 0;
 }
 
+/* ============================================================
+   STICKY HEADER — returning users
+   ============================================================ */
+
+.landing-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: transparent;
+  transition: background-color 300ms ease, border-color 300ms ease;
+  border-bottom: 1px solid transparent;
+}
+
+.landing-header.header-solid {
+  background: rgba(0, 0, 0, 0.85);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.landing-header-logo {
+  height: 20px;
+  width: auto;
+  opacity: 0.7;
+  transition: opacity 200ms ease;
+}
+
+.landing-header.header-solid .landing-header-logo {
+  opacity: 0.9;
+}
+
+.landing-sign-in {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  color: rgba(255, 255, 255, 0.45);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 0;
+  transition: color 200ms ease;
+  letter-spacing: 0.01em;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.landing-sign-in:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
 /* Shared section label */
 .landing-section-label {
   font-size: 0.6875rem;
@@ -628,6 +683,10 @@
     padding: 60px 16px 48px;
   }
 
+  .landing-header {
+    padding: 14px 16px;
+  }
+
   .landing-logo {
     height: 24px;
   }
@@ -705,6 +764,18 @@
     padding: 48px 14px 40px;
   }
 
+  .landing-header {
+    padding: 12px 14px;
+  }
+
+  .landing-header-logo {
+    height: 18px;
+  }
+
+  .landing-sign-in {
+    font-size: 0.75rem;
+  }
+
   .landing-logo {
     height: 22px;
   }
@@ -753,6 +824,10 @@
   .landing-step-line {
     opacity: 1;
     transform: none;
+    transition: none;
+  }
+
+  .landing-header {
     transition: none;
   }
 }
