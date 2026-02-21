@@ -115,6 +115,7 @@
   .ai-chat-header {
     position: relative;
     padding-top: 24px;
+    touch-action: none; /* Enable custom swipe gesture */
   }
 }
 
@@ -216,6 +217,29 @@
 @keyframes emptyEyeBreath {
   0%, 100% { opacity: 0.35; }
   50% { opacity: 0.65; }
+}
+
+/* ============================================================
+   MESSAGE ROW — avatar + content layout
+   ============================================================ */
+
+.ai-chat-message-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.ai-chat-avatar {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+  margin-top: 1px;
+  opacity: 0.45;
+}
+
+[data-theme="light"] .ai-chat-avatar {
+  filter: invert(1);
 }
 
 /* ============================================================

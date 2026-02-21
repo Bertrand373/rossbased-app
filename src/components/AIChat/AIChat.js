@@ -31,7 +31,13 @@ const AIChat = ({ isLoggedIn, isOpen, onClose }) => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const chatBodyRef = useRef(null);
+  const panelRef = useRef(null);
   const hasTrackedOpen = useRef(false);
+  
+  // Swipe-to-close refs
+  const touchStartY = useRef(0);
+  const touchDeltaY = useRef(0);
+  const isDragging = useRef(false);
 
   // Track chat opened (once per open)
   useEffect(() => {
@@ -98,6 +104,55 @@ const AIChat = ({ isLoggedIn, isOpen, onClose }) => {
       trackAILimitReached();
     }
   }, [usage.messagesRemaining, usage.messagesLimit]);
+
+  // Swipe-to-close (mobile drawer)
+  const handleTouchStart = useCallback((e) => {
+    touchStartY.current = e.touches[0].clientY;
+    touchDeltaY.current = 0;
+    isDragging.current = false;
+  }, []);
+
+  const handleTouchMove = useCallback((e) => {
+    const delta = e.touches[0].clientY - touchStartY.current;
+    if (delta < 0) return; // Only allow downward swipe
+    if (delta > 10) {
+      isDragging.current = true;
+      touchDeltaY.current = delta;
+      if (panelRef.current) {
+        panelRef.current.style.transition = 'none';
+        panelRef.current.style.transform = `translateY(${delta}px)`;
+      }
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (!isDragging.current) return;
+    
+    if (touchDeltaY.current > 100 && panelRef.current) {
+      // Threshold met — animate out and close
+      panelRef.current.style.transition = 'transform 250ms ease-out';
+      panelRef.current.style.transform = 'translateY(100%)';
+      setTimeout(() => {
+        if (panelRef.current) {
+          panelRef.current.style.transition = '';
+          panelRef.current.style.transform = '';
+        }
+        onClose();
+      }, 250);
+    } else if (panelRef.current) {
+      // Below threshold — snap back
+      panelRef.current.style.transition = 'transform 250ms ease-out';
+      panelRef.current.style.transform = '';
+      setTimeout(() => {
+        if (panelRef.current) {
+          panelRef.current.style.transition = '';
+        }
+      }, 250);
+    }
+    
+    isDragging.current = false;
+    touchDeltaY.current = 0;
+  }, [onClose]);
 
   // Fetch usage stats
   const fetchUsage = async () => {
@@ -311,11 +366,17 @@ const AIChat = ({ isLoggedIn, isOpen, onClose }) => {
       {/* Chat Panel */}
       <div className={`ai-chat-overlay ${isOpen ? 'open' : ''}`} onClick={onClose}>
         <div 
+          ref={panelRef}
           className={`ai-chat-panel ${isOpen ? 'open' : ''}`}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <header className="ai-chat-header">
+          <header 
+            className="ai-chat-header"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
             <div className="ai-chat-header-content">
               <h2 className="ai-chat-title">The Oracle</h2>
               <span className="ai-chat-subtitle">
@@ -354,30 +415,47 @@ const AIChat = ({ isLoggedIn, isOpen, onClose }) => {
                     <span className="ai-chat-message-time">{formatTime(msg.timestamp)}</span>
                   </div>
                 )}
-                <div className="ai-chat-message-content">
-                  {msg.content}
-                </div>
+                {msg.role === 'assistant' ? (
+                  <div className="ai-chat-message-row">
+                    <img src="/The_Oracle.png" alt="" className="ai-chat-avatar" />
+                    <div className="ai-chat-message-content">
+                      {msg.content}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="ai-chat-message-content">
+                    {msg.content}
+                  </div>
+                )}
               </div>
             ))}
 
             {/* Streaming response */}
             {streamingText && (
               <div className="ai-chat-message assistant">
-                <div className="ai-chat-message-content streaming">
-                  {streamingText}
-                  <span className="ai-chat-cursor" />
+                <div className="ai-chat-message-row">
+                  <img src="/The_Oracle.png" alt="" className="ai-chat-avatar" />
+                  <div className="ai-chat-message-content streaming">
+                    {streamingText}
+                    <span className="ai-chat-cursor" />
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Loading indicator - Theme aware */}
+            {/* Loading indicator */}
             {isLoading && !streamingText && (
-              <div className="ai-chat-loading">
-                <img 
-                  src={getLoadingIcon()} 
-                  alt="" 
-                  className="ai-chat-loading-icon"
-                />
+              <div className="ai-chat-message assistant">
+                <div className="ai-chat-message-row">
+                  <img src="/The_Oracle.png" alt="" className="ai-chat-avatar" />
+                  <div className="ai-chat-loading">
+                    <img 
+                      src={getLoadingIcon()} 
+                      alt="" 
+                      className="ai-chat-loading-icon"
+                    />
+                  </div>
+                </div>
               </div>
             )}
 

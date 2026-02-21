@@ -17,11 +17,30 @@ const PaywallScreen = ({
   // Reset processing state if user navigates back from Stripe
   useEffect(() => {
     const reset = () => setIsProcessing(false);
+    
+    // Window regains focus (tab switch back)
     window.addEventListener('focus', reset);
-    window.addEventListener('pageshow', reset);
+    
+    // Page restored from bfcache (browser back button)
+    const onPageShow = (e) => { if (e.persisted) reset(); };
+    window.addEventListener('pageshow', onPageShow);
+    
+    // Tab becomes visible again (mobile PWA, app switch)
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') reset();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    
+    // Stripe cancel redirect lands with ?checkout=canceled
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('checkout') === 'canceled') {
+      reset();
+    }
+
     return () => {
       window.removeEventListener('focus', reset);
-      window.removeEventListener('pageshow', reset);
+      window.removeEventListener('pageshow', onPageShow);
+      document.removeEventListener('visibilitychange', onVisibility);
     };
   }, []);
   
@@ -67,8 +86,11 @@ const PaywallScreen = ({
     setIsProcessing(true);
     try {
       await onCheckout(selectedPlan);
-    } finally {
-      // Don't set false - page will redirect to Stripe
+      // Safety net: if redirect somehow didn't happen, reset after 10s
+      setTimeout(() => setIsProcessing(false), 10000);
+    } catch (err) {
+      // Checkout failed before redirect (network error, etc.)
+      setIsProcessing(false);
     }
   };
 
