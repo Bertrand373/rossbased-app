@@ -66,10 +66,6 @@ const Landing = ({ onLogin }) => {
           HERO — Logo, headline, video, CTA
           ============================================================ */}
       <section className="landing-hero">
-        <div className="landing-logo-container">
-          <img src={trackerLogo} alt="TitanTrack" className="landing-logo" />
-        </div>
-
         <h1 className="landing-headline">
           Your patterns are predictable.<br />
           <span className="landing-headline-accent">Now they work for you.</span>

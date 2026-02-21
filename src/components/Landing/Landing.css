@@ -143,16 +143,6 @@
   z-index: 1;
 }
 
-.landing-logo-container {
-  margin-bottom: 40px;
-}
-
-.landing-logo {
-  height: 30px;
-  width: auto;
-  opacity: 0.9;
-}
-
 .landing-headline {
   font-size: 2.25rem;
   font-weight: 500;
@@ -547,10 +537,6 @@
   animation: fadeInUp 600ms ease forwards;
 }
 
-.landing-logo-container {
-  animation: fadeInUp 600ms ease forwards;
-}
-
 .landing-headline {
   animation: fadeInUp 600ms ease 100ms forwards;
   opacity: 0;
@@ -687,14 +673,6 @@
     padding: 14px 16px;
   }
 
-  .landing-logo {
-    height: 24px;
-  }
-
-  .landing-logo-container {
-    margin-bottom: 32px;
-  }
-
   .landing-headline {
     font-size: 1.5rem;
   }
@@ -776,10 +754,6 @@
     font-size: 0.75rem;
   }
 
-  .landing-logo {
-    height: 22px;
-  }
-
   .landing-headline {
     font-size: 1.25rem;
   }
@@ -804,7 +778,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .landing-hero,
-  .landing-logo-container,
   .landing-headline,
   .landing-sub,
   .landing-video-wrap,
