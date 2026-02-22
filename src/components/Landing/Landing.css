@@ -43,6 +43,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 24px;
+  padding-top: calc(16px + env(safe-area-inset-top, 0px));
   background: transparent;
   transition: background-color 300ms ease, border-color 300ms ease;
   border-bottom: 1px solid transparent;
@@ -671,6 +672,7 @@
 
   .landing-header {
     padding: 14px 16px;
+    padding-top: calc(14px + env(safe-area-inset-top, 0px));
   }
 
   .landing-header-logo {
@@ -748,6 +750,7 @@
 
   .landing-header {
     padding: 12px 14px;
+    padding-top: calc(12px + env(safe-area-inset-top, 0px));
   }
 
   .landing-header-logo {
