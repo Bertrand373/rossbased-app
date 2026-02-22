@@ -932,8 +932,23 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     const isBetaPeriod = now < launchDate;
     
     const BETA_DAILY_LIMIT = 5;
-    const FREE_LIFETIME_LIMIT = 3;
+    const FREE_WEEKLY_LIMIT = 3;
     const PREMIUM_DAILY_LIMIT = 25;
+
+    // Weekly limit tracking for free users (resets every Monday UTC)
+    const getWeekStartUTC = () => {
+      const d = new Date();
+      const day = d.getUTCDay(); // 0=Sun, 1=Mon
+      const diff = day === 0 ? 6 : day - 1; // days since Monday
+      const monday = new Date(d);
+      monday.setUTCDate(d.getUTCDate() - diff);
+      monday.setUTCHours(0, 0, 0, 0);
+      return monday.toISOString().split('T')[0];
+    };
+    const currentWeekStart = getWeekStartUTC();
+    const storedWeekStart = user.aiUsage?.weekStart || '';
+    const isNewWeek = storedWeekStart !== currentWeekStart;
+    const currentWeeklyCount = isNewWeek ? 0 : (user.aiUsage?.weeklyCount || 0);
 
     // Check limits
     if (isBetaPeriod && currentCount >= BETA_DAILY_LIMIT) {
@@ -946,10 +961,10 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
         error: 'Daily limit reached',
         message: `You've used all ${PREMIUM_DAILY_LIMIT} daily messages. Resets at midnight.`
       });
-    } else if (!isBetaPeriod && !user.isPremium && currentLifetime >= FREE_LIFETIME_LIMIT) {
+    } else if (!isBetaPeriod && !user.isPremium && currentWeeklyCount >= FREE_WEEKLY_LIMIT) {
       return res.status(429).json({ 
-        error: 'Free limit reached',
-        message: `Free users get ${FREE_LIFETIME_LIMIT} AI messages total. Upgrade to Premium.`
+        error: 'Weekly limit reached',
+        message: `You've used your ${FREE_WEEKLY_LIMIT} weekly messages. Resets Monday. Upgrade for unlimited.`
       });
     }
 
@@ -1143,7 +1158,9 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
           'aiUsage.date': userLocalDate,
           'aiUsage.count': currentCount + 1,
           'aiUsage.lifetimeCount': currentLifetime + 1,
-          'aiUsage.lastUsed': now
+          'aiUsage.lastUsed': now,
+          'aiUsage.weekStart': currentWeekStart,
+          'aiUsage.weeklyCount': isNewWeek ? 1 : currentWeeklyCount + 1
         }
       }
     );
@@ -1302,16 +1319,17 @@ Examples:
     } else if (user.isPremium) {
       messagesRemaining = PREMIUM_DAILY_LIMIT - (currentCount + 1);
     } else {
-      messagesRemaining = FREE_LIFETIME_LIMIT - (currentLifetime + 1);
+      messagesRemaining = FREE_WEEKLY_LIMIT - (isNewWeek ? 1 : currentWeeklyCount + 1);
     }
 
     // Send usage update and done signal
     res.write(`data: ${JSON.stringify({ 
       type: 'usage', 
       messagesUsed: currentCount + 1,
-      messagesLimit: isBetaPeriod ? BETA_DAILY_LIMIT : (user.isPremium ? PREMIUM_DAILY_LIMIT : FREE_LIFETIME_LIMIT),
-      messagesRemaining,
-      isBetaPeriod
+      messagesLimit: isBetaPeriod ? BETA_DAILY_LIMIT : (user.isPremium ? PREMIUM_DAILY_LIMIT : FREE_WEEKLY_LIMIT),
+      messagesRemaining: Math.max(0, messagesRemaining),
+      isBetaPeriod,
+      isPremium: user.isPremium || false
     })}\n\n`);
     res.write('data: [DONE]\n\n');
     res.end();
@@ -1340,37 +1358,55 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
     const storedDate = user.aiUsage?.date || '';
     const isNewDay = storedDate !== userLocalDate;
     const currentCount = isNewDay ? 0 : (user.aiUsage?.count || 0);
-    const currentLifetime = user.aiUsage?.lifetimeCount || 0;
 
     const launchDate = new Date('2026-02-18T00:00:00Z');
     const isBetaPeriod = now < launchDate;
     
     const BETA_DAILY_LIMIT = 5;
-    const FREE_LIFETIME_LIMIT = 3;
+    const FREE_WEEKLY_LIMIT = 3;
     const PREMIUM_DAILY_LIMIT = 25;
 
-    let messagesUsed, messagesLimit, messagesRemaining;
+    // Weekly tracking for free users
+    const getWeekStartUTC = () => {
+      const d = new Date();
+      const day = d.getUTCDay();
+      const diff = day === 0 ? 6 : day - 1;
+      const monday = new Date(d);
+      monday.setUTCDate(d.getUTCDate() - diff);
+      monday.setUTCHours(0, 0, 0, 0);
+      return monday.toISOString().split('T')[0];
+    };
+    const currentWeekStart = getWeekStartUTC();
+    const storedWeekStart = user.aiUsage?.weekStart || '';
+    const isNewWeek = storedWeekStart !== currentWeekStart;
+    const currentWeeklyCount = isNewWeek ? 0 : (user.aiUsage?.weeklyCount || 0);
+
+    let messagesUsed, messagesLimit, messagesRemaining, resetsAt;
 
     if (isBetaPeriod) {
       messagesUsed = currentCount;
       messagesLimit = BETA_DAILY_LIMIT;
       messagesRemaining = BETA_DAILY_LIMIT - currentCount;
+      resetsAt = 'midnight';
     } else if (user.isPremium) {
       messagesUsed = currentCount;
       messagesLimit = PREMIUM_DAILY_LIMIT;
       messagesRemaining = PREMIUM_DAILY_LIMIT - currentCount;
+      resetsAt = 'midnight';
     } else {
-      messagesUsed = currentLifetime;
-      messagesLimit = FREE_LIFETIME_LIMIT;
-      messagesRemaining = FREE_LIFETIME_LIMIT - currentLifetime;
+      messagesUsed = currentWeeklyCount;
+      messagesLimit = FREE_WEEKLY_LIMIT;
+      messagesRemaining = FREE_WEEKLY_LIMIT - currentWeeklyCount;
+      resetsAt = 'Monday';
     }
 
     res.json({
       messagesUsed,
       messagesLimit,
-      messagesRemaining,
+      messagesRemaining: Math.max(0, messagesRemaining),
       isBetaPeriod,
-      isPremium: user.isPremium || false
+      isPremium: user.isPremium || false,
+      resetsAt
     });
   } catch (err) {
     console.error('Get AI usage error:', err);
@@ -1391,15 +1427,29 @@ app.get('/api/ai-usage/:username', authenticate, async (req, res) => {
     const storedDate = user.aiUsage?.date || '';
     const isNewDay = storedDate !== userLocalDate;
     const currentCount = isNewDay ? 0 : (user.aiUsage?.count || 0);
-    const currentLifetime = user.aiUsage?.lifetimeCount || 0;
 
     // Check if beta period
     const launchDate = new Date('2026-02-18T00:00:00Z');
     const isBetaPeriod = now < launchDate;
     
     const BETA_DAILY_LIMIT = 5;
-    const FREE_LIFETIME_LIMIT = 3;
+    const FREE_WEEKLY_LIMIT = 3;
     const PREMIUM_DAILY_LIMIT = 25;
+
+    // Weekly tracking for free users
+    const getWeekStartUTC = () => {
+      const d = new Date();
+      const day = d.getUTCDay();
+      const diff = day === 0 ? 6 : day - 1;
+      const monday = new Date(d);
+      monday.setUTCDate(d.getUTCDate() - diff);
+      monday.setUTCHours(0, 0, 0, 0);
+      return monday.toISOString().split('T')[0];
+    };
+    const currentWeekStart = getWeekStartUTC();
+    const storedWeekStart = user.aiUsage?.weekStart || '';
+    const isNewWeek = storedWeekStart !== currentWeekStart;
+    const currentWeeklyCount = isNewWeek ? 0 : (user.aiUsage?.weeklyCount || 0);
 
     let messagesUsed, messagesLimit, messagesRemaining, resetsAt;
 
@@ -1407,23 +1457,23 @@ app.get('/api/ai-usage/:username', authenticate, async (req, res) => {
       messagesUsed = currentCount;
       messagesLimit = BETA_DAILY_LIMIT;
       messagesRemaining = BETA_DAILY_LIMIT - currentCount;
-      resetsAt = 'midnight (your timezone)';
+      resetsAt = 'midnight';
     } else if (user.isPremium) {
       messagesUsed = currentCount;
       messagesLimit = PREMIUM_DAILY_LIMIT;
       messagesRemaining = PREMIUM_DAILY_LIMIT - currentCount;
-      resetsAt = 'midnight (your timezone)';
+      resetsAt = 'midnight';
     } else {
-      messagesUsed = currentLifetime;
-      messagesLimit = FREE_LIFETIME_LIMIT;
-      messagesRemaining = FREE_LIFETIME_LIMIT - currentLifetime;
-      resetsAt = null; // Lifetime limit doesn't reset
+      messagesUsed = currentWeeklyCount;
+      messagesLimit = FREE_WEEKLY_LIMIT;
+      messagesRemaining = FREE_WEEKLY_LIMIT - currentWeeklyCount;
+      resetsAt = 'Monday';
     }
 
     res.json({
       messagesUsed,
       messagesLimit,
-      messagesRemaining,
+      messagesRemaining: Math.max(0, messagesRemaining),
       isBetaPeriod,
       isPremium: user.isPremium || false,
       resetsAt,

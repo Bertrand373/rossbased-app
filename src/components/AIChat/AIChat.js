@@ -54,7 +54,8 @@ const AIChat = ({ isLoggedIn, isOpen, onClose }) => {
     messagesUsed: 0,
     messagesLimit: 5,
     messagesRemaining: 5,
-    isBetaPeriod: true
+    isBetaPeriod: true,
+    isPremium: false
   });
   const [error, setError] = useState(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -326,7 +327,8 @@ const AIChat = ({ isLoggedIn, isOpen, onClose }) => {
                   messagesUsed: parsed.messagesUsed,
                   messagesLimit: parsed.messagesLimit,
                   messagesRemaining: parsed.messagesRemaining,
-                  isBetaPeriod: parsed.isBetaPeriod
+                  isBetaPeriod: parsed.isBetaPeriod,
+                  isPremium: parsed.isPremium || false
                 });
               } else if (parsed.type === 'error') {
                 throw new Error(parsed.message);
@@ -411,7 +413,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose }) => {
             <div className="ai-chat-header-content">
               <h2 className="ai-chat-title">The Oracle</h2>
               <span className="ai-chat-subtitle">
-                {usage.messagesRemaining} remaining · {usage.isBetaPeriod ? 'Beta' : 'Premium'}
+                {usage.messagesRemaining} remaining · {usage.isBetaPeriod ? 'Beta' : usage.isPremium ? 'Premium' : 'Free'}
               </span>
             </div>
             <button 
@@ -579,8 +581,15 @@ const AIChat = ({ isLoggedIn, isOpen, onClose }) => {
             ) : (
               <div className="ai-chat-limit-reached">
                 <span className="ai-chat-limit-text">
-                  Daily limit reached · Resets at midnight
+                  {usage.isPremium || usage.isBetaPeriod 
+                    ? 'Daily limit reached · Resets at midnight' 
+                    : 'Weekly limit reached · Resets Monday'}
                 </span>
+                {!usage.isPremium && !usage.isBetaPeriod && (
+                  <span className="ai-chat-limit-subtext" style={{display: 'block', marginTop: '4px', fontSize: '11px', opacity: 0.5}}>
+                    Upgrade for unlimited Oracle access
+                  </span>
+                )}
               </div>
             )}
           </div>
