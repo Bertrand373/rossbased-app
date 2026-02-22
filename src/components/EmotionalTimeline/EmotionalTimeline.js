@@ -3,12 +3,12 @@
 // UPDATED: Analysis tab focused on ONE powerful insight - emotional trajectory
 import React, { useState, useEffect } from 'react';
 import './EmotionalTimeline.css';
-import { FaCheck, FaExclamationTriangle } from 'react-icons/fa';
+import { FaCheck, FaExclamationTriangle, FaLock } from 'react-icons/fa';
 
 // Body scroll lock for modals
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 
-const EmotionalTimeline = ({ userData, updateUserData }) => {
+const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal }) => {
   const [activeTab, setActiveTab] = useState('journey');
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -354,8 +354,13 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
 
   const analysis = calculateTrajectory();
 
-  // Open phase modal
+  // Open phase modal - free users can only view current phase
   const openPhase = (phase) => {
+    const isCurrent = phase.id === currentPhase?.id;
+    if (!isPremium && !isCurrent) {
+      if (openPlanModal) openPlanModal();
+      return;
+    }
     setSelectedPhase(phase);
     setShowModal(true);
   };
@@ -411,10 +416,12 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
           <div className="et-phases">
             {phases.map((phase, index) => {
               const status = getPhaseStatus(phase);
+              const isCurrent = phase.id === currentPhase?.id;
+              const isLocked = !isPremium && !isCurrent;
               return (
                 <div 
                   key={phase.id}
-                  className={`et-phase ${status}`}
+                  className={`et-phase ${status}${isLocked ? ' et-phase-locked' : ''}`}
                   onClick={() => openPhase(phase)}
                 >
                   <div className="et-phase-num">
@@ -425,7 +432,7 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                     <p>Days {phase.days}</p>
                   </div>
                   <div className="et-phase-status">
-                    {status === 'completed' && <FaCheck />}
+                    {isLocked ? <FaLock /> : status === 'completed' && <FaCheck />}
                   </div>
                 </div>
               );
@@ -437,6 +444,19 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
       {/* Analysis Tab - ONE powerful insight */}
       {activeTab === 'analysis' && (
         <div className="et-analysis">
+          {!isPremium ? (
+            <div className="et-analysis-locked">
+              <FaLock className="et-analysis-locked-icon" />
+              <h3>Your Emotional Trajectory</h3>
+              <p>See how your energy, focus, confidence and more are trending over your journey</p>
+              {openPlanModal && (
+                <button className="et-analysis-locked-btn" onClick={openPlanModal}>
+                  Upgrade to Premium
+                </button>
+              )}
+            </div>
+          ) : (
+          <>
           {/* YOUR PROGRESS - The core insight */}
           <div className="insight-card">
             <div className="insight-card-header">
@@ -482,6 +502,8 @@ const EmotionalTimeline = ({ userData, updateUserData }) => {
                 <span className="phase-context-expectation">{currentPhase?.expectation}</span>
               </div>
             </div>
+          )}
+          </>
           )}
         </div>
       )}

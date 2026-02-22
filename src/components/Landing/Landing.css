@@ -451,19 +451,99 @@
    ============================================================ */
 
 .landing-footer {
-  padding: 32px 24px;
+  padding: 48px 24px 32px;
   text-align: center;
   position: relative;
   z-index: 1;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
 
-.landing-footer p {
+/* TT icon */
+.landing-footer-brand {
+  margin-bottom: 4px;
+}
+
+.landing-footer-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  opacity: 0.25;
+  transition: opacity 300ms ease;
+}
+
+.landing-footer-icon:hover {
+  opacity: 0.45;
+}
+
+/* Social icons */
+.landing-footer-social {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.landing-footer-social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.2);
+  transition: color 200ms ease, background-color 200ms ease;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.landing-footer-social-link:hover {
+  color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* Legal links */
+.landing-footer-legal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.landing-footer-legal a {
   font-size: 0.6875rem;
   color: rgba(255, 255, 255, 0.2);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: color 150ms ease;
+}
+
+.landing-footer-legal a:hover {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.landing-footer-dot {
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.1);
+}
+
+/* Copyright */
+.landing-footer-copy {
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.15);
   font-weight: 400;
   margin: 0;
   letter-spacing: 0.02em;
+}
+
+/* Disclaimer */
+.landing-footer-disclaimer {
+  font-size: 0.625rem;
+  color: rgba(255, 255, 255, 0.1);
+  font-weight: 400;
+  margin: 0;
+  letter-spacing: 0.01em;
 }
 
 /* ============================================================

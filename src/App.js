@@ -644,13 +644,13 @@ function AppContent({
                     />
                   } />
                   <Route path="/calendar" element={
-                    <Calendar userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} />
+                    <Calendar userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} openPlanModal={openPlanModal} />
                   } />
                   <Route path="/stats" element={
                     <Stats userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} openPlanModal={openPlanModal} />
                   } />
                   <Route path="/timeline" element={
-                    <EmotionalTimeline userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} />
+                    <EmotionalTimeline userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} openPlanModal={openPlanModal} />
                   } />
                   <Route path="/urge-toolkit" element={
                     <UrgeToolkit userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} openPlanModal={openPlanModal} />

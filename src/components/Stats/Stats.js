@@ -481,8 +481,8 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         </div>
       </section>
 
-      {/* Share Progress Card */}
-      <ShareCard userData={safeUserData} isVisible={true} />
+      {/* Share Progress Card - Premium only */}
+      {isPremium && <ShareCard userData={safeUserData} isVisible={true} />}
 
       {/* Benefit Tracker */}
       <section className="stats-section">

@@ -93,7 +93,7 @@ const MoonIcon = ({ phase, size = 11, emoji }) => {
   );
 };
 
-const Calendar = ({ userData, isPremium, updateUserData }) => {
+const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [dayInfoModal, setDayInfoModal] = useState(false);
@@ -400,7 +400,11 @@ const Calendar = ({ userData, isPremium, updateUserData }) => {
     <div className="calendar-journal">
       <h4>Journal</h4>
       
-      {isEditingNote ? (
+      {!isPremium ? (
+        <div className="calendar-journal-locked" onClick={() => openPlanModal && openPlanModal()}>
+          <p>Upgrade to Premium to journal</p>
+        </div>
+      ) : isEditingNote ? (
         <div className="calendar-journal-editing">
           <textarea
             className="calendar-journal-textarea"
