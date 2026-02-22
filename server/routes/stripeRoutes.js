@@ -193,17 +193,41 @@ router.post('/portal', authenticate, async (req, res) => {
   }
 });
 
+const crypto = require('crypto');
+
 // ============================================
 // STRIPE WEBHOOK HANDLER
 // ============================================
-// IMPORTANT: This route uses raw body parsing (configured in app.js)
+// IMPORTANT: This route uses rawBody captured by verify callback in express.json()
 // Stripe sends events here when payment status changes
 router.post('/webhook', async (req, res) => {
   const sig = req.headers['stripe-signature'];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   
-  // Debug: Log body type to diagnose parsing issues
-  console.log(`🔍 Webhook hit | rawBody exists: ${!!req.rawBody} | rawBody type: ${typeof req.rawBody} | isBuffer: ${Buffer.isBuffer(req.rawBody)} | sig exists: ${!!sig} | secret exists: ${!!webhookSecret}`);
+  // ---- DIAGNOSTIC: Manual HMAC verification to find mismatch ----
+  const sigParts = {};
+  (sig || '').split(',').forEach(item => {
+    const [key, ...rest] = item.split('=');
+    if (key && rest.length) sigParts[key.trim()] = rest.join('=');
+  });
+  
+  const timestamp = sigParts.t;
+  const expectedSig = sigParts.v1;
+  const rawBodyStr = req.rawBody ? req.rawBody.toString('utf8') : '';
+  const signedPayload = `${timestamp}.${rawBodyStr}`;
+  const computedSig = crypto.createHmac('sha256', webhookSecret).update(signedPayload, 'utf8').digest('hex');
+  
+  console.log(`🔍 WEBHOOK DIAGNOSTIC:`);
+  console.log(`   timestamp: ${timestamp}`);
+  console.log(`   expected v1: ${expectedSig ? expectedSig.substring(0, 20) + '...' : 'MISSING'}`);
+  console.log(`   computed v1: ${computedSig.substring(0, 20)}...`);
+  console.log(`   match: ${expectedSig === computedSig}`);
+  console.log(`   secret first 10: ${webhookSecret ? webhookSecret.substring(0, 10) : 'MISSING'}`);
+  console.log(`   secret length: ${webhookSecret ? webhookSecret.length : 0}`);
+  console.log(`   rawBody bytes: ${req.rawBody ? req.rawBody.length : 0}`);
+  console.log(`   rawBody first 80: ${rawBodyStr.substring(0, 80)}`);
+  console.log(`   full sig header: ${sig ? sig.substring(0, 80) + '...' : 'MISSING'}`);
+  // ---- END DIAGNOSTIC ----
   
   let event;
   
