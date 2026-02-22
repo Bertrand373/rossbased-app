@@ -53,13 +53,15 @@ const checkPremiumAccess = (user) => {
       return { hasPremium: true, reason: 'active_subscription', subscription: sub };
       
     case 'trial': {
+      // Legacy: no new trials are created (free tier replaced trials)
+      // Honor any still-active trials, expired ones become free tier
       const trialValid = sub.trialEndDate && now < new Date(sub.trialEndDate);
       if (trialValid) {
         const daysLeft = Math.ceil((new Date(sub.trialEndDate) - now) / (1000 * 60 * 60 * 24));
         return { hasPremium: true, reason: 'trial_active', daysLeft, subscription: sub };
       }
-      // Trial expired - update status
-      return { hasPremium: false, reason: 'trial_expired', subscription: sub };
+      // Trial expired → free tier (no premium)
+      return { hasPremium: false, reason: 'no_subscription', subscription: sub };
     }
     
     case 'canceled': {
@@ -82,24 +84,12 @@ const checkPremiumAccess = (user) => {
 };
 
 // ============================================
-// START FREE TRIAL
+// START FREE TRIAL (DEPRECATED)
 // ============================================
+// No longer used — free tier replaced trials.
+// Kept to avoid breaking any remaining callers.
 const startFreeTrial = async (user) => {
-  const now = new Date();
-  const trialEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days
-  
-  user.subscription = {
-    ...user.subscription,
-    status: 'trial',
-    plan: 'none',
-    trialStartDate: now,
-    trialEndDate: trialEnd
-  };
-  user.isPremium = true;
-  
-  await user.save({ validateModifiedOnly: true });
-  console.log(`✅ Free trial started for ${user.username}, expires ${trialEnd.toISOString()}`);
-  
+  console.warn(`⚠️ startFreeTrial called for ${user.username} — trials are deprecated. User remains on free tier.`);
   return user;
 };
 

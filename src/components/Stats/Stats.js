@@ -50,7 +50,7 @@ import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
-const Stats = ({ userData, isPremium, updateUserData, onUpgrade }) => {
+const Stats = ({ userData, isPremium, updateUserData, createCheckout }) => {
   const [selectedMetric, setSelectedMetric] = useState('energy');
   const [timeRange, setTimeRange] = useState('week');
   const [showMilestoneModal, setShowMilestoneModal] = useState(false);
@@ -557,8 +557,8 @@ const Stats = ({ userData, isPremium, updateUserData, onUpgrade }) => {
               <p>Day {safeUserData.currentStreak || 0} · {memoizedInsights.phaseInfo?.name || 'Initial Adaptation'}</p>
             </div>
             <div className="upgrade-card">
-              <p>Unlock detailed analytics and personalized optimization</p>
-              <button className="btn-primary" onClick={onUpgrade}>Upgrade to Premium</button>
+              <p>Unlock full analytics, AI predictions, and pattern recognition</p>
+              <button className="btn-primary" onClick={() => createCheckout && createCheckout('monthly')}>Upgrade to Premium</button>
             </div>
           </div>
         )}
