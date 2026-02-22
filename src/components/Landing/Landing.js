@@ -90,9 +90,9 @@ const Landing = ({ onLogin }) => {
         </div>
 
         <button className="landing-cta" onClick={openAuth}>
-          Start Free Trial
+          Get Started Free
         </button>
-        <p className="landing-trial-note">7 days free · $8/mo after · Cancel anytime</p>
+        <p className="landing-trial-note">Free forever · Premium when you're ready</p>
       </section>
 
       {/* ============================================================
@@ -265,9 +265,9 @@ const Landing = ({ onLogin }) => {
         </div>
 
         <button className="landing-cta cta-bottom" onClick={openAuth}>
-          Start Free Trial
+          Get Started Free
         </button>
-        <p className="landing-trial-note">7 days free · Cancel anytime · No commitment</p>
+        <p className="landing-trial-note">Free to start · Upgrade anytime · Cancel anytime</p>
       </section>
 
       {/* ============================================================

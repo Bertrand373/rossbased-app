@@ -33,6 +33,7 @@ import AdminCockpit from './components/Admin/AdminCockpit';
 import { useUserData } from './hooks/useUserData';
 import { useSubscription } from './hooks/useSubscription';
 import PaywallScreen from './components/Subscription/PaywallScreen';
+import PlanModal from './components/Subscription/PlanModal';
 import DiscordLinkCallback from './components/Auth/DiscordLinkCallback';
 
 // AMBIENT AI HOOKS - Auto-train only (risk indicator removed, floating card handles alerts)
@@ -511,6 +512,10 @@ function AppContent({
   // This is what ALL child components use to gate premium features
   const effectivePremium = hasSubscription;
   
+  // Plan modal state - single upgrade flow for the entire app
+  const [showPlanModal, setShowPlanModal] = useState(false);
+  const openPlanModal = () => setShowPlanModal(true);
+  
   const { theme } = useTheme();
   
   // Theme-aware logo
@@ -584,21 +589,6 @@ function AppContent({
 
         {isLoggedIn ? (
           <>
-            {/* PAYWALL: Show if user has no active subscription */}
-            {!hasSubscription && (
-              <PaywallScreen 
-                userData={userData}
-                subscriptionStatus={subscriptionStatus}
-                onCheckout={createCheckout}
-                onLinkDiscord={() => {
-                  const clientId = process.env.REACT_APP_DISCORD_CLIENT_ID;
-                  const redirectUri = encodeURIComponent(
-                    window.location.origin + '/auth/discord/link-callback'
-                  );
-                  window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=identify%20email`;
-                }}
-              />
-            )}
             
             <header className="app-header">
               <div className="logo-container">
@@ -653,7 +643,7 @@ function AppContent({
                     <Calendar userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} />
                   } />
                   <Route path="/stats" element={
-                    <Stats userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} createCheckout={createCheckout} />
+                    <Stats userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} openPlanModal={openPlanModal} />
                   } />
                   <Route path="/timeline" element={
                     <EmotionalTimeline userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} />
@@ -673,6 +663,7 @@ function AppContent({
                       trialDaysLeft={trialDaysLeft}
                       onManageBilling={openPortal}
                       createCheckout={createCheckout}
+                      openPlanModal={openPlanModal}
                     />
                   } />
                   <Route path="/urge-prediction" element={
@@ -689,6 +680,14 @@ function AppContent({
                 </Routes>
               </div>
             </main>
+            
+            {/* Universal upgrade modal */}
+            <PlanModal
+              isOpen={showPlanModal}
+              onClose={() => setShowPlanModal(false)}
+              onCheckout={createCheckout}
+              subscriptionStatus={subscriptionStatus}
+            />
           </>
         ) : (
           <Routes>
