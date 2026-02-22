@@ -67,7 +67,12 @@ app.options('*', cors());
 // Otherwise Stripe signature verification fails
 app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
 
-app.use(express.json({ limit: '50mb' }));
+// JSON body parser for all OTHER routes — explicitly skip webhook path
+// express.json() can overwrite the raw Buffer that Stripe needs for signature verification
+app.use((req, res, next) => {
+  if (req.originalUrl === '/api/stripe/webhook') return next();
+  express.json({ limit: '50mb' })(req, res, next);
+});
 
 // Error-handling middleware
 app.use((err, req, res, next) => {
