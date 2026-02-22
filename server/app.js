@@ -30,6 +30,7 @@ const { getCommunityPulse } = require('./services/communityPulse');
 const stripeRoutes = require('./routes/stripeRoutes');
 const discordLinkRoutes = require('./routes/discordLink');
 const { expireStaleTrials, expireStaleCanceled } = require('./middleware/subscriptionMiddleware');
+const { checkAndSendOnboardingNotification } = require('./services/notificationService');
 
 // Import leaderboard service
 const { 
@@ -197,6 +198,46 @@ mongoose.connect(mongoUri, {
           console.error('Oracle outcome job error:', err.message);
         }
       }, 4 * 60 * 60 * 1000); // Every 4 hours
+
+      // ============================================
+      // ONBOARDING NOTIFICATION SEQUENCE (runs every 2 hours)
+      // Sends 6 drip notifications over 37 days to free users
+      // Each user gets max 1 notification per cycle
+      // ============================================
+      setInterval(async () => {
+        try {
+          const NotificationSubscription = require('./models/NotificationSubscription');
+
+          // Find all users with active notification subscriptions who aren't premium
+          const activeSubs = await NotificationSubscription.find({
+            notificationsEnabled: true,
+            fcmToken: { $exists: true, $ne: null }
+          }).select('username').lean();
+
+          if (activeSubs.length === 0) return;
+
+          // Batch-fetch these users (non-premium only)
+          const usernames = activeSubs.map(s => s.username);
+          const users = await User.find({
+            username: { $in: usernames },
+            isPremium: { $ne: true }
+          }).select('username createdAt isPremium onboardingNotificationsSent').lean();
+
+          let sent = 0;
+          for (const user of users) {
+            const result = await checkAndSendOnboardingNotification(user);
+            if (result.success) sent++;
+            // Small delay between sends
+            if (result.success) await new Promise(r => setTimeout(r, 200));
+          }
+
+          if (sent > 0) {
+            console.log(`📬 Onboarding: sent ${sent} notifications to ${users.length} eligible users`);
+          }
+        } catch (err) {
+          console.error('Onboarding notification job error:', err.message);
+        }
+      }, 2 * 60 * 60 * 1000); // Every 2 hours
     } catch (error) {
       console.error('Failed to initialize schedulers:', error);
     }
