@@ -155,6 +155,10 @@
 
 .ut-intensity {
   margin-bottom: 48px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 24px 20px;
 }
 
 .ut-intensity-scale {
@@ -217,6 +221,10 @@
 
 .ut-protocols {
   margin-bottom: 32px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 4px 20px;
 }
 
 .ut-protocol {
@@ -298,9 +306,10 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 24px 0;
-  border-top: 1px solid var(--border-subtle);
-  border-bottom: 1px solid var(--border-subtle);
+  padding: 24px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
   text-align: center;
 }
 
@@ -350,6 +359,10 @@
 
 .ut-protocol-steps {
   margin-bottom: 40px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 20px;
 }
 
 .ut-steps-header {
@@ -399,6 +412,10 @@
 
 .ut-interactive-tools {
   margin-bottom: 32px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 4px 20px;
 }
 
 .ut-tools-label {
@@ -461,8 +478,10 @@
 
 .ut-quick-actions {
   margin-bottom: 40px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border-subtle);
+  padding: 20px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
 }
 
 .ut-quick-list {
@@ -495,6 +514,10 @@
 
 .ut-triggers {
   margin-bottom: 32px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 20px;
 }
 
 .ut-triggers-label {
@@ -968,9 +991,11 @@
 
 .ut-peak-recording {
   width: 100%;
-  padding: 24px 0;
+  padding: 24px;
   margin-bottom: 32px;
-  border-bottom: 1px solid var(--border-subtle);
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
   text-align: center;
   animation: fadeInUp 500ms ease forwards;
   opacity: 0;

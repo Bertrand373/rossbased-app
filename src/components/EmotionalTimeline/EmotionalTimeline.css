@@ -88,12 +88,14 @@
 
 .et-current {
   text-align: center;
-  padding: 0 0 48px 0;
+  padding: 28px 24px 32px;
   cursor: pointer;
   transition: opacity 150ms ease;
   -webkit-tap-highlight-color: transparent;
-  border-bottom: 1px solid var(--border-subtle);
-  margin-bottom: 40px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  margin-bottom: 16px;
 }
 
 .et-current:hover { opacity: 0.8; }
@@ -167,13 +169,17 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 4px 20px;
 }
 
 .et-phase {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 20px 0;
+  padding: 18px 0;
   background: transparent;
   border: none;
   border-bottom: 1px solid var(--border-subtle);
@@ -449,11 +455,11 @@
 }
 
 .et-analysis .insight-card {
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  padding-bottom: 32px;
-  margin-bottom: 0;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 16px;
 }
 
 .et-analysis .insight-card-header {
@@ -565,9 +571,10 @@
 
 /* Phase Context */
 .phase-context {
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border-subtle);
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 20px 24px;
 }
 
 .phase-context-inner {
@@ -869,6 +876,9 @@
   text-align: center;
   padding: 64px 32px;
   gap: 12px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
 }
 
 .et-analysis-locked-icon {

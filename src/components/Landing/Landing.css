@@ -318,14 +318,17 @@
 
 .landing-journey-steps {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 0;
 }
 
 .landing-step {
   flex: 1;
   text-align: center;
-  padding: 0 12px;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .landing-step-time {
@@ -353,18 +356,13 @@
   margin: 0;
 }
 
+/* Desktop: vertical separator line between columns */
 .landing-step-line {
-  width: 1px;
-  min-height: 80px;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(255, 255, 255, 0.1) 30%,
-    rgba(255, 255, 255, 0.1) 70%,
-    transparent 100%
-  );
-  flex-shrink: 0;
-  margin-top: 32px;
+  display: none;
+}
+
+.landing-step + .landing-step {
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 /* ============================================================
@@ -451,7 +449,7 @@
    ============================================================ */
 
 .landing-footer {
-  padding: 48px 24px 32px;
+  padding: 56px 24px 40px;
   text-align: center;
   position: relative;
   z-index: 1;
@@ -459,41 +457,41 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
 }
 
 /* TT icon */
 .landing-footer-brand {
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .landing-footer-icon {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
-  opacity: 0.25;
+  opacity: 0.3;
   transition: opacity 300ms ease;
 }
 
 .landing-footer-icon:hover {
-  opacity: 0.45;
+  opacity: 0.5;
 }
 
 /* Social icons */
 .landing-footer-social {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
 }
 
 .landing-footer-social-link {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.25);
   transition: color 200ms ease, background-color 200ms ease;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
@@ -513,25 +511,25 @@
 
 .landing-footer-legal a {
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.25);
   text-decoration: none;
   letter-spacing: 0.02em;
   transition: color 150ms ease;
 }
 
 .landing-footer-legal a:hover {
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .landing-footer-dot {
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.12);
 }
 
 /* Copyright */
 .landing-footer-copy {
   font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.18);
   font-weight: 400;
   margin: 0;
   letter-spacing: 0.02em;
@@ -540,7 +538,7 @@
 /* Disclaimer */
 .landing-footer-disclaimer {
   font-size: 0.625rem;
-  color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.12);
   font-weight: 400;
   margin: 0;
   letter-spacing: 0.01em;
@@ -716,12 +714,26 @@
 
   .landing-step {
     max-width: 300px;
+    padding: 0 12px;
+  }
+
+  .landing-step + .landing-step {
+    border-left: none;
+    margin-top: 8px;
   }
 
   .landing-step-line {
+    display: block;
     width: 1px;
     min-height: 40px;
     margin: 12px 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(255, 255, 255, 0.08) 30%,
+      rgba(255, 255, 255, 0.08) 70%,
+      transparent 100%
+    );
   }
 
   .landing-pricing {
