@@ -625,6 +625,7 @@ function AppContent({
               isLoggedIn={isLoggedIn} 
               isOpen={showAIChat}
               onClose={() => setShowAIChat(false)}
+              openPlanModal={openPlanModal}
             />
             
             <main className="app-content">
@@ -649,7 +650,7 @@ function AppContent({
                     <EmotionalTimeline userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} />
                   } />
                   <Route path="/urge-toolkit" element={
-                    <UrgeToolkit userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} />
+                    <UrgeToolkit userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} openPlanModal={openPlanModal} />
                   } />
                   <Route path="/profile" element={
                     <Profile 

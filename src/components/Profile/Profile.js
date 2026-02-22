@@ -24,7 +24,8 @@ const Profile = ({
   isTrial,
   trialDaysLeft,
   onManageBilling,
-  createCheckout
+  createCheckout,
+  openPlanModal
 }) => {
   const [activeTab, setActiveTab] = useState('account');
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -816,8 +817,8 @@ const Profile = ({
               )}
 
               {!isPremium && (
-                <button className="billing-manage-btn" onClick={() => createCheckout('monthly')}>
-                  Subscribe
+                <button className="billing-manage-btn" onClick={openPlanModal}>
+                  Upgrade to Premium
                 </button>
               )}
             </div>

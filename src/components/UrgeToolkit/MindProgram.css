@@ -418,7 +418,6 @@
   padding: 32px 0;
   text-align: center;
   border-top: 1px solid var(--border-subtle);
-  border-bottom: 1px solid var(--border-subtle);
   margin-bottom: 8px;
 }
 
@@ -426,6 +425,27 @@
   font-size: 0.8125rem;
   color: var(--text-tertiary);
   line-height: 1.5;
+}
+
+.mp-locked-btn {
+  display: block;
+  margin: 16px auto 0;
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: 1px solid var(--border-prominent);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mp-locked-btn:hover {
+  background: var(--surface-overlay);
+  color: var(--text);
 }
 
 /* =============================================================================

@@ -36,7 +36,7 @@ const getDefaultData = () => ({
 // COMPONENT
 // ============================================================
 
-const MindProgram = ({ isPremium, userData, updateUserData }) => {
+const MindProgram = ({ isPremium, userData, updateUserData, openPlanModal }) => {
   // Initialize from server data, with one-time localStorage migration
   const getInitialProgress = () => {
     const serverData = userData?.mindProgram;
@@ -316,7 +316,12 @@ const MindProgram = ({ isPremium, userData, updateUserData }) => {
       {/* Premium gate */}
       {!isPremium ? (
         <div className="mp-locked">
-          <span className="mp-locked-text">Subscribe to unlock the Based30 Mind Program</span>
+          <span className="mp-locked-text">Upgrade to Premium to unlock the Based30 Mind Program</span>
+          {openPlanModal && (
+            <button className="mp-locked-btn" onClick={openPlanModal}>
+              Upgrade to Premium
+            </button>
+          )}
         </div>
       ) : (
         <>

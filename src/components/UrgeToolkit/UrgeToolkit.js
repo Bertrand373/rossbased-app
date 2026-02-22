@@ -51,7 +51,7 @@ const ORBIT_POINTS = [
   { id: 'dantian', name: 'Qi Hai', location: 'Dan Tian', instruction: 'Energy returns below the navel' }
 ];
 
-const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
+const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   // Core States
   const [currentStep, setCurrentStep] = useState('assessment');
   const [urgeIntensity, setUrgeIntensity] = useState(0);
@@ -640,7 +640,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData }) => {
   return (
     <div className="urge-toolkit">
       {/* Mind Program — Always visible at top */}
-      <MindProgram isPremium={isPremium} userData={userData} updateUserData={updateUserData} />
+      <MindProgram isPremium={isPremium} userData={userData} updateUserData={updateUserData} openPlanModal={openPlanModal} />
 
       {/* Peak State Recording — shows most recent during crisis */}
       {userData.peakRecordings && userData.peakRecordings.length > 0 && (() => {

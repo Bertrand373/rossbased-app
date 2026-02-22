@@ -479,6 +479,26 @@
   color: var(--text-muted);
 }
 
+.ai-chat-upgrade-btn {
+  margin-top: 8px;
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: 1px solid var(--border-prominent);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ai-chat-upgrade-btn:hover {
+  background: var(--surface-overlay);
+  color: var(--text);
+}
+
 .ai-chat-limit-subtext {
   font-size: 0.75rem;
   color: var(--text-tertiary);

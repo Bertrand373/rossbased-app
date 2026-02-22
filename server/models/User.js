@@ -181,13 +181,17 @@ const userSchema = new mongoose.Schema({
       date: String,
       count: { type: Number, default: 0 },
       lifetimeCount: { type: Number, default: 0 },
-      lastUsed: Date
+      lastUsed: Date,
+      weekStart: { type: String, default: '' },
+      weeklyCount: { type: Number, default: 0 }
     },
     default: {
       date: '',
       count: 0,
       lifetimeCount: 0,
-      lastUsed: null
+      lastUsed: null,
+      weekStart: '',
+      weeklyCount: 0
     }
   },
   
