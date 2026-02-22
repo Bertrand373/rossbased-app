@@ -18,7 +18,7 @@ import interventionService from '../../services/InterventionService';
 // Mixpanel Analytics
 import { trackDailyLog, trackStreakReset } from '../../utils/mixpanel';
 
-const Tracker = ({ userData, updateUserData, isPremium }) => {
+const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   // FIXED: Only show date picker if user has completed onboarding but hasn't set date
   const [showDatePicker, setShowDatePicker] = useState(!userData.startDate && userData.hasSeenOnboarding);
   const [showBenefits, setShowBenefits] = useState(false);
@@ -66,6 +66,7 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   // Peak State Recording — prompt after high benefit logs
   const [showPeakPrompt, setShowPeakPrompt] = useState(false);
   const [peakMessage, setPeakMessage] = useState('');
+  const [showLogLock, setShowLogLock] = useState(false);
   
   // Live clock state - updates every minute
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -76,6 +77,10 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
   
   // Use stored currentStreak for consistency across all tabs
   const streak = userData.currentStreak || 1;
+
+  // Free users can log benefits for the first 30 days of each streak
+  // Resets automatically on relapse (streak goes back to 1)
+  const canLogBenefits = isPremium || streak <= 30;
 
   const todayLogged = userData.benefitTracking?.some(
     b => format(new Date(b.date), 'yyyy-MM-dd') === format(currentTime, 'yyyy-MM-dd')
@@ -535,6 +540,23 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         </div>
       )}
 
+      {/* Benefit Logging Lock — Free users past day 30 */}
+      {showLogLock && (
+        <div className="overlay">
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+            <h2>Logging Locked</h2>
+            <p>
+              Benefit tracking is available for the first 30 days of each streak. 
+              You're on day {streak} — upgrade to Premium for unlimited logging and full analytics.
+            </p>
+            <div className="confirm-actions">
+              <button className="btn-primary" onClick={() => { setShowLogLock(false); onUpgrade(); }}>Upgrade</button>
+              <button className="btn-ghost" onClick={() => setShowLogLock(false)}>Not now</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main */}
       {/* Energy Almanac - Fixed at top */}
       {/* Only shows when PatternInsightCard is NOT showing */}
@@ -573,9 +595,9 @@ const Tracker = ({ userData, updateUserData, isPremium }) => {
         {/* ONBOARDING TARGET: benefits-trigger */}
         <button 
           className={`${todayLogged ? 'btn-logged' : 'btn-primary'} benefits-trigger`}
-          onClick={() => setShowBenefits(true)}
+          onClick={() => canLogBenefits ? setShowBenefits(true) : setShowLogLock(true)}
         >
-          {todayLogged ? 'Logged Today ✓' : 'Log Today'}
+          {todayLogged ? 'Logged Today ✓' : canLogBenefits ? 'Log Today' : 'Log Today 🔒'}
         </button>
       </footer>
 

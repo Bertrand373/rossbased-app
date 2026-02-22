@@ -511,6 +511,9 @@ function AppContent({
   // This is what ALL child components use to gate premium features
   const effectivePremium = hasSubscription;
   
+  // Upgrade handler — triggers Stripe checkout (defaults to annual for best conversion)
+  const handleUpgrade = (plan = 'yearly') => createCheckout(plan);
+  
   const { theme } = useTheme();
   
   // Theme-aware logo
@@ -584,21 +587,8 @@ function AppContent({
 
         {isLoggedIn ? (
           <>
-            {/* PAYWALL: Show if user has no active subscription */}
-            {!hasSubscription && (
-              <PaywallScreen 
-                userData={userData}
-                subscriptionStatus={subscriptionStatus}
-                onCheckout={createCheckout}
-                onLinkDiscord={() => {
-                  const clientId = process.env.REACT_APP_DISCORD_CLIENT_ID;
-                  const redirectUri = encodeURIComponent(
-                    window.location.origin + '/auth/discord/link-callback'
-                  );
-                  window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=identify%20email`;
-                }}
-              />
-            )}
+            {/* Free tier: all logged-in users see the app */}
+            {/* Premium features gated in-component (Oracle limits, logging wall, ML lock) */}
             
             <header className="app-header">
               <div className="logo-container">
@@ -624,7 +614,7 @@ function AppContent({
               triggerAfterCheckIns={1}
               triggerAfterVisits={3}
               currentCheckIns={userData?.totalCheckIns || 0}
-              suppress={!hasSubscription || subLoading}
+              suppress={subLoading}
             />
             
             {/* Floating Oracle Eye - hidden on admin */}
@@ -647,13 +637,14 @@ function AppContent({
                       isPremium={effectivePremium}
                       setGoal={setGoal}
                       cancelGoal={cancelGoal}
+                      onUpgrade={handleUpgrade}
                     />
                   } />
                   <Route path="/calendar" element={
                     <Calendar userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} />
                   } />
                   <Route path="/stats" element={
-                    <Stats userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} />
+                    <Stats userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} onUpgrade={handleUpgrade} />
                   } />
                   <Route path="/timeline" element={
                     <EmotionalTimeline userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} />
