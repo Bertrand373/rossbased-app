@@ -1,9 +1,9 @@
 // ShareCard.js - TITANTRACK
 // Shareable stats card - premium minimal aesthetic
 // Theme-aware design, canvas-based image generation
-// MINIMAL VERSION: Just the number. The number is the flex.
+// Enhanced: benefit scores + milestone detection for viral growth
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
 import './ShareCard.css';
 
@@ -15,6 +15,17 @@ const ShareIcon = () => (
     <line x1="12" y1="2" x2="12" y2="15"/>
   </svg>
 );
+
+// Milestone definitions
+const MILESTONES = {
+  7:   'ONE WEEK',
+  14:  'TWO WEEKS',
+  30:  'ONE MONTH',
+  60:  'TWO MONTHS',
+  90:  'NINETY DAYS',
+  180: 'SIX MONTHS',
+  365: 'ONE YEAR'
+};
 
 const ShareCard = ({ userData, isVisible = true }) => {
   const [showPreview, setShowPreview] = useState(false);
@@ -44,6 +55,36 @@ const ShareCard = ({ userData, isVisible = true }) => {
   const streak = userData?.currentStreak || 0;
   const today = format(new Date(), 'MMM d, yyyy');
 
+  // Milestone detection
+  const milestoneLabel = MILESTONES[streak] || null;
+  const isMilestone = !!milestoneLabel;
+
+  // Compute overall benefit score from most recent 7 days of logs
+  const benefitScore = useMemo(() => {
+    const logs = userData?.benefitTracking;
+    if (!logs || logs.length === 0) return null;
+
+    // Get last 7 logs (or fewer)
+    const sorted = [...logs].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const recent = sorted.slice(0, 7);
+
+    const metrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+    let total = 0;
+    let count = 0;
+
+    recent.forEach(log => {
+      metrics.forEach(m => {
+        if (log[m] != null && log[m] > 0) {
+          total += log[m];
+          count++;
+        }
+      });
+    });
+
+    if (count === 0) return null;
+    return Math.round((total / count) * 10) / 10; // One decimal place
+  }, [userData?.benefitTracking]);
+
   // Generate the card image using Canvas API - theme-aware
   const generateCardImage = useCallback(() => {
     return new Promise((resolve) => {
@@ -62,6 +103,7 @@ const ShareCard = ({ userData, isVisible = true }) => {
       const borderColor = isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
       const subtleColor = isDarkTheme ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)';
       const mutedColor = isDarkTheme ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.25)';
+      const accentColor = isDarkTheme ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)';
 
       // Background
       ctx.fillStyle = bgColor;
@@ -72,17 +114,44 @@ const ShareCard = ({ userData, isVisible = true }) => {
       ctx.lineWidth = 2;
       ctx.strokeRect(40, 40, width - 80, height - 80);
 
+      // Layout shifts based on content
+      const hasScore = benefitScore !== null;
+      const hasExtra = hasScore || isMilestone;
+      const dayY = hasExtra ? height * 0.36 : height * 0.45;
+
       // Day number - large, commanding, centered
       ctx.fillStyle = textColor;
       ctx.font = '600 320px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(streak.toString(), width / 2, height * 0.45);
+      ctx.fillText(streak.toString(), width / 2, dayY);
 
       // "DAYS" label
       ctx.fillStyle = subtleColor;
       ctx.font = '500 36px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      ctx.fillText('DAYS', width / 2, height * 0.58);
+      let labelY = dayY + height * 0.13;
+      ctx.fillText('DAYS', width / 2, labelY);
+
+      // Milestone label (if applicable)
+      if (isMilestone) {
+        labelY += 70;
+        ctx.fillStyle = accentColor;
+        ctx.font = '600 30px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText(milestoneLabel, width / 2, labelY);
+      }
+
+      // Benefit score (if available)
+      if (hasScore) {
+        labelY += 80;
+        // Score number
+        ctx.fillStyle = textColor;
+        ctx.font = '600 64px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText(benefitScore.toFixed(1), width / 2, labelY);
+        // Label
+        ctx.fillStyle = mutedColor;
+        ctx.font = '500 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        ctx.fillText('OVERALL SCORE', width / 2, labelY + 40);
+      }
 
       // Footer - date and branding
       ctx.fillStyle = mutedColor;
@@ -95,7 +164,7 @@ const ShareCard = ({ userData, isVisible = true }) => {
 
       resolve(canvas);
     });
-  }, [streak, today, isDarkTheme]);
+  }, [streak, today, isDarkTheme, benefitScore, isMilestone, milestoneLabel]);
 
   // Handle share action
   const handleShare = async () => {
@@ -169,9 +238,9 @@ const ShareCard = ({ userData, isVisible = true }) => {
   return (
     <>
       {/* Share Section in Stats */}
-      <div className="share-card-section">
+      <div className={`share-card-section${isMilestone ? ' share-card-milestone' : ''}`}>
         <div className="share-card-header">
-          <span>Share Progress</span>
+          <span>{isMilestone ? `${milestoneLabel} — Share It` : 'Share Progress'}</span>
         </div>
         
         <div className="share-card-preview" onClick={openPreview}>
@@ -179,9 +248,15 @@ const ShareCard = ({ userData, isVisible = true }) => {
             <span className="share-mini-day">{streak}</span>
             <span className="share-mini-label">days</span>
           </div>
+          {benefitScore !== null && (
+            <div className="share-mini-score">
+              <span className="share-mini-score-value">{benefitScore.toFixed(1)}</span>
+              <span className="share-mini-score-label">overall</span>
+            </div>
+          )}
           <div className="share-card-cta">
             <ShareIcon />
-            <span>Tap to share</span>
+            <span>{isMilestone ? 'Share your milestone' : 'Tap to share'}</span>
           </div>
         </div>
       </div>
@@ -193,6 +268,15 @@ const ShareCard = ({ userData, isVisible = true }) => {
             <div className="share-modal-card">
               <span className="share-modal-day">{streak}</span>
               <span className="share-modal-day-label">DAYS</span>
+              {isMilestone && (
+                <span className="share-modal-milestone">{milestoneLabel}</span>
+              )}
+              {benefitScore !== null && (
+                <div className="share-modal-score">
+                  <span className="share-modal-score-value">{benefitScore.toFixed(1)}</span>
+                  <span className="share-modal-score-label">OVERALL SCORE</span>
+                </div>
+              )}
               <div className="share-modal-footer">
                 <span className="share-modal-date">{today}</span>
                 <span className="share-modal-brand">titantrack.app</span>

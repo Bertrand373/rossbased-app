@@ -31,6 +31,18 @@
 }
 
 /* ============================================================
+   MILESTONE HIGHLIGHT - Subtle glow on milestone days
+   ============================================================ */
+
+.share-card-milestone .share-card-header span {
+  color: var(--text-secondary);
+}
+
+.share-card-milestone .share-card-preview {
+  border-color: var(--border-prominent);
+}
+
+/* ============================================================
    MINI PREVIEW CARD - Tappable
    ============================================================ */
 
@@ -60,7 +72,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .share-mini-day {
@@ -79,6 +91,29 @@
   text-transform: uppercase;
   letter-spacing: 0.2em;
   margin-top: 8px;
+}
+
+/* Benefit score in mini preview */
+.share-mini-score {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.share-mini-score-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  font-feature-settings: 'tnum' 1;
+}
+
+.share-mini-score-label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .share-card-cta {
@@ -177,6 +212,40 @@
   text-transform: uppercase;
   letter-spacing: 0.3em;
   margin-top: 12px;
+}
+
+/* Milestone label in modal */
+.share-modal-milestone {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-top: 16px;
+}
+
+/* Benefit score in modal */
+.share-modal-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.share-modal-score-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  font-feature-settings: 'tnum' 1;
+}
+
+.share-modal-score-label {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-top: 4px;
 }
 
 .share-modal-footer {
