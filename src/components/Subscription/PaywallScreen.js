@@ -51,35 +51,26 @@ const PaywallScreen = ({
   
   // Determine headline based on context
   const getHeadline = () => {
-    if (reason === 'trial_expired' && streakCount > 0) {
+    if ((reason === 'subscription_ended' || reason === 'expired') && streakCount > 0) {
       return `Day ${streakCount}.`;
-    }
-    if (reason === 'trial_expired' && longestStreak > 0) {
-      return 'Your patterns are still here.';
-    }
-    if (reason === 'trial_expired') {
-      return 'Seven days in.';
     }
     if (reason === 'subscription_ended' || reason === 'expired') {
       return 'Nothing was lost.';
     }
-    return 'Unlock TitanTrack.';
+    if (streakCount > 30) {
+      return `Day ${streakCount}. You're ready.`;
+    }
+    return 'Upgrade to Premium.';
   };
   
   const getSubheadline = () => {
-    if (reason === 'trial_expired' && streakCount > 0) {
-      return 'Your streak is yours. Your data lives here.';
-    }
-    if (reason === 'trial_expired' && longestStreak > 0) {
-      return 'Every check-in, every pattern, every prediction. Waiting.';
-    }
-    if (reason === 'trial_expired') {
-      return 'Now you know what this is. Decide.';
-    }
     if (reason === 'subscription_ended' || reason === 'expired') {
       return 'Your history, your patterns, your progress. All here.';
     }
-    return 'Track the work. See the change.';
+    if (streakCount > 30) {
+      return 'Your free logging window ended. Premium keeps the data flowing.';
+    }
+    return 'Your streak runs free. Premium unlocks the full picture.';
   };
 
   const handleCheckout = async () => {
@@ -107,11 +98,11 @@ const PaywallScreen = ({
         <h1 className="paywall-headline">{getHeadline()}</h1>
         <p className="paywall-subheadline">{getSubheadline()}</p>
         
-        {/* Outcomes, not features */}
+        {/* What Premium unlocks */}
         <div className="paywall-features">
-          <div className="paywall-feature">Know your risk before urges hit</div>
-          <div className="paywall-feature">See what retention is actually changing in you</div>
-          <div className="paywall-feature">AI that learns your patterns, not someone else's</div>
+          <div className="paywall-feature">Unlimited benefit logging — track every day, not just 30</div>
+          <div className="paywall-feature">ML predictions that learn your patterns and warn before urges</div>
+          <div className="paywall-feature">Full analytics, phase insights, and unlimited Oracle access</div>
         </div>
         
         {/* Plan selector */}
@@ -142,9 +133,7 @@ const PaywallScreen = ({
           disabled={isProcessing}
         >
           {isProcessing ? 'Processing...' : 
-            reason === 'no_subscription' 
-              ? 'Start 7-Day Free Trial' 
-              : `Continue — $${selectedPlan === 'yearly' ? '62/yr' : '8/mo'}`
+            `Upgrade — $${selectedPlan === 'yearly' ? '62/yr' : '8/mo'}`
           }
         </button>
         
@@ -163,10 +152,7 @@ const PaywallScreen = ({
         
         {/* Legal */}
         <p className="paywall-legal">
-          {reason === 'no_subscription' 
-            ? 'Card required. Not charged until trial ends. Cancel anytime.'
-            : 'Cancel anytime. Secure payment via Stripe.'
-          }
+          Cancel anytime. Secure payment via Stripe.
         </p>
         
         <button className="paywall-signout" onClick={() => {
