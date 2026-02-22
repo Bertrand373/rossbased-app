@@ -63,16 +63,16 @@ app.use(cors({
 // Handle CORS preflight requests
 app.options('*', cors());
 
-// STRIPE WEBHOOK: Must use raw body parser BEFORE express.json()
-// Otherwise Stripe signature verification fails
-app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
-
-// JSON body parser for all OTHER routes — explicitly skip webhook path
-// express.json() can overwrite the raw Buffer that Stripe needs for signature verification
-app.use((req, res, next) => {
-  if (req.originalUrl === '/api/stripe/webhook') return next();
-  express.json({ limit: '50mb' })(req, res, next);
-});
+// STRIPE WEBHOOK: Capture raw body via verify callback for signature verification
+// This is Stripe's recommended approach - captures bytes before any parsing
+app.use(express.json({
+  limit: '50mb',
+  verify: (req, res, buf) => {
+    if (req.originalUrl === '/api/stripe/webhook') {
+      req.rawBody = buf;
+    }
+  }
+}));
 
 // Error-handling middleware
 app.use((err, req, res, next) => {

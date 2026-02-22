@@ -202,10 +202,14 @@ router.post('/webhook', async (req, res) => {
   const sig = req.headers['stripe-signature'];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   
+  // Debug: Log body type to diagnose parsing issues
+  console.log(`🔍 Webhook hit | rawBody exists: ${!!req.rawBody} | rawBody type: ${typeof req.rawBody} | isBuffer: ${Buffer.isBuffer(req.rawBody)} | sig exists: ${!!sig} | secret exists: ${!!webhookSecret}`);
+  
   let event;
   
   try {
-    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+    // Use rawBody captured by verify callback in express.json() - Stripe's recommended approach
+    event = stripe.webhooks.constructEvent(req.rawBody, sig, webhookSecret);
   } catch (err) {
     console.error('⚠️ Webhook signature verification failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
