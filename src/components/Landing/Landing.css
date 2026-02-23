@@ -19,14 +19,48 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-.landing-bg {
+/* Film grain texture — barely visible noise that adds depth to flat black */
+.landing::before {
+  content: '';
   position: fixed;
   inset: 0;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 40% at 50% 120%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='512' height='512' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+}
+
+/* Ambient gradient — slow-moving deep darks that make the page breathe */
+.landing-bg {
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
   pointer-events: none;
   z-index: 0;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(15, 10, 45, 0.7) 0%, transparent 50%),
+    radial-gradient(circle at 70% 50%, rgba(8, 14, 35, 0.5) 0%, transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(20, 8, 35, 0.3) 0%, transparent 40%);
+  animation: ambientDrift 30s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Static radial glow anchored at hero — focal depth */
+.landing-bg::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 35% at 50% 0%, rgba(15, 12, 35, 0.5) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+@keyframes ambientDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-3%, -2%) scale(1.02); }
+  66% { transform: translate(2%, -4%) scale(1.01); }
 }
 
 /* ============================================================
@@ -167,7 +201,7 @@
   margin: 0 0 48px 0;
 }
 
-/* Video wrapper */
+/* Video wrapper — soft ambient glow from the screen */
 .landing-video-wrap {
   width: 100%;
   max-width: 300px;
@@ -175,7 +209,10 @@
   border-radius: 20px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.6),
+    0 0 80px rgba(100, 80, 200, 0.03),
+    0 0 160px rgba(100, 80, 200, 0.015);
   position: relative;
   background: #000;
 }
@@ -901,5 +938,10 @@
 
   .landing-header {
     transition: none;
+  }
+
+  .landing-bg {
+    animation: none;
+    transform: none;
   }
 }
