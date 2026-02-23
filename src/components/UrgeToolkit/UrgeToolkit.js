@@ -728,8 +728,15 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
                     onClick={() => handleUrgeIntensity(level)}
                   >
                     <span className="ut-intensity-num">{level}</span>
+                    {urgeIntensity === level && <span className="ut-intensity-dot" />}
                   </button>
                 ))}
+              </div>
+              <div className="ut-intensity-track">
+                <div 
+                  className="ut-intensity-fill" 
+                  style={{ width: urgeIntensity > 0 ? `${((urgeIntensity - 0.5) / 10) * 100}%` : '0%' }}
+                />
               </div>
               <div className="ut-intensity-labels">
                 <span>Mild</span>

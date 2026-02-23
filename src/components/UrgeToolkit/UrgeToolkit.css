@@ -153,51 +153,82 @@
   background: var(--surface-overlay);
   border: 1px solid var(--border-subtle);
   border-radius: 16px;
-  padding: 24px 20px;
+  padding: 24px 20px 20px;
 }
 
 .ut-intensity-scale {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 4px;
-  margin-bottom: 20px;
-  padding: 8px 0;
+  gap: 0;
+  margin-bottom: 12px;
 }
 
 .ut-intensity-btn {
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   background: transparent;
   border: none;
-  padding: 12px 0;
-  color: var(--text-muted);
-  font-size: 1rem;
+  padding: 8px 0;
+  color: var(--text-tertiary);
+  font-size: 0.9375rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 200ms ease;
+  transition: color 200ms ease;
   -webkit-tap-highlight-color: transparent;
+  position: relative;
 }
 
 .ut-intensity-btn:hover {
   color: var(--text-secondary);
-  transform: scale(1.2);
 }
 
 .ut-intensity-btn:active {
-  transform: scale(1.1);
+  transform: scale(0.95);
 }
 
 .ut-intensity-btn.selected {
   color: var(--text);
-  transform: scale(1.4);
+  font-weight: 600;
 }
 
 .ut-intensity-num {
   font-feature-settings: 'tnum' 1;
+}
+
+.ut-intensity-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--text);
+  animation: dotIn 200ms ease forwards;
+}
+
+@keyframes dotIn {
+  from { opacity: 0; transform: scale(0); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Track + Fill — matches audio player and 30-night progress bar */
+.ut-intensity-track {
+  width: 100%;
+  height: 3px;
+  background: var(--border-subtle);
+  border-radius: 2px;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+
+.ut-intensity-fill {
+  height: 100%;
+  background: var(--text);
+  border-radius: 2px;
+  transition: width 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .ut-intensity-labels {
@@ -931,7 +962,7 @@
   .ut-steps { margin-bottom: 36px; }
   .ut-step { padding: 8px 12px; font-size: 0.8125rem; }
   .ut-section-title { font-size: 1.375rem; }
-  .ut-intensity-btn { max-width: 32px; font-size: 0.8125rem; }
+  .ut-intensity-btn { font-size: 0.8125rem; }
   .ut-sheet { gap: 28px; }
   .ut-modal-title { font-size: 1.25rem; }
   .ut-breathing-circle { width: 160px; height: 160px; }

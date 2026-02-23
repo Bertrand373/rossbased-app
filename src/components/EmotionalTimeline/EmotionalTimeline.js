@@ -353,11 +353,6 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
 
   // Open phase modal - free users can only view current phase
   const openPhase = (phase) => {
-    const isCurrent = phase.id === currentPhase?.id;
-    if (!isPremium && !isCurrent) {
-      if (openPlanModal) openPlanModal();
-      return;
-    }
     setSelectedPhase(phase);
     setShowModal(true);
     requestAnimationFrame(() => {
@@ -435,12 +430,10 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
       <div className="et-phases">
         {phases.map((phase, index) => {
           const status = getPhaseStatus(phase);
-          const isCurrent = phase.id === currentPhase?.id;
-          const isLocked = !isPremium && !isCurrent;
           return (
             <div 
               key={phase.id}
-              className={`et-phase ${status}${isLocked ? ' et-phase-locked' : ''}`}
+              className={`et-phase ${status}`}
               onClick={() => openPhase(phase)}
             >
               <div className="et-phase-num">
@@ -460,18 +453,6 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
 
       {/* Trajectory — Open section below phase list */}
       <div className="et-trajectory">
-        {!isPremium ? (
-          <div className="et-trajectory-locked">
-            <h3>Your Emotional Trajectory</h3>
-            <p>Track how each phase shifts your baseline — early days vs. now</p>
-            {openPlanModal && (
-              <button className="et-trajectory-locked-btn" onClick={openPlanModal}>
-                Upgrade to Premium
-              </button>
-            )}
-          </div>
-        ) : (
-        <>
           <div className="et-trajectory-header">
             <span>Your Progress</span>
           </div>
@@ -515,8 +496,6 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
               </div>
             </div>
           )}
-        </>
-        )}
       </div>
 
       {/* Phase Modal - Bottom sheet on mobile, centered card on desktop */}

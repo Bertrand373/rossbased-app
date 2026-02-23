@@ -434,56 +434,6 @@
   margin: 0;
 }
 
-/* Locked state for free users */
-.et-trajectory-locked {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 32px 16px;
-  gap: 12px;
-}
-
-.et-trajectory-locked h3 {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--text);
-  margin: 0;
-  letter-spacing: -0.02em;
-}
-
-.et-trajectory-locked p {
-  font-size: 0.8125rem;
-  color: var(--text-muted, rgba(255,255,255,0.45));
-  margin: 0;
-  line-height: 1.5;
-  max-width: 280px;
-}
-
-.et-trajectory-locked-btn {
-  margin-top: 8px;
-  padding: 10px 24px;
-  background: var(--surface-overlay);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  font-family: inherit;
-  letter-spacing: -0.01em;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: border-color 150ms ease, transform 150ms ease;
-}
-
-.et-trajectory-locked-btn:hover {
-  border-color: rgba(255, 255, 255, 0.25);
-}
-
-.et-trajectory-locked-btn:active {
-  transform: scale(0.98);
-}
-
 /* Trajectory List */
 .trajectory-list {
   display: flex;
@@ -794,15 +744,6 @@
   .trajectory-label { font-size: 1rem; }
   .trajectory-early, .trajectory-now { font-size: 1rem; }
   .trajectory-delta { font-size: 0.875rem; }
-}
-
-/* =============================================================================
-   PREMIUM GATES
-   ============================================================================= */
-
-/* Locked phase rows - dimmed with lock icon */
-.et-phase.et-phase-locked {
-  opacity: 0.35;
 }
 
 /* =============================================================================
