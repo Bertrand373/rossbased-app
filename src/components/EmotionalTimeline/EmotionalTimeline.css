@@ -32,24 +32,11 @@
 }
 
 /* =============================================================================
-   TABS - Text-only with dividers
+   CURRENT PHASE CARD
    ============================================================================= */
-
-/* =============================================================================
-   LAYOUT
-   ============================================================================= */
-
-.et-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 400px;
-  animation: fadeInUp 500ms ease 50ms forwards;
-  opacity: 0;
-}
 
 .et-current {
+  width: 100%;
   text-align: center;
   padding: 28px 24px 32px;
   cursor: pointer;
@@ -133,6 +120,7 @@
   flex-direction: column;
   gap: 0;
   padding: 0;
+  width: 100%;
 }
 
 .et-phase {
@@ -400,10 +388,6 @@
   background: var(--border);
   color: var(--text);
 }
-
-/* =============================================================================
-   ANALYSIS TAB
-   ============================================================================= */
 
 /* =============================================================================
    TRAJECTORY SECTION (open, no container - matches Stats rhythm)
