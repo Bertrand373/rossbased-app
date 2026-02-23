@@ -588,9 +588,6 @@ label {
 
 body.modal-open {
   overflow: hidden !important;
-  position: fixed !important;
-  width: 100% !important;
-  height: 100% !important;
   touch-action: none !important;
 }
 
@@ -600,7 +597,8 @@ body.modal-open {
 .prediction-overlay,
 .et-overlay,
 .modal-overlay,
-.ut-breathing-overlay {
+.ut-breathing-overlay,
+.plan-overlay {
   overscroll-behavior: contain !important;
 }
 
