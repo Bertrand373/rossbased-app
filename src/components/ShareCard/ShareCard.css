@@ -131,7 +131,8 @@
 }
 
 /* ============================================================
-   MODAL OVERLAY - Theme-aware
+   MODAL OVERLAY - Transition-based (smooth open + close)
+   Matches AI Chat pattern
    ============================================================ */
 
 .share-modal-overlay {
@@ -140,44 +141,63 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--overlay-bg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  background-color: rgba(0, 0, 0, 0);
   z-index: 1000;
-  padding: 24px;
-  animation: shareModalFadeIn 200ms ease;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  pointer-events: none;
+  transition: background-color 300ms ease;
 }
 
-@keyframes shareModalFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.share-modal-overlay.open {
+  background-color: var(--overlay-bg);
+  pointer-events: auto;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
+
+/* ============================================================
+   MODAL PANEL - Bottom sheet mobile, centered desktop
+   ============================================================ */
 
 .share-modal {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 320px;
-  animation: shareModalSlideUp 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 400px;
+  background: var(--background);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  padding: 24px 24px;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  transform: translateY(100%);
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
 }
 
-@keyframes shareModalSlideUp {
-  from { 
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
-  }
+.share-modal.open {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Drag handle pill - mobile sheet indicator */
+.share-modal::before {
+  content: '';
+  width: 36px;
+  height: 4px;
+  background: var(--border-prominent);
+  border-radius: 2px;
+  opacity: 0.5;
+  margin-bottom: 20px;
+  flex-shrink: 0;
 }
 
 /* ============================================================
-   MODAL CARD - Full preview of shareable image
-   Theme-aware - matches what will be generated
+   MODAL CARD - Preview of shareable image
    ============================================================ */
 
 .share-modal-card {
@@ -187,13 +207,13 @@
   justify-content: center;
   width: 100%;
   aspect-ratio: 1080 / 1350;
-  max-height: 60vh;
-  background: var(--background);
-  border: 1px solid var(--border-prominent);
+  max-height: 50vh;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 32px 24px;
   position: relative;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .share-modal-day {
@@ -266,7 +286,7 @@
 }
 
 /* ============================================================
-   MODAL BUTTONS - Theme-aware
+   MODAL BUTTONS
    ============================================================ */
 
 .share-modal-btn {
@@ -338,22 +358,53 @@
 }
 
 /* ============================================================
-   RESPONSIVE
+   DESKTOP - Centered floating card
    ============================================================ */
 
 @media (min-width: 768px) {
-  .share-modal-card {
-    max-height: 500px;
-    width: auto;
-    min-width: 300px;
+  .share-modal-overlay {
+    align-items: center;
   }
-  
+
+  .share-modal {
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    max-width: 360px;
+    padding-bottom: 24px;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
+  }
+
+  .share-modal.open {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  /* Hide drag pill on desktop */
+  .share-modal::before {
+    display: none;
+  }
+
+  .share-modal-card {
+    max-height: 400px;
+    min-width: 280px;
+  }
+
   .share-modal-day {
     font-size: 7rem;
   }
   
   .share-mini-day {
     font-size: 5rem;
+  }
+}
+
+/* Light mode shadow */
+@media (min-width: 768px) {
+  [data-theme="light"] .share-modal {
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.08);
   }
 }
 
@@ -376,7 +427,7 @@
 @media (prefers-reduced-motion: reduce) {
   .share-modal-overlay,
   .share-modal {
-    animation: none;
+    transition: none;
   }
   
   .share-card-preview,

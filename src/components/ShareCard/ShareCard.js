@@ -29,6 +29,7 @@ const MILESTONES = {
 
 const ShareCard = ({ userData, isVisible = true }) => {
   const [showPreview, setShowPreview] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const canvasRef = useRef(null);
   
@@ -166,6 +167,27 @@ const ShareCard = ({ userData, isVisible = true }) => {
     });
   }, [streak, today, isDarkTheme, benefitScore, isMilestone, milestoneLabel]);
 
+  // Open preview - mount then animate in
+  const openPreview = useCallback(() => {
+    document.body.style.overflow = 'hidden';
+    setShowPreview(true);
+    // Next frame: trigger CSS transition
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setPreviewOpen(true);
+      });
+    });
+  }, []);
+
+  // Close preview - animate out then unmount
+  const closePreview = useCallback(() => {
+    setPreviewOpen(false);
+    setTimeout(() => {
+      setShowPreview(false);
+      document.body.style.overflow = '';
+    }, 300); // Match CSS transition duration
+  }, []);
+
   // Handle share action
   const handleShare = async () => {
     setIsGenerating(true);
@@ -189,8 +211,7 @@ const ShareCard = ({ userData, isVisible = true }) => {
             try {
               await navigator.share(shareData);
               setIsGenerating(false);
-              document.body.style.overflow = '';
-              setShowPreview(false);
+              closePreview();
               return;
             } catch (err) {
               // User cancelled or share failed, fall through to download
@@ -212,25 +233,12 @@ const ShareCard = ({ userData, isVisible = true }) => {
         URL.revokeObjectURL(url);
         
         setIsGenerating(false);
-        document.body.style.overflow = '';
-        setShowPreview(false);
+        closePreview();
       }, 'image/png', 1.0);
     } catch (err) {
       console.error('Error generating card:', err);
       setIsGenerating(false);
     }
-  };
-
-  // Open preview modal
-  const openPreview = () => {
-    document.body.style.overflow = 'hidden';
-    setShowPreview(true);
-  };
-
-  // Close preview modal
-  const closePreview = () => {
-    document.body.style.overflow = '';
-    setShowPreview(false);
   };
 
   if (!isVisible) return null;
@@ -261,10 +269,16 @@ const ShareCard = ({ userData, isVisible = true }) => {
         </div>
       </div>
 
-      {/* Preview Modal */}
+      {/* Preview Modal - always in DOM when showPreview, animated via .open class */}
       {showPreview && (
-        <div className="share-modal-overlay" onClick={closePreview}>
-          <div className="share-modal" onClick={e => e.stopPropagation()}>
+        <div 
+          className={`share-modal-overlay${previewOpen ? ' open' : ''}`} 
+          onClick={closePreview}
+        >
+          <div 
+            className={`share-modal${previewOpen ? ' open' : ''}`} 
+            onClick={e => e.stopPropagation()}
+          >
             <div className="share-modal-card">
               <span className="share-modal-day">{streak}</span>
               <span className="share-modal-day-label">DAYS</span>
