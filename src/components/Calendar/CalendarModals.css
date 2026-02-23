@@ -115,8 +115,8 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding: 16px 0 8px 0;
-  mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black 100%);
 }
 
 .calendar-modal-content::-webkit-scrollbar { display: none; }
@@ -638,8 +638,8 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 8px 0;
-  mask-image: linear-gradient(to bottom, transparent 0%, black 8px, black calc(100% - 8px), transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8px, black calc(100% - 8px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 8px, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8px, black 100%);
 }
 
 .calendar-triggers-list::-webkit-scrollbar { width: 2px; }
@@ -1091,6 +1091,11 @@
 .cal-sheet .calendar-modal-footer,
 .cal-sheet .moon-detail-footer {
   padding-bottom: 0;
+  background-color: var(--background);
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid var(--border-subtle);
+  margin-top: auto;
 }
 
 /* Moon detail centering inside sheet */

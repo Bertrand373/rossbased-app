@@ -1166,7 +1166,9 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
               onTouchStart={handleCalSheetTouchStart}
               onTouchMove={handleCalSheetTouchMove}
               onTouchEnd={handleCalSheetTouchEnd}
-            />
+            >
+              <button className="sheet-close" onClick={() => closeCalSheet(closeDayInfo)} aria-label="Close">✕</button>
+            </div>
             <div className="calendar-modal calendar-day-info has-scrollable-content">
             {(() => {
               const dayBenefits = getDayBenefits(selectedDate);
@@ -1226,9 +1228,6 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                         Edit Day
                       </button>
                     )}
-                    <button className="calendar-btn-ghost" onClick={() => closeCalSheet(closeDayInfo)}>
-                      Close
-                    </button>
                   </div>
                 </>
               );
@@ -1280,7 +1279,9 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
               onTouchStart={handleCalSheetTouchStart}
               onTouchMove={handleCalSheetTouchMove}
               onTouchEnd={handleCalSheetTouchEnd}
-            />
+            >
+              <button className="sheet-close" onClick={() => closeCalSheet(closeMoonDetail)} aria-label="Close">✕</button>
+            </div>
             <div className="calendar-modal moon-detail-modal">
             {(() => {
               const lunar = getLunarData(selectedMoonDate);
@@ -1309,12 +1310,6 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                         : "The new moon marks a time of renewal and introspection. Some find this a powerful period for setting intentions and deepening practice."
                       }
                     </p>
-                  </div>
-                  
-                  <div className="moon-detail-footer">
-                    <button className="calendar-btn-ghost" onClick={() => closeCalSheet(closeMoonDetail)}>
-                      Close
-                    </button>
                   </div>
                 </>
               );
