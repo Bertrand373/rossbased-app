@@ -973,3 +973,173 @@
   font-family: inherit;
   cursor: pointer;
 }
+
+/* ============================================================
+   BOTTOM SHEET PATTERN - Oracle style
+   Used by: Streak Options, Reset Confirm, Log Lock
+   ============================================================ */
+
+.tracker-sheet-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0);
+  z-index: 1000;
+  pointer-events: none;
+  transition: background-color 300ms ease;
+}
+
+.tracker-sheet-backdrop.open {
+  background-color: var(--overlay-bg);
+  pointer-events: auto;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.tracker-sheet-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 400px;
+  margin: 0 auto;
+  background: var(--background);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  padding: 0 24px 24px;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  transform: translateY(100%);
+  transition: transform 300ms ease;
+  pointer-events: none;
+}
+
+.tracker-sheet-panel.open {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Sheet header - swipe target area */
+.tracker-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 20px 0 12px;
+  flex-shrink: 0;
+}
+
+/* Mobile: pill + bigger touch target */
+@media (max-width: 767px) {
+  .tracker-sheet-header::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 4px;
+    background: var(--border-prominent);
+    border-radius: 2px;
+    opacity: 0.5;
+  }
+
+  .tracker-sheet-header {
+    position: relative;
+    padding-top: 24px;
+    touch-action: none;
+  }
+}
+
+/* Override .sheet positioning when inside panel */
+.tracker-sheet-panel .sheet {
+  position: static;
+  bottom: auto;
+  left: auto;
+  right: auto;
+  padding: 0;
+  animation: none;
+  width: 100%;
+}
+
+/* Override .confirm-modal when inside panel */
+.tracker-sheet-panel .confirm-modal {
+  max-width: none;
+  animation: none;
+  width: 100%;
+}
+
+/* Desktop: centered floating card */
+@media (min-width: 768px) {
+  .tracker-sheet-panel {
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    top: 50%;
+    width: 400px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    padding-bottom: 24px;
+    transform: translate(-50%, -50%) scale(0.96);
+    opacity: 0;
+    transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
+  }
+
+  .tracker-sheet-panel.open {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+
+  .tracker-sheet-header::before {
+    display: none;
+  }
+
+  /* Sheet content inside panel on desktop */
+  .tracker-sheet-panel .sheet {
+    max-width: none;
+  }
+}
+
+/* Light mode shadow */
+@media (min-width: 768px) {
+  [data-theme="light"] .tracker-sheet-panel {
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* ============================================================
+   SMOOTH OVERLAY CLOSE - Transition layer over .overlay
+   Benefits modal + Peak Prompt
+   ============================================================ */
+
+.tracker-overlay {
+  animation: none !important;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.tracker-overlay.ready {
+  opacity: 1;
+}
+
+.tracker-overlay .benefits-modal,
+.tracker-overlay .peak-prompt {
+  animation: none !important;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 300ms cubic-bezier(0.16, 1, 0.3, 1), transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tracker-overlay.ready .benefits-modal,
+.tracker-overlay.ready .peak-prompt {
+  opacity: 1;
+  transform: translateY(0);
+}
