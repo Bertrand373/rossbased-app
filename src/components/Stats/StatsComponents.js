@@ -158,11 +158,7 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
   return (
     <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={closeSheet}>
       <div ref={panelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
-        <div className="sheet-header" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
-          <button className="sheet-close" onClick={closeSheet} aria-label="Close">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
-        </div>
+        <div className="sheet-header" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} />
         <div className="modal" style={{ animation: 'none' }}>
           <span className="modal-num">{info.value}</span>
           <h2>{info.label}</h2>
@@ -178,6 +174,7 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
               ))}
             </div>
           )}
+          <button className="btn-ghost" onClick={closeSheet}>Close</button>
         </div>
       </div>
     </div>

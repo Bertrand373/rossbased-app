@@ -90,39 +90,6 @@
 }
 
 /* ============================================================
-   CLOSE BUTTON — X in top-right for content-display sheets
-   ============================================================ */
-
-.sheet-close {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 50%;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 0;
-  transition: all 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.sheet-close:hover {
-  background-color: var(--surface-overlay);
-  color: var(--text-secondary);
-}
-
-.sheet-close:active {
-  transform: translateY(-50%) scale(0.92);
-}
-
-/* ============================================================
    DESKTOP — centered floating card
    ============================================================ */
 
