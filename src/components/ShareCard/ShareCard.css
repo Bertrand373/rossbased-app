@@ -282,9 +282,9 @@
   to { transform: rotate(360deg); }
 }
 
-/* Ghost close inside share modal */
-.share-modal .btn-ghost {
-  margin-top: 8px;
+/* Ghost close inside share sheet */
+.share-sheet .btn-ghost {
+  margin-top: 4px;
 }
 
 /* ============================================================

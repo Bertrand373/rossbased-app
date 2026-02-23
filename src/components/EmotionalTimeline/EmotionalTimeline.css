@@ -24,11 +24,6 @@
   }
   
   .et-container > * { max-width: 480px; }
-  
-  .et-container > .et-overlay {
-    max-width: none;
-    width: 100%;
-  }
 }
 
 /* =============================================================================
@@ -586,58 +581,31 @@
 }
 
 /* =============================================================================
-   MODAL
+   PHASE DETAIL SHEET — uses shared BottomSheet.css
    ============================================================================= */
 
-.et-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: var(--overlay-bg);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
+.et-sheet {
+  max-height: 85dvh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-  padding: 24px;
-  padding-top: max(24px, env(safe-area-inset-top));
-  padding-bottom: max(24px, env(safe-area-inset-bottom));
-  animation: etOverlayIn 200ms ease;
 }
 
-@keyframes etOverlayIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+@media (min-width: 768px) {
+  .et-sheet {
+    max-height: min(720px, calc(100vh - 80px));
+  }
 }
 
-.et-modal {
-  width: 100%;
-  max-width: 340px;
-  max-height: calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  background: transparent;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  animation: etModalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes etModalIn {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.et-modal-header {
+.et-sheet-header {
   flex-shrink: 0;
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  padding-bottom: 24px;
+  padding-bottom: 20px;
   border-bottom: 1px solid var(--border-subtle);
-  background: transparent;
 }
 
-.et-modal-num {
+.et-sheet-num {
   font-size: 1.75rem;
   font-weight: 500;
   color: var(--text-tertiary);
@@ -645,7 +613,7 @@
   line-height: 1;
 }
 
-.et-modal-header h2 {
+.et-sheet-header h2 {
   font-size: 1.25rem;
   font-weight: 500;
   color: var(--text);
@@ -653,27 +621,46 @@
   letter-spacing: -0.02em;
 }
 
-.et-modal-header p {
+.et-sheet-header p {
   font-size: 0.8125rem;
   color: var(--text-muted);
   margin: 0;
 }
 
-.et-modal-scroll {
+.et-sheet-scroll {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   min-height: 0;
-  padding: 32px 0;
-  mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+  padding: 24px 0;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 12px, black calc(100% - 12px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 12px, black calc(100% - 12px), transparent 100%);
 }
 
-.et-modal-body {
+.et-sheet-body {
   display: flex;
   flex-direction: column;
   gap: 32px;
 }
+
+.et-sheet .btn-ghost {
+  flex-shrink: 0;
+  width: 100%;
+  padding: 16px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.et-sheet .btn-ghost:hover { color: var(--text); }
 
 .et-modal-section { padding: 0; }
 
@@ -759,30 +746,6 @@
 .et-next h4 { color: var(--text-muted) !important; }
 .et-next p { color: var(--text-muted) !important; }
 
-.et-modal-footer {
-  flex-shrink: 0;
-  padding-top: 24px;
-  border-top: 1px solid var(--border-subtle);
-  background: transparent;
-}
-
-.et-modal-btn {
-  width: 100%;
-  padding: 16px 24px;
-  background: transparent;
-  border: none;
-  border-radius: 12px;
-  color: var(--text-secondary);
-  font-size: 0.9375rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: color 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.et-modal-btn:hover { color: var(--text); }
-
 /* =============================================================================
    ANIMATIONS
    ============================================================================= */
@@ -812,9 +775,8 @@
   .trajectory-early, .trajectory-now { font-size: 0.875rem; }
   .trajectory-delta { font-size: 0.75rem; min-width: 44px; }
   .phase-context-expectation { font-size: 0.8125rem; }
-  .et-modal { max-width: 100%; }
-  .et-modal-header { gap: 12px; padding-bottom: 20px; }
-  .et-modal-body { gap: 28px; }
+  .et-sheet-header { gap: 12px; padding-bottom: 16px; }
+  .et-sheet-body { gap: 28px; }
   .et-modal-section p, .et-modal-section li { font-size: 0.875rem; }
 }
 
@@ -833,7 +795,6 @@
   .trajectory-label { font-size: 1rem; }
   .trajectory-early, .trajectory-now { font-size: 1rem; }
   .trajectory-delta { font-size: 0.875rem; }
-  .et-modal { max-width: 360px; }
 }
 
 /* =============================================================================
@@ -860,7 +821,7 @@
     opacity: 1;
   }
   
-  .et-overlay, .et-modal, .et-progress-fill, .et-slider::-webkit-slider-thumb, .et-slider-fill {
+  .et-progress-fill, .et-slider::-webkit-slider-thumb, .et-slider-fill {
     animation: none;
     transition: none;
   }

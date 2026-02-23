@@ -563,6 +563,17 @@
   transform: scale(0.98);
 }
 
+/* Keyframes for explainer modal animations */
+@keyframes modalOverlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 @media (max-width: 480px) {
   .mp-explainer-title { font-size: 1.25rem; }
 }

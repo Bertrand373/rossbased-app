@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import './PlanModal.css';
+import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 
 const PlanModal = ({ 
   isOpen, 
@@ -14,6 +15,25 @@ const PlanModal = ({
 }) => {
   const [selectedPlan, setSelectedPlan] = useState('yearly');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showContent, setShowContent] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+
+  // Bottom sheet animation
+  useEffect(() => {
+    if (isOpen) {
+      setShowContent(true);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setModalOpen(true));
+      });
+    } else {
+      setModalOpen(false);
+      const timer = setTimeout(() => setShowContent(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  // Lock body scroll
+  useBodyScrollLock(showContent);
 
   // Reset state when modal opens
   useEffect(() => {
@@ -46,17 +66,7 @@ const PlanModal = ({
     };
   }, [isOpen]);
 
-  // Lock body scroll when open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add('modal-open');
-    } else {
-      document.body.classList.remove('modal-open');
-    }
-    return () => document.body.classList.remove('modal-open');
-  }, [isOpen]);
-
-  if (!isOpen) return null;
+  if (!showContent) return null;
 
   const reason = subscriptionStatus?.reason || 'no_subscription';
   const isNewUser = reason === 'no_subscription';
@@ -73,7 +83,7 @@ const PlanModal = ({
   };
 
   return (
-    <div className="plan-overlay" onClick={onClose}>
+    <div className={`plan-overlay ${modalOpen ? 'sheet-open' : ''}`} onClick={onClose}>
       <div className="plan-modal" onClick={e => e.stopPropagation()}>
         
         {/* Close button */}

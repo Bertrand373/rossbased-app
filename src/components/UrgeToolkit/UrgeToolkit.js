@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import './UrgeToolkit.css';
+import '../../styles/BottomSheet.css';
 import MindProgram from './MindProgram';
 
 // Icons
@@ -96,6 +97,9 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
   const [coldTimer, setColdTimer] = useState(0);
   const [coldTarget, setColdTarget] = useState(120); // 2 minutes default
   
+  // Shared animation state for all modals (only one open at a time)
+  const [modalAnimOpen, setModalAnimOpen] = useState(false);
+  
   // Refs
   const breathingIntervalRef = useRef(null);
   const orbitIntervalRef = useRef(null);
@@ -187,6 +191,22 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
     };
   }, []);
 
+  // Modal animation helpers
+  const animateModalOpen = (showSetter) => {
+    showSetter(true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setModalAnimOpen(true));
+    });
+  };
+
+  const animateModalClose = (showSetter, cleanup) => {
+    setModalAnimOpen(false);
+    setTimeout(() => {
+      showSetter(false);
+      if (cleanup) cleanup();
+    }, 300);
+  };
+
   // ============================================================
   // INTENSITY & PROTOCOL SELECTION
   // ============================================================
@@ -243,7 +263,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
     setBreathingActive(false);
     if (breathingIntervalRef.current) clearInterval(breathingIntervalRef.current);
     stopActiveTimer();
-    setShowBreathingModal(false);
+    animateModalClose(setShowBreathingModal);
     toast.success(message);
     setTimeout(() => setCurrentStep('tools'), 800);
   };
@@ -330,7 +350,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
     setBreathingActive(false);
     if (breathingIntervalRef.current) clearInterval(breathingIntervalRef.current);
     stopActiveTimer();
-    setShowBreathingModal(false);
+    animateModalClose(setShowBreathingModal);
     setCurrentStep('tools');
   };
 
@@ -379,7 +399,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
     setOrbitActive(false);
     if (orbitIntervalRef.current) clearInterval(orbitIntervalRef.current);
     stopActiveTimer();
-    setShowOrbitModal(false);
+    animateModalClose(setShowOrbitModal);
     toast.success(`${orbitTargetCycles} cycles complete - energy circulated`);
     setCurrentStep('summary');
   };
@@ -388,7 +408,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
     setOrbitActive(false);
     if (orbitIntervalRef.current) clearInterval(orbitIntervalRef.current);
     stopActiveTimer();
-    setShowOrbitModal(false);
+    animateModalClose(setShowOrbitModal);
   };
 
   // ============================================================
@@ -413,10 +433,11 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
 
   const completeGrounding = () => {
     stopActiveTimer();
-    setShowGroundingModal(false);
+    animateModalClose(setShowGroundingModal, () => {
+      setGroundingStep(0);
+      setGroundingItems({ see: [], hear: [], touch: [], smell: [], taste: [] });
+    });
     toast.success('Grounding complete - you are present');
-    setGroundingStep(0);
-    setGroundingItems({ see: [], hear: [], touch: [], smell: [], taste: [] });
   };
 
   // ============================================================
@@ -443,7 +464,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
     setColdActive(false);
     if (coldIntervalRef.current) clearInterval(coldIntervalRef.current);
     stopActiveTimer();
-    setShowColdModal(false);
+    animateModalClose(setShowColdModal);
     toast.success(`${Math.floor(coldTimer / 60)}:${String(coldTimer % 60).padStart(2, '0')} of cold exposure - warrior mindset activated`);
   };
 
@@ -454,7 +475,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
     if (coldTimer > 10) {
       toast.success(`${coldTimer}s logged - every second counts`);
     }
-    setShowColdModal(false);
+    animateModalClose(setShowColdModal);
   };
 
   // ============================================================
@@ -472,7 +493,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
         desc: 'Guided energy circulation',
         action: () => {
           setOrbitTargetCycles(experienceLevel === 'advanced' ? 18 : 9);
-          setShowOrbitModal(true);
+          animateModalOpen(setShowOrbitModal);
           startActiveTimer();
         }
       });
@@ -484,7 +505,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
       name: '5-4-3-2-1 Grounding',
       desc: 'Sensory awareness technique',
       action: () => {
-        setShowGroundingModal(true);
+        animateModalOpen(setShowGroundingModal);
         startActiveTimer();
       }
     });
@@ -496,7 +517,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
       desc: experienceLevel === 'beginner' ? '2 min timer' : '5 min timer',
       action: () => {
         setColdTarget(experienceLevel === 'beginner' ? 120 : 300);
-        setShowColdModal(true);
+        animateModalOpen(setShowColdModal);
       }
     });
     
@@ -555,6 +576,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
   
   const resetSession = () => {
     stopActiveTimer();
+    setModalAnimOpen(false);
     setCurrentStep('assessment');
     setUrgeIntensity(0);
     setActiveProtocol(null);
@@ -780,7 +802,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
                   </div>
                 )}
                 
-                <button className="ut-btn-primary" onClick={() => setShowBreathingModal(true)}>
+                <button className="ut-btn-primary" onClick={() => animateModalOpen(setShowBreathingModal)}>
                   Begin Session
                 </button>
               </div>
@@ -941,8 +963,11 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
           BREATHING MODAL
           ================================================================ */}
       {showBreathingModal && (
-        <div className="ut-modal-overlay">
-          <div className="ut-modal">
+        <div className={`sheet-backdrop${modalAnimOpen ? ' open' : ''}`}
+          onClick={!breathingActive ? () => animateModalClose(setShowBreathingModal) : undefined}>
+          <div className={`sheet-panel ut-sheet${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" />
+
             <div className="ut-modal-header">
               <span className="ut-modal-title">
                 {advancedBreathing && experienceLevel !== 'beginner' ? 'Advanced Breathing' : 'Box Breathing'}
@@ -990,7 +1015,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
                   <button className="ut-btn-primary" onClick={startBreathing}>
                     Start
                   </button>
-                  <button className="ut-btn-ghost" onClick={() => setShowBreathingModal(false)}>
+                  <button className="ut-btn-ghost" onClick={() => animateModalClose(setShowBreathingModal)}>
                     Cancel
                   </button>
                 </>
@@ -1008,8 +1033,11 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
           MICROCOSMIC ORBIT MODAL
           ================================================================ */}
       {showOrbitModal && (
-        <div className="ut-modal-overlay">
-          <div className="ut-modal ut-orbit-modal">
+        <div className={`sheet-backdrop${modalAnimOpen ? ' open' : ''}`}
+          onClick={!orbitActive ? () => animateModalClose(setShowOrbitModal) : undefined}>
+          <div className={`sheet-panel ut-sheet ut-sheet-orbit${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" />
+
             <div className="ut-modal-header">
               <span className="ut-modal-title">Microcosmic Orbit</span>
               <span className="ut-modal-subtitle">
@@ -1139,7 +1167,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
                   <button className="ut-btn-primary" onClick={startOrbit}>
                     Begin
                   </button>
-                  <button className="ut-btn-ghost" onClick={() => setShowOrbitModal(false)}>
+                  <button className="ut-btn-ghost" onClick={() => animateModalClose(setShowOrbitModal)}>
                     Cancel
                   </button>
                 </>
@@ -1157,8 +1185,11 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
           GROUNDING MODAL
           ================================================================ */}
       {showGroundingModal && (
-        <div className="ut-modal-overlay">
-          <div className="ut-modal">
+        <div className={`sheet-backdrop${modalAnimOpen ? ' open' : ''}`}
+          onClick={() => animateModalClose(setShowGroundingModal, () => setGroundingStep(0))}>
+          <div className={`sheet-panel ut-sheet${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" />
+
             <div className="ut-modal-header">
               <span className="ut-modal-title">5-4-3-2-1 Grounding</span>
               <span className="ut-modal-subtitle">Anchor yourself in the present moment</span>
@@ -1191,8 +1222,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
                 {groundingStep < GROUNDING_STEPS.length - 1 ? 'Next' : 'Complete'}
               </button>
               <button className="ut-btn-ghost" onClick={() => {
-                setShowGroundingModal(false);
-                setGroundingStep(0);
+                animateModalClose(setShowGroundingModal, () => setGroundingStep(0));
               }}>
                 Cancel
               </button>
@@ -1205,8 +1235,11 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
           COLD EXPOSURE MODAL
           ================================================================ */}
       {showColdModal && (
-        <div className="ut-modal-overlay">
-          <div className="ut-modal">
+        <div className={`sheet-backdrop${modalAnimOpen ? ' open' : ''}`}
+          onClick={!coldActive ? () => animateModalClose(setShowColdModal) : undefined}>
+          <div className={`sheet-panel ut-sheet${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" />
+
             <div className="ut-modal-header">
               <span className="ut-modal-title">Cold Exposure</span>
               <span className="ut-modal-subtitle">
@@ -1254,7 +1287,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
                   <button className="ut-btn-primary" onClick={startCold}>
                     Start Timer
                   </button>
-                  <button className="ut-btn-ghost" onClick={() => setShowColdModal(false)}>
+                  <button className="ut-btn-ghost" onClick={() => animateModalClose(setShowColdModal)}>
                     Cancel
                   </button>
                 </>

@@ -3,6 +3,7 @@
 // UPDATED: Analysis tab focused on ONE powerful insight - emotional trajectory
 import React, { useState } from 'react';
 import './EmotionalTimeline.css';
+import '../../styles/BottomSheet.css';
 import { FaCheck, FaExclamationTriangle, FaLock } from 'react-icons/fa';
 
 // Body scroll lock for modals
@@ -11,6 +12,7 @@ import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal }) => {
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   // Lock body scroll when modal is open
   useBodyScrollLock(showModal);
@@ -352,6 +354,17 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
     }
     setSelectedPhase(phase);
     setShowModal(true);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setModalOpen(true));
+    });
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setTimeout(() => {
+      setShowModal(false);
+      setSelectedPhase(null);
+    }, 300);
   };
 
   return (
@@ -469,12 +482,14 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
         )}
       </div>
 
-      {/* Phase Modal - Enhanced with new content sections */}
+      {/* Phase Modal - Bottom sheet on mobile, centered card on desktop */}
       {showModal && selectedPhase && (
-        <div className="et-overlay">
-          <div className="et-modal" onClick={e => e.stopPropagation()}>
-            <div className="et-modal-header">
-              <span className="et-modal-num">
+        <div className={`sheet-backdrop${modalOpen ? ' open' : ''}`} onClick={closeModal}>
+          <div className={`sheet-panel et-sheet${modalOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" />
+
+            <div className="et-sheet-header">
+              <span className="et-sheet-num">
                 {String(phases.findIndex(p => p.id === selectedPhase.id) + 1).padStart(2, '0')}
               </span>
               <div>
@@ -483,8 +498,8 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
               </div>
             </div>
 
-            <div className="et-modal-scroll">
-              <div className="et-modal-body">
+            <div className="et-sheet-scroll">
+              <div className="et-sheet-body">
                 {/* Duration estimate */}
                 {selectedPhase.duration && (
                   <div className="et-modal-section et-duration">
@@ -576,11 +591,9 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
               </div>
             </div>
             
-            <div className="et-modal-footer">
-              <button className="et-modal-btn" onClick={() => setShowModal(false)}>
-                Close
-              </button>
-            </div>
+            <button className="btn-ghost" onClick={closeModal}>
+              Close
+            </button>
           </div>
         </div>
       )}
