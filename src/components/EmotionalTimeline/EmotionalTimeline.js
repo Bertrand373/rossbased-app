@@ -1,7 +1,7 @@
 // EmotionalTimeline.js - TITANTRACK MINIMAL
 // Matches Landing/Tracker/Stats aesthetic
 // UPDATED: Analysis tab focused on ONE powerful insight - emotional trajectory
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import './EmotionalTimeline.css';
 import '../../styles/BottomSheet.css';
 import { FaCheck, FaExclamationTriangle, FaLock } from 'react-icons/fa';
@@ -13,6 +13,12 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Swipe-to-dismiss refs
+  const sheetPanelRef = useRef(null);
+  const touchStartY = useRef(0);
+  const touchDeltaY = useRef(0);
+  const isDragging = useRef(false);
 
   // Lock body scroll when modal is open
   useBodyScrollLock(showModal);
@@ -367,6 +373,38 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
     }, 300);
   };
 
+  // Swipe-to-dismiss handlers
+  const onTouchStart = useCallback((e) => {
+    touchStartY.current = e.touches[0].clientY;
+    touchDeltaY.current = 0;
+    isDragging.current = false;
+  }, []);
+
+  const onTouchMove = useCallback((e) => {
+    const delta = e.touches[0].clientY - touchStartY.current;
+    if (delta < 0) return;
+    if (delta > 10) {
+      isDragging.current = true;
+      touchDeltaY.current = delta;
+      if (sheetPanelRef.current) {
+        sheetPanelRef.current.style.transform = `translateY(${delta}px)`;
+        sheetPanelRef.current.style.transition = 'none';
+      }
+    }
+  }, []);
+
+  const onTouchEnd = useCallback(() => {
+    if (!isDragging.current) return;
+    if (sheetPanelRef.current) {
+      sheetPanelRef.current.style.transition = '';
+      sheetPanelRef.current.style.transform = '';
+    }
+    if (touchDeltaY.current > 80) {
+      closeModal();
+    }
+    isDragging.current = false;
+  }, []);
+
   return (
     <div className="et-container">
 
@@ -485,8 +523,13 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
       {/* Phase Modal - Bottom sheet on mobile, centered card on desktop */}
       {showModal && selectedPhase && (
         <div className={`sheet-backdrop${modalOpen ? ' open' : ''}`} onClick={closeModal}>
-          <div className={`sheet-panel et-sheet${modalOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
-            <div className="sheet-header" />
+          <div ref={sheetPanelRef} className={`sheet-panel et-sheet${modalOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div 
+              className="sheet-header"
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            />
 
             <div className="et-sheet-header">
               <span className="et-sheet-num">
