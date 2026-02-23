@@ -32,6 +32,12 @@ const ShareCard = ({ userData, isVisible = true }) => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const canvasRef = useRef(null);
+  const panelRef = useRef(null);
+  
+  // Swipe-to-close refs
+  const touchStartY = useRef(0);
+  const touchDeltaY = useRef(0);
+  const isDragging = useRef(false);
   
   // Theme detection
   const [isDarkTheme, setIsDarkTheme] = useState(() => {
@@ -188,6 +194,57 @@ const ShareCard = ({ userData, isVisible = true }) => {
     }, 300); // Match CSS transition duration
   }, []);
 
+  // Swipe-to-close (mobile drawer) - matches Oracle pattern
+  const handleTouchStart = useCallback((e) => {
+    touchStartY.current = e.touches[0].clientY;
+    touchDeltaY.current = 0;
+    isDragging.current = false;
+  }, []);
+
+  const handleTouchMove = useCallback((e) => {
+    const delta = e.touches[0].clientY - touchStartY.current;
+    if (delta < 0) return; // Only allow downward swipe
+    if (delta > 10) {
+      isDragging.current = true;
+      touchDeltaY.current = delta;
+      if (panelRef.current) {
+        panelRef.current.style.transition = 'none';
+        panelRef.current.style.transform = `translateY(${delta}px)`;
+      }
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (!isDragging.current) return;
+    
+    if (touchDeltaY.current > 100 && panelRef.current) {
+      // Threshold met — animate out and close
+      panelRef.current.style.transition = 'transform 250ms ease-out';
+      panelRef.current.style.transform = 'translateY(100%)';
+      setTimeout(() => {
+        if (panelRef.current) {
+          panelRef.current.style.transition = '';
+          panelRef.current.style.transform = '';
+        }
+        setPreviewOpen(false);
+        setShowPreview(false);
+        document.body.style.overflow = '';
+      }, 250);
+    } else if (panelRef.current) {
+      // Below threshold — snap back
+      panelRef.current.style.transition = 'transform 250ms ease-out';
+      panelRef.current.style.transform = '';
+      setTimeout(() => {
+        if (panelRef.current) {
+          panelRef.current.style.transition = '';
+        }
+      }, 250);
+    }
+    
+    isDragging.current = false;
+    touchDeltaY.current = 0;
+  }, []);
+
   // Handle share action
   const handleShare = async () => {
     setIsGenerating(true);
@@ -276,15 +333,26 @@ const ShareCard = ({ userData, isVisible = true }) => {
           onClick={closePreview}
         >
           <div 
+            ref={panelRef}
             className={`share-modal${previewOpen ? ' open' : ''}`} 
             onClick={e => e.stopPropagation()}
           >
-            <button className="share-modal-x" onClick={closePreview} aria-label="Close">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-            </button>
+            {/* Header - drag handle + X close, swipe target */}
+            <div 
+              className="share-modal-header"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              <div className="share-modal-pill" />
+              <button className="share-modal-x" onClick={closePreview} aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+
             <div className="share-modal-card">
               <span className="share-modal-day">{streak}</span>
               <span className="share-modal-day-label">DAYS</span>
