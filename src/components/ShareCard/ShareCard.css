@@ -282,32 +282,9 @@
   to { transform: rotate(360deg); }
 }
 
-/* Header - swipe target area + X close, matches Oracle exactly */
-/* Share header override — X button pushed right */
-.share-sheet-header {
-  justify-content: flex-end;
-  padding: 20px 20px 0;
-}
-
-/* X close button */
-.share-modal-x {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 50%;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.share-modal-x:hover {
-  background-color: var(--surface-overlay);
-  color: var(--text-secondary);
+/* Ghost close inside share modal */
+.share-modal .btn-ghost {
+  margin-top: 8px;
 }
 
 /* ============================================================
@@ -347,8 +324,7 @@
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .share-card-preview,
-  .share-modal-btn,
-  .share-modal-x {
+  .share-modal-btn {
     transition: none;
   }
   
