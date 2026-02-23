@@ -68,6 +68,14 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   const [peakMessage, setPeakMessage] = useState('');
   const [showLogLock, setShowLogLock] = useState(false);
   
+  // Bottom sheet animation state
+  const [sheetReady, setSheetReady] = useState(false);
+  const [overlayReady, setOverlayReady] = useState(false);
+  const sheetPanelRef = useRef(null);
+  const sheetTouchStartY = useRef(0);
+  const sheetTouchDeltaY = useRef(0);
+  const sheetIsDragging = useRef(false);
+  
   // Live clock state - updates every minute
   const [currentTime, setCurrentTime] = useState(new Date());
   
@@ -94,6 +102,28 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     
     return () => clearInterval(timer);
   }, []);
+
+  // Bottom sheet animation: trigger .open class after mount
+  useEffect(() => {
+    if (showStreakOptions || showResetConfirm || showLogLock) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setSheetReady(true));
+      });
+    } else {
+      setSheetReady(false);
+    }
+  }, [showStreakOptions, showResetConfirm, showLogLock]);
+
+  // Full-screen overlay animation: trigger .ready class after mount
+  useEffect(() => {
+    if (showBenefits || showPeakPrompt) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setOverlayReady(true));
+      });
+    } else {
+      setOverlayReady(false);
+    }
+  }, [showBenefits, showPeakPrompt]);
 
   // Load existing benefits for today
   useEffect(() => {
@@ -186,6 +216,70 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     });
     setShowDatePicker(false);
   };
+
+  // Bottom sheet: animate close then run callback
+  const closeSheet = useCallback((callback) => {
+    setSheetReady(false);
+    setTimeout(() => {
+      callback();
+    }, 300);
+  }, []);
+
+  // Full-screen overlay: animate out then run callback
+  const closeOverlay = useCallback((callback) => {
+    setOverlayReady(false);
+    setTimeout(() => {
+      callback();
+    }, 300);
+  }, []);
+
+  // Swipe-to-close (mobile) - matches Oracle pattern
+  const handleSheetTouchStart = useCallback((e) => {
+    sheetTouchStartY.current = e.touches[0].clientY;
+    sheetTouchDeltaY.current = 0;
+    sheetIsDragging.current = false;
+  }, []);
+
+  const handleSheetTouchMove = useCallback((e) => {
+    const delta = e.touches[0].clientY - sheetTouchStartY.current;
+    if (delta < 0) return;
+    if (delta > 10) {
+      sheetIsDragging.current = true;
+      sheetTouchDeltaY.current = delta;
+      if (sheetPanelRef.current) {
+        sheetPanelRef.current.style.transition = 'none';
+        sheetPanelRef.current.style.transform = `translateY(${delta}px)`;
+      }
+    }
+  }, []);
+
+  const handleSheetTouchEnd = useCallback(() => {
+    if (!sheetIsDragging.current) return;
+    if (sheetTouchDeltaY.current > 100 && sheetPanelRef.current) {
+      sheetPanelRef.current.style.transition = 'transform 250ms ease-out';
+      sheetPanelRef.current.style.transform = 'translateY(100%)';
+      setTimeout(() => {
+        if (sheetPanelRef.current) {
+          sheetPanelRef.current.style.transition = '';
+          sheetPanelRef.current.style.transform = '';
+        }
+        setSheetReady(false);
+        setShowStreakOptions(false);
+        setShowResetConfirm(false);
+        setShowLogLock(false);
+      }, 250);
+    } else if (sheetPanelRef.current) {
+      sheetPanelRef.current.style.transition = 'transform 250ms ease-out';
+      sheetPanelRef.current.style.transform = '';
+      setTimeout(() => {
+        if (sheetPanelRef.current) {
+          sheetPanelRef.current.style.transition = '';
+        }
+      }, 250);
+    }
+    sheetIsDragging.current = false;
+    sheetTouchDeltaY.current = 0;
+  }, []);
 
   // Reset streak (relapse) - keep toast, this is significant
   const handleReset = () => {
@@ -378,7 +472,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       
       {/* Benefits Modal */}
       {showBenefits && (
-        <div className="overlay">
+        <div className={`overlay tracker-overlay${overlayReady ? ' ready' : ''}`}>
           <div className="benefits-modal" onClick={e => e.stopPropagation()}>
             <h2>Log Benefits</h2>
             <p>Rate today's benefits</p>
@@ -440,7 +534,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
             
             <div className="benefits-actions">
               <button className="btn-primary" onClick={saveBenefits}>Save</button>
-              <button className="btn-ghost" onClick={() => setShowBenefits(false)}>Cancel</button>
+              <button className="btn-ghost" onClick={() => closeOverlay(() => setShowBenefits(false))}>Cancel</button>
             </div>
           </div>
         </div>
@@ -448,7 +542,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
       {/* Peak State Recording Prompt */}
       {showPeakPrompt && (
-        <div className="overlay">
+        <div className={`overlay tracker-overlay${overlayReady ? ' ready' : ''}`}>
           <div className="peak-prompt" onClick={e => e.stopPropagation()}>
             <div className="peak-prompt-header">
               <span className="peak-prompt-signal">PEAK STATE DETECTED</span>
@@ -479,7 +573,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
               >
                 Save Transmission
               </button>
-              <button className="btn-ghost" onClick={() => { setShowPeakPrompt(false); setPeakMessage(''); }}>
+              <button className="btn-ghost" onClick={() => closeOverlay(() => { setShowPeakPrompt(false); setPeakMessage(''); })}>
                 Skip
               </button>
             </div>
@@ -489,52 +583,68 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
       {/* Streak Options */}
       {showStreakOptions && (
-        <div className="overlay">
-          <div className="sheet" onClick={e => e.stopPropagation()}>
-            <div className="sheet-content">
-              <button onClick={() => { setShowStreakOptions(false); setShowDatePicker(true); }}>
-                Edit start date
-              </button>
-              <div className="sheet-divider" />
-              <button 
-                onClick={() => { setResetType('wetdream'); setShowResetConfirm(true); }}
-              >
-                Log wet dream
-              </button>
-              <div className="sheet-divider" />
-              <button 
-                className="danger" 
-                onClick={() => { setResetType('relapse'); setShowResetConfirm(true); }}
-              >
-                Reset streak
+        <div className={`tracker-sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowStreakOptions(false))}>
+          <div ref={sheetPanelRef} className={`tracker-sheet-panel${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div 
+              className="tracker-sheet-header"
+              onTouchStart={handleSheetTouchStart}
+              onTouchMove={handleSheetTouchMove}
+              onTouchEnd={handleSheetTouchEnd}
+            />
+            <div className="sheet">
+              <div className="sheet-content">
+                <button onClick={() => closeSheet(() => { setShowStreakOptions(false); setShowDatePicker(true); })}>
+                  Edit start date
+                </button>
+                <div className="sheet-divider" />
+                <button 
+                  onClick={() => closeSheet(() => { setShowStreakOptions(false); setResetType('wetdream'); setShowResetConfirm(true); })}
+                >
+                  Log wet dream
+                </button>
+                <div className="sheet-divider" />
+                <button 
+                  className="danger" 
+                  onClick={() => closeSheet(() => { setShowStreakOptions(false); setResetType('relapse'); setShowResetConfirm(true); })}
+                >
+                  Reset streak
+                </button>
+              </div>
+              <button className="cancel" onClick={() => closeSheet(() => setShowStreakOptions(false))}>
+                Cancel
               </button>
             </div>
-            <button className="cancel" onClick={() => setShowStreakOptions(false)}>
-              Cancel
-            </button>
           </div>
         </div>
       )}
 
       {/* Reset Confirm */}
       {showResetConfirm && (
-        <div className="overlay">
-          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
-            <h2>{resetType === 'wetdream' ? 'Log wet dream?' : 'Reset streak?'}</h2>
-            <p>
-              {resetType === 'wetdream' 
-                ? 'This will be logged but won\'t affect your streak. Wet dreams are natural.'
-                : 'Your current streak will be saved to history.'
-              }
-            </p>
-            <div className="confirm-actions">
-              <button 
-                className={resetType === 'relapse' ? 'btn-danger' : 'btn-primary'} 
-                onClick={resetType === 'wetdream' ? handleLogWetDream : handleReset}
-              >
-                {resetType === 'wetdream' ? 'Log it' : 'Reset'}
-              </button>
-              <button className="btn-ghost" onClick={() => setShowResetConfirm(false)}>Cancel</button>
+        <div className={`tracker-sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowResetConfirm(false))}>
+          <div ref={sheetPanelRef} className={`tracker-sheet-panel${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div 
+              className="tracker-sheet-header"
+              onTouchStart={handleSheetTouchStart}
+              onTouchMove={handleSheetTouchMove}
+              onTouchEnd={handleSheetTouchEnd}
+            />
+            <div className="confirm-modal">
+              <h2>{resetType === 'wetdream' ? 'Log wet dream?' : 'Reset streak?'}</h2>
+              <p>
+                {resetType === 'wetdream' 
+                  ? 'This will be logged but won\'t affect your streak. Wet dreams are natural.'
+                  : 'Your current streak will be saved to history.'
+                }
+              </p>
+              <div className="confirm-actions">
+                <button 
+                  className={resetType === 'relapse' ? 'btn-danger' : 'btn-primary'} 
+                  onClick={resetType === 'wetdream' ? handleLogWetDream : handleReset}
+                >
+                  {resetType === 'wetdream' ? 'Log it' : 'Reset'}
+                </button>
+                <button className="btn-ghost" onClick={() => closeSheet(() => setShowResetConfirm(false))}>Cancel</button>
+              </div>
             </div>
           </div>
         </div>
@@ -542,16 +652,24 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
       {/* Benefit Logging Lock — Free users past day 30 */}
       {showLogLock && (
-        <div className="overlay">
-          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
-            <h2>Logging Locked</h2>
-            <p>
-              Benefit tracking is available for the first 30 days of each streak. 
-              You're on day {streak} — upgrade to Premium for unlimited logging and full analytics.
-            </p>
-            <div className="confirm-actions">
-              <button className="btn-primary" onClick={() => { setShowLogLock(false); onUpgrade(); }}>Upgrade</button>
-              <button className="btn-ghost" onClick={() => setShowLogLock(false)}>Not now</button>
+        <div className={`tracker-sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowLogLock(false))}>
+          <div ref={sheetPanelRef} className={`tracker-sheet-panel${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div 
+              className="tracker-sheet-header"
+              onTouchStart={handleSheetTouchStart}
+              onTouchMove={handleSheetTouchMove}
+              onTouchEnd={handleSheetTouchEnd}
+            />
+            <div className="confirm-modal">
+              <h2>Logging Locked</h2>
+              <p>
+                Benefit tracking is available for the first 30 days of each streak. 
+                You're on day {streak} — upgrade to Premium for unlimited logging and full analytics.
+              </p>
+              <div className="confirm-actions">
+                <button className="btn-primary" onClick={() => closeSheet(() => { setShowLogLock(false); onUpgrade(); })}>Upgrade</button>
+                <button className="btn-ghost" onClick={() => closeSheet(() => setShowLogLock(false))}>Not now</button>
+              </div>
             </div>
           </div>
         </div>
