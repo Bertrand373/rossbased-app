@@ -1,10 +1,7 @@
 // StatsComponents.js - TITANTRACK
 // Shared components for Stats - modals and loading states
-import React from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { format } from 'date-fns';
-
-// Body scroll lock for modals
-import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 
 // Loading state component
 export const InsightLoadingState = ({ insight, isVisible }) => {
@@ -44,10 +41,71 @@ export const MiniInfoBanner = ({ description }) => {
   );
 };
 
-// Stat Card Modal - Transparent floating design like Tracker
+// Stat Card Modal — Bottom sheet with X close
 export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }) => {
-  // Lock body scroll when modal is open
-  useBodyScrollLock(showModal);
+  const [sheetReady, setSheetReady] = useState(false);
+  const panelRef = useRef(null);
+  const startY = useRef(0);
+  const deltaY = useRef(0);
+  const dragging = useRef(false);
+
+  // Animate in
+  useEffect(() => {
+    if (showModal) {
+      requestAnimationFrame(() => requestAnimationFrame(() => setSheetReady(true)));
+    } else {
+      setSheetReady(false);
+    }
+  }, [showModal]);
+
+  const closeSheet = useCallback(() => {
+    setSheetReady(false);
+    setTimeout(onClose, 300);
+  }, [onClose]);
+
+  // Swipe-to-close
+  const onTouchStart = useCallback((e) => {
+    startY.current = e.touches[0].clientY;
+    deltaY.current = 0;
+    dragging.current = false;
+  }, []);
+
+  const onTouchMove = useCallback((e) => {
+    const d = e.touches[0].clientY - startY.current;
+    if (d < 0) return;
+    if (d > 10) {
+      dragging.current = true;
+      deltaY.current = d;
+      if (panelRef.current) {
+        panelRef.current.style.transition = 'none';
+        panelRef.current.style.transform = `translateY(${d}px)`;
+      }
+    }
+  }, []);
+
+  const onTouchEnd = useCallback(() => {
+    if (!dragging.current) return;
+    if (deltaY.current > 100 && panelRef.current) {
+      panelRef.current.style.transition = 'transform 250ms ease-out';
+      panelRef.current.style.transform = 'translateY(100%)';
+      setTimeout(() => {
+        if (panelRef.current) {
+          panelRef.current.style.transition = '';
+          panelRef.current.style.transform = '';
+        }
+        setSheetReady(false);
+        onClose();
+      }, 250);
+    } else if (panelRef.current) {
+      panelRef.current.style.transition = 'transform 250ms ease-out';
+      panelRef.current.style.transform = '';
+      setTimeout(() => {
+        if (panelRef.current) panelRef.current.style.transition = '';
+      }, 250);
+    }
+    dragging.current = false;
+    deltaY.current = 0;
+  }, [onClose]);
   
   if (!showModal || !selectedStatCard) return null;
   
@@ -98,24 +156,27 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
   const info = getStatInfo();
   
   return (
-    <div className="overlay">
-      <div className="modal" onClick={e => e.stopPropagation()}>
-        <span className="modal-num">{info.value}</span>
-        <h2>{info.label}</h2>
-        <p className="modal-text">{info.description}</p>
-        
-        {info.details.length > 0 && (
-          <div className="stat-detail-breakdown">
-            {info.details.map((detail, idx) => (
-              <div key={idx} className="stat-breakdown-item">
-                <span className="stat-breakdown-label">{detail.label}</span>
-                <span className="stat-breakdown-value">{detail.value}</span>
-              </div>
-            ))}
-          </div>
-        )}
-        
-        <button className="btn-ghost" onClick={onClose}>Close</button>
+    <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={closeSheet}>
+      <div ref={panelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+        <div className="sheet-header" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
+          <button className="sheet-close" onClick={closeSheet} aria-label="Close">✕</button>
+        </div>
+        <div className="modal" style={{ animation: 'none' }}>
+          <span className="modal-num">{info.value}</span>
+          <h2>{info.label}</h2>
+          <p className="modal-text">{info.description}</p>
+          
+          {info.details.length > 0 && (
+            <div className="stat-detail-breakdown">
+              {info.details.map((detail, idx) => (
+                <div key={idx} className="stat-breakdown-item">
+                  <span className="stat-breakdown-label">{detail.label}</span>
+                  <span className="stat-breakdown-value">{detail.value}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -46,9 +46,6 @@ import {
   generateMLOptimization
 } from './StatsAnalyticsUtils';
 
-// Body scroll lock for modals
-import useBodyScrollLock from '../../hooks/useBodyScrollLock';
-
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
@@ -86,9 +83,6 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const sheetStartY = useRef(0);
   const sheetDeltaY = useRef(0);
   const sheetDragging = useRef(false);
-
-  // Only StatCardModal needs scroll lock (full-screen); sheets handle themselves
-  useBodyScrollLock(showStatModal);
 
   // Sheet open animation
   const sheetVisible = showMilestoneModal || showResetStreakModal || showResetAllModal;
@@ -698,7 +692,9 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       {showMilestoneModal && selectedMilestone && (
         <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => { setShowMilestoneModal(false); setSelectedMilestone(null); })}>
           <div ref={sheetPanelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
-            <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd} />
+            <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd}>
+              <button className="sheet-close" onClick={() => closeSheet(() => { setShowMilestoneModal(false); setSelectedMilestone(null); })} aria-label="Close">✕</button>
+            </div>
             <div className="modal" style={{ animation: 'none' }}>
               <span className="modal-num">{selectedMilestone.days}</span>
               <h2>{selectedMilestone.label}</h2>
@@ -726,7 +722,6 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                   </>
                 )}
               </p>
-              <button className="btn-ghost" onClick={() => closeSheet(() => { setShowMilestoneModal(false); setSelectedMilestone(null); })}>Close</button>
             </div>
           </div>
         </div>
