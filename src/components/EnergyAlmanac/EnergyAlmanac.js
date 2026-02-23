@@ -2,10 +2,12 @@
 // Personal Energy Almanac - Cycle-based daily forecast
 // Replaces DailyTransmission with pure client-side calculations
 // No API costs - all math done locally
-// UPDATED: Modal structure matches TitanTrack pattern (header/scroll/footer)
+// UPDATED: Expanded modal uses shared BottomSheet.css pattern
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import './EnergyAlmanac.css';
+import '../../styles/BottomSheet.css';
+import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
@@ -40,31 +42,18 @@ const getChineseYear = (date) => {
 
 /**
  * Calculate moon phase (0-29.53 day cycle)
- * 
- * Uses recent verified new moon reference to minimize drift error.
- * Reference: Jan 29, 2025 at 12:36 UTC (verified via timeanddate.com)
- * 
- * Thresholds adjusted to account for:
- * - Checking at midnight vs actual peak time
- * - ~1 day buffer for significant phases (new/full)
  */
 const getMoonPhase = (date = new Date()) => {
-  // Recent verified new moon - minimizes accumulated error
-  // Jan 29, 2025 at 12:36 UTC (source: timeanddate.com, USNO)
   const knownNewMoon = new Date('2025-01-29T12:36:00Z');
-  const lunarCycle = 29.53058867; // Mean synodic month
+  const lunarCycle = 29.53058867;
   
   const daysSinceKnown = (date - knownNewMoon) / (1000 * 60 * 60 * 24);
   const currentCycleDay = ((daysSinceKnown % lunarCycle) + lunarCycle) % lunarCycle;
   
   const illumination = Math.round((1 - Math.cos(2 * Math.PI * currentCycleDay / lunarCycle)) / 2 * 100);
   
-  // Phase thresholds (days into cycle)
-  // New Moon peaks at day 0, Full Moon peaks at day ~14.77
-  // Thresholds give ~1.5 day window for new/full to catch the day even when checking at midnight
   let phase, emoji, energy;
   if (currentCycleDay < 1.5 || currentCycleDay >= 28.5) {
-    // New Moon window: last 1 day of cycle + first 1.5 days
     phase = 'New Moon'; emoji = '🌑';
     energy = 'New beginnings, intention setting, introspection';
   } else if (currentCycleDay < 7.38) {
@@ -74,11 +63,9 @@ const getMoonPhase = (date = new Date()) => {
     phase = 'First Quarter'; emoji = '🌓';
     energy = 'Challenges arise, decision points, commitment';
   } else if (currentCycleDay < 13.0) {
-    // Waxing Gibbous ends earlier to give Full Moon more buffer
     phase = 'Waxing Gibbous'; emoji = '🌔';
     energy = 'Refinement, adjustment, patience before fruition';
   } else if (currentCycleDay < 16.5) {
-    // Full Moon window: ~3.5 days centered around day 14.77
     phase = 'Full Moon'; emoji = '🌕';
     energy = 'Peak energy, culmination, heightened emotions';
   } else if (currentCycleDay < 21.15) {
@@ -124,7 +111,6 @@ const getSpermatogenesisPhase = (streakDays) => {
 
 /**
  * Calculate Personal Day number (numerology)
- * Uses proper reduction method
  */
 const getPersonalDay = (birthDate, currentDate = new Date()) => {
   if (!birthDate) return null;
@@ -143,7 +129,6 @@ const getPersonalDay = (birthDate, currentDate = new Date()) => {
     return num;
   };
   
-  // Reduce each component first, then add
   const birthSum = reduceToDigit(birthMonth + birthDay);
   const yearSum = reduceToDigit(
     String(currentYear).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0)
@@ -182,7 +167,6 @@ const getChineseZodiac = (birthDate, currentDate = new Date()) => {
                    'Horse', 'Goat', 'Monkey', 'Rooster', 'Dog', 'Pig'];
   const elements = ['Wood', 'Fire', 'Earth', 'Metal', 'Water'];
   
-  // Get Chinese year (accounting for Lunar New Year)
   const birthChineseYear = getChineseYear(birth);
   const currentChineseYear = getChineseYear(currentDate);
   
@@ -193,11 +177,9 @@ const getChineseZodiac = (birthDate, currentDate = new Date()) => {
   const animal = animals[animalIndex];
   const element = elements[elementIndex];
   
-  // Current year animal
   const currentAnimalIndex = (currentChineseYear - 4) % 12;
   const currentAnimal = animals[currentAnimalIndex];
   
-  // Conflict pairs (opposite on zodiac wheel - 6 years apart)
   const conflictPairs = {
     'Rat': 'Horse', 'Horse': 'Rat',
     'Ox': 'Goat', 'Goat': 'Ox',
@@ -207,7 +189,6 @@ const getChineseZodiac = (birthDate, currentDate = new Date()) => {
     'Snake': 'Pig', 'Pig': 'Snake'
   };
   
-  // Compatible groups (trine harmony - 4 years apart)
   const compatibleGroups = [
     ['Rat', 'Dragon', 'Monkey'],
     ['Ox', 'Snake', 'Rooster'],
@@ -239,7 +220,6 @@ const getChineseZodiac = (birthDate, currentDate = new Date()) => {
 const generateForecast = (moonData, spermaData, personalDay, zodiac, streakDays) => {
   const forecasts = [];
   
-  // Spermatogenesis insight
   if (spermaData.position <= 16) {
     forecasts.push(`Day ${streakDays}. Foundation phase of cycle ${spermaData.cycleNumber}. Energy accumulating.`);
   } else if (spermaData.position <= 40) {
@@ -250,7 +230,6 @@ const generateForecast = (moonData, spermaData, personalDay, zodiac, streakDays)
     forecasts.push(`Day ${streakDays}. Full reabsorption in cycle ${spermaData.cycleNumber}. Transmutation potential highest.`);
   }
   
-  // Moon synergy
   if (moonData.phase === 'Full Moon') {
     forecasts.push('Full moon amplifies your field. Others notice your presence.');
   } else if (moonData.phase === 'New Moon') {
@@ -261,7 +240,6 @@ const generateForecast = (moonData, spermaData, personalDay, zodiac, streakDays)
     forecasts.push('Lunar energy releasing. Good for reflection and letting go.');
   }
   
-  // Personal Day layer
   if (personalDay) {
     if ([11, 22, 33].includes(personalDay.number)) {
       forecasts.push(`Master number ${personalDay.number}. Heightened spiritual frequency.`);
@@ -278,6 +256,71 @@ const generateForecast = (moonData, spermaData, personalDay, zodiac, streakDays)
 const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [aiSynthesis, setAiSynthesis] = useState(null);
+
+  // Bottom sheet state
+  const [showContent, setShowContent] = useState(false);
+  const [sheetReady, setSheetReady] = useState(false);
+  const sheetPanelRef = useRef(null);
+  const touchStartY = useRef(0);
+  const touchDeltaY = useRef(0);
+  const isDragging = useRef(false);
+
+  // Lock body scroll when sheet is open
+  useBodyScrollLock(showContent);
+
+  // Sheet mount/unmount + animation
+  useEffect(() => {
+    if (isExpanded) {
+      setShowContent(true);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setSheetReady(true));
+      });
+    } else {
+      setSheetReady(false);
+      const timer = setTimeout(() => setShowContent(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isExpanded]);
+
+  // Animated close
+  const closeSheet = useCallback((cb) => {
+    setSheetReady(false);
+    setTimeout(cb, 300);
+  }, []);
+
+  const handleClose = useCallback(() => closeSheet(() => setIsExpanded(false)), [closeSheet]);
+
+  // Swipe-to-dismiss
+  const onTouchStart = useCallback((e) => {
+    touchStartY.current = e.touches[0].clientY;
+    touchDeltaY.current = 0;
+    isDragging.current = false;
+  }, []);
+
+  const onTouchMove = useCallback((e) => {
+    const delta = e.touches[0].clientY - touchStartY.current;
+    if (delta < 0) return;
+    if (delta > 10) {
+      isDragging.current = true;
+      touchDeltaY.current = delta;
+      if (sheetPanelRef.current) {
+        sheetPanelRef.current.style.transform = `translateY(${delta}px)`;
+        sheetPanelRef.current.style.transition = 'none';
+      }
+    }
+  }, []);
+
+  const onTouchEnd = useCallback(() => {
+    if (!isDragging.current) return;
+    if (sheetPanelRef.current) {
+      sheetPanelRef.current.style.transition = '';
+      sheetPanelRef.current.style.transform = '';
+    }
+    if (touchDeltaY.current > 80) {
+      handleClose();
+    }
+    isDragging.current = false;
+  }, [handleClose]);
   
   const calculations = useMemo(() => {
     const today = new Date();
@@ -293,7 +336,7 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
     return { moon, sperma, personalDay, zodiac, forecast, streakDays };
   }, [userData?.currentStreak, userData?.birthDate]);
 
-  // Fetch AI-generated synthesis (with localStorage cache to prevent re-fetch on tab switch)
+  // Fetch AI-generated synthesis
   useEffect(() => {
     const fetchSynthesis = async () => {
       const token = localStorage.getItem('token');
@@ -301,8 +344,7 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
 
       const { moon, sperma, personalDay, zodiac, streakDays } = calculations;
 
-      // Check localStorage cache first — avoid API call entirely if we have today's synthesis
-      const todayKey = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+      const todayKey = new Date().toLocaleDateString('en-CA');
       const cacheKey = `synthesis_${todayKey}_${streakDays}`;
       const cached = localStorage.getItem(cacheKey);
       if (cached) {
@@ -332,7 +374,6 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
         if (response.ok) {
           const data = await response.json();
           setAiSynthesis(data.synthesis);
-          // Cache in localStorage — clean up old keys first
           Object.keys(localStorage).forEach(k => {
             if (k.startsWith('synthesis_') && k !== cacheKey) localStorage.removeItem(k);
           });
@@ -340,7 +381,6 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
         }
       } catch (err) {
         console.error('Synthesis fetch error:', err);
-        // Falls back to template forecast — no problem
       }
     };
 
@@ -381,11 +421,21 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
         <p className="almanac-preview">{aiSynthesis || forecast}</p>
       </div>
       
-      {/* Expanded Modal */}
-      {isExpanded && (
-        <div className="almanac-overlay" onClick={() => setIsExpanded(false)}>
-          <div className="almanac-modal" onClick={e => e.stopPropagation()}>
-            
+      {/* Expanded Bottom Sheet */}
+      {showContent && (
+        <div className={`sheet-backdrop almanac-backdrop${sheetReady ? ' open' : ''}`} onClick={handleClose}>
+          <div 
+            ref={sheetPanelRef}
+            className={`sheet-panel almanac-sheet${sheetReady ? ' open' : ''}`}
+            onClick={e => e.stopPropagation()}
+          >
+            <div 
+              className="sheet-header"
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            />
+
             {/* Header */}
             <div className="almanac-modal-header">
               <h2>Today's Alignment</h2>
@@ -465,7 +515,7 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
             <div className="almanac-modal-footer">
               <button 
                 className="almanac-btn-ghost" 
-                onClick={() => setIsExpanded(false)}
+                onClick={handleClose}
               >
                 Done
               </button>

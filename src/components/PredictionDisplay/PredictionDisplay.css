@@ -1,5 +1,6 @@
 /* src/components/PredictionDisplay/PredictionDisplay.css */
-/* Full screen modal - matches Tracker/Calendar modal aesthetic exactly */
+/* Full screen modal - smooth class-based transitions */
+/* Consistent overlay treatment with ET/Calendar */
 
 /* =============================================================================
    OVERLAY - Full screen, centered content
@@ -11,7 +12,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.95);
+  background-color: var(--overlay-bg);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   display: flex;
@@ -25,7 +26,14 @@
   padding-right: max(24px, env(safe-area-inset-right));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  animation: predictionOverlayIn 200ms ease;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.prediction-overlay.pred-ready {
+  opacity: 1;
 }
 
 /* Spacers push content to center, collapse when content is tall */
@@ -34,11 +42,6 @@
   content: '';
   flex: 1;
   min-height: 24px;
-}
-
-@keyframes predictionOverlayIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 
 /* =============================================================================
@@ -52,18 +55,15 @@
   padding: 0;
   flex-shrink: 0;
   text-align: center;
-  animation: predictionModalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 300ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes predictionModalIn {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.prediction-overlay.pred-ready .prediction-modal {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* =============================================================================
@@ -73,13 +73,13 @@
 .prediction-header {
   margin-bottom: 40px;
   padding-bottom: 32px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .prediction-label {
   font-size: 0.6875rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
   letter-spacing: 0.15em;
   text-transform: uppercase;
   margin: 0 0 24px 0;
@@ -96,21 +96,21 @@
   font-size: 5rem;
   font-weight: 200;
   line-height: 1;
-  color: #ffffff;
+  color: var(--text);
   letter-spacing: -0.02em;
 }
 
 .prediction-percent {
   font-size: 1.75rem;
   font-weight: 300;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-tertiary);
   margin-left: 4px;
 }
 
 .prediction-level {
   font-size: 0.9375rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -120,7 +120,7 @@
 
 .prediction-loading {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -136,12 +136,12 @@
 .insight-section-label {
   font-size: 0.6875rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-tertiary);
   letter-spacing: 0.15em;
   text-transform: uppercase;
   margin: 0 0 20px 0;
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .insight-block {
@@ -155,14 +155,14 @@
 .insight-title {
   font-size: 0.9375rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-secondary);
   margin: 0 0 4px 0;
 }
 
 .insight-detail {
   font-size: 0.8125rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted);
   line-height: 1.5;
   margin: 0;
 }
@@ -171,14 +171,14 @@
 .historical-line {
   font-size: 0.875rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
   margin: 0 0 4px 0;
 }
 
 .historical-outcome {
   font-size: 0.8125rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -189,7 +189,7 @@
 .prediction-message {
   font-size: 0.9375rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
   line-height: 1.6;
   margin: 0 0 32px 0;
 }
@@ -197,7 +197,7 @@
 .prediction-disclaimer {
   font-size: 0.75rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--text-tertiary);
   line-height: 1.6;
   margin: 0 0 40px 0;
   max-width: 300px;
@@ -206,7 +206,7 @@
 }
 
 /* =============================================================================
-   ACTIONS - Matches Tracker/Calendar buttons
+   ACTIONS
    ============================================================================= */
 
 .prediction-actions {
@@ -219,10 +219,10 @@
 .prediction-actions .btn-primary {
   width: 100%;
   padding: 16px 24px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  color: #ffffff;
+  color: var(--text);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -232,7 +232,7 @@
 }
 
 .prediction-actions .btn-primary:hover {
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: var(--text-secondary);
 }
 
 .prediction-actions .btn-primary:active {
@@ -245,7 +245,7 @@
   background: transparent;
   border: none;
   border-radius: 12px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -255,7 +255,7 @@
 }
 
 .prediction-actions .btn-ghost:hover {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-secondary);
 }
 
 /* =============================================================================
@@ -265,92 +265,9 @@
 .prediction-context {
   font-size: 0.625rem;
   font-weight: 400;
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--text-tertiary);
   margin: 0;
   letter-spacing: 0.03em;
-}
-
-/* =============================================================================
-   LIGHT THEME OVERRIDES
-   ============================================================================= */
-
-[data-theme="light"] .prediction-overlay {
-  background-color: var(--overlay-bg);
-}
-
-[data-theme="light"] .prediction-header {
-  border-bottom-color: var(--border-subtle);
-}
-
-[data-theme="light"] .prediction-label {
-  color: var(--text-muted);
-}
-
-[data-theme="light"] .prediction-score {
-  color: var(--text);
-}
-
-[data-theme="light"] .prediction-percent {
-  color: var(--text-tertiary);
-}
-
-[data-theme="light"] .prediction-level {
-  color: var(--text-muted);
-}
-
-[data-theme="light"] .prediction-loading {
-  color: var(--text-muted);
-}
-
-[data-theme="light"] .insight-section-label {
-  color: var(--text-tertiary);
-  border-bottom-color: var(--border-subtle);
-}
-
-[data-theme="light"] .insight-title {
-  color: rgba(0, 0, 0, 0.7);
-}
-
-[data-theme="light"] .insight-detail {
-  color: var(--text-muted);
-}
-
-[data-theme="light"] .historical-line {
-  color: var(--text-secondary);
-}
-
-[data-theme="light"] .historical-outcome {
-  color: var(--text-muted);
-}
-
-[data-theme="light"] .prediction-message {
-  color: var(--text-muted);
-}
-
-[data-theme="light"] .prediction-disclaimer {
-  color: var(--text-tertiary);
-}
-
-[data-theme="light"] .prediction-actions .btn-primary {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.1);
-  color: #000000;
-}
-
-[data-theme="light"] .prediction-actions .btn-primary:hover {
-  border-color: rgba(0, 0, 0, 0.25);
-}
-
-[data-theme="light"] .prediction-actions .btn-ghost {
-  color: var(--text-muted);
-}
-
-[data-theme="light"] .prediction-actions .btn-ghost:hover {
-  color: var(--text-secondary);
-}
-
-[data-theme="light"] .prediction-context {
-  color: var(--text-tertiary);
 }
 
 /* =============================================================================
@@ -411,7 +328,16 @@
 @media (prefers-reduced-motion: reduce) {
   .prediction-overlay,
   .prediction-modal {
-    animation: none;
+    transition: none;
+  }
+  
+  .prediction-overlay {
+    opacity: 1;
+  }
+  
+  .prediction-modal {
+    opacity: 1;
+    transform: none;
   }
   
   .prediction-actions .btn-primary,

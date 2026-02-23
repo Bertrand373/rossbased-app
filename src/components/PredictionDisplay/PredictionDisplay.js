@@ -1,9 +1,9 @@
 // src/components/PredictionDisplay/PredictionDisplay.js
 // Full screen modal matching Tracker/Calendar modal aesthetic
 // Integrated with InterventionService for outcome tracking
-// FIXED: Uses correct Emotional Timeline phase names
+// Smooth class-based transitions (no keyframes)
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './PredictionDisplay.css';
 import mlPredictionService from '../../services/MLPredictionService';
@@ -15,6 +15,14 @@ function PredictionDisplay({ userData }) {
   const [prediction, setPrediction] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [interventionId, setInterventionId] = useState(null);
+  const [ready, setReady] = useState(false);
+
+  // Smooth entrance on mount
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => setReady(true));
+    });
+  }, []);
 
   useEffect(() => {
     loadPrediction();
@@ -65,19 +73,27 @@ function PredictionDisplay({ userData }) {
     setIsLoading(false);
   };
 
+  // Animated close then navigate
+  const animateOut = useCallback((cb) => {
+    setReady(false);
+    setTimeout(cb, 300);
+  }, []);
+
   const handleStruggling = () => {
     // Record that user acknowledged they're struggling
     if (interventionId) {
       interventionService.recordResponse(interventionId, 'struggling');
     }
     
-    navigate('/urge-toolkit', { 
-      state: { 
-        fromPrediction: true,
-        interventionId: interventionId,
-        riskScore: prediction?.riskScore,
-        suggestedTools: prediction?.patterns?.suggestions?.[0]?.tools 
-      } 
+    animateOut(() => {
+      navigate('/urge-toolkit', { 
+        state: { 
+          fromPrediction: true,
+          interventionId: interventionId,
+          riskScore: prediction?.riskScore,
+          suggestedTools: prediction?.patterns?.suggestions?.[0]?.tools 
+        } 
+      });
     });
   };
 
@@ -87,7 +103,7 @@ function PredictionDisplay({ userData }) {
       interventionService.recordResponse(interventionId, 'fine');
     }
     
-    navigate('/');
+    animateOut(() => navigate('/'));
   };
 
   const getRiskInfo = (score) => {
@@ -108,7 +124,7 @@ function PredictionDisplay({ userData }) {
   // Loading state
   if (isLoading) {
     return (
-      <div className="prediction-overlay">
+      <div className={`prediction-overlay${ready ? ' pred-ready' : ''}`}>
         <div className="prediction-modal">
           <p className="prediction-loading">Analyzing patterns...</p>
         </div>
@@ -128,7 +144,7 @@ function PredictionDisplay({ userData }) {
                       prediction?.factors?.emotionalProcessingPhase;
 
   return (
-    <div className="prediction-overlay">
+    <div className={`prediction-overlay${ready ? ' pred-ready' : ''}`}>
       <div className="prediction-modal">
         
         {/* Header */}

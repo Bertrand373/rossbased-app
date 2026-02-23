@@ -1,6 +1,6 @@
 /* src/components/EnergyAlmanac/EnergyAlmanac.css */
-/* Energy Almanac - Matches TitanTrack modal aesthetic */
-/* Transparent modal, 40px blur, footer Done button, proper section headers */
+/* Energy Almanac - Collapsed card + Bottom sheet expanded view */
+/* Positioning handled by BottomSheet.css, content styles here */
 
 /* ============================================================
    COLLAPSED CARD (on Tracker)
@@ -96,55 +96,22 @@
 }
 
 /* ============================================================
-   OVERLAY - Matches TitanTrack standard (40px blur)
+   SHEET OVERRIDES — z-index + sizing
    ============================================================ */
 
-.almanac-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: var(--overlay-bg);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+.sheet-backdrop.almanac-backdrop {
   z-index: 10000;
-  padding: 24px;
-  padding-top: max(24px, env(safe-area-inset-top));
-  padding-bottom: max(24px, env(safe-area-inset-bottom));
-  animation: almanacOverlayIn 200ms ease;
 }
 
-@keyframes almanacOverlayIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* ============================================================
-   MODAL - Transparent, no border/radius (TitanTrack pattern)
-   ============================================================ */
-
-.almanac-modal {
-  width: 100%;
-  max-width: 340px;
-  max-height: calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  text-align: left;
+.sheet-panel.almanac-sheet {
+  z-index: 10001;
+  max-height: 85dvh;
   display: flex;
   flex-direction: column;
-  animation: almanacModalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes almanacModalIn {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ============================================================
-   MODAL HEADER - Matches ET pattern
+   MODAL HEADER
    ============================================================ */
 
 .almanac-modal-header {
@@ -356,11 +323,7 @@
     margin-bottom: 16px;
   }
   
-  .almanac-modal {
-    max-width: 100%;
-  }
-  
-  .almanac-modal-title h2 {
+  .almanac-modal-header h2 {
     font-size: 1.125rem;
   }
   
@@ -417,11 +380,7 @@
 }
 
 @media (min-width: 768px) {
-  .almanac-modal {
-    max-width: 360px;
-  }
-  
-  .almanac-modal-title h2 {
+  .almanac-modal-header h2 {
     font-size: 1.375rem;
   }
   
@@ -442,11 +401,6 @@
   .energy-almanac {
     animation: none;
     opacity: 1;
-  }
-  
-  .almanac-overlay,
-  .almanac-modal {
-    animation: none;
   }
   
   .almanac-progress-fill {
