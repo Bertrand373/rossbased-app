@@ -380,9 +380,7 @@ const ShareCard = ({ userData, isVisible = true }) => {
               )}
             </button>
             
-            <button className="share-modal-close" onClick={closePreview}>
-              Cancel
-            </button>
+            <button className="btn-ghost" onClick={closePreview}>Close</button>
           </div>
         </div>
       )}
