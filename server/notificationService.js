@@ -286,10 +286,10 @@ const notificationTemplates = {
     data: { url: '/stats', type: 'onboarding' }
   },
 
-  // Day 25: Approaching the wall (no premium mention)
+  // Day 25: Post-free-logs nudge (most daily loggers have used their 14 free logs by now)
   onboarding_day25: {
     title: 'Day 25',
-    body: 'Five days until your free logging window closes. Make them count.',
+    body: 'Your data tells a story now. Unlock unlimited logging to keep it going.',
     data: { url: '/', type: 'onboarding' }
   },
 

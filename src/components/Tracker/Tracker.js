@@ -87,9 +87,11 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   // Use stored currentStreak for consistency across all tabs
   const streak = userData.currentStreak || 1;
 
-  // Free users can log benefits for the first 30 days of each streak
-  // Resets automatically on relapse (streak goes back to 1)
-  const canLogBenefits = isPremium || streak <= 30;
+  // Free users get 14 lifetime benefit logs (not per-streak, total)
+  // Once used, upgrade to Premium for unlimited logging
+  const FREE_LOG_LIMIT = 14;
+  const totalLogs = userData.benefitTracking?.length || 0;
+  const canLogBenefits = isPremium || totalLogs < FREE_LOG_LIMIT;
 
   const todayLogged = userData.benefitTracking?.some(
     b => format(new Date(b.date), 'yyyy-MM-dd') === format(currentTime, 'yyyy-MM-dd')
@@ -651,7 +653,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         </div>
       )}
 
-      {/* Benefit Logging Lock — Free users past day 30 */}
+      {/* Benefit Logging Lock — Free users past 14 lifetime logs */}
       {showLogLock && (
         <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowLogLock(false))}>
           <div ref={sheetPanelRef} className={`sheet-panel tracker-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
@@ -664,8 +666,8 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
             <div className="confirm-modal">
               <h2>Logging Locked</h2>
               <p>
-                Benefit tracking is available for the first 30 days of each streak. 
-                You're on day {streak} — upgrade to Premium for unlimited logging and full analytics.
+                You've used all {FREE_LOG_LIMIT} free benefit logs. 
+                Upgrade to Premium for unlimited logging, full analytics, and ML predictions.
               </p>
               <div className="confirm-actions">
                 <button className="btn-primary" onClick={() => closeSheet(() => { setShowLogLock(false); onUpgrade(); })}>Upgrade</button>

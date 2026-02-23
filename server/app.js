@@ -30,7 +30,7 @@ const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 const { getCommunityPulse } = require('./services/communityPulse');
 const stripeRoutes = require('./routes/stripeRoutes');
 const discordLinkRoutes = require('./routes/discordLink');
-const { expireStaleTrials, expireStaleCanceled } = require('./middleware/subscriptionMiddleware');
+const { expireStaleTrials, expireStaleCanceled, checkPremiumAccess } = require('./middleware/subscriptionMiddleware');
 const { checkAndSendOnboardingNotification } = require('./services/notificationService');
 
 // Import leaderboard service
@@ -430,6 +430,20 @@ app.get('/api/user/:username', authenticate, async (req, res) => {
 app.put('/api/user/:username', authenticate, async (req, res) => {
   console.log('Received update for user:', req.params.username);
   try {
+    // ── Free-tier benefit log enforcement (14 lifetime logs) ──
+    if (req.body.benefitTracking) {
+      const user = await User.findOne({ username: req.params.username }).select('benefitTracking subscription isPremium');
+      if (user) {
+        const { hasPremium } = checkPremiumAccess(user);
+        const existingCount = user.benefitTracking?.length || 0;
+        const incomingCount = req.body.benefitTracking.length;
+        // Only block if they're ADDING new entries (not editing existing ones)
+        if (!hasPremium && incomingCount > existingCount && existingCount >= 14) {
+          return res.status(403).json({ error: 'Free log limit reached. Upgrade to Premium for unlimited logging.' });
+        }
+      }
+    }
+
     const user = await User.findOneAndUpdate(
       { username: req.params.username },
       { $set: req.body },
