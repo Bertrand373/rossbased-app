@@ -94,7 +94,6 @@ const Landing = ({ onLogin }) => {
                 loop
                 playsInline
                 preload="auto"
-                poster="/videos/demo-poster.jpg"
                 className="landing-video"
               >
                 <source src="/videos/demo.mp4" type="video/mp4" />
