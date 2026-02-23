@@ -5,6 +5,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import KnowledgeBase from './KnowledgeBase';
 import OracleHealth from './OracleHealth';
+import RevenueCard from './RevenueCard';
 import './AdminCockpit.css';
 
 const API = process.env.REACT_APP_API || process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
@@ -111,10 +112,6 @@ const RetentionChart = ({ data }) => {
 // MAIN COMPONENT
 // ============================================================
 const AdminCockpit = () => {
-  const [verified, setVerified] = useState(() => sessionStorage.getItem('ac_verified') === '1');
-  const [passInput, setPassInput] = useState('');
-  const [passError, setPassError] = useState(false);
-  const [verifying, setVerifying] = useState(false);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
   const [tab, setTab] = useState('dashboard');
@@ -130,29 +127,6 @@ const AdminCockpit = () => {
 
   const token = localStorage.getItem('token');
   const headers = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
-
-  const handleVerify = async (e) => {
-    if (e) e.preventDefault();
-    setVerifying(true);
-    setPassError(false);
-    try {
-      const res = await fetch(`${API}/api/analytics/verify`, {
-        method: 'POST', headers,
-        body: JSON.stringify({ password: passInput })
-      });
-      const data = await res.json();
-      if (data.verified) {
-        sessionStorage.setItem('ac_verified', '1');
-        setVerified(true);
-      } else {
-        setPassError(true);
-        setPassInput('');
-      }
-    } catch {
-      setPassError(true);
-    }
-    setVerifying(false);
-  };
 
   const fetchData = useCallback(async (endpoint) => {
     const res = await fetch(`${API}/api/analytics/${endpoint}`, { headers });
@@ -179,14 +153,13 @@ const AdminCockpit = () => {
     setLoading(false);
   }, [fetchData]);
 
-  useEffect(() => { if (verified) loadAll(); }, [loadAll, verified]);
+  useEffect(() => { loadAll(); }, [loadAll]);
 
   // Auto-refresh every 60s for real-time feel
   useEffect(() => {
-    if (!verified) return;
     const interval = setInterval(() => loadAll(), 60000);
     return () => clearInterval(interval);
-  }, [verified]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Computed
   const stickiness = overview?.dau > 0 && overview?.mau > 0 ? Math.round((overview.dau / overview.mau) * 100) : 0;
@@ -250,34 +223,6 @@ const AdminCockpit = () => {
 
   if (authError) return <div className="ac-wrap"><div className="ac-error">{authError}</div></div>;
 
-  // ===== PASSWORD GATE =====
-  if (!verified) {
-    return (
-      <div className="ac-wrap">
-        <div className="ac-gate">
-          <div className="ac-gate-icon">&#9670;</div>
-          <h2 className="ac-gate-title">Command Center</h2>
-          <p className="ac-gate-sub">Admin access required</p>
-          <div className="ac-gate-form" onKeyDown={e => e.key === 'Enter' && handleVerify()}>
-            <input
-              type="password"
-              className={`ac-gate-input ${passError ? 'error' : ''}`}
-              placeholder="Enter password"
-              value={passInput}
-              onChange={e => { setPassInput(e.target.value); setPassError(false); }}
-              autoFocus
-              disabled={verifying}
-            />
-            <button className="ac-gate-btn" onClick={handleVerify} disabled={!passInput || verifying}>
-              {verifying ? 'Verifying...' : 'Enter'}
-            </button>
-          </div>
-          {passError && <p className="ac-gate-error">Wrong password</p>}
-        </div>
-      </div>
-    );
-  }
-
   if (loading) return <div className="ac-wrap"><div className="ac-loading"><div className="ac-loader" /><span>Loading command center...</span></div></div>;
 
   return (
@@ -308,6 +253,7 @@ const AdminCockpit = () => {
           { id: 'checkins', label: 'Check-ins' },
           { id: 'behavior', label: 'Behavior' },
           { id: 'users', label: 'Users' },
+          { id: 'revenue', label: 'Revenue' },
           { id: 'oracle', label: 'Oracle' },
         ].map(t => (
           <button key={t.id} className={`ac-nav-btn ${tab === t.id ? 'active' : ''}`} onClick={() => setTab(t.id)}>
@@ -830,6 +776,13 @@ const AdminCockpit = () => {
               </table>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ===== REVENUE ===== */}
+      {tab === 'revenue' && (
+        <div className="ac-oracle-wrap">
+          <RevenueCard />
         </div>
       )}
 
