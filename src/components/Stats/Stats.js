@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import './Stats.css';
+import '../../styles/BottomSheet.css';
 import toast from 'react-hot-toast';
 
 // Import extracted components
@@ -78,9 +79,78 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
   const chartRef = useRef(null);
   const safeUserData = useMemo(() => validateUserData(userData), [userData]);
-  
-  // Lock body scroll when any modal is open
-  useBodyScrollLock(showMilestoneModal || showResetStreakModal || showResetAllModal || showStatModal);
+
+  // Bottom sheet state
+  const [sheetReady, setSheetReady] = useState(false);
+  const sheetPanelRef = useRef(null);
+  const sheetStartY = useRef(0);
+  const sheetDeltaY = useRef(0);
+  const sheetDragging = useRef(false);
+
+  // Only StatCardModal needs scroll lock (full-screen); sheets handle themselves
+  useBodyScrollLock(showStatModal);
+
+  // Sheet open animation
+  const sheetVisible = showMilestoneModal || showResetStreakModal || showResetAllModal;
+  useEffect(() => {
+    if (sheetVisible) {
+      requestAnimationFrame(() => requestAnimationFrame(() => setSheetReady(true)));
+    } else {
+      setSheetReady(false);
+    }
+  }, [sheetVisible]);
+
+  const closeSheet = useCallback((cb) => {
+    setSheetReady(false);
+    setTimeout(cb, 300);
+  }, []);
+
+  // Swipe-to-close handlers
+  const onSheetTouchStart = useCallback((e) => {
+    sheetStartY.current = e.touches[0].clientY;
+    sheetDeltaY.current = 0;
+    sheetDragging.current = false;
+  }, []);
+
+  const onSheetTouchMove = useCallback((e) => {
+    const delta = e.touches[0].clientY - sheetStartY.current;
+    if (delta < 0) return;
+    if (delta > 10) {
+      sheetDragging.current = true;
+      sheetDeltaY.current = delta;
+      if (sheetPanelRef.current) {
+        sheetPanelRef.current.style.transition = 'none';
+        sheetPanelRef.current.style.transform = `translateY(${delta}px)`;
+      }
+    }
+  }, []);
+
+  const onSheetTouchEnd = useCallback(() => {
+    if (!sheetDragging.current) return;
+    if (sheetDeltaY.current > 100 && sheetPanelRef.current) {
+      sheetPanelRef.current.style.transition = 'transform 250ms ease-out';
+      sheetPanelRef.current.style.transform = 'translateY(100%)';
+      setTimeout(() => {
+        if (sheetPanelRef.current) {
+          sheetPanelRef.current.style.transition = '';
+          sheetPanelRef.current.style.transform = '';
+        }
+        setSheetReady(false);
+        setShowMilestoneModal(false);
+        setShowResetStreakModal(false);
+        setShowResetAllModal(false);
+        setSelectedMilestone(null);
+      }, 250);
+    } else if (sheetPanelRef.current) {
+      sheetPanelRef.current.style.transition = 'transform 250ms ease-out';
+      sheetPanelRef.current.style.transform = '';
+      setTimeout(() => {
+        if (sheetPanelRef.current) sheetPanelRef.current.style.transition = '';
+      }, 250);
+    }
+    sheetDragging.current = false;
+    sheetDeltaY.current = 0;
+  }, []);
   
   // Detect theme changes for chart colors
   useEffect(() => {
@@ -626,65 +696,71 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
       {/* Milestone Modal - Transparent floating */}
       {showMilestoneModal && selectedMilestone && (
-        <div className="overlay">
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <span className="modal-num">{selectedMilestone.days}</span>
-            <h2>{selectedMilestone.label}</h2>
-            {selectedMilestone.date && (
-              <p className="modal-date">Reached {format(new Date(selectedMilestone.date), 'MMMM d, yyyy')}</p>
-            )}
-            <p className="modal-text">
-              {/* Contextual text: different message if earned but currently below milestone */}
-              {(safeUserData.currentStreak || 0) >= selectedMilestone.days ? (
-                // Currently at or past this milestone - celebratory
-                <>
-                  {selectedMilestone.days === 7 && "Foundation set. Energy stabilizing, clarity emerging."}
-                  {selectedMilestone.days === 14 && "Two weeks in. Focus and physical energy improving."}
-                  {selectedMilestone.days === 30 && "One month. Habits formed, transformation underway."}
-                  {selectedMilestone.days === 90 && "Ninety days. Neurological rewiring complete."}
-                  {selectedMilestone.days === 180 && "Six months. Baseline permanently elevated."}
-                  {selectedMilestone.days === 365 && "One year. This is now who you are."}
-                </>
-              ) : (
-                // Earned but relapsed - acknowledgment + challenge
-                <>
-                  {selectedMilestone.days === 7 && "You've built the foundation before. Build it again."}
-                  {selectedMilestone.days === 14 && "Two weeks is in your wheelhouse. Reclaim it."}
-                  {selectedMilestone.days === 30 && "You've proven you can do this. Now do it again."}
-                  {selectedMilestone.days === 90 && "You've rewired once. The path is familiar."}
-                  {selectedMilestone.days === 180 && "Six months was yours. Take it back."}
-                  {selectedMilestone.days === 365 && "A year lives in you. Rise again."}
-                </>
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => { setShowMilestoneModal(false); setSelectedMilestone(null); })}>
+          <div ref={sheetPanelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd} />
+            <div className="modal" style={{ animation: 'none' }}>
+              <span className="modal-num">{selectedMilestone.days}</span>
+              <h2>{selectedMilestone.label}</h2>
+              {selectedMilestone.date && (
+                <p className="modal-date">Reached {format(new Date(selectedMilestone.date), 'MMMM d, yyyy')}</p>
               )}
-            </p>
-            <button className="btn-ghost" onClick={() => setShowMilestoneModal(false)}>Close</button>
-          </div>
-        </div>
-      )}
-
-      {/* Reset Streak Modal */}
-      {showResetStreakModal && (
-        <div className="overlay">
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <h2>Reset Streak?</h2>
-            <p className="modal-text">This will reset your current streak to 0. Your history and benefits data will be kept.</p>
-            <div className="modal-buttons">
-              <button className="btn-danger" onClick={confirmResetStreak}>Reset Streak</button>
-              <button className="btn-ghost" onClick={() => setShowResetStreakModal(false)}>Cancel</button>
+              <p className="modal-text">
+                {(safeUserData.currentStreak || 0) >= selectedMilestone.days ? (
+                  <>
+                    {selectedMilestone.days === 7 && "Foundation set. Energy stabilizing, clarity emerging."}
+                    {selectedMilestone.days === 14 && "Two weeks in. Focus and physical energy improving."}
+                    {selectedMilestone.days === 30 && "One month. Habits formed, transformation underway."}
+                    {selectedMilestone.days === 90 && "Ninety days. Neurological rewiring complete."}
+                    {selectedMilestone.days === 180 && "Six months. Baseline permanently elevated."}
+                    {selectedMilestone.days === 365 && "One year. This is now who you are."}
+                  </>
+                ) : (
+                  <>
+                    {selectedMilestone.days === 7 && "You've built the foundation before. Build it again."}
+                    {selectedMilestone.days === 14 && "Two weeks is in your wheelhouse. Reclaim it."}
+                    {selectedMilestone.days === 30 && "You've proven you can do this. Now do it again."}
+                    {selectedMilestone.days === 90 && "You've rewired once. The path is familiar."}
+                    {selectedMilestone.days === 180 && "Six months was yours. Take it back."}
+                    {selectedMilestone.days === 365 && "A year lives in you. Rise again."}
+                  </>
+                )}
+              </p>
+              <button className="btn-ghost" onClick={() => closeSheet(() => { setShowMilestoneModal(false); setSelectedMilestone(null); })}>Close</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Reset All Modal */}
+      {/* Reset Streak Sheet */}
+      {showResetStreakModal && (
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowResetStreakModal(false))}>
+          <div ref={sheetPanelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd} />
+            <div className="modal" style={{ animation: 'none' }}>
+              <h2>Reset Streak?</h2>
+              <p className="modal-text">This will reset your current streak to 0. Your history and benefits data will be kept.</p>
+              <div className="modal-buttons">
+                <button className="btn-danger" onClick={confirmResetStreak}>Reset Streak</button>
+                <button className="btn-ghost" onClick={() => closeSheet(() => setShowResetStreakModal(false))}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reset All Sheet */}
       {showResetAllModal && (
-        <div className="overlay">
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <h2>Reset All Data?</h2>
-            <p className="modal-text">This will permanently delete all progress data including streaks, benefits, and milestones. This cannot be undone.</p>
-            <div className="modal-buttons">
-              <button className="btn-danger" onClick={confirmResetAll}>Reset All</button>
-              <button className="btn-ghost" onClick={() => setShowResetAllModal(false)}>Cancel</button>
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowResetAllModal(false))}>
+          <div ref={sheetPanelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd} />
+            <div className="modal" style={{ animation: 'none' }}>
+              <h2>Reset All Data?</h2>
+              <p className="modal-text">This will permanently delete all progress data including streaks, benefits, and milestones. This cannot be undone.</p>
+              <div className="modal-buttons">
+                <button className="btn-danger" onClick={confirmResetAll}>Reset All</button>
+                <button className="btn-ghost" onClick={() => closeSheet(() => setShowResetAllModal(false))}>Cancel</button>
+              </div>
             </div>
           </div>
         </div>

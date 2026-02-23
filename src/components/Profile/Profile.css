@@ -1005,6 +1005,51 @@
 }
 
 /* =============================================================================
+   BOTTOM SHEET — content overrides (positioning via BottomSheet.css)
+   Used by: Export, Delete confirm
+   ============================================================================= */
+
+.profile-sheet {
+  align-items: center;
+  padding: 0 20px 20px;
+  text-align: center;
+}
+
+.profile-sheet .confirm-modal {
+  animation: none !important;
+  width: 100%;
+  max-width: none;
+}
+
+/* =============================================================================
+   SMOOTH-CLOSE OVERLAY — Feedback + Privacy
+   ============================================================================= */
+
+.overlay.profile-transition {
+  animation: none;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.overlay.profile-transition.profile-ready {
+  opacity: 1;
+}
+
+.profile-transition .modal,
+.profile-transition .privacy-modal {
+  animation: none;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
+.profile-transition.profile-ready .modal,
+.profile-transition.profile-ready .privacy-modal {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =============================================================================
    RESPONSIVE
    ============================================================================= */
 

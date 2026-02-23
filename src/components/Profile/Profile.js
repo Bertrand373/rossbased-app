@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import './Profile.css';
+import '../../styles/BottomSheet.css';
 import { useNotifications } from '../../hooks/useNotifications';
 // Theme context
 import { useTheme } from '../../App';
@@ -100,8 +101,93 @@ const Profile = ({
   // Theme
   const { theme, toggleTheme } = useTheme();
 
-  // Lock body scroll when any modal is open
-  useBodyScrollLock(showFeedbackModal || showDeleteConfirm || showExportModal || showPrivacyModal);
+  // Bottom sheet state (export + delete)
+  const [sheetReady, setSheetReady] = useState(false);
+  const sheetPanelRef = useRef(null);
+  const sheetStartY = useRef(0);
+  const sheetDeltaY = useRef(0);
+  const sheetDragging = useRef(false);
+
+  // Smooth-close overlay state (feedback + privacy)
+  const [overlayReady, setOverlayReady] = useState(false);
+
+  // Only full-screen overlays need scroll lock
+  useBodyScrollLock(showFeedbackModal || showPrivacyModal);
+
+  // Sheet animation
+  const sheetVisible = showExportModal || showDeleteConfirm;
+  useEffect(() => {
+    if (sheetVisible) {
+      requestAnimationFrame(() => requestAnimationFrame(() => setSheetReady(true)));
+    } else {
+      setSheetReady(false);
+    }
+  }, [sheetVisible]);
+
+  // Overlay animation
+  useEffect(() => {
+    if (showFeedbackModal || showPrivacyModal) {
+      requestAnimationFrame(() => requestAnimationFrame(() => setOverlayReady(true)));
+    } else {
+      setOverlayReady(false);
+    }
+  }, [showFeedbackModal, showPrivacyModal]);
+
+  const closeSheet = useCallback((cb) => {
+    setSheetReady(false);
+    setTimeout(cb, 300);
+  }, []);
+
+  const closeOverlay = useCallback((cb) => {
+    setOverlayReady(false);
+    setTimeout(cb, 300);
+  }, []);
+
+  // Swipe-to-close
+  const onSheetTouchStart = useCallback((e) => {
+    sheetStartY.current = e.touches[0].clientY;
+    sheetDeltaY.current = 0;
+    sheetDragging.current = false;
+  }, []);
+
+  const onSheetTouchMove = useCallback((e) => {
+    const delta = e.touches[0].clientY - sheetStartY.current;
+    if (delta < 0) return;
+    if (delta > 10) {
+      sheetDragging.current = true;
+      sheetDeltaY.current = delta;
+      if (sheetPanelRef.current) {
+        sheetPanelRef.current.style.transition = 'none';
+        sheetPanelRef.current.style.transform = `translateY(${delta}px)`;
+      }
+    }
+  }, []);
+
+  const onSheetTouchEnd = useCallback(() => {
+    if (!sheetDragging.current) return;
+    if (sheetDeltaY.current > 100 && sheetPanelRef.current) {
+      sheetPanelRef.current.style.transition = 'transform 250ms ease-out';
+      sheetPanelRef.current.style.transform = 'translateY(100%)';
+      setTimeout(() => {
+        if (sheetPanelRef.current) {
+          sheetPanelRef.current.style.transition = '';
+          sheetPanelRef.current.style.transform = '';
+        }
+        setSheetReady(false);
+        setShowExportModal(false);
+        setShowDeleteConfirm(false);
+        setDeleteConfirmText('');
+      }, 250);
+    } else if (sheetPanelRef.current) {
+      sheetPanelRef.current.style.transition = 'transform 250ms ease-out';
+      sheetPanelRef.current.style.transform = '';
+      setTimeout(() => {
+        if (sheetPanelRef.current) sheetPanelRef.current.style.transition = '';
+      }, 250);
+    }
+    sheetDragging.current = false;
+    sheetDeltaY.current = 0;
+  }, []);
 
   const tabs = [
     { id: 'account', label: 'Account' },
@@ -1110,8 +1196,9 @@ const Profile = ({
       </div>
 
       {/* FEEDBACK MODAL */}
+      {/* FEEDBACK — smooth-close overlay (form with inputs) */}
       {showFeedbackModal && (
-        <div className="overlay">
+        <div className={`overlay profile-transition${overlayReady ? ' profile-ready' : ''}`}>
           <div className="modal legacy" onClick={e => e.stopPropagation()}>
             <h2>Send Feedback</h2>
             <p>Help us improve TitanTrack</p>
@@ -1152,70 +1239,76 @@ const Profile = ({
 
             <div className="modal-actions">
               <button className="btn-primary" onClick={handleFeedbackSubmit}>Submit</button>
-              <button className="btn-ghost" onClick={() => setShowFeedbackModal(false)}>Cancel</button>
+              <button className="btn-ghost" onClick={() => closeOverlay(() => setShowFeedbackModal(false))}>Cancel</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* EXPORT MODAL */}
+      {/* EXPORT — bottom sheet */}
       {showExportModal && (
-        <div className="overlay">
-          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
-            <h2>Export Data</h2>
-            <p>Download all your tracking data including streak history, journal entries, and settings.</p>
-            <div className="confirm-actions">
-              <button className="btn-primary" onClick={handleDataExport}>Download</button>
-              <button className="btn-ghost" onClick={() => setShowExportModal(false)}>Cancel</button>
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowExportModal(false))}>
+          <div ref={sheetPanelRef} className={`sheet-panel profile-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd} />
+            <div className="confirm-modal" style={{ animation: 'none' }}>
+              <h2>Export Data</h2>
+              <p>Download all your tracking data including streak history, journal entries, and settings.</p>
+              <div className="confirm-actions">
+                <button className="btn-primary" onClick={handleDataExport}>Download</button>
+                <button className="btn-ghost" onClick={() => closeSheet(() => setShowExportModal(false))}>Cancel</button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* DELETE MODAL */}
+      {/* DELETE — bottom sheet */}
       {showDeleteConfirm && (
-        <div className="overlay">
-          <div className="confirm-modal delete-confirm-modal" onClick={e => e.stopPropagation()}>
-            <h2>Delete Account?</h2>
-            <p>This will permanently delete all your data. This cannot be undone.</p>
-            
-            <div className="delete-confirm-input">
-              <label>Type <strong>DELETE</strong> to confirm</label>
-              <input
-                type="text"
-                value={deleteConfirmText}
-                onChange={(e) => setDeleteConfirmText(e.target.value.toUpperCase())}
-                placeholder="DELETE"
-                autoComplete="off"
-                spellCheck="false"
-              />
-            </div>
-            
-            <div className="confirm-actions">
-              <button 
-                className="btn-danger" 
-                onClick={handleAccountDeletion}
-                disabled={deleteConfirmText !== 'DELETE'}
-              >
-                Delete Account
-              </button>
-              <button 
-                className="btn-ghost" 
-                onClick={() => {
-                  setShowDeleteConfirm(false);
-                  setDeleteConfirmText('');
-                }}
-              >
-                Cancel
-              </button>
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); })}>
+          <div ref={sheetPanelRef} className={`sheet-panel profile-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd} />
+            <div className="confirm-modal delete-confirm-modal" style={{ animation: 'none' }}>
+              <h2>Delete Account?</h2>
+              <p>This will permanently delete all your data. This cannot be undone.</p>
+              
+              <div className="delete-confirm-input">
+                <label>Type <strong>DELETE</strong> to confirm</label>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value.toUpperCase())}
+                  placeholder="DELETE"
+                  autoComplete="off"
+                  spellCheck="false"
+                />
+              </div>
+              
+              <div className="confirm-actions">
+                <button 
+                  className="btn-danger" 
+                  onClick={handleAccountDeletion}
+                  disabled={deleteConfirmText !== 'DELETE'}
+                >
+                  Delete Account
+                </button>
+                <button 
+                  className="btn-ghost" 
+                  onClick={() => closeSheet(() => {
+                    setShowDeleteConfirm(false);
+                    setDeleteConfirmText('');
+                  })}
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* PRIVACY POLICY MODAL */}
+      {/* PRIVACY — smooth-close overlay (long scroll) */}
       {showPrivacyModal && (
-        <div className="overlay">
+        <div className={`overlay profile-transition${overlayReady ? ' profile-ready' : ''}`}>
           <div className="privacy-modal" onClick={e => e.stopPropagation()}>
             <div className="privacy-header">
               <h2>Privacy Policy</h2>
@@ -1265,7 +1358,7 @@ const Profile = ({
             </div>
 
             <div className="privacy-footer">
-              <button className="btn-primary" onClick={() => setShowPrivacyModal(false)}>Done</button>
+              <button className="btn-primary" onClick={() => closeOverlay(() => setShowPrivacyModal(false))}>Done</button>
             </div>
           </div>
         </div>
