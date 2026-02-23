@@ -1,7 +1,7 @@
 // EmotionalTimeline.js - TITANTRACK MINIMAL
 // Matches Landing/Tracker/Stats aesthetic
 // UPDATED: Analysis tab focused on ONE powerful insight - emotional trajectory
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './EmotionalTimeline.css';
 import { FaCheck, FaExclamationTriangle, FaLock } from 'react-icons/fa';
 
@@ -9,7 +9,6 @@ import { FaCheck, FaExclamationTriangle, FaLock } from 'react-icons/fa';
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 
 const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal }) => {
-  const [activeTab, setActiveTab] = useState('journey');
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -245,16 +244,6 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
 
   const progress = getProgress();
 
-  // Lock scroll on Analysis tab (fixed content)
-  useEffect(() => {
-    if (activeTab === 'analysis') {
-      document.body.classList.add('static-view');
-    } else {
-      document.body.classList.remove('static-view');
-    }
-    return () => document.body.classList.remove('static-view');
-  }, [activeTab]);
-
   // ============================================================
   // ANALYSIS - Focused trajectory calculation
   // ============================================================
@@ -365,136 +354,109 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
     setShowModal(true);
   };
 
-  // Tab items - Journey and Analysis only
-  const tabs = [
-    { key: 'journey', label: 'Journey' },
-    { key: 'analysis', label: 'Analysis' }
-  ];
-
   return (
     <div className="et-container">
-      {/* Tabs */}
-      <nav className="et-tabs">
-        {tabs.map((tab, index) => (
-          <React.Fragment key={tab.key}>
-            <button
-              className={`et-tab ${activeTab === tab.key ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab.key)}
-            >
-              {tab.label}
-            </button>
-            {index < tabs.length - 1 && <div className="et-tab-divider" />}
-          </React.Fragment>
-        ))}
-      </nav>
 
-      {/* Journey Tab */}
-      {activeTab === 'journey' && (
-        <div className="et-journey">
-          <div className="et-current" onClick={() => openPhase(currentPhase)}>
-            <div className="et-current-header">
-              <span className="et-current-num">
-                {String(phases.findIndex(p => p.id === currentPhase?.id) + 1).padStart(2, '0')}
-              </span>
-              <div className="et-current-info">
-                <h2 className="et-current-name">{currentPhase?.name}</h2>
-                <p className="et-current-days">Days {currentPhase?.days}</p>
-              </div>
-            </div>
-            
-            <div className="et-progress">
-              <div className="et-progress-bar">
-                <div 
-                  className="et-progress-fill" 
-                  style={{ width: `${progress.percent}%` }} 
-                />
-              </div>
-              <span className="et-progress-text">{progress.text}</span>
-            </div>
-          </div>
-
-          <div className="et-phases">
-            {phases.map((phase, index) => {
-              const status = getPhaseStatus(phase);
-              const isCurrent = phase.id === currentPhase?.id;
-              const isLocked = !isPremium && !isCurrent;
-              return (
-                <div 
-                  key={phase.id}
-                  className={`et-phase ${status}${isLocked ? ' et-phase-locked' : ''}`}
-                  onClick={() => openPhase(phase)}
-                >
-                  <div className="et-phase-num">
-                    {String(index + 1).padStart(2, '0')}
-                  </div>
-                  <div className="et-phase-info">
-                    <h3>{phase.name}</h3>
-                    <p>Days {phase.days}</p>
-                  </div>
-                  <div className="et-phase-status">
-                    {isLocked ? <FaLock /> : status === 'completed' && <FaCheck />}
-                  </div>
-                </div>
-              );
-            })}
+      {/* Current Phase — Hero card */}
+      <div className="et-current" onClick={() => openPhase(currentPhase)}>
+        <div className="et-current-header">
+          <span className="et-current-num">
+            {String(phases.findIndex(p => p.id === currentPhase?.id) + 1).padStart(2, '0')}
+          </span>
+          <div className="et-current-info">
+            <h2 className="et-current-name">{currentPhase?.name}</h2>
+            <p className="et-current-days">Days {currentPhase?.days}</p>
           </div>
         </div>
-      )}
+        
+        <div className="et-progress">
+          <div className="et-progress-bar">
+            <div 
+              className="et-progress-fill" 
+              style={{ width: `${progress.percent}%` }} 
+            />
+          </div>
+          <span className="et-progress-text">{progress.text}</span>
+        </div>
+      </div>
 
-      {/* Analysis Tab - ONE powerful insight */}
-      {activeTab === 'analysis' && (
-        <div className="et-analysis">
-          {!isPremium ? (
-            <div className="et-analysis-locked">
-              <FaLock className="et-analysis-locked-icon" />
-              <h3>Your Emotional Trajectory</h3>
-              <p>See how your energy, focus, confidence and more are trending over your journey</p>
-              {openPlanModal && (
-                <button className="et-analysis-locked-btn" onClick={openPlanModal}>
-                  Upgrade to Premium
-                </button>
-              )}
+      {/* Phase List — Open, no container */}
+      <div className="et-phases">
+        {phases.map((phase, index) => {
+          const status = getPhaseStatus(phase);
+          const isCurrent = phase.id === currentPhase?.id;
+          const isLocked = !isPremium && !isCurrent;
+          return (
+            <div 
+              key={phase.id}
+              className={`et-phase ${status}${isLocked ? ' et-phase-locked' : ''}`}
+              onClick={() => openPhase(phase)}
+            >
+              <div className="et-phase-num">
+                {String(index + 1).padStart(2, '0')}
+              </div>
+              <div className="et-phase-info">
+                <h3>{phase.name}</h3>
+                <p>Days {phase.days}</p>
+              </div>
+              <div className="et-phase-status">
+                {isLocked ? <FaLock /> : status === 'completed' && <FaCheck />}
+              </div>
             </div>
-          ) : (
-          <>
-          {/* YOUR PROGRESS - The core insight */}
-          <div className="insight-card">
-            <div className="insight-card-header">
-              <span>Your Progress</span>
-            </div>
-            <div className="insight-card-content">
-              {!analysis.hasData ? (
-                <div className="insight-empty">
-                  <p className="empty-message">{analysis.checkIns}/{analysis.needed} logs</p>
-                  <p className="empty-context">
-                    Log how you feel in the Tracker to build your emotional trajectory
-                  </p>
-                </div>
-              ) : (
-                <div className="trajectory-list">
-                  {analysis.trajectory.map((metric) => (
-                    <div key={metric.key} className="trajectory-row">
-                      <span className="trajectory-label">{metric.label}</span>
-                      <div className="trajectory-values">
-                        <span className="trajectory-early">{metric.early}</span>
-                        <span className="trajectory-arrow">→</span>
-                        <span className="trajectory-now">{metric.now}</span>
-                      </div>
-                      <span className={`trajectory-delta ${
-                        metric.improved ? 'improved' : 
-                        metric.declined ? 'declined' : 'stable'
-                      }`}>
-                        {metric.improved ? (metric.invert ? '↓' : '↑') : 
-                         metric.declined ? (metric.invert ? '↑' : '↓') : '→'} {metric.delta}
-                      </span>
+          );
+        })}
+      </div>
+
+      {/* Trajectory — Open section below phase list */}
+      <div className="et-trajectory">
+        {!isPremium ? (
+          <div className="et-trajectory-locked">
+            <FaLock className="et-trajectory-locked-icon" />
+            <h3>Your Emotional Trajectory</h3>
+            <p>See how your energy, focus, confidence and more are trending over your journey</p>
+            {openPlanModal && (
+              <button className="et-trajectory-locked-btn" onClick={openPlanModal}>
+                Upgrade to Premium
+              </button>
+            )}
+          </div>
+        ) : (
+        <>
+          <div className="et-trajectory-header">
+            <span>Your Progress</span>
+          </div>
+          <div className="et-trajectory-content">
+            {!analysis.hasData ? (
+              <div className="et-trajectory-empty">
+                <p className="empty-message">{analysis.checkIns}/{analysis.needed} logs</p>
+                <p className="empty-context">
+                  Log how you feel in the Tracker to build your emotional trajectory
+                </p>
+              </div>
+            ) : (
+              <div className="trajectory-list">
+                {analysis.trajectory.map((metric) => (
+                  <div key={metric.key} className="trajectory-row">
+                    <span className="trajectory-label">{metric.label}</span>
+                    <div className="trajectory-values">
+                      <span className="trajectory-early">{metric.early}</span>
+                      <span className="trajectory-arrow">→</span>
+                      <span className="trajectory-now">{metric.now}</span>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    <span className={`trajectory-delta ${
+                      metric.improved ? 'improved' : 
+                      metric.declined ? 'declined' : 'stable'
+                    }`}>
+                      {metric.improved ? (metric.invert ? '↓' : '↑') : 
+                       metric.declined ? (metric.invert ? '↑' : '↓') : '→'} {metric.delta}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* PHASE CONTEXT - Only show when we have trajectory data */}
+          {/* Phase Context — below trajectory when data exists */}
           {analysis.hasData && (
             <div className="phase-context">
               <div className="phase-context-inner">
@@ -503,10 +465,9 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
               </div>
             </div>
           )}
-          </>
-          )}
-        </div>
-      )}
+        </>
+        )}
+      </div>
 
       {/* Phase Modal - Enhanced with new content sections */}
       {showModal && selectedPhase && (

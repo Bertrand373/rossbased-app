@@ -35,51 +35,14 @@
    TABS - Text-only with dividers
    ============================================================================= */
 
-.et-tabs {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0;
-  margin-bottom: 48px;
-  animation: fadeInUp 500ms ease forwards;
-  opacity: 0;
-}
-
-.et-tab {
-  padding: 8px 16px;
-  background: transparent;
-  border: none;
-  color: var(--text-tertiary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: color 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.et-tab:hover:not(.active) {
-  color: var(--text-secondary);
-}
-
-.et-tab.active {
-  color: var(--text);
-  font-weight: 600;
-}
-
-.et-tab-divider {
-  width: 1px;
-  height: 16px;
-  background-color: var(--border-prominent);
-}
-
 /* =============================================================================
-   JOURNEY TAB
+   LAYOUT
    ============================================================================= */
 
-.et-journey {
+.et-container {
   display: flex;
   flex-direction: column;
+  align-items: center;
   width: 100%;
   max-width: 400px;
   animation: fadeInUp 500ms ease 50ms forwards;
@@ -169,10 +132,7 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  background: var(--surface-overlay);
-  border: 1px solid var(--border-subtle);
-  border-radius: 16px;
-  padding: 4px 20px;
+  padding: 0;
 }
 
 .et-phase {
@@ -445,31 +405,25 @@
    ANALYSIS TAB
    ============================================================================= */
 
-.et-analysis {
-  display: flex;
-  flex-direction: column;
+/* =============================================================================
+   TRAJECTORY SECTION (open, no container - matches Stats rhythm)
+   ============================================================================= */
+
+.et-trajectory {
   width: 100%;
-  max-width: 400px;
-  animation: fadeInUp 500ms ease 50ms forwards;
-  opacity: 0;
+  padding-top: 32px;
+  margin-top: 8px;
+  border-top: 1px solid var(--border-subtle);
 }
 
-.et-analysis .insight-card {
-  background: var(--surface-overlay);
-  border: 1px solid var(--border-subtle);
-  border-radius: 16px;
-  padding: 24px;
-  margin-bottom: 16px;
-}
-
-.et-analysis .insight-card-header {
+.et-trajectory-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
 }
 
-.et-analysis .insight-card-header span {
+.et-trajectory-header span {
   font-size: 0.6875rem;
   font-weight: 600;
   color: var(--text-muted);
@@ -477,29 +431,73 @@
   letter-spacing: 0.1em;
 }
 
-.et-analysis .insight-card-header .header-sub {
-  font-weight: 400;
-  color: var(--text-tertiary);
-  text-transform: none;
-  letter-spacing: 0;
-}
-
-.et-analysis .insight-empty {
+.et-trajectory-empty {
   padding: 20px 0;
   text-align: center;
 }
 
-.et-analysis .empty-message {
+.et-trajectory-empty .empty-message {
   font-size: 0.875rem;
   color: var(--text-muted);
   margin: 0 0 6px 0;
   font-weight: 500;
 }
 
-.et-analysis .empty-context {
+.et-trajectory-empty .empty-context {
   font-size: 0.75rem;
   color: var(--text-tertiary);
   margin: 0;
+}
+
+/* Locked state for free users */
+.et-trajectory-locked {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 16px;
+  gap: 12px;
+}
+
+.et-trajectory-locked-icon {
+  font-size: 1.25rem;
+  color: var(--text-muted, rgba(255,255,255,0.3));
+  margin-bottom: 4px;
+}
+
+.et-trajectory-locked h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.et-trajectory-locked p {
+  font-size: 0.8125rem;
+  color: var(--text-muted, rgba(255,255,255,0.45));
+  margin: 0;
+  line-height: 1.5;
+  max-width: 280px;
+}
+
+.et-trajectory-locked-btn {
+  margin-top: 8px;
+  padding: 10px 24px;
+  background: var(--text, #fff);
+  color: var(--background, #000);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 150ms ease;
+}
+
+.et-trajectory-locked-btn:active {
+  opacity: 0.8;
 }
 
 /* Trajectory List */
@@ -571,10 +569,9 @@
 
 /* Phase Context */
 .phase-context {
-  background: var(--surface-overlay);
-  border: 1px solid var(--border-subtle);
-  border-radius: 16px;
-  padding: 20px 24px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-subtle);
 }
 
 .phase-context-inner {
@@ -811,8 +808,6 @@
 
 @media (max-width: 480px) {
   .et-container { padding: 32px 16px 100px; }
-  .et-tabs { margin-bottom: 40px; }
-  .et-tab { padding: 8px 12px; font-size: 0.8125rem; }
   .et-current-header { gap: 10px; margin-bottom: 28px; }
   .et-current-num { font-size: 1.375rem; }
   .et-current-name { font-size: 0.875rem; }
@@ -835,8 +830,6 @@
 
 @media (max-width: 360px) {
   .et-container { padding: 28px 12px 90px; }
-  .et-tab { padding: 6px 10px; font-size: 0.75rem; }
-  .et-tab-divider { height: 12px; }
   .trajectory-values { gap: 6px; }
   .trajectory-label { min-width: 70px; font-size: 0.8125rem; }
   .trajectory-early, .trajectory-now { font-size: 0.8125rem; min-width: 24px; }
@@ -867,67 +860,12 @@
   font-size: 0.625rem;
 }
 
-/* Analysis tab locked state */
-.et-analysis-locked {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 64px 32px;
-  gap: 12px;
-  background: var(--surface-overlay);
-  border: 1px solid var(--border-subtle);
-  border-radius: 16px;
-}
-
-.et-analysis-locked-icon {
-  font-size: 1.25rem;
-  color: var(--text-muted, rgba(255,255,255,0.3));
-  margin-bottom: 4px;
-}
-
-.et-analysis-locked h3 {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--text, #fff);
-  margin: 0;
-  letter-spacing: -0.02em;
-}
-
-.et-analysis-locked p {
-  font-size: 0.8125rem;
-  color: var(--text-muted, rgba(255,255,255,0.45));
-  margin: 0;
-  line-height: 1.5;
-  max-width: 280px;
-}
-
-.et-analysis-locked-btn {
-  margin-top: 8px;
-  padding: 10px 24px;
-  background: var(--text, #fff);
-  color: var(--background, #000);
-  border: none;
-  border-radius: 8px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: opacity 150ms ease;
-}
-
-.et-analysis-locked-btn:active {
-  opacity: 0.8;
-}
-
 /* =============================================================================
    REDUCED MOTION
    ============================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .et-tabs, .et-journey, .et-checkin, .et-analysis {
+  .et-container, .et-current, .et-trajectory {
     animation: none;
     opacity: 1;
   }
