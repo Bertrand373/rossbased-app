@@ -469,20 +469,25 @@
 .et-trajectory-locked-btn {
   margin-top: 8px;
   padding: 10px 24px;
-  background: var(--text, #fff);
-  color: var(--background, #000);
-  border: none;
-  border-radius: 8px;
+  background: var(--surface-overlay);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
   font-size: 0.8125rem;
   font-weight: 600;
+  font-family: inherit;
   letter-spacing: -0.01em;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: opacity 150ms ease;
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.et-trajectory-locked-btn:hover {
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .et-trajectory-locked-btn:active {
-  opacity: 0.8;
+  transform: scale(0.98);
 }
 
 /* Trajectory List */

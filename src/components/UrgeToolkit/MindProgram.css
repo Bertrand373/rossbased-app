@@ -431,21 +431,24 @@
   display: block;
   margin: 16px auto 0;
   padding: 10px 24px;
-  border-radius: 8px;
-  border: 1px solid var(--border-prominent);
-  background: transparent;
-  color: var(--text-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-overlay);
+  color: var(--text);
   font-size: 0.8125rem;
-  font-weight: 500;
+  font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: border-color 150ms ease, transform 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .mp-locked-btn:hover {
-  background: var(--surface-overlay);
-  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.mp-locked-btn:active {
+  transform: scale(0.98);
 }
 
 /* =============================================================================
