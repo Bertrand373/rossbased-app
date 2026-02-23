@@ -46,6 +46,8 @@
   border: 1px solid var(--border-subtle);
   border-radius: 16px;
   margin-bottom: 16px;
+  animation: fadeInUp 500ms ease forwards;
+  opacity: 0;
 }
 
 .et-current:hover { opacity: 0.8; }
@@ -121,6 +123,8 @@
   gap: 0;
   padding: 0;
   width: 100%;
+  animation: fadeInUp 500ms ease 100ms forwards;
+  opacity: 0;
 }
 
 .et-phase {
@@ -398,6 +402,8 @@
   padding-top: 32px;
   margin-top: 8px;
   border-top: 1px solid var(--border-subtle);
+  animation: fadeInUp 500ms ease 200ms forwards;
+  opacity: 0;
 }
 
 .et-trajectory-header {
@@ -849,7 +855,7 @@
    ============================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .et-container, .et-current, .et-trajectory {
+  .et-container, .et-current, .et-phases, .et-trajectory {
     animation: none;
     opacity: 1;
   }
