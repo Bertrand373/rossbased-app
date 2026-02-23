@@ -1,0 +1,131 @@
+/* src/styles/BottomSheet.css */
+/* Single source of truth — extracted from Oracle (AIChat.css) */
+/* Every bottom sheet in the app imports this file */
+
+/* ============================================================
+   BACKDROP
+   ============================================================ */
+
+.sheet-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0);
+  z-index: 9000;
+  pointer-events: none;
+  transition: background-color 300ms ease;
+}
+
+.sheet-backdrop.open {
+  background-color: var(--overlay-bg);
+  pointer-events: auto;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* ============================================================
+   PANEL — matches ai-chat-panel exactly
+   No border. No max-width on mobile. 16px radius.
+   ============================================================ */
+
+.sheet-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  transform: translateY(100%);
+  transition: transform 300ms ease;
+  pointer-events: none;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.sheet-panel.open {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* ============================================================
+   HEADER — swipe pill + touch target
+   ============================================================ */
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 0 0;
+  flex-shrink: 0;
+}
+
+/* Mobile: pill indicator + expanded touch zone */
+@media (max-width: 767px) {
+  .sheet-header {
+    position: relative;
+    padding-top: 20px;
+    touch-action: none;
+  }
+
+  .sheet-header::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 4px;
+    background: var(--border-prominent);
+    border-radius: 2px;
+    opacity: 0.5;
+  }
+}
+
+/* ============================================================
+   DESKTOP — centered floating card
+   ============================================================ */
+
+@media (min-width: 768px) {
+  .sheet-panel {
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    top: 50%;
+    width: 400px;
+    border-radius: 20px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    padding-bottom: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+    opacity: 0;
+    transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
+  }
+
+  .sheet-panel.open {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+
+  .sheet-header::before {
+    display: none;
+  }
+
+  [data-theme="light"] .sheet-panel {
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet-backdrop,
+  .sheet-panel {
+    transition: none;
+  }
+}

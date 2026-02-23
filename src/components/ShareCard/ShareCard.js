@@ -6,6 +6,7 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
 import './ShareCard.css';
+import '../../styles/BottomSheet.css';
 
 // Share icon (iOS style)
 const ShareIcon = () => (
@@ -329,17 +330,17 @@ const ShareCard = ({ userData, isVisible = true }) => {
       {/* Preview Modal - always in DOM when showPreview, animated via .open class */}
       {showPreview && (
         <div 
-          className={`share-modal-overlay${previewOpen ? ' open' : ''}`} 
+          className={`sheet-backdrop${previewOpen ? ' open' : ''}`} 
           onClick={closePreview}
         >
           <div 
             ref={panelRef}
-            className={`share-modal${previewOpen ? ' open' : ''}`} 
+            className={`sheet-panel share-sheet${previewOpen ? ' open' : ''}`} 
             onClick={e => e.stopPropagation()}
           >
             {/* Header - swipe target + X close */}
             <div 
-              className="share-modal-header"
+              className="sheet-header share-sheet-header"
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}

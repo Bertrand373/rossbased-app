@@ -1061,89 +1061,19 @@
 }
 
 /* =============================================================================
-   BOTTOM SHEET - Oracle pattern for Day Info + Moon Detail
+   BOTTOM SHEET — content overrides (positioning via BottomSheet.css)
+   Used by: Day Info, Moon Detail
    ============================================================================= */
 
-.cal-sheet-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0);
-  z-index: 10000;
-  pointer-events: none;
-  transition: background-color 300ms ease;
-}
-
-.cal-sheet-backdrop.open {
-  background-color: var(--overlay-bg);
-  pointer-events: auto;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-.cal-sheet-panel {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 10001;
-  display: flex;
-  flex-direction: column;
-  max-width: 400px;
+/* Calendar sheet content sizing */
+.cal-sheet {
   max-height: 85dvh;
-  margin: 0 auto;
-  background: var(--background);
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  border: 1px solid var(--border);
-  border-bottom: none;
-  padding: 0 24px;
-  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-  transform: translateY(100%);
-  transition: transform 300ms ease;
-  pointer-events: none;
+  padding: 0 20px 20px;
   overflow: hidden;
 }
 
-.cal-sheet-panel.open {
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.cal-sheet-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 12px 0 0;
-  flex-shrink: 0;
-}
-
-@media (max-width: 767px) {
-  .cal-sheet-header::before {
-    content: '';
-    position: absolute;
-    top: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 36px;
-    height: 4px;
-    background: var(--border-prominent);
-    border-radius: 2px;
-    opacity: 0.5;
-  }
-
-  .cal-sheet-header {
-    position: relative;
-    padding-top: 20px;
-    touch-action: none;
-  }
-}
-
 /* Override calendar-modal when inside sheet panel */
-.cal-sheet-panel .calendar-modal {
+.cal-sheet .calendar-modal {
   animation: none !important;
   max-height: none;
   width: 100%;
@@ -1151,55 +1081,22 @@
 }
 
 /* Day Info flexes to fill panel, internal content scrolls */
-.cal-sheet-panel .calendar-day-info {
+.cal-sheet .calendar-day-info {
   flex: 1;
   min-height: 0;
   overflow: hidden;
 }
 
 /* Footer inside sheet needs no extra bottom padding (panel handles safe area) */
-.cal-sheet-panel .calendar-modal-footer,
-.cal-sheet-panel .moon-detail-footer {
+.cal-sheet .calendar-modal-footer,
+.cal-sheet .moon-detail-footer {
   padding-bottom: 0;
 }
 
 /* Moon detail centering inside sheet */
-.cal-sheet-panel .moon-detail-modal {
+.cal-sheet .moon-detail-modal {
   animation: none !important;
   text-align: center;
-}
-
-/* Desktop: centered floating card */
-@media (min-width: 768px) {
-  .cal-sheet-panel {
-    left: 50%;
-    right: auto;
-    bottom: auto;
-    top: 50%;
-    width: 400px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
-    padding-bottom: 24px;
-    transform: translate(-50%, -50%) scale(0.96);
-    opacity: 0;
-    transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
-  }
-
-  .cal-sheet-panel.open {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-  }
-
-  .cal-sheet-header::before {
-    display: none;
-  }
-}
-
-@media (min-width: 768px) {
-  [data-theme="light"] .cal-sheet-panel {
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.08);
-  }
 }
 
 /* =============================================================================

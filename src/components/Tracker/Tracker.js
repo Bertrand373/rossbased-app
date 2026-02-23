@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
 import './Tracker.css';
+import '../../styles/BottomSheet.css';
 import DatePicker from '../Shared/DatePicker';
 import PatternInsightCard from '../PatternInsight/PatternInsightCard';
 import EnergyAlmanac from '../EnergyAlmanac/EnergyAlmanac';
@@ -583,10 +584,10 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
       {/* Streak Options */}
       {showStreakOptions && (
-        <div className={`tracker-sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowStreakOptions(false))}>
-          <div ref={sheetPanelRef} className={`tracker-sheet-panel${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowStreakOptions(false))}>
+          <div ref={sheetPanelRef} className={`sheet-panel tracker-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div 
-              className="tracker-sheet-header"
+              className="sheet-header"
               onTouchStart={handleSheetTouchStart}
               onTouchMove={handleSheetTouchMove}
               onTouchEnd={handleSheetTouchEnd}
@@ -620,10 +621,10 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
       {/* Reset Confirm */}
       {showResetConfirm && (
-        <div className={`tracker-sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowResetConfirm(false))}>
-          <div ref={sheetPanelRef} className={`tracker-sheet-panel${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowResetConfirm(false))}>
+          <div ref={sheetPanelRef} className={`sheet-panel tracker-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div 
-              className="tracker-sheet-header"
+              className="sheet-header"
               onTouchStart={handleSheetTouchStart}
               onTouchMove={handleSheetTouchMove}
               onTouchEnd={handleSheetTouchEnd}
@@ -652,10 +653,10 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
       {/* Benefit Logging Lock — Free users past day 30 */}
       {showLogLock && (
-        <div className={`tracker-sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowLogLock(false))}>
-          <div ref={sheetPanelRef} className={`tracker-sheet-panel${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowLogLock(false))}>
+          <div ref={sheetPanelRef} className={`sheet-panel tracker-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div 
-              className="tracker-sheet-header"
+              className="sheet-header"
               onTouchStart={handleSheetTouchStart}
               onTouchMove={handleSheetTouchMove}
               onTouchEnd={handleSheetTouchEnd}

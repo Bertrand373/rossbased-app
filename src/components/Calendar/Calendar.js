@@ -7,6 +7,7 @@ import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSa
 import toast from 'react-hot-toast';
 import './CalendarBase.css';
 import './CalendarModals.css';
+import '../../styles/BottomSheet.css';
 
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
@@ -1158,10 +1159,10 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           DAY INFO - Bottom Sheet
           ================================================================ */}
       {dayInfoModal && selectedDate && (
-        <div className={`cal-sheet-backdrop${calSheetReady ? ' open' : ''}`} onClick={() => closeCalSheet(closeDayInfo)}>
-          <div ref={calSheetPanelRef} className={`cal-sheet-panel${calSheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+        <div className={`sheet-backdrop${calSheetReady ? ' open' : ''}`} onClick={() => closeCalSheet(closeDayInfo)}>
+          <div ref={calSheetPanelRef} className={`sheet-panel cal-sheet${calSheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div 
-              className="cal-sheet-header"
+              className="sheet-header"
               onTouchStart={handleCalSheetTouchStart}
               onTouchMove={handleCalSheetTouchMove}
               onTouchEnd={handleCalSheetTouchEnd}
@@ -1272,10 +1273,10 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           MOON DETAIL - Bottom Sheet
           ================================================================ */}
       {moonDetailModal && selectedMoonDate && (
-        <div className={`cal-sheet-backdrop${calSheetReady ? ' open' : ''}`} onClick={() => closeCalSheet(closeMoonDetail)}>
-          <div ref={calSheetPanelRef} className={`cal-sheet-panel${calSheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+        <div className={`sheet-backdrop${calSheetReady ? ' open' : ''}`} onClick={() => closeCalSheet(closeMoonDetail)}>
+          <div ref={calSheetPanelRef} className={`sheet-panel cal-sheet${calSheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div 
-              className="cal-sheet-header"
+              className="sheet-header"
               onTouchStart={handleCalSheetTouchStart}
               onTouchMove={handleCalSheetTouchMove}
               onTouchEnd={handleCalSheetTouchEnd}
