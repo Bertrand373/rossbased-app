@@ -224,16 +224,19 @@ const Landing = ({ onLogin }) => {
 
         <div className="landing-journey-steps">
           <div className="landing-step">
+            <span className="landing-step-num">1</span>
             <span className="landing-step-time">Week 1</span>
             <h3 className="landing-step-title">Track</h3>
             <p className="landing-step-desc">
               Log daily. The system observes your energy, focus, habits, and emotional state.
+              Every entry sharpens the model.
             </p>
           </div>
 
           <div className="landing-step-line" />
 
           <div className="landing-step">
+            <span className="landing-step-num">2</span>
             <span className="landing-step-time">Week 2–3</span>
             <h3 className="landing-step-title">Learn</h3>
             <p className="landing-step-desc">
@@ -245,6 +248,7 @@ const Landing = ({ onLogin }) => {
           <div className="landing-step-line" />
 
           <div className="landing-step">
+            <span className="landing-step-num">3</span>
             <span className="landing-step-time">Week 3+</span>
             <h3 className="landing-step-title">Predict</h3>
             <p className="landing-step-desc">
