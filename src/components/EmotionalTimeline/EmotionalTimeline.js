@@ -4,7 +4,7 @@
 import React, { useState, useRef, useCallback } from 'react';
 import './EmotionalTimeline.css';
 import '../../styles/BottomSheet.css';
-import { FaCheck, FaExclamationTriangle, FaLock } from 'react-icons/fa';
+import { FaCheck, FaExclamationTriangle } from 'react-icons/fa';
 
 // Body scroll lock for modals
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
@@ -451,7 +451,7 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
                 <p>Days {phase.days}</p>
               </div>
               <div className="et-phase-status">
-                {isLocked ? <FaLock /> : status === 'completed' && <FaCheck />}
+                {status === 'completed' && <FaCheck />}
               </div>
             </div>
           );
@@ -462,9 +462,8 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
       <div className="et-trajectory">
         {!isPremium ? (
           <div className="et-trajectory-locked">
-            <FaLock className="et-trajectory-locked-icon" />
             <h3>Your Emotional Trajectory</h3>
-            <p>See how your energy, focus, confidence and more are trending over your journey</p>
+            <p>Track how each phase shifts your baseline — early days vs. now</p>
             {openPlanModal && (
               <button className="et-trajectory-locked-btn" onClick={openPlanModal}>
                 Upgrade to Premium

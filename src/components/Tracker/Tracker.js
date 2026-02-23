@@ -664,10 +664,10 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
               onTouchEnd={handleSheetTouchEnd}
             />
             <div className="confirm-modal">
-              <h2>Logging Locked</h2>
+              <h2>Free Logs Used</h2>
               <p>
                 You've used all {FREE_LOG_LIMIT} free benefit logs. 
-                Upgrade to Premium for unlimited logging, full analytics, and ML predictions.
+                Go Premium for unlimited logging, full analytics, and ML predictions.
               </p>
               <div className="confirm-actions">
                 <button className="btn-primary" onClick={() => closeSheet(() => { setShowLogLock(false); onUpgrade(); })}>Upgrade</button>
@@ -718,7 +718,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
           className={`${todayLogged ? 'btn-logged' : 'btn-primary'} benefits-trigger`}
           onClick={() => canLogBenefits ? setShowBenefits(true) : setShowLogLock(true)}
         >
-          {todayLogged ? 'Logged Today ✓' : canLogBenefits ? 'Log Today' : 'Log Today 🔒'}
+          {todayLogged ? 'Logged Today ✓' : 'Log Today'}
         </button>
       </footer>
 

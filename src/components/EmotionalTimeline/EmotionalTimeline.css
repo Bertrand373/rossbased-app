@@ -444,12 +444,6 @@
   gap: 12px;
 }
 
-.et-trajectory-locked-icon {
-  font-size: 1.25rem;
-  color: var(--text-muted, rgba(255,255,255,0.3));
-  margin-bottom: 4px;
-}
-
 .et-trajectory-locked h3 {
   font-size: 1rem;
   font-weight: 500;
@@ -809,11 +803,6 @@
 /* Locked phase rows - dimmed with lock icon */
 .et-phase.et-phase-locked {
   opacity: 0.35;
-}
-
-.et-phase.et-phase-locked .et-phase-status {
-  color: var(--text-muted, rgba(255,255,255,0.45));
-  font-size: 0.625rem;
 }
 
 /* =============================================================================
