@@ -64,36 +64,44 @@ const Landing = ({ onLogin }) => {
       </header>
 
       {/* ============================================================
-          HERO — Logo, headline, video, CTA
+          HERO — Split layout: copy left, video right on desktop
           ============================================================ */}
       <section className="landing-hero">
-        <h1 className="landing-headline">
-          Your patterns are predictable.<br />
-          <span className="landing-headline-accent">Now they work for you.</span>
-        </h1>
+        <div className="landing-hero-inner">
+          <div className="landing-hero-copy">
+            <h1 className="landing-headline">
+              Your patterns are predictable.<br />
+              <span className="landing-headline-accent">Now they work for you.</span>
+            </h1>
 
-        <p className="landing-sub">
-          The AI-powered retention tracker that learns your vulnerabilities
-          and intervenes before you relapse.
-        </p>
+            <p className="landing-sub">
+              The AI-powered retention tracker that learns your vulnerabilities
+              and intervenes before you relapse.
+            </p>
 
-        {/* Demo video */}
-        <div className="landing-video-wrap">
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="landing-video"
-          >
-            <source src="/videos/demo.mp4" type="video/mp4" />
-          </video>
+            <button className="landing-cta" onClick={openAuth}>
+              Get Started Free
+            </button>
+            <p className="landing-trial-note">Free forever · Premium when you're ready</p>
+          </div>
+
+          {/* Demo video */}
+          <div className="landing-hero-video">
+            <div className="landing-video-wrap">
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                poster="/videos/demo-poster.jpg"
+                className="landing-video"
+              >
+                <source src="/videos/demo.mp4" type="video/mp4" />
+              </video>
+            </div>
+          </div>
         </div>
-
-        <button className="landing-cta" onClick={openAuth}>
-          Get Started Free
-        </button>
-        <p className="landing-trial-note">Free forever · Premium when you're ready</p>
       </section>
 
       {/* ============================================================
@@ -230,7 +238,7 @@ const Landing = ({ onLogin }) => {
             <span className="landing-step-time">Week 2–3</span>
             <h3 className="landing-step-title">Learn</h3>
             <p className="landing-step-desc">
-              The neural network silently trains on your patterns.
+              The neural network trains on your patterns.
               It identifies your danger zones, your vulnerable hours, your triggers.
             </p>
           </div>

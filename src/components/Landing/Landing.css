@@ -165,7 +165,7 @@
 }
 
 /* ============================================================
-   HERO
+   HERO — Split layout on desktop, stacked on mobile
    ============================================================ */
 
 .landing-hero {
@@ -176,6 +176,31 @@
   padding: 120px 24px 80px;
   position: relative;
   z-index: 1;
+}
+
+/* Inner container — becomes side-by-side on desktop */
+.landing-hero-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 960px;
+  gap: 48px;
+}
+
+/* Copy block — headline, sub, CTA */
+.landing-hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Video block */
+.landing-hero-video {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .landing-headline {
@@ -198,14 +223,13 @@
   color: rgba(255, 255, 255, 0.5);
   line-height: 1.6;
   max-width: 440px;
-  margin: 0 0 48px 0;
+  margin: 0 0 36px 0;
 }
 
 /* Video wrapper — soft ambient glow from the screen */
 .landing-video-wrap {
   width: 100%;
   max-width: 300px;
-  margin: 0 auto 48px;
   border-radius: 20px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -221,6 +245,66 @@
   width: 100%;
   display: block;
   border-radius: 20px;
+}
+
+/* Desktop split hero — text left, video right */
+@media (min-width: 769px) {
+  .landing-hero {
+    padding: 140px 48px 100px;
+  }
+
+  .landing-hero-inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 64px;
+  }
+
+  .landing-hero-copy {
+    flex: 1;
+    align-items: flex-start;
+    text-align: left;
+    min-width: 0;
+  }
+
+  .landing-hero-video {
+    flex-shrink: 0;
+  }
+
+  .landing-video-wrap {
+    max-width: 280px;
+  }
+
+  .landing-trial-note {
+    text-align: left;
+  }
+
+  .landing-headline {
+    font-size: 2.75rem;
+  }
+
+  .landing-sub {
+    max-width: 480px;
+  }
+}
+
+/* Larger desktops — more room */
+@media (min-width: 1024px) {
+  .landing-hero {
+    padding: 160px 64px 120px;
+  }
+
+  .landing-hero-inner {
+    gap: 80px;
+  }
+
+  .landing-video-wrap {
+    max-width: 320px;
+  }
+
+  .landing-headline {
+    font-size: 3rem;
+  }
 }
 
 /* ============================================================
@@ -259,12 +343,12 @@
 }
 
 /* ============================================================
-   FEATURES
+   FEATURES — wider on desktop
    ============================================================ */
 
 .landing-features {
   padding: 80px 24px;
-  max-width: 800px;
+  max-width: 960px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
@@ -275,6 +359,12 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 48px 40px;
+}
+
+@media (min-width: 769px) {
+  .landing-features-grid {
+    gap: 56px 64px;
+  }
 }
 
 .landing-feature {
@@ -341,12 +431,12 @@
 }
 
 /* ============================================================
-   JOURNEY — How it works
+   JOURNEY — How it works — wider with connecting line on desktop
    ============================================================ */
 
 .landing-journey {
   padding: 80px 24px;
-  max-width: 700px;
+  max-width: 800px;
   margin: 0 auto;
   position: relative;
   z-index: 1;
@@ -357,6 +447,27 @@
   display: flex;
   align-items: stretch;
   gap: 0;
+  position: relative;
+}
+
+/* Desktop: horizontal connecting line behind the steps */
+@media (min-width: 769px) {
+  .landing-journey-steps::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 15%;
+    right: 15%;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.06) 15%,
+      rgba(255, 255, 255, 0.06) 85%,
+      transparent 100%
+    );
+    z-index: 0;
+  }
 }
 
 .landing-step {
@@ -366,6 +477,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
 .landing-step-time {
@@ -486,7 +599,7 @@
    ============================================================ */
 
 .landing-footer {
-  padding: 56px 24px 40px;
+  padding: 40px 24px 32px;
   text-align: center;
   position: relative;
   z-index: 1;
@@ -503,10 +616,10 @@
 }
 
 .landing-footer-icon {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   object-fit: contain;
-  opacity: 0.3;
+  opacity: 0.4;
   transition: opacity 300ms ease;
 }
 
@@ -704,7 +817,11 @@
 
   .landing-video-wrap {
     max-width: 260px;
-    margin-bottom: 36px;
+    margin: 0 auto;
+  }
+
+  .landing-hero-inner {
+    gap: 36px;
   }
 
   .landing-cta {
@@ -820,7 +937,6 @@
   .landing-video-wrap {
     max-width: 240px;
     border-radius: 16px;
-    margin-bottom: 32px;
   }
 
   .landing-video {
