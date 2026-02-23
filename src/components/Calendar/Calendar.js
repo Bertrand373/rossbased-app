@@ -1,6 +1,6 @@
 // components/Calendar/Calendar.js - TITANTRACK ELITE
 // Two CSS files: CalendarBase.css + CalendarModals.css
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, differenceInDays, isAfter,
   startOfWeek as getWeekStart, addWeeks, subWeeks } from 'date-fns';
@@ -107,12 +107,34 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [moonDetailModal, setMoonDetailModal] = useState(false);
   const [selectedMoonDate, setSelectedMoonDate] = useState(null);
 
+  // Overlay animation state
+  const [calOverlayReady, setCalOverlayReady] = useState(false);
+
   // Journal states
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [noteText, setNoteText] = useState('');
 
   // Lock body scroll when any modal is open
   useBodyScrollLock(dayInfoModal || editDayModal || moonDetailModal);
+
+  // Overlay animation: trigger .cal-ready class after mount
+  useEffect(() => {
+    if (dayInfoModal || editDayModal || moonDetailModal) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setCalOverlayReady(true));
+      });
+    } else {
+      setCalOverlayReady(false);
+    }
+  }, [dayInfoModal, editDayModal, moonDetailModal]);
+
+  // Animate overlay out then run callback
+  const closeCalOverlay = useCallback((callback) => {
+    setCalOverlayReady(false);
+    setTimeout(() => {
+      callback();
+    }, 300);
+  }, []);
 
 
   // Get trigger options from unified constants (Calendar shows ALL triggers)
@@ -1057,7 +1079,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           Single overlay stays mounted during transitions, no flash
           ================================================================ */}
       {(dayInfoModal || editDayModal) && selectedDate && (
-        <div className="calendar-overlay">
+        <div className={`calendar-overlay cal-transition${calOverlayReady ? ' cal-ready' : ''}`}>
           
           {/* DAY INFO MODAL */}
           {dayInfoModal && (
@@ -1121,7 +1143,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                         Edit Day
                       </button>
                     )}
-                    <button className="calendar-btn-ghost" onClick={closeDayInfo}>
+                    <button className="calendar-btn-ghost" onClick={() => closeCalOverlay(closeDayInfo)}>
                       Close
                     </button>
                   </div>
@@ -1166,7 +1188,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           MOON DETAIL MODAL - Premium lunar information
           ================================================================ */}
       {moonDetailModal && selectedMoonDate && (
-        <div className="calendar-overlay">
+        <div className={`calendar-overlay cal-transition${calOverlayReady ? ' cal-ready' : ''}`}>
           <div className="calendar-modal moon-detail-modal" onClick={e => e.stopPropagation()}>
             {(() => {
               const lunar = getLunarData(selectedMoonDate);
@@ -1198,7 +1220,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                   </div>
                   
                   <div className="moon-detail-footer">
-                    <button className="calendar-btn-ghost" onClick={closeMoonDetail}>
+                    <button className="calendar-btn-ghost" onClick={() => closeCalOverlay(closeMoonDetail)}>
                       Close
                     </button>
                   </div>

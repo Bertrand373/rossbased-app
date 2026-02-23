@@ -1059,3 +1059,37 @@
     padding-bottom: 8px;
   }
 }
+
+/* =============================================================================
+   SMOOTH OVERLAY CLOSE - Transition layer over .calendar-overlay
+   ============================================================================= */
+
+.calendar-overlay.cal-transition {
+  animation: none !important;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.calendar-overlay.cal-transition.cal-ready {
+  opacity: 1;
+}
+
+.cal-transition .calendar-modal {
+  animation: none !important;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 300ms cubic-bezier(0.16, 1, 0.3, 1), transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cal-transition .moon-detail-modal {
+  animation: none !important;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 300ms cubic-bezier(0.16, 1, 0.3, 1), transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cal-transition.cal-ready .calendar-modal,
+.cal-transition.cal-ready .moon-detail-modal {
+  opacity: 1;
+  transform: none;
+}
