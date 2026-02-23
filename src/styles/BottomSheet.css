@@ -96,30 +96,30 @@
 .sheet-close {
   position: absolute;
   right: 0;
-  top: 14px;
-  width: 32px;
-  height: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
   border: none;
   border-radius: 50%;
-  color: var(--text-tertiary);
-  font-size: 1.125rem;
+  color: var(--text-muted);
   cursor: pointer;
   padding: 0;
-  transition: color 150ms ease, background 150ms ease;
+  transition: all 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .sheet-close:hover {
+  background-color: var(--surface-overlay);
   color: var(--text-secondary);
-  background: var(--surface-overlay);
 }
 
 .sheet-close:active {
-  transform: scale(0.92);
+  transform: translateY(-50%) scale(0.92);
 }
 
 /* ============================================================

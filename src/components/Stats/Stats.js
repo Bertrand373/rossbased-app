@@ -693,7 +693,9 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => { setShowMilestoneModal(false); setSelectedMilestone(null); })}>
           <div ref={sheetPanelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd}>
-              <button className="sheet-close" onClick={() => closeSheet(() => { setShowMilestoneModal(false); setSelectedMilestone(null); })} aria-label="Close">✕</button>
+              <button className="sheet-close" onClick={() => closeSheet(() => { setShowMilestoneModal(false); setSelectedMilestone(null); })} aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
             </div>
             <div className="modal" style={{ animation: 'none' }}>
               <span className="modal-num">{selectedMilestone.days}</span>

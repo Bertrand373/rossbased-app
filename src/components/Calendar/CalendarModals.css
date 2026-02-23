@@ -114,9 +114,10 @@
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  padding: 16px 0 8px 0;
-  mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black 100%);
+  padding: 16px 0 24px 0;
+  padding-bottom: 24px;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
 }
 
 .calendar-modal-content::-webkit-scrollbar { display: none; }
@@ -638,8 +639,9 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 8px 0;
-  mask-image: linear-gradient(to bottom, transparent 0%, black 8px, black 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8px, black 100%);
+  padding-bottom: 16px;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 8px, black calc(100% - 8px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8px, black calc(100% - 8px), transparent 100%);
 }
 
 .calendar-triggers-list::-webkit-scrollbar { width: 2px; }
