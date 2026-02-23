@@ -1,6 +1,6 @@
 // components/Calendar/Calendar.js - TITANTRACK ELITE
 // Two CSS files: CalendarBase.css + CalendarModals.css
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
   isSameDay, subMonths, addMonths, differenceInDays, isAfter,
   startOfWeek as getWeekStart, addWeeks, subWeeks } from 'date-fns';
@@ -109,24 +109,48 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
   // Overlay animation state
   const [calOverlayReady, setCalOverlayReady] = useState(false);
+  const [calSheetReady, setCalSheetReady] = useState(false);
+  const calSheetPanelRef = useRef(null);
+  const calSheetTouchStartY = useRef(0);
+  const calSheetTouchDeltaY = useRef(0);
+  const calSheetIsDragging = useRef(false);
 
   // Journal states
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [noteText, setNoteText] = useState('');
 
-  // Lock body scroll when any modal is open
-  useBodyScrollLock(dayInfoModal || editDayModal || moonDetailModal);
+  // Only lock body scroll for full-screen Edit Day (sheets handle their own containment)
+  useBodyScrollLock(editDayModal);
 
-  // Overlay animation: trigger .cal-ready class after mount
+  // Sheet animation: trigger .open class for Day Info + Moon Detail
   useEffect(() => {
-    if (dayInfoModal || editDayModal || moonDetailModal) {
+    if (dayInfoModal || moonDetailModal) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setCalSheetReady(true));
+      });
+    } else {
+      setCalSheetReady(false);
+    }
+  }, [dayInfoModal, moonDetailModal]);
+
+  // Overlay animation: trigger .cal-ready class for Edit Day
+  useEffect(() => {
+    if (editDayModal) {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setCalOverlayReady(true));
       });
     } else {
       setCalOverlayReady(false);
     }
-  }, [dayInfoModal, editDayModal, moonDetailModal]);
+  }, [editDayModal]);
+
+  // Animate sheet out then run callback
+  const closeCalSheet = useCallback((callback) => {
+    setCalSheetReady(false);
+    setTimeout(() => {
+      callback();
+    }, 300);
+  }, []);
 
   // Animate overlay out then run callback
   const closeCalOverlay = useCallback((callback) => {
@@ -134,6 +158,57 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setTimeout(() => {
       callback();
     }, 300);
+  }, []);
+
+  // Swipe-to-close for sheets (mobile)
+  const handleCalSheetTouchStart = useCallback((e) => {
+    calSheetTouchStartY.current = e.touches[0].clientY;
+    calSheetTouchDeltaY.current = 0;
+    calSheetIsDragging.current = false;
+  }, []);
+
+  const handleCalSheetTouchMove = useCallback((e) => {
+    const delta = e.touches[0].clientY - calSheetTouchStartY.current;
+    if (delta < 0) return;
+    if (delta > 10) {
+      calSheetIsDragging.current = true;
+      calSheetTouchDeltaY.current = delta;
+      if (calSheetPanelRef.current) {
+        calSheetPanelRef.current.style.transition = 'none';
+        calSheetPanelRef.current.style.transform = `translateY(${delta}px)`;
+      }
+    }
+  }, []);
+
+  const handleCalSheetTouchEnd = useCallback(() => {
+    if (!calSheetIsDragging.current) return;
+    if (calSheetTouchDeltaY.current > 100 && calSheetPanelRef.current) {
+      calSheetPanelRef.current.style.transition = 'transform 250ms ease-out';
+      calSheetPanelRef.current.style.transform = 'translateY(100%)';
+      setTimeout(() => {
+        if (calSheetPanelRef.current) {
+          calSheetPanelRef.current.style.transition = '';
+          calSheetPanelRef.current.style.transform = '';
+        }
+        setCalSheetReady(false);
+        setDayInfoModal(false);
+        setMoonDetailModal(false);
+        setSelectedDate(null);
+        setSelectedMoonDate(null);
+        setIsEditingNote(false);
+        setNoteText('');
+      }, 250);
+    } else if (calSheetPanelRef.current) {
+      calSheetPanelRef.current.style.transition = 'transform 250ms ease-out';
+      calSheetPanelRef.current.style.transform = '';
+      setTimeout(() => {
+        if (calSheetPanelRef.current) {
+          calSheetPanelRef.current.style.transition = '';
+        }
+      }, 250);
+    }
+    calSheetIsDragging.current = false;
+    calSheetTouchDeltaY.current = 0;
   }, []);
 
 
@@ -280,11 +355,13 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   };
 
   const showEditFromInfo = () => {
-    setEditDayModal(true);
-    setDayInfoModal(false);
-    setSelectedTrigger('');
-    setShowTriggerSelection(false);
-    setEditingExistingTrigger(false);
+    closeCalSheet(() => {
+      setDayInfoModal(false);
+      setEditDayModal(true);
+      setSelectedTrigger('');
+      setShowTriggerSelection(false);
+      setEditingExistingTrigger(false);
+    });
   };
 
   const closeEditModal = () => {
@@ -295,11 +372,13 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   };
 
   const backToDayInfo = () => {
-    setDayInfoModal(true);
-    setEditDayModal(false);
-    setShowTriggerSelection(false);
-    setEditingExistingTrigger(false);
-    setSelectedTrigger('');
+    closeCalOverlay(() => {
+      setEditDayModal(false);
+      setDayInfoModal(true);
+      setShowTriggerSelection(false);
+      setEditingExistingTrigger(false);
+      setSelectedTrigger('');
+    });
   };
 
   // Moon detail modal handlers
@@ -1074,17 +1153,20 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         );
       })()}
 
+
       {/* ================================================================
-          DAY INFO + EDIT DAY - SHARED OVERLAY
-          Single overlay stays mounted during transitions, no flash
+          DAY INFO - Bottom Sheet
           ================================================================ */}
-      {(dayInfoModal || editDayModal) && selectedDate && (
-        <div className={`calendar-overlay cal-transition${calOverlayReady ? ' cal-ready' : ''}`}>
-          
-          {/* DAY INFO MODAL */}
-          {dayInfoModal && (
-          <div className="calendar-modal calendar-day-info has-scrollable-content" onClick={e => e.stopPropagation()}>
-            
+      {dayInfoModal && selectedDate && (
+        <div className={`cal-sheet-backdrop${calSheetReady ? ' open' : ''}`} onClick={() => closeCalSheet(closeDayInfo)}>
+          <div ref={calSheetPanelRef} className={`cal-sheet-panel${calSheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div 
+              className="cal-sheet-header"
+              onTouchStart={handleCalSheetTouchStart}
+              onTouchMove={handleCalSheetTouchMove}
+              onTouchEnd={handleCalSheetTouchEnd}
+            />
+            <div className="calendar-modal calendar-day-info has-scrollable-content">
             {(() => {
               const dayBenefits = getDayBenefits(selectedDate);
               const hasBenefits = !!dayBenefits;
@@ -1143,20 +1225,24 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                         Edit Day
                       </button>
                     )}
-                    <button className="calendar-btn-ghost" onClick={() => closeCalOverlay(closeDayInfo)}>
+                    <button className="calendar-btn-ghost" onClick={() => closeCalSheet(closeDayInfo)}>
                       Close
                     </button>
                   </div>
                 </>
               );
             })()}
+            </div>
           </div>
-          )}
+        </div>
+      )}
 
-          {/* EDIT DAY MODAL */}
-          {editDayModal && (
+      {/* ================================================================
+          EDIT DAY - Full Screen Overlay
+          ================================================================ */}
+      {editDayModal && selectedDate && (
+        <div className={`calendar-overlay cal-transition${calOverlayReady ? ' cal-ready' : ''}`}>
           <div className={`calendar-modal calendar-edit-day ${showTriggerSelection ? 'has-trigger-selection' : ''}`} onClick={e => e.stopPropagation()}>
-            
             <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
             {getEditSubtitle() && <p>{getEditSubtitle()}</p>}
 
@@ -1179,17 +1265,22 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
               )}
             </div>
           </div>
-          )}
-
         </div>
       )}
 
       {/* ================================================================
-          MOON DETAIL MODAL - Premium lunar information
+          MOON DETAIL - Bottom Sheet
           ================================================================ */}
       {moonDetailModal && selectedMoonDate && (
-        <div className={`calendar-overlay cal-transition${calOverlayReady ? ' cal-ready' : ''}`}>
-          <div className="calendar-modal moon-detail-modal" onClick={e => e.stopPropagation()}>
+        <div className={`cal-sheet-backdrop${calSheetReady ? ' open' : ''}`} onClick={() => closeCalSheet(closeMoonDetail)}>
+          <div ref={calSheetPanelRef} className={`cal-sheet-panel${calSheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div 
+              className="cal-sheet-header"
+              onTouchStart={handleCalSheetTouchStart}
+              onTouchMove={handleCalSheetTouchMove}
+              onTouchEnd={handleCalSheetTouchEnd}
+            />
+            <div className="calendar-modal moon-detail-modal">
             {(() => {
               const lunar = getLunarData(selectedMoonDate);
               return (
@@ -1220,13 +1311,14 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                   </div>
                   
                   <div className="moon-detail-footer">
-                    <button className="calendar-btn-ghost" onClick={() => closeCalOverlay(closeMoonDetail)}>
+                    <button className="calendar-btn-ghost" onClick={() => closeCalSheet(closeMoonDetail)}>
                       Close
                     </button>
                   </div>
                 </>
               );
             })()}
+            </div>
           </div>
         </div>
       )}
