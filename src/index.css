@@ -37,6 +37,11 @@
   --surface-overlay: rgba(255, 255, 255, 0.08);
   --surface-elevated: #111111;
   
+  /* Bottom sheet glass surface */
+  --sheet-bg: rgba(18, 18, 20, 0.82);
+  --sheet-border: rgba(255, 255, 255, 0.06);
+  --sheet-highlight: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 40%);
+  
   /* Header, Nav, and Overlay backgrounds */
   --header-bg: rgba(0, 0, 0, 0.9);
   --nav-bg: rgba(0, 0, 0, 0.95);
@@ -106,6 +111,11 @@
   --surface-raised: #f0f0f0;
   --surface-overlay: rgba(0, 0, 0, 0.06);
   --surface-elevated: #f5f5f5;
+  
+  /* Bottom sheet glass surface */
+  --sheet-bg: rgba(245, 245, 247, 0.82);
+  --sheet-border: rgba(0, 0, 0, 0.06);
+  --sheet-highlight: linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, transparent 40%);
   
   /* Header, Nav, and Overlay backgrounds */
   --header-bg: rgba(255, 255, 255, 0.9);
