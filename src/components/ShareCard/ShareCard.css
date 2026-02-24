@@ -282,10 +282,34 @@
   to { transform: rotate(360deg); }
 }
 
-/* Ghost close inside share sheet */
-.share-sheet .btn-ghost {
-  margin-top: 4px;
+/* Sheet actions — side-by-side */
+.share-sheet-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  width: 100%;
 }
+
+.share-sheet-actions .share-modal-btn {
+  flex: 1;
+}
+
+.share-btn-ghost {
+  flex: 1;
+  padding: 16px 24px;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.share-btn-ghost:hover { color: var(--text); }
 
 /* ============================================================
    DESKTOP - Centered floating card, matches Oracle desktop

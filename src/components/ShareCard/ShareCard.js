@@ -365,22 +365,24 @@ const ShareCard = ({ userData, isVisible = true }) => {
               </div>
             </div>
             
-            <button 
-              className="share-modal-btn" 
-              onClick={handleShare}
-              disabled={isGenerating}
-            >
-              {isGenerating ? (
-                <span className="share-btn-loading"></span>
-              ) : (
-                <>
-                  <ShareIcon />
-                  <span>Share</span>
-                </>
-              )}
-            </button>
-            
-            <button className="btn-ghost" onClick={closePreview}>Close</button>
+            <div className="share-sheet-actions">
+              <button 
+                className="share-modal-btn" 
+                onClick={handleShare}
+                disabled={isGenerating}
+              >
+                {isGenerating ? (
+                  <span className="share-btn-loading"></span>
+                ) : (
+                  <>
+                    <ShareIcon />
+                    <span>Share</span>
+                  </>
+                )}
+              </button>
+              
+              <button className="share-btn-ghost" onClick={closePreview}>Close</button>
+            </div>
           </div>
         </div>
       )}

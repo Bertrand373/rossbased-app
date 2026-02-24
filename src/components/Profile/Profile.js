@@ -101,21 +101,18 @@ const Profile = ({
   // Theme
   const { theme, toggleTheme } = useTheme();
 
-  // Bottom sheet state (export + delete)
+  // Bottom sheet state (all modals)
   const [sheetReady, setSheetReady] = useState(false);
   const sheetPanelRef = useRef(null);
   const sheetStartY = useRef(0);
   const sheetDeltaY = useRef(0);
   const sheetDragging = useRef(false);
 
-  // Smooth-close overlay state (feedback + privacy)
-  const [overlayReady, setOverlayReady] = useState(false);
-
-  // Only full-screen overlays need scroll lock
-  useBodyScrollLock(showFeedbackModal || showPrivacyModal);
+  // Scroll lock — no longer needed (all modals are sheets now)
+  // useBodyScrollLock kept for future use
 
   // Sheet animation
-  const sheetVisible = showExportModal || showDeleteConfirm;
+  const sheetVisible = showExportModal || showDeleteConfirm || showFeedbackModal || showPrivacyModal;
   useEffect(() => {
     if (sheetVisible) {
       requestAnimationFrame(() => requestAnimationFrame(() => setSheetReady(true)));
@@ -124,22 +121,8 @@ const Profile = ({
     }
   }, [sheetVisible]);
 
-  // Overlay animation
-  useEffect(() => {
-    if (showFeedbackModal || showPrivacyModal) {
-      requestAnimationFrame(() => requestAnimationFrame(() => setOverlayReady(true)));
-    } else {
-      setOverlayReady(false);
-    }
-  }, [showFeedbackModal, showPrivacyModal]);
-
   const closeSheet = useCallback((cb) => {
     setSheetReady(false);
-    setTimeout(cb, 300);
-  }, []);
-
-  const closeOverlay = useCallback((cb) => {
-    setOverlayReady(false);
     setTimeout(cb, 300);
   }, []);
 
@@ -176,6 +159,8 @@ const Profile = ({
         setSheetReady(false);
         setShowExportModal(false);
         setShowDeleteConfirm(false);
+        setShowFeedbackModal(false);
+        setShowPrivacyModal(false);
         setDeleteConfirmText('');
       }, 250);
     } else if (sheetPanelRef.current) {
@@ -501,8 +486,8 @@ const Profile = ({
   };
 
   const handleFeedbackSubmit = async () => {
-    if (!feedbackSubject.trim() || !feedbackMessage.trim()) {
-      toast.error('Please fill in both fields');
+    if (!feedbackMessage.trim()) {
+      toast.error('Please enter your feedback');
       return;
     }
     
@@ -512,7 +497,7 @@ const Profile = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: feedbackType,
-          subject: feedbackSubject.trim(),
+          subject: feedbackType,
           message: feedbackMessage.trim(),
           username: userData?.username || 'Anonymous'
         })
@@ -522,10 +507,9 @@ const Profile = ({
         throw new Error('Failed to send feedback');
       }
       
-      setFeedbackSubject('');
       setFeedbackMessage('');
       setFeedbackType('general');
-      setShowFeedbackModal(false);
+      closeSheet(() => setShowFeedbackModal(false));
       toast.success('Feedback sent');
     } catch (error) {
       console.error('Feedback error:', error);
@@ -1150,33 +1134,6 @@ const Profile = ({
 
             <div className="about-divider" />
 
-            {/* Core Pillars */}
-            <div className="about-pillars">
-              <span className="about-pillars-title">Core Pillars</span>
-              
-              <div className="about-pillar">
-                <span className="pillar-name">Streak Intelligence</span>
-                <span className="pillar-desc">Track your journey with precision.</span>
-              </div>
-              
-              <div className="about-pillar">
-                <span className="pillar-name">Benefit Analytics</span>
-                <span className="pillar-desc">Track what retention unlocks in you.</span>
-              </div>
-              
-              <div className="about-pillar">
-                <span className="pillar-name">Predictive Intelligence</span>
-                <span className="pillar-desc">On-device AI learns your patterns.</span>
-              </div>
-              
-              <div className="about-pillar">
-                <span className="pillar-name">Crisis Toolkit</span>
-                <span className="pillar-desc">When urges hit, you're prepared.</span>
-              </div>
-            </div>
-
-            <div className="about-divider" />
-
             {/* Links */}
             <div className="about-links">
               <a href="https://discord.gg/RDFC5eUtuA" target="_blank" rel="noopener noreferrer" className="about-link">
@@ -1195,13 +1152,13 @@ const Profile = ({
         )}
       </div>
 
-      {/* FEEDBACK MODAL */}
-      {/* FEEDBACK — smooth-close overlay (form with inputs) */}
+      {/* FEEDBACK — bottom sheet */}
       {showFeedbackModal && (
-        <div className={`overlay profile-transition${overlayReady ? ' profile-ready' : ''}`}>
-          <div className="modal legacy" onClick={e => e.stopPropagation()}>
-            <h2>Send Feedback</h2>
-            <p>Help us improve TitanTrack</p>
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowFeedbackModal(false))}>
+          <div ref={sheetPanelRef} className={`sheet-panel profile-sheet feedback-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd} />
+            
+            <h2 className="feedback-sheet-title">Send Feedback</h2>
             
             <div className="feedback-types">
               {feedbackTypes.map(type => (
@@ -1216,30 +1173,18 @@ const Profile = ({
             </div>
 
             <div className="modal-field">
-              <label>Subject</label>
-              <input
-                type="text"
-                value={feedbackSubject}
-                onChange={(e) => setFeedbackSubject(e.target.value)}
-                placeholder="Brief description"
-                maxLength={100}
-              />
-            </div>
-
-            <div className="modal-field">
-              <label>Message</label>
               <textarea
                 value={feedbackMessage}
                 onChange={(e) => setFeedbackMessage(e.target.value)}
                 placeholder="Your feedback..."
-                rows={4}
+                rows={3}
                 maxLength={500}
               />
             </div>
 
-            <div className="modal-actions">
+            <div className="confirm-actions">
               <button className="btn-primary" onClick={handleFeedbackSubmit}>Submit</button>
-              <button className="btn-ghost" onClick={() => closeOverlay(() => setShowFeedbackModal(false))}>Cancel</button>
+              <button className="btn-ghost" onClick={() => closeSheet(() => setShowFeedbackModal(false))}>Cancel</button>
             </div>
           </div>
         </div>
@@ -1306,16 +1251,18 @@ const Profile = ({
         </div>
       )}
 
-      {/* PRIVACY — smooth-close overlay (long scroll) */}
+      {/* PRIVACY — bottom sheet */}
       {showPrivacyModal && (
-        <div className={`overlay profile-transition${overlayReady ? ' profile-ready' : ''}`}>
-          <div className="privacy-modal" onClick={e => e.stopPropagation()}>
-            <div className="privacy-header">
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowPrivacyModal(false))}>
+          <div ref={sheetPanelRef} className={`sheet-panel profile-sheet privacy-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd} />
+            
+            <div className="privacy-sheet-header">
               <h2>Privacy Policy</h2>
               <span className="privacy-updated">Last updated: December 2024</span>
             </div>
             
-            <div className="privacy-content">
+            <div className="privacy-sheet-scroll">
               <section className="privacy-section">
                 <h3>Overview</h3>
                 <p>TitanTrack is designed with your privacy as a priority. We collect only what's necessary to provide you with personalized tracking and insights.</p>
@@ -1357,9 +1304,7 @@ const Profile = ({
               </section>
             </div>
 
-            <div className="privacy-footer">
-              <button className="btn-primary" onClick={() => closeOverlay(() => setShowPrivacyModal(false))}>Done</button>
-            </div>
+            <button className="btn-ghost privacy-done-btn" onClick={() => closeSheet(() => setShowPrivacyModal(false))}>Done</button>
           </div>
         </div>
       )}

@@ -953,15 +953,15 @@
 
 .confirm-actions {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-direction: row;
+  gap: 10px;
   margin-top: 40px;
 }
 
 .confirm-actions .btn-primary,
 .confirm-actions .btn-ghost,
 .confirm-actions .btn-danger {
-  width: 100%;
+  flex: 1;
   padding: 14px 20px;
 }
 
@@ -1019,6 +1019,101 @@
   animation: none !important;
   width: 100%;
   max-width: none;
+}
+
+/* Feedback sheet — concise form layout */
+.feedback-sheet {
+  text-align: left;
+}
+
+.feedback-sheet-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0 0 24px 0;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+.feedback-sheet .modal-field {
+  margin-bottom: 0;
+}
+
+.feedback-sheet .modal-field label {
+  display: none;
+}
+
+.feedback-sheet .confirm-actions {
+  margin-top: 24px;
+}
+
+/* Privacy sheet — scrollable content */
+.privacy-sheet {
+  text-align: left;
+  max-height: 85dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .privacy-sheet {
+    max-height: min(720px, calc(100vh - 80px));
+  }
+}
+
+.privacy-sheet-header {
+  flex-shrink: 0;
+  text-align: center;
+  padding-bottom: 20px;
+}
+
+.privacy-sheet-header h2 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0 0 6px 0;
+  letter-spacing: -0.02em;
+}
+
+.privacy-sheet-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  min-height: 0;
+  padding: 4px 0;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 12px, black calc(100% - 12px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 12px, black calc(100% - 12px), transparent 100%);
+}
+
+.privacy-sheet .privacy-section {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.privacy-sheet .privacy-section:last-child {
+  border-bottom: none;
+}
+
+.privacy-sheet .privacy-section h3 {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 6px 0;
+}
+
+.privacy-sheet .privacy-section p {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Solo done button — borderless */
+.privacy-done-btn {
+  flex-shrink: 0;
+  width: 100%;
+  border: none !important;
 }
 
 /* =============================================================================
