@@ -223,15 +223,15 @@
 
 .modal-actions {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-direction: row;
+  gap: 10px;
   margin-top: 48px;
 }
 
 .modal .btn-primary,
 .modal-actions .btn-primary {
-  width: 100%;
-  padding: 16px 24px;
+  flex: 1;
+  padding: 14px 20px;
   background: var(--surface-overlay);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -250,28 +250,29 @@
 
 .modal .btn-ghost,
 .modal-actions .btn-ghost {
-  width: 100%;
-  padding: 16px 24px;
+  flex: 1;
+  padding: 14px 20px;
   background: transparent;
-  border: none;
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
   color: var(--text-secondary);
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: border-color 150ms ease, color 150ms ease;
 }
 
 .modal .btn-ghost:hover,
 .modal-actions .btn-ghost:hover {
+  border-color: var(--border);
   color: var(--text);
 }
 
 .modal .btn-danger,
 .modal-actions .btn-danger {
-  width: 100%;
-  padding: 16px 24px;
+  flex: 1;
+  padding: 14px 20px;
   background: var(--surface-overlay);
   border: none;
   border-radius: 12px;
@@ -317,13 +318,13 @@
 
 .confirm-actions {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-direction: row;
+  gap: 10px;
   margin-top: 40px;
 }
 
 .confirm-actions .btn-primary {
-  width: 100%;
+  flex: 1;
   padding: 14px 20px;
   background: var(--surface-overlay);
   border: 1px solid var(--border);
@@ -341,25 +342,26 @@
 }
 
 .confirm-actions .btn-ghost {
-  width: 100%;
+  flex: 1;
   padding: 14px 20px;
   background: transparent;
-  border: none;
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
   color: var(--text-secondary);
   font-size: 0.9375rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: color 150ms ease;
+  transition: border-color 150ms ease, color 150ms ease;
 }
 
 .confirm-actions .btn-ghost:hover {
+  border-color: var(--border);
   color: var(--text);
 }
 
 .confirm-actions .btn-danger {
-  width: 100%;
+  flex: 1;
   padding: 14px 20px;
   background: var(--status-relapse-bg);
   border: none;
@@ -588,8 +590,8 @@
 
 .benefits-actions {
   display: flex;
-  flex-direction: column;
-  gap: 0;
+  flex-direction: row;
+  gap: 10px;
   flex-shrink: 0;
   padding-top: 24px;
   position: relative;
@@ -599,8 +601,8 @@
 }
 
 .benefits-actions .btn-primary {
-  width: 100%;
-  padding: 16px 24px;
+  flex: 1;
+  padding: 14px 20px;
   background: var(--surface-overlay);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -617,20 +619,21 @@
 }
 
 .benefits-actions .btn-ghost {
-  width: 100%;
-  padding: 16px 24px;
+  flex: 1;
+  padding: 14px 20px;
   background: transparent;
-  border: none;
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
   color: var(--text-secondary);
   font-size: 0.9375rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: color 150ms ease;
+  transition: border-color 150ms ease, color 150ms ease;
 }
 
 .benefits-actions .btn-ghost:hover {
+  border-color: var(--border);
   color: var(--text);
 }
 
@@ -767,7 +770,7 @@
   .benefit-num { font-size: 0.875rem; }
   .benefits-actions { padding-top: 20px; }
   .benefits-actions .btn-primary,
-  .benefits-actions .btn-ghost { padding: 16px 20px; font-size: 0.9375rem; }
+  .benefits-actions .btn-ghost { padding: 14px 16px; font-size: 0.875rem; }
   
   .confirm-modal h2 { font-size: 1.25rem; }
   .confirm-modal p { font-size: 0.8125rem; }
@@ -933,13 +936,13 @@
 
 .peak-prompt-actions {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-direction: row;
+  gap: 10px;
   margin-top: 32px;
 }
 
 .peak-prompt-actions .btn-primary {
-  width: 100%;
+  flex: 1;
   padding: 14px 20px;
   background: var(--surface-overlay);
   border: 1px solid var(--border);
@@ -957,15 +960,22 @@
 .peak-prompt-actions .btn-primary:disabled { opacity: 0.3; cursor: default; }
 
 .peak-prompt-actions .btn-ghost {
-  width: 100%;
+  flex: 1;
   padding: 14px 20px;
   background: transparent;
-  border: none;
+  border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
   font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
+  border-radius: 12px;
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.peak-prompt-actions .btn-ghost:hover {
+  border-color: var(--border);
+  color: var(--text);
 }
 
 /* ============================================================
