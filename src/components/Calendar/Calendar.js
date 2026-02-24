@@ -14,9 +14,6 @@ import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 // NEW: Import InterventionService for ML feedback loop
 import interventionService from '../../services/InterventionService';
 
-// Body scroll lock for modals
-import useBodyScrollLock from '../../hooks/useBodyScrollLock';
-
 // UNIFIED TRIGGER SYSTEM
 import { getAllTriggers, getTriggerLabel } from '../../constants/triggerConstants';
 
@@ -98,7 +95,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [dayInfoModal, setDayInfoModal] = useState(false);
-  const [editDayModal, setEditDayModal] = useState(false);
+  const [sheetView, setSheetView] = useState('info'); // 'info' | 'edit'
   const [viewMode, setViewMode] = useState('month');
   const [selectedTrigger, setSelectedTrigger] = useState('');
   const [showTriggerSelection, setShowTriggerSelection] = useState(false);
@@ -109,7 +106,6 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [selectedMoonDate, setSelectedMoonDate] = useState(null);
 
   // Overlay animation state
-  const [calOverlayReady, setCalOverlayReady] = useState(false);
   const [calSheetReady, setCalSheetReady] = useState(false);
   const calSheetPanelRef = useRef(null);
   const calSheetTouchStartY = useRef(0);
@@ -119,9 +115,6 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   // Journal states
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [noteText, setNoteText] = useState('');
-
-  // Only lock body scroll for full-screen Edit Day (sheets handle their own containment)
-  useBodyScrollLock(editDayModal);
 
   // Sheet animation: trigger .open class for Day Info + Moon Detail
   useEffect(() => {
@@ -134,28 +127,9 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     }
   }, [dayInfoModal, moonDetailModal]);
 
-  // Overlay animation: trigger .cal-ready class for Edit Day
-  useEffect(() => {
-    if (editDayModal) {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setCalOverlayReady(true));
-      });
-    } else {
-      setCalOverlayReady(false);
-    }
-  }, [editDayModal]);
-
   // Animate sheet out then run callback
   const closeCalSheet = useCallback((callback) => {
     setCalSheetReady(false);
-    setTimeout(() => {
-      callback();
-    }, 300);
-  }, []);
-
-  // Animate overlay out then run callback
-  const closeCalOverlay = useCallback((callback) => {
-    setCalOverlayReady(false);
     setTimeout(() => {
       callback();
     }, 300);
@@ -198,6 +172,10 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         setSelectedMoonDate(null);
         setIsEditingNote(false);
         setNoteText('');
+        setSheetView('info');
+        setShowTriggerSelection(false);
+        setEditingExistingTrigger(false);
+        setSelectedTrigger('');
       }, 250);
     } else if (calSheetPanelRef.current) {
       calSheetPanelRef.current.style.transition = 'transform 250ms ease-out';
@@ -345,6 +323,10 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     const existingNote = userData.notes && userData.notes[dayStr];
     setNoteText(existingNote || '');
     setIsEditingNote(false);
+    setSheetView('info');
+    setShowTriggerSelection(false);
+    setEditingExistingTrigger(false);
+    setSelectedTrigger('');
     setDayInfoModal(true);
   };
 
@@ -353,33 +335,37 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setSelectedDate(null);
     setIsEditingNote(false);
     setNoteText('');
-  };
-
-  const showEditFromInfo = () => {
-    closeCalSheet(() => {
-      setDayInfoModal(false);
-      setEditDayModal(true);
-      setSelectedTrigger('');
-      setShowTriggerSelection(false);
-      setEditingExistingTrigger(false);
-    });
-  };
-
-  const closeEditModal = () => {
-    setEditDayModal(false);
+    setSheetView('info');
     setShowTriggerSelection(false);
     setEditingExistingTrigger(false);
     setSelectedTrigger('');
   };
 
-  const backToDayInfo = () => {
-    closeCalOverlay(() => {
-      setEditDayModal(false);
-      setDayInfoModal(true);
+  const showEditFromInfo = () => {
+    setSheetView('edit');
+    setSelectedTrigger('');
+    setShowTriggerSelection(false);
+    setEditingExistingTrigger(false);
+  };
+
+  const closeEditModal = () => {
+    closeCalSheet(() => {
+      setDayInfoModal(false);
+      setSelectedDate(null);
+      setSheetView('info');
       setShowTriggerSelection(false);
       setEditingExistingTrigger(false);
       setSelectedTrigger('');
+      setIsEditingNote(false);
+      setNoteText('');
     });
+  };
+
+  const backToDayInfo = () => {
+    setShowTriggerSelection(false);
+    setEditingExistingTrigger(false);
+    setSelectedTrigger('');
+    setSheetView('info');
   };
 
   // Moon detail modal handlers
@@ -1156,7 +1142,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
 
       {/* ================================================================
-          DAY INFO - Bottom Sheet
+          DAY INFO / EDIT — Smart Morphing Sheet
           ================================================================ */}
       {dayInfoModal && selectedDate && (
         <div className={`sheet-backdrop${calSheetReady ? ' open' : ''}`} onClick={() => closeCalSheet(closeDayInfo)}>
@@ -1167,101 +1153,104 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
               onTouchMove={handleCalSheetTouchMove}
               onTouchEnd={handleCalSheetTouchEnd}
             />
-            <div className="calendar-modal calendar-day-info has-scrollable-content">
-            {(() => {
-              const dayBenefits = getDayBenefits(selectedDate);
-              const hasBenefits = !!dayBenefits;
-              const isFuture = isFutureDay(selectedDate);
-              
-              const benefitItems = hasBenefits ? [
-                { label: 'Energy', value: dayBenefits.energy },
-                { label: 'Focus', value: dayBenefits.focus },
-                { label: 'Confidence', value: dayBenefits.confidence },
-                { label: 'Aura', value: dayBenefits.aura || 5 },
-                { label: 'Sleep', value: dayBenefits.sleep || dayBenefits.attraction || 5 },
-                { label: 'Workout', value: dayBenefits.workout || dayBenefits.gymPerformance || 5 }
-              ] : [];
-              
-              return (
-                <>
-                  {/* STICKY HEADER */}
-                  <div className="calendar-modal-header">
-                    <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
-                    <div className="calendar-status-info">
-                      {renderStatusBadge()}
-                    </div>
-                  </div>
+            <div className="cal-sheet-body" style={{ transition: 'height 300ms cubic-bezier(0.16, 1, 0.3, 1)' }}>
 
-                  {/* SCROLLABLE CONTENT */}
-                  <div className="calendar-modal-content">
-                    {/* Moon phase info - always shown */}
-                    {renderMoonPhaseInfo()}
-                    
-                    {/* Benefits section (if any) */}
-                    {hasBenefits && (
-                      <div className="calendar-benefits">
-                        <h4>Benefits</h4>
-                        <div className="calendar-benefits-list">
-                          {benefitItems.map(item => (
-                            <div key={item.label} className="calendar-benefit-row">
-                              <span className="calendar-benefit-label">{item.label}</span>
-                              <div className="calendar-benefit-bar">
-                                <div className="calendar-benefit-fill" style={{ width: `${item.value * 10}%` }} />
-                              </div>
-                              <div className="calendar-benefit-value">{item.value}</div>
-                            </div>
-                          ))}
+              {/* ---- INFO VIEW ---- */}
+              {sheetView === 'info' && (
+                <div className="calendar-modal calendar-day-info has-scrollable-content cal-view-animate" key="info-view">
+                {(() => {
+                  const dayBenefits = getDayBenefits(selectedDate);
+                  const hasBenefits = !!dayBenefits;
+                  const isFuture = isFutureDay(selectedDate);
+                  
+                  const benefitItems = hasBenefits ? [
+                    { label: 'Energy', value: dayBenefits.energy },
+                    { label: 'Focus', value: dayBenefits.focus },
+                    { label: 'Confidence', value: dayBenefits.confidence },
+                    { label: 'Aura', value: dayBenefits.aura || 5 },
+                    { label: 'Sleep', value: dayBenefits.sleep || dayBenefits.attraction || 5 },
+                    { label: 'Workout', value: dayBenefits.workout || dayBenefits.gymPerformance || 5 }
+                  ] : [];
+                  
+                  return (
+                    <>
+                      {/* STICKY HEADER */}
+                      <div className="calendar-modal-header">
+                        <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
+                        <div className="calendar-status-info">
+                          {renderStatusBadge()}
                         </div>
                       </div>
-                    )}
-                    
-                    {/* Journal section (if not future) */}
-                    {!isFuture && renderJournalSection()}
-                  </div>
 
-                  {/* STICKY FOOTER */}
-                  <div className="calendar-modal-footer">
-                    {!isFuture && (
-                      <button className="calendar-btn-primary" onClick={showEditFromInfo}>
-                        Edit Day
+                      {/* SCROLLABLE CONTENT */}
+                      <div className="calendar-modal-content">
+                        {/* Moon phase info - always shown */}
+                        {renderMoonPhaseInfo()}
+                        
+                        {/* Benefits section (if any) */}
+                        {hasBenefits && (
+                          <div className="calendar-benefits">
+                            <h4>Benefits</h4>
+                            <div className="calendar-benefits-list">
+                              {benefitItems.map(item => (
+                                <div key={item.label} className="calendar-benefit-row">
+                                  <span className="calendar-benefit-label">{item.label}</span>
+                                  <div className="calendar-benefit-bar">
+                                    <div className="calendar-benefit-fill" style={{ width: `${item.value * 10}%` }} />
+                                  </div>
+                                  <div className="calendar-benefit-value">{item.value}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Journal section (if not future) */}
+                        {!isFuture && renderJournalSection()}
+                      </div>
+
+                      {/* STICKY FOOTER */}
+                      <div className="calendar-modal-footer">
+                        {!isFuture && (
+                          <button className="calendar-btn-primary" onClick={showEditFromInfo}>
+                            Edit Day
+                          </button>
+                        )}
+                        <button className="calendar-btn-ghost" onClick={() => closeCalSheet(closeDayInfo)}>Close</button>
+                      </div>
+                    </>
+                  );
+                })()}
+                </div>
+              )}
+
+              {/* ---- EDIT VIEW ---- */}
+              {sheetView === 'edit' && (
+                <div className={`calendar-modal calendar-edit-day cal-view-animate ${showTriggerSelection ? 'has-trigger-selection' : ''}`} key="edit-view">
+                  <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
+                  {getEditSubtitle() && <p>{getEditSubtitle()}</p>}
+
+                  {renderEditContent()}
+
+                  <div className="calendar-actions">
+                    {!showTriggerSelection && getEditOptions().type !== 'future' && (
+                      <button className="calendar-btn-back" onClick={backToDayInfo}>
+                        Back
                       </button>
                     )}
-                    <button className="calendar-btn-ghost" onClick={() => closeCalSheet(closeDayInfo)}>Close</button>
+                    {showTriggerSelection && (
+                      <button className="calendar-btn-back" onClick={() => {
+                        setShowTriggerSelection(false);
+                        setEditingExistingTrigger(false);
+                        setSelectedTrigger('');
+                      }}>
+                        Back
+                      </button>
+                    )}
                   </div>
-                </>
-              );
-            })()}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ================================================================
-          EDIT DAY - Full Screen Overlay
-          ================================================================ */}
-      {editDayModal && selectedDate && (
-        <div className={`calendar-overlay cal-transition${calOverlayReady ? ' cal-ready' : ''}`}>
-          <div className={`calendar-modal calendar-edit-day ${showTriggerSelection ? 'has-trigger-selection' : ''}`} onClick={e => e.stopPropagation()}>
-            <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
-            {getEditSubtitle() && <p>{getEditSubtitle()}</p>}
-
-            {renderEditContent()}
-
-            <div className="calendar-actions">
-              {!showTriggerSelection && getEditOptions().type !== 'future' && (
-                <button className="calendar-btn-back" onClick={backToDayInfo}>
-                  Back
-                </button>
+                </div>
               )}
-              {showTriggerSelection && (
-                <button className="calendar-btn-back" onClick={() => {
-                  setShowTriggerSelection(false);
-                  setEditingExistingTrigger(false);
-                  setSelectedTrigger('');
-                }}>
-                  Back
-                </button>
-              )}
+
             </div>
           </div>
         </div>
