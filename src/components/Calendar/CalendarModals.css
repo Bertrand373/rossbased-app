@@ -170,20 +170,16 @@
 .calendar-status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 28px;
-  border-radius: 100px;
+  gap: 8px;
   font-size: 0.9375rem;
   font-weight: 500;
-  background: var(--surface-overlay);
   color: var(--text-secondary);
-  border: none;
 }
 
 .calendar-status-badge .status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
   flex-shrink: 0;
 }
 
@@ -199,27 +195,22 @@
 }
 
 .calendar-status-badge.current-streak {
-  background: var(--status-current-bg);
   color: var(--status-current);
 }
 
 .calendar-status-badge.former-streak {
-  background: var(--status-former-bg);
   color: var(--status-former);
 }
 
 .calendar-status-badge.relapse {
-  background: var(--status-relapse-bg);
   color: var(--status-relapse);
 }
 
 .calendar-status-badge.wet-dream {
-  background: var(--status-wetdream-bg);
   color: var(--status-wetdream);
 }
 
 .calendar-status-badge.future {
-  background: var(--surface-overlay);
   color: var(--text-muted);
 }
 
@@ -567,9 +558,9 @@
 }
 
 .calendar-option-btn .option-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
   flex-shrink: 0;
 }
 
@@ -805,7 +796,7 @@
   .calendar-modal { max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 24px); }
   .calendar-modal.calendar-edit-day.has-trigger-selection { height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 24px); }
   .calendar-modal-header h3, .calendar-day-info h3, .calendar-edit-day h3 { font-size: 0.6875rem; }
-  .calendar-status-badge { padding: 12px 24px; font-size: 0.875rem; }
+  .calendar-status-badge { font-size: 0.875rem; }
   .calendar-benefit-label { font-size: 0.8125rem; min-width: 90px; }
   .calendar-benefit-value { width: 28px; height: 28px; min-width: 28px; font-size: 0.875rem; }
   .calendar-option-btn { padding: 14px 20px; font-size: 0.875rem; }
@@ -817,7 +808,7 @@
 
 @media (max-width: 480px) {
   .calendar-modal-header h3, .calendar-day-info h3, .calendar-edit-day h3 { font-size: 0.6875rem; }
-  .calendar-status-badge { padding: 10px 20px; font-size: 0.8125rem; }
+  .calendar-status-badge { font-size: 0.8125rem; }
   .calendar-benefits h4, .calendar-journal h4 { font-size: 0.6875rem; }
   .calendar-benefit-row { gap: 12px; }
   .calendar-benefit-label { font-size: 0.75rem; min-width: 80px; }
@@ -836,14 +827,14 @@
   .calendar-modal { max-width: 360px; }
   .calendar-modal.calendar-edit-day.has-trigger-selection { max-height: 700px; height: auto; }
   .calendar-modal-header h3, .calendar-day-info h3, .calendar-edit-day h3 { font-size: 0.6875rem; }
-  .calendar-status-badge { padding: 14px 28px; font-size: 0.9375rem; }
-  .calendar-status-badge .status-dot { width: 9px; height: 9px; }
+  .calendar-status-badge { font-size: 0.9375rem; }
+  .calendar-status-badge .status-dot { width: 16px; height: 3px; }
   .calendar-benefits h4, .calendar-journal h4 { font-size: 0.8125rem; }
   .calendar-benefit-row { gap: 20px; }
   .calendar-benefit-label { font-size: 0.9375rem; min-width: 110px; }
   .calendar-benefit-value { width: 36px; height: 36px; min-width: 36px; font-size: 1.0625rem; }
   .calendar-option-btn { padding: 18px 28px; font-size: 1rem; }
-  .calendar-option-btn .option-dot { width: 10px; height: 10px; }
+  .calendar-option-btn .option-dot { width: 16px; height: 3px; }
   .calendar-trigger { padding: 16px 0; font-size: 0.9375rem; }
   .calendar-btn-primary, .calendar-btn-ghost, .calendar-btn-back { padding: 14px 20px; font-size: 0.9375rem; }
   .calendar-actions { margin-top: 32px; }
