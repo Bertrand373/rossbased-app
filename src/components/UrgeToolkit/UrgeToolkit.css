@@ -214,6 +214,17 @@
   transition: width 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.ut-intensity-endpoints {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.ut-intensity-endpoint {
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
+}
+
 /* =============================================================================
    PROTOCOL SELECTION
    ============================================================================= */
@@ -608,12 +619,12 @@
 
 .ut-actions {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-direction: row;
+  gap: 10px;
 }
 
 .ut-btn-primary {
-  width: 100%;
+  flex: 1;
   padding: 16px 24px;
   background: var(--surface-overlay);
   border: 1px solid var(--border);
@@ -631,10 +642,10 @@
 .ut-btn-primary:active { transform: scale(0.98); }
 
 .ut-btn-ghost {
-  width: 100%;
+  flex: 1;
   padding: 16px 24px;
   background: transparent;
-  border: none;
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
   color: var(--text-secondary);
   font-size: 0.9375rem;
@@ -647,8 +658,13 @@
 
 .ut-btn-ghost:hover { color: var(--text); }
 
+/* Solo ghost buttons (e.g. only action) are borderless */
+.ut-btn-ghost:only-child {
+  border: none;
+}
+
 .ut-btn-stop {
-  width: 100%;
+  flex: 1;
   padding: 16px 24px;
   background: rgba(255, 59, 48, 0.15);
   border: none;
@@ -746,14 +762,14 @@
 /* Modal footer */
 .ut-modal-footer {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-direction: row;
+  gap: 10px;
 }
 
 .ut-modal-footer .ut-btn-primary,
 .ut-modal-footer .ut-btn-ghost,
 .ut-modal-footer .ut-btn-stop {
-  width: 100%;
+  flex: 1;
 }
 
 /* =============================================================================

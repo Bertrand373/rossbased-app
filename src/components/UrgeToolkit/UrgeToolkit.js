@@ -737,6 +737,10 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
                   style={{ width: urgeIntensity > 0 ? `${((urgeIntensity - 0.5) / 10) * 100}%` : '0%' }}
                 />
               </div>
+              <div className="ut-intensity-endpoints">
+                <span className="ut-intensity-endpoint">Mild</span>
+                <span className="ut-intensity-endpoint">Overwhelming</span>
+              </div>
             </div>
           </>
         )}
