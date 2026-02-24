@@ -983,6 +983,14 @@
 .moon-detail-footer .calendar-btn-ghost {
   flex: none;
   width: 100%;
+  border: none;
+}
+
+/* Solo ghost buttons (no paired primary) — borderless */
+.calendar-modal-footer .calendar-btn-ghost:only-child {
+  border: none;
+  flex: none;
+  width: 100%;
 }
 
 /* Moon detail modal responsive */
