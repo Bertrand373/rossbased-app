@@ -167,10 +167,8 @@
 .ut-intensity-btn {
   flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   background: transparent;
   border: none;
   padding: 8px 0;
@@ -181,7 +179,6 @@
   cursor: pointer;
   transition: color 200ms ease;
   -webkit-tap-highlight-color: transparent;
-  position: relative;
 }
 
 .ut-intensity-btn:hover {
@@ -201,26 +198,12 @@
   font-feature-settings: 'tnum' 1;
 }
 
-.ut-intensity-dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--text);
-  animation: dotIn 200ms ease forwards;
-}
-
-@keyframes dotIn {
-  from { opacity: 0; transform: scale(0); }
-  to { opacity: 1; transform: scale(1); }
-}
-
 /* Track + Fill — matches audio player and 30-night progress bar */
 .ut-intensity-track {
   width: 100%;
   height: 3px;
   background: var(--border-subtle);
   border-radius: 2px;
-  margin-bottom: 14px;
   overflow: hidden;
 }
 
@@ -229,16 +212,6 @@
   background: var(--text);
   border-radius: 2px;
   transition: width 300ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.ut-intensity-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.6875rem;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: 0 4px;
 }
 
 /* =============================================================================
