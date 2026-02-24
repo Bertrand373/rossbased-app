@@ -71,6 +71,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   
   // Bottom sheet animation state
   const [sheetReady, setSheetReady] = useState(false);
+  const [benefitsReady, setBenefitsReady] = useState(false);
   const [overlayReady, setOverlayReady] = useState(false);
   const sheetPanelRef = useRef(null);
   const sheetTouchStartY = useRef(0);
@@ -108,14 +109,25 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
   // Bottom sheet animation: trigger .open class after mount
   useEffect(() => {
-    if (showStreakOptions || showResetConfirm || showLogLock || showBenefits) {
+    if (showStreakOptions || showResetConfirm || showLogLock) {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setSheetReady(true));
       });
     } else {
       setSheetReady(false);
     }
-  }, [showStreakOptions, showResetConfirm, showLogLock, showBenefits]);
+  }, [showStreakOptions, showResetConfirm, showLogLock]);
+
+  // Benefits sheet - dedicated state to prevent race conditions
+  useEffect(() => {
+    if (showBenefits) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setBenefitsReady(true));
+      });
+    } else {
+      setBenefitsReady(false);
+    }
+  }, [showBenefits]);
 
   // Full-screen overlay animation: trigger .ready class after mount
   useEffect(() => {
@@ -228,6 +240,14 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     }, 300);
   }, []);
 
+  // Benefits sheet: dedicated close handler
+  const closeBenefits = useCallback((callback) => {
+    setBenefitsReady(false);
+    setTimeout(() => {
+      callback();
+    }, 300);
+  }, []);
+
   // Full-screen overlay: animate out then run callback
   const closeOverlay = useCallback((callback) => {
     setOverlayReady(false);
@@ -267,9 +287,11 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
           sheetPanelRef.current.style.transform = '';
         }
         setSheetReady(false);
+        setBenefitsReady(false);
         setShowStreakOptions(false);
         setShowResetConfirm(false);
         setShowLogLock(false);
+        setShowBenefits(false);
       }, 250);
     } else if (sheetPanelRef.current) {
       sheetPanelRef.current.style.transition = 'transform 250ms ease-out';
@@ -475,8 +497,8 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       
       {/* Benefits Modal - Bottom Sheet */}
       {showBenefits && (
-        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowBenefits(false))}>
-          <div ref={sheetPanelRef} className={`sheet-panel benefits-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+        <div className={`sheet-backdrop${benefitsReady ? ' open' : ''}`} onClick={() => closeBenefits(() => setShowBenefits(false))}>
+          <div ref={sheetPanelRef} className={`sheet-panel benefits-sheet${benefitsReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div 
               className="sheet-header"
               onTouchStart={handleSheetTouchStart}
@@ -543,7 +565,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
               
               <div className="benefits-actions">
                 <button className="btn-primary" onClick={saveBenefits}>Save</button>
-                <button className="btn-ghost" onClick={() => closeSheet(() => setShowBenefits(false))}>Cancel</button>
+                <button className="btn-ghost" onClick={() => closeBenefits(() => setShowBenefits(false))}>Cancel</button>
               </div>
             </div>
           </div>
