@@ -624,19 +624,42 @@
 
 .modal-buttons {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-direction: row;
+  gap: 10px;
 }
 
 .modal-buttons .btn-danger,
 .modal-buttons .btn-ghost {
-  width: 100%;
+  flex: 1;
   padding: 14px 20px;
+}
+
+.modal-buttons .btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.modal-buttons .btn-ghost:hover {
+  border-color: var(--border);
+  color: var(--text);
 }
 
 .modal-buttons .btn-danger {
   background: var(--status-relapse-bg);
   color: var(--status-relapse);
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
 }
 
 /* Stat detail breakdown */
@@ -758,7 +781,7 @@
   .modal-num { font-size: 3.5rem; }
   .stats-page .modal h2 { font-size: 1.25rem; }
   .modal-text { font-size: 0.875rem; margin-bottom: 32px; }
-  .modal-buttons .btn-danger, .modal-buttons .btn-ghost { padding: 14px 20px; font-size: 0.875rem; }
+  .modal-buttons .btn-danger, .modal-buttons .btn-ghost { padding: 12px 16px; font-size: 0.875rem; }
   .stats-page .btn-primary, .stats-page .btn-ghost, .stats-page .btn-danger { padding: 14px 20px; font-size: 0.875rem; border-radius: 12px; }
 }
 
