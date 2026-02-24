@@ -1093,7 +1093,7 @@
 .cal-sheet .calendar-modal-footer,
 .cal-sheet .moon-detail-footer {
   padding-bottom: 0;
-  background-color: var(--background);
+  background: transparent;
   position: relative;
   z-index: 2;
   border-top: 1px solid var(--border-subtle);

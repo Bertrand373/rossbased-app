@@ -108,25 +108,25 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
   // Bottom sheet animation: trigger .open class after mount
   useEffect(() => {
-    if (showStreakOptions || showResetConfirm || showLogLock) {
+    if (showStreakOptions || showResetConfirm || showLogLock || showBenefits) {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setSheetReady(true));
       });
     } else {
       setSheetReady(false);
     }
-  }, [showStreakOptions, showResetConfirm, showLogLock]);
+  }, [showStreakOptions, showResetConfirm, showLogLock, showBenefits]);
 
   // Full-screen overlay animation: trigger .ready class after mount
   useEffect(() => {
-    if (showBenefits || showPeakPrompt) {
+    if (showPeakPrompt) {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setOverlayReady(true));
       });
     } else {
       setOverlayReady(false);
     }
-  }, [showBenefits, showPeakPrompt]);
+  }, [showPeakPrompt]);
 
   // Load existing benefits for today
   useEffect(() => {
@@ -473,71 +473,78 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         />
       )}
       
-      {/* Benefits Modal */}
+      {/* Benefits Modal - Bottom Sheet */}
       {showBenefits && (
-        <div className={`overlay tracker-overlay${overlayReady ? ' ready' : ''}`}>
-          <div className="benefits-modal" onClick={e => e.stopPropagation()}>
-            <h2>Log Benefits</h2>
-            <p>Rate today's benefits</p>
-            
-            <div className="benefits-list">
-              {benefitsList.map(({ key, label, desc }) => (
-                <div key={key} className="benefit-row">
-                  <div className="benefit-info">
-                    <span>{label}</span>
-                    <span className="benefit-num">{benefits[key]}/10</span>
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowBenefits(false))}>
+          <div ref={sheetPanelRef} className={`sheet-panel benefits-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div 
+              className="sheet-header"
+              onTouchStart={handleSheetTouchStart}
+              onTouchMove={handleSheetTouchMove}
+              onTouchEnd={handleSheetTouchEnd}
+            />
+            <div className="benefits-modal">
+              <h2>Log Benefits</h2>
+              
+              <div className="benefits-list">
+                {benefitsList.map(({ key, label, desc }) => (
+                  <div key={key} className="benefit-row">
+                    <div className="benefit-info">
+                      <span>{label}</span>
+                      <span className="benefit-num">{benefits[key]}/10</span>
+                    </div>
+                    <div className="benefit-slider">
+                      <div 
+                        className="benefit-fill" 
+                        ref={el => fillRefs.current[key] = el}
+                        style={{ width: `${((benefits[key] - 1) / 9) * 100}%` }}
+                      />
+                      <input
+                        type="range"
+                        min="1"
+                        max="10"
+                        value={benefits[key]}
+                        onChange={e => handleBenefitChange(key, e.target.value)}
+                      />
+                    </div>
+                    <span className="benefit-desc">{desc}</span>
                   </div>
-                  <div className="benefit-slider">
-                    <div 
-                      className="benefit-fill" 
-                      ref={el => fillRefs.current[key] = el}
-                      style={{ width: `${((benefits[key] - 1) / 9) * 100}%` }}
-                    />
-                    <input
-                      type="range"
-                      min="1"
-                      max="10"
-                      value={benefits[key]}
-                      onChange={e => handleBenefitChange(key, e.target.value)}
-                    />
-                  </div>
-                  <span className="benefit-desc">{desc}</span>
-                </div>
-              ))}
+                ))}
 
-              {/* Emotional State - optional */}
-              <div className="benefits-section-divider">
-                <span>How You Feel</span>
+                {/* Emotional State - optional */}
+                <div className="benefits-section-divider">
+                  <span>How You Feel</span>
+                </div>
+
+                {emotionalList.map(({ key, label, desc }) => (
+                  <div key={key} className="benefit-row">
+                    <div className="benefit-info">
+                      <span>{label}</span>
+                      <span className="benefit-num">{benefits[key]}/10</span>
+                    </div>
+                    <div className="benefit-slider">
+                      <div 
+                        className="benefit-fill" 
+                        ref={el => fillRefs.current[key] = el}
+                        style={{ width: `${((benefits[key] - 1) / 9) * 100}%` }}
+                      />
+                      <input
+                        type="range"
+                        min="1"
+                        max="10"
+                        value={benefits[key]}
+                        onChange={e => handleBenefitChange(key, e.target.value)}
+                      />
+                    </div>
+                    <span className="benefit-desc">{desc}</span>
+                  </div>
+                ))}
               </div>
-
-              {emotionalList.map(({ key, label, desc }) => (
-                <div key={key} className="benefit-row">
-                  <div className="benefit-info">
-                    <span>{label}</span>
-                    <span className="benefit-num">{benefits[key]}/10</span>
-                  </div>
-                  <div className="benefit-slider">
-                    <div 
-                      className="benefit-fill" 
-                      ref={el => fillRefs.current[key] = el}
-                      style={{ width: `${((benefits[key] - 1) / 9) * 100}%` }}
-                    />
-                    <input
-                      type="range"
-                      min="1"
-                      max="10"
-                      value={benefits[key]}
-                      onChange={e => handleBenefitChange(key, e.target.value)}
-                    />
-                  </div>
-                  <span className="benefit-desc">{desc}</span>
-                </div>
-              ))}
-            </div>
-            
-            <div className="benefits-actions">
-              <button className="btn-primary" onClick={saveBenefits}>Save</button>
-              <button className="btn-ghost" onClick={() => closeOverlay(() => setShowBenefits(false))}>Cancel</button>
+              
+              <div className="benefits-actions">
+                <button className="btn-primary" onClick={saveBenefits}>Save</button>
+                <button className="btn-ghost" onClick={() => closeSheet(() => setShowBenefits(false))}>Cancel</button>
+              </div>
             </div>
           </div>
         </div>

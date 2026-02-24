@@ -592,16 +592,10 @@
   gap: 0;
   flex-shrink: 0;
   padding-top: 24px;
-  /* Solid background to prevent sliders showing through */
   position: relative;
   z-index: 10;
-  background: var(--background);
-  margin-left: -24px;
-  margin-right: -24px;
-  margin-bottom: -24px;
-  padding-left: 24px;
-  padding-right: 24px;
-  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  background: transparent;
+  border-top: 1px solid var(--border-subtle);
 }
 
 .benefits-actions .btn-primary {
@@ -661,7 +655,7 @@
 }
 
 .sheet-content {
-  background-color: var(--surface-raised);
+  background: var(--sheet-bg);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   border-radius: 16px;
@@ -705,7 +699,7 @@
 }
 
 .sheet button.cancel {
-  background-color: var(--surface-raised);
+  background: var(--sheet-bg);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   border-radius: 12px;
@@ -1003,6 +997,24 @@
   padding: 0 20px 20px;
 }
 
+/* Benefits sheet — scrollable content with fixed footer */
+.benefits-sheet {
+  max-height: 90dvh;
+  padding: 0 20px 20px;
+}
+
+.benefits-sheet .benefits-modal {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  height: auto;
+  animation: none;
+}
+
+.benefits-sheet .benefits-modal h2 {
+  padding-bottom: 20px;
+}
+
 /* ============================================================
    SMOOTH OVERLAY CLOSE - Transition layer over .overlay
    Benefits modal + Peak Prompt
@@ -1018,7 +1030,6 @@
   opacity: 1;
 }
 
-.tracker-overlay .benefits-modal,
 .tracker-overlay .peak-prompt {
   animation: none !important;
   opacity: 0;
@@ -1026,7 +1037,6 @@
   transition: opacity 300ms cubic-bezier(0.16, 1, 0.3, 1), transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.tracker-overlay.ready .benefits-modal,
 .tracker-overlay.ready .peak-prompt {
   opacity: 1;
   transform: translateY(0);
