@@ -496,11 +496,16 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         <div className="calendar-journal-editing">
           <textarea
             className="calendar-journal-textarea"
+            ref={(el) => {
+              if (el) {
+                el.focus();
+                setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+              }
+            }}
             value={noteText}
             onChange={(e) => setNoteText(e.target.value)}
             placeholder="What's on your mind?"
             rows="4"
-            autoFocus
           />
           <div className="calendar-journal-actions">
             <button className="calendar-journal-save" onClick={saveNote}>
