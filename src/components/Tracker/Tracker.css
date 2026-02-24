@@ -597,7 +597,6 @@
   position: relative;
   z-index: 10;
   background: transparent;
-  border-top: 1px solid var(--border-subtle);
 }
 
 .benefits-actions .btn-primary {
@@ -1010,7 +1009,6 @@
 /* Benefits sheet — scrollable content with fixed footer */
 .benefits-sheet {
   max-height: 90dvh;
-  padding: 0 20px 20px;
 }
 
 .benefits-sheet .benefits-modal {

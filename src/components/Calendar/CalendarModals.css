@@ -1069,7 +1069,6 @@
 /* Calendar sheet content sizing */
 .cal-sheet {
   max-height: 85dvh;
-  padding: 0 20px 20px;
   overflow: hidden;
 }
 
@@ -1095,7 +1094,6 @@
   background: transparent;
   position: relative;
   z-index: 2;
-  border-top: 1px solid var(--border-subtle);
   margin-top: auto;
 }
 
