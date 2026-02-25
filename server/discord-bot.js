@@ -855,6 +855,40 @@ client.on('messageCreate', async (message) => {
     return;
   }
 
+  // --- !nuke - Clone channel and delete old one (instant wipe, admin only) ---
+  // Clones name, topic, position, permissions. Deletes original. 2 seconds.
+  if (message.content === '!nuke' && ADMIN_DISCORD_USERS.includes(authorUsername)) {
+    try {
+      const channel = message.channel;
+      const channelPos = channel.position;
+      
+      // Clone the channel (copies name, topic, permissions, parent category)
+      const cloned = await channel.clone({
+        reason: `Channel nuked by ${authorUsername}`
+      });
+      
+      // Match the original position
+      await cloned.setPosition(channelPos).catch(() => {});
+      
+      // Delete the old channel
+      await channel.delete(`Nuked by ${authorUsername}`);
+      
+      // Send a fresh welcome message in the new channel
+      const welcomeEmbed = new EmbedBuilder()
+        .setColor(ORACLE_COLOR)
+        .setDescription('Oracle is here. Ask anything.')
+        .setFooter({ text: 'Oracle · titantrack.app', iconURL: 'https://titantrack.app/The_Oracle.png' });
+      await cloned.send({ embeds: [welcomeEmbed] });
+      
+      console.log(`💥 ${authorUsername} nuked #${channelName} — channel recreated`);
+      
+    } catch (error) {
+      console.error('Nuke error:', error);
+      await message.reply('Nuke failed. Bot needs "Manage Channels" permission.').catch(() => {});
+    }
+    return;
+  }
+
   // ============================================================
   // WISDOM CHANNEL AUTO-INGESTION
   // Auto-ingest long messages from configured wisdom channels
