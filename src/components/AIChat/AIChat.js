@@ -411,7 +411,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
             onTouchEnd={handleTouchEnd}
           >
             <div className="ai-chat-header-content">
-              <h2 className="ai-chat-title">The Oracle</h2>
+              <img src="/oracle-wordmark.png" alt="Oracle" className="ai-chat-header-wordmark" />
               <span className="ai-chat-subtitle">
                 {usage.messagesRemaining} remaining · {usage.isBetaPeriod ? 'Beta' : usage.isPremium ? 'Premium' : `Free · ${usage.messagesLimit}/week`}
               </span>
@@ -433,10 +433,11 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
             {messages.length === 0 && !isLoading && (
               <div className="ai-chat-empty">
                 <img src="/The_Oracle.png" alt="" className="ai-chat-empty-eye" />
-                <p className="ai-chat-empty-title">The Oracle awaits.</p>
+                <p className="ai-chat-empty-title">Oracle awaits.</p>
                 <p className="ai-chat-empty-subtitle">
                   Ask about your journey, phases, flatlines, transmutation, or anything on your mind.
                 </p>
+                <img src="/oracle-wordmark.png" alt="" className="ai-chat-empty-wordmark" />
               </div>
             )}
 
@@ -507,6 +508,12 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
               >
                 Clear chat
               </button>
+            )}
+
+            {messages.length > 0 && !isLoading && !streamingText && (
+              <div className="ai-chat-watermark">
+                <img src="/oracle-wordmark.png" alt="" className="ai-chat-watermark-img" />
+              </div>
             )}
 
             <div ref={messagesEndRef} />

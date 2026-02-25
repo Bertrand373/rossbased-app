@@ -71,7 +71,8 @@ function buildOracleEmbed(text) {
   
   return new EmbedBuilder()
     .setColor(ORACLE_COLOR)
-    .setDescription(desc);
+    .setDescription(desc)
+    .setFooter({ text: 'ORACLE', iconURL: 'https://titantrack.app/The_Oracle.png' });
 }
 
 /**
@@ -83,15 +84,15 @@ function buildInsightEmbed(text, daysBack = 7) {
   
   const embed = new EmbedBuilder()
     .setColor(ORACLE_COLOR)
-    .setAuthor({ name: 'The Oracle Observes' })
+    .setAuthor({ name: 'Oracle Observes' })
     .setDescription(desc)
-    .setFooter({ text: `Pattern analysis · last ${daysBack} days` })
+    .setFooter({ text: `ORACLE · Pattern analysis · last ${daysBack} days`, iconURL: 'https://titantrack.app/The_Oracle.png' })
     .setTimestamp();
   
   // Use bot avatar if available (set at runtime)
   if (client?.user) {
     const avatarURL = client.user.displayAvatarURL({ size: 64 });
-    embed.setAuthor({ name: 'The Oracle Observes', iconURL: avatarURL });
+    embed.setAuthor({ name: 'Oracle Observes', iconURL: avatarURL });
     embed.setThumbnail(avatarURL);
   }
   
@@ -790,6 +791,70 @@ client.on('messageCreate', async (message) => {
     }
   }
 
+  // --- !purge - Bulk delete messages in current channel (admin only) ---
+  // Usage: !purge (default 100) or !purge 50
+  // Discord API limit: can only bulk-delete messages < 14 days old
+  // For older messages, it deletes one by one (slower but works)
+  if (message.content.startsWith('!purge') && ADMIN_DISCORD_USERS.includes(authorUsername)) {
+    const args = message.content.split(' ');
+    const isAll = args[1] === 'all';
+    const requestedCount = isAll ? Infinity : (parseInt(args[1]) || 100);
+    const maxCount = isAll ? Infinity : Math.min(requestedCount, 500); // Safety cap unless "all"
+    
+    try {
+      await message.reply(`⏳ Purging ${isAll ? 'ALL' : `up to ${maxCount}`} messages from #${channelName}...`);
+      
+      let totalDeleted = 0;
+      let hasMore = true;
+      
+      while (hasMore && totalDeleted < maxCount) {
+        const batchSize = Math.min(100, isAll ? 100 : maxCount - totalDeleted);
+        const fetched = await message.channel.messages.fetch({ limit: batchSize });
+        
+        if (fetched.size === 0) {
+          hasMore = false;
+          break;
+        }
+        
+        // Split into bulk-deletable (< 14 days) and old messages
+        const fourteenDaysAgo = Date.now() - (14 * 24 * 60 * 60 * 1000);
+        const recent = fetched.filter(m => m.createdTimestamp > fourteenDaysAgo);
+        const old = fetched.filter(m => m.createdTimestamp <= fourteenDaysAgo);
+        
+        // Bulk delete recent messages (fast)
+        if (recent.size >= 2) {
+          await message.channel.bulkDelete(recent, true);
+          totalDeleted += recent.size;
+        } else if (recent.size === 1) {
+          await recent.first().delete().catch(() => {});
+          totalDeleted += 1;
+        }
+        
+        // Delete old messages one by one (slow but necessary)
+        for (const [, msg] of old) {
+          if (totalDeleted >= maxCount) break;
+          await msg.delete().catch(() => {});
+          totalDeleted++;
+          // Small delay to avoid rate limits
+          await new Promise(r => setTimeout(r, 300));
+        }
+        
+        if (fetched.size < batchSize) hasMore = false;
+      }
+      
+      // Send confirmation then auto-delete it after 5 seconds
+      const confirm = await message.channel.send(`✓ Purged ${totalDeleted} messages from #${channelName}`);
+      setTimeout(() => confirm.delete().catch(() => {}), 5000);
+      
+      console.log(`🗑️ ${authorUsername} purged ${totalDeleted} messages from #${channelName}`);
+      
+    } catch (error) {
+      console.error('Purge error:', error);
+      await message.channel.send('Purge failed. Bot may need "Manage Messages" permission.').catch(() => {});
+    }
+    return;
+  }
+
   // ============================================================
   // WISDOM CHANNEL AUTO-INGESTION
   // Auto-ingest long messages from configured wisdom channels
@@ -990,7 +1055,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       
       // Only add footer to the LAST chunk
       if (i === chunks.length - 1 && remaining <= 5 && remaining > 0) {
-        embed.setFooter({ text: `${remaining} remaining today` });
+        embed.setFooter({ text: `ORACLE · ${remaining} remaining today`, iconURL: 'https://titantrack.app/The_Oracle.png' });
       }
       
       if (i === 0) {
@@ -1173,10 +1238,6 @@ client.once('ready', () => {
       console.log('[Insight] Weekly insight trigger firing...');
       
       const insight = await generateWeeklyInsight(7);
-      if (!insight) {
-        console.log('[Insight] Not enough observations for automatic insight');
-        return;
-      }
       
       // Find the target channel
       const guild = client.guilds.cache.first();
@@ -1188,6 +1249,28 @@ client.once('ready', () => {
       
       if (!targetChannel) {
         console.error(`[Insight] Could not find channel #${INSIGHT_CHANNEL}`);
+        return;
+      }
+      
+      if (!insight) {
+        // Quiet week — DM admin so we know it fired, don't clutter the channel
+        try {
+          const guild = client.guilds.cache.first();
+          if (guild) {
+            const members = await guild.members.fetch();
+            const admin = members.find(m => ADMIN_DISCORD_USERS.includes(m.user.username.toLowerCase()));
+            if (admin) {
+              const quietEmbed = new EmbedBuilder()
+                .setColor(ORACLE_COLOR)
+                .setDescription('Quiet week. Not enough signal to read a pattern. Scheduler fired but nothing posted.')
+                .setFooter({ text: 'ORACLE', iconURL: 'https://titantrack.app/The_Oracle.png' });
+              await admin.send({ embeds: [quietEmbed] });
+            }
+          }
+        } catch (dmErr) {
+          console.error('[Insight] Could not DM admin:', dmErr.message);
+        }
+        console.log(`🔮 Weekly insight: quiet week, DM sent to admin`);
         return;
       }
       
