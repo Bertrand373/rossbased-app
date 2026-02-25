@@ -296,7 +296,7 @@
 .mp-confirm-btn {
   width: 100%;
   padding: 14px 20px;
-  border-radius: 12px;
+  border-radius: 9999px;
   border: 1px solid var(--border);
   background: var(--surface-overlay);
   color: var(--text);
@@ -388,7 +388,7 @@
 
 .mp-restart-btn {
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 9999px;
   border: 1px solid var(--border-prominent);
   background: transparent;
   color: var(--text-secondary);
@@ -431,7 +431,7 @@
   display: block;
   margin: 16px auto 0;
   padding: 10px 24px;
-  border-radius: 12px;
+  border-radius: 9999px;
   border: 1px solid var(--border);
   background: var(--surface-overlay);
   color: var(--text);
@@ -546,7 +546,7 @@
 .mp-explainer-btn {
   width: 100%;
   padding: 16px 24px;
-  border-radius: 12px;
+  border-radius: 9999px;
   border: 1px solid var(--border);
   background: var(--surface-overlay);
   color: var(--text);

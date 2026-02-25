@@ -496,7 +496,12 @@ async function autoIngestMessage(msg, channelName) {
 // ============================================================
 
 // Check if user is rate limited (persisted to MongoDB — survives restarts)
-const isRateLimited = async (userId) => {
+const isRateLimited = async (userId, username) => {
+  // Admins have no daily limit
+  if (username && ADMIN_DISCORD_USERS.includes(username.toLowerCase())) {
+    return { limited: false };
+  }
+  
   const now = Date.now();
   
   // Cooldown check (in-memory is fine for seconds-level cooldown)
@@ -942,7 +947,7 @@ client.on('messageCreate', async (message) => {
   }
   
   // Rate limit check (persisted to MongoDB)
-  const rateLimited = await isRateLimited(message.author.id);
+  const rateLimited = await isRateLimited(message.author.id, authorUsername);
   if (rateLimited.limited) {
     if (rateLimited.reason === 'cooldown') {
       // Silent ignore for cooldown
@@ -1087,8 +1092,9 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
     for (let i = 0; i < chunks.length; i++) {
       const embed = buildOracleEmbed(chunks[i]);
       
-      // Only add footer to the LAST chunk
-      if (i === chunks.length - 1 && remaining <= 5 && remaining > 0) {
+      // Only add remaining footer to the LAST chunk (skip for admins)
+      const isAdmin = ADMIN_DISCORD_USERS.includes(authorUsername);
+      if (i === chunks.length - 1 && remaining <= 5 && remaining > 0 && !isAdmin) {
         embed.setFooter({ text: `Oracle · titantrack.app · ${remaining} remaining today`, iconURL: 'https://titantrack.app/The_Oracle.png' });
       }
       
