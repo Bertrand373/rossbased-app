@@ -777,7 +777,7 @@
   width: 100%;
 }
 
-.stats-sheet .modal {
+.sheet-panel.stats-sheet .modal {
   animation: none !important;
   width: 100%;
   max-width: none;
