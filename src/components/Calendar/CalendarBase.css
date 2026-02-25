@@ -225,8 +225,10 @@
   justify-content: center;
   gap: 8px;
   padding: 10px 16px;
-  background: var(--surface-overlay);
-  border-top: 1px solid var(--border-subtle);
+  background: rgba(10, 10, 10, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   z-index: 100;
