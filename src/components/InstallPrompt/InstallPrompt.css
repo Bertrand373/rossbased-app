@@ -3,55 +3,15 @@
 /* Theme-aware version - uses CSS variables from index.css */
 
 /* =============================================================================
-   OVERLAY - Theme-aware
+   BOTTOM SHEET — content overrides (positioning via BottomSheet.css)
    ============================================================================= */
 
-.install-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: var(--overlay-bg);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  display: flex;
-  flex-direction: column;
+.install-sheet {
   align-items: center;
-  justify-content: center;
-  z-index: 10000;
-  padding: 24px;
-  padding-top: max(24px, env(safe-area-inset-top));
-  padding-bottom: max(24px, env(safe-area-inset-bottom));
-  padding-left: max(24px, env(safe-area-inset-left));
-  padding-right: max(24px, env(safe-area-inset-right));
-  animation: installOverlayIn 200ms ease;
-}
-
-@keyframes installOverlayIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* =============================================================================
-   MODAL - Transparent floating, matches confirm-modal pattern
-   ============================================================================= */
-
-.install-modal {
-  width: 100%;
-  max-width: 340px;
-  background: transparent;
-  position: relative;
+  padding: 0 20px 20px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
   text-align: center;
-  animation: installModalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes installModalIn {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  z-index: 10001;
 }
 
 /* =============================================================================
@@ -248,16 +208,6 @@
    ============================================================================= */
 
 @media (max-width: 480px) {
-  .install-overlay {
-    padding: 20px;
-    padding-top: max(20px, env(safe-area-inset-top));
-    padding-bottom: max(20px, env(safe-area-inset-bottom));
-  }
-  
-  .install-modal {
-    max-width: 100%;
-  }
-  
   .install-header {
     margin-bottom: 28px;
     padding-bottom: 28px;
@@ -298,12 +248,6 @@
 }
 
 @media (max-width: 360px) {
-  .install-overlay {
-    padding: 16px;
-    padding-top: max(16px, env(safe-area-inset-top));
-    padding-bottom: max(16px, env(safe-area-inset-bottom));
-  }
-  
   .install-header h2 {
     font-size: 1.125rem;
   }
@@ -334,11 +278,6 @@
    ============================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .install-overlay,
-  .install-modal {
-    animation: none;
-  }
-  
   .install-btn-primary,
   .install-btn-ghost {
     transition: none;

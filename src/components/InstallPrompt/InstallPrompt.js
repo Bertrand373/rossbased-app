@@ -2,8 +2,9 @@
 // TITANTRACK - Premium PWA Install Prompt
 // Minimal, typography-driven, matches app aesthetic exactly
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './InstallPrompt.css';
+import '../../styles/BottomSheet.css';
 
 // =============================================================================
 // PLATFORM DETECTION
@@ -125,6 +126,70 @@ const InstallPrompt = ({
   const [isVisible, setIsVisible] = useState(false);
   const [platformInfo, setPlatformInfo] = useState(null);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [sheetReady, setSheetReady] = useState(false);
+  const panelRef = useRef(null);
+  const touchStartY = useRef(0);
+  const touchDeltaY = useRef(0);
+  const isDragging = useRef(false);
+
+  // Sheet open animation
+  useEffect(() => {
+    if (isVisible) {
+      requestAnimationFrame(() => requestAnimationFrame(() => setSheetReady(true)));
+    } else {
+      setSheetReady(false);
+    }
+  }, [isVisible]);
+
+  const closeSheet = useCallback((cb) => {
+    setSheetReady(false);
+    setTimeout(() => cb && cb(), 300);
+  }, []);
+
+  // Swipe-to-dismiss
+  const onTouchStart = useCallback((e) => {
+    touchStartY.current = e.touches[0].clientY;
+    touchDeltaY.current = 0;
+    isDragging.current = false;
+  }, []);
+
+  const onTouchMove = useCallback((e) => {
+    const d = e.touches[0].clientY - touchStartY.current;
+    if (d < 0) return;
+    if (d > 10) {
+      isDragging.current = true;
+      touchDeltaY.current = d;
+      if (panelRef.current) {
+        panelRef.current.style.transition = 'none';
+        panelRef.current.style.transform = `translateY(${d}px)`;
+      }
+    }
+  }, []);
+
+  const onTouchEnd = useCallback(() => {
+    if (!isDragging.current) return;
+    if (touchDeltaY.current > 100 && panelRef.current) {
+      panelRef.current.style.transition = 'transform 250ms ease-out';
+      panelRef.current.style.transform = 'translateY(100%)';
+      setTimeout(() => {
+        if (panelRef.current) {
+          panelRef.current.style.transition = '';
+          panelRef.current.style.transform = '';
+        }
+        setSheetReady(false);
+        setIsVisible(false);
+        onClose?.();
+      }, 250);
+    } else if (panelRef.current) {
+      panelRef.current.style.transition = 'transform 250ms ease-out';
+      panelRef.current.style.transform = '';
+      setTimeout(() => {
+        if (panelRef.current) panelRef.current.style.transition = '';
+      }, 250);
+    }
+    isDragging.current = false;
+    touchDeltaY.current = 0;
+  }, [onClose]);
   
   // Initialize
   useEffect(() => {
@@ -196,13 +261,17 @@ const InstallPrompt = ({
     } else {
       localStorage.setItem('titantrack_install_dismissed', new Date().toISOString());
     }
-    setIsVisible(false);
-    onClose?.();
+    closeSheet(() => {
+      setIsVisible(false);
+      onClose?.();
+    });
   };
   
   const handleClose = () => {
-    setIsVisible(false);
-    onClose?.();
+    closeSheet(() => {
+      setIsVisible(false);
+      onClose?.();
+    });
   };
   
   // Don't render if conditions not met
@@ -219,8 +288,9 @@ const InstallPrompt = ({
   const appIcon = currentTheme === 'light' ? '/icon-192-black.png' : '/icon-192.png';
   
   return (
-    <div className="install-overlay" onClick={handleClose}>
-      <div className="install-modal" onClick={e => e.stopPropagation()}>
+    <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={handleClose} style={{ zIndex: 10000 }}>
+      <div ref={panelRef} className={`sheet-panel install-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+        <div className="sheet-header" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} />
         
         {/* Header */}
         <div className="install-header">
