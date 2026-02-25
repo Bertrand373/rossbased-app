@@ -399,6 +399,41 @@
 }
 
 /* ============================================================
+   ORACLE — The AI guide
+   ============================================================ */
+
+.landing-oracle {
+  padding: 100px 24px;
+  max-width: 480px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.landing-oracle-wordmark {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 28px;
+}
+
+.landing-oracle-text {
+  font-size: 0.9375rem;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.7;
+  margin: 0 0 16px 0;
+}
+
+.landing-oracle-sub {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.25);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+/* ============================================================
    TESTIMONIAL
    ============================================================ */
 
@@ -715,6 +750,7 @@
 
 .landing-problem,
 .landing-features,
+.landing-oracle,
 .landing-testimonial,
 .landing-journey,
 .landing-pricing {
@@ -725,6 +761,7 @@
 
 .landing-problem.in-view,
 .landing-features.in-view,
+.landing-oracle.in-view,
 .landing-testimonial.in-view,
 .landing-journey.in-view,
 .landing-pricing.in-view {
@@ -968,6 +1005,7 @@
 
   .landing-problem,
   .landing-features,
+  .landing-oracle,
   .landing-testimonial,
   .landing-journey,
   .landing-pricing {
@@ -1056,6 +1094,7 @@
 
   .landing-problem,
   .landing-features,
+  .landing-oracle,
   .landing-testimonial,
   .landing-journey,
   .landing-pricing,
