@@ -993,6 +993,19 @@
   width: 100%;
 }
 
+/* Remove nested backgrounds — sheet-panel already provides the bg */
+.sheet-panel .sheet-content {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.sheet-panel .sheet button.cancel {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
 /* Override .confirm-modal when inside panel */
 .sheet-panel .confirm-modal {
   max-width: none;
@@ -1004,6 +1017,7 @@
 .tracker-sheet {
   align-items: center;
   padding: 0 20px 20px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
 }
 
 /* Benefits sheet — scrollable content with fixed footer */

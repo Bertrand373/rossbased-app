@@ -90,12 +90,12 @@
 
 .date-actions {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-direction: row;
+  gap: 10px;
 }
 
 .date-actions .btn-primary {
-  width: 100%;
+  flex: 1;
   padding: 16px 24px;
   background: var(--surface-overlay);
   border: 1px solid var(--border);
@@ -113,7 +113,7 @@
 }
 
 .date-actions .btn-ghost {
-  width: 100%;
+  flex: 1;
   padding: 16px 24px;
   background: transparent;
   border: none;

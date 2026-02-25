@@ -109,14 +109,14 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
   // Bottom sheet animation: trigger .open class after mount
   useEffect(() => {
-    if (showStreakOptions || showResetConfirm || showLogLock) {
+    if (showStreakOptions || showResetConfirm || showLogLock || showDatePicker) {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setSheetReady(true));
       });
     } else {
       setSheetReady(false);
     }
-  }, [showStreakOptions, showResetConfirm, showLogLock]);
+  }, [showStreakOptions, showResetConfirm, showLogLock, showDatePicker]);
 
   // Benefits sheet - dedicated state to prevent race conditions
   useEffect(() => {
@@ -468,8 +468,8 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     toast.success('Transmission recorded.');
   };
 
-  // Show date picker if no start date set
-  if (showDatePicker) {
+  // Show date picker overlay if no start date set (initial setup only)
+  if (showDatePicker && !userData.startDate) {
     return (
       <div className="tracker">
         <div className="overlay">
@@ -703,6 +703,26 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                 <button className="btn-ghost" onClick={() => closeSheet(() => setShowLogLock(false))}>Not now</button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Date Picker — Bottom Sheet (edit mode) */}
+      {showDatePicker && userData.startDate && (
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowDatePicker(false))}>
+          <div ref={sheetPanelRef} className={`sheet-panel tracker-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div 
+              className="sheet-header"
+              onTouchStart={handleSheetTouchStart}
+              onTouchMove={handleSheetTouchMove}
+              onTouchEnd={handleSheetTouchEnd}
+            />
+            <DatePicker
+              onSubmit={(date) => closeSheet(() => handleDateSubmit(date))}
+              onCancel={() => closeSheet(() => setShowDatePicker(false))}
+              initialDate={new Date(userData.startDate)}
+              title="Edit start date"
+            />
           </div>
         </div>
       )}
