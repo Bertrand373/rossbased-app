@@ -145,68 +145,6 @@ h4 { font-size: 0.875rem; }
   gap: 12px;
 }
 
-/* Floating Oracle Eye Button */
-.oracle-float-btn {
-  position: fixed;
-  bottom: calc(76px + env(safe-area-inset-bottom, 0));
-  right: 16px;
-  z-index: 95;
-  width: 48px;
-  height: 48px;
-  border: none;
-  background: none;
-  padding: 0;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  animation: oracleBreath 4s ease-in-out infinite;
-}
-
-.oracle-float-btn img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-[data-theme="light"] .oracle-float-btn img {
-  filter: invert(1);
-}
-
-.oracle-float-btn:active {
-  transform: scale(0.88);
-}
-
-@keyframes oracleBreath {
-  0%, 100% { opacity: 0.55; }
-  50% { opacity: 0.9; }
-}
-
-/* Desktop - no mobile nav, sit lower */
-@media (min-width: 1025px) {
-  .oracle-float-btn {
-    bottom: 24px;
-    right: 24px;
-    width: 52px;
-    height: 52px;
-  }
-}
-
-/* Small phones */
-@media (max-width: 350px) {
-  .oracle-float-btn {
-    bottom: calc(68px + env(safe-area-inset-bottom, 0));
-    right: 12px;
-    width: 44px;
-    height: 44px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .oracle-float-btn {
-    animation: none;
-    opacity: 0.7;
-  }
-}
-
 /* Profile circle */
 .profile-circle {
   width: 30px;
@@ -295,6 +233,15 @@ h4 { font-size: 0.875rem; }
 .header-nav .nav-link.active {
   color: var(--text);
   font-weight: 600;
+}
+
+/* Oracle button in desktop nav - styled like a nav link */
+.header-nav .nav-link-oracle {
+  background: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .header-nav .nav-divider {

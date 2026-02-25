@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 
 // Import extracted components
 import { StatCardModal } from './StatsComponents';
+import EmotionalTimeline from '../EmotionalTimeline/EmotionalTimeline';
 import { 
   YourNumbers,
   YourPatterns,
@@ -49,6 +50,7 @@ import {
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
+  const [activeView, setActiveView] = useState('analytics');
   const [selectedMetric, setSelectedMetric] = useState('energy');
   const [timeRange, setTimeRange] = useState('week');
   const [showMilestoneModal, setShowMilestoneModal] = useState(false);
@@ -498,6 +500,36 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
   return (
     <div className="stats-page">
+      {/* Sub-tab navigation — Analytics | Timeline */}
+      <nav className="stats-tabs">
+        <button
+          className={`stats-tab ${activeView === 'analytics' ? 'active' : ''}`}
+          onClick={() => setActiveView('analytics')}
+        >
+          Analytics
+        </button>
+        <div className="stats-tab-divider" />
+        <button
+          className={`stats-tab ${activeView === 'timeline' ? 'active' : ''}`}
+          onClick={() => setActiveView('timeline')}
+        >
+          Timeline
+        </button>
+      </nav>
+
+      {/* Timeline view — EmotionalTimeline component */}
+      {activeView === 'timeline' && (
+        <EmotionalTimeline 
+          userData={userData} 
+          isPremium={isPremium} 
+          updateUserData={updateUserData} 
+          openPlanModal={openPlanModal} 
+        />
+      )}
+
+      {/* Analytics view — existing Stats content */}
+      {activeView === 'analytics' && (
+      <>
       {/* Stat Cards - Hero primary stats, subdued secondary stats */}
       <div className="stat-grid">
         <div className="stat-row-primary">
@@ -771,6 +803,8 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
             </div>
           </div>
         </div>
+      )}
+      </>
       )}
     </div>
   );

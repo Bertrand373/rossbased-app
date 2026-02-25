@@ -12,7 +12,6 @@ import trackerLogoBlack from './assets/trackerapplogo-black.png';
 import Tracker from './components/Tracker/Tracker';
 import Calendar from './components/Calendar/Calendar';
 import Stats from './components/Stats/Stats';
-import EmotionalTimeline from './components/EmotionalTimeline/EmotionalTimeline';
 import UrgeToolkit from './components/UrgeToolkit/UrgeToolkit';
 import Profile from './components/Profile/Profile';
 import Landing from './components/Landing/Landing';
@@ -131,13 +130,13 @@ const ProfileButton = ({ userData }) => {
   );
 };
 
-// Desktop Navigation - Text only with dividers (dots removed)
-const HeaderNavigation = () => {
+// Desktop Navigation - Text only with dividers, Oracle opens AI chat
+const HeaderNavigation = ({ onOracleClick }) => {
   const navItems = [
     { path: '/', label: 'Tracker' },
     { path: '/calendar', label: 'Calendar' },
+    { type: 'oracle', label: 'Oracle' },
     { path: '/stats', label: 'Stats' },
-    { path: '/timeline', label: 'Timeline' },
     { path: '/urge-toolkit', label: 'Urges' }
   ];
 
@@ -145,29 +144,27 @@ const HeaderNavigation = () => {
     <nav className="header-nav">
       <div className="nav-container">
         {navItems.map((item, index) => (
-          <React.Fragment key={item.path}>
-            <NavLink 
-              to={item.path}
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-            >
-              {item.label}
-            </NavLink>
+          <React.Fragment key={item.path || item.type}>
+            {item.type === 'oracle' ? (
+              <button 
+                className="nav-link nav-link-oracle"
+                onClick={onOracleClick}
+              >
+                {item.label}
+              </button>
+            ) : (
+              <NavLink 
+                to={item.path}
+                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+              >
+                {item.label}
+              </NavLink>
+            )}
             {index < navItems.length - 1 && <span className="nav-divider" />}
           </React.Fragment>
         ))}
       </div>
     </nav>
-  );
-};
-
-// Oracle floating button - hidden on admin and when chat is open
-const OracleButton = ({ showAIChat, setShowAIChat }) => {
-  const location = useLocation();
-  if (showAIChat || location.pathname === '/admin') return null;
-  return (
-    <button className="oracle-float-btn" onClick={() => setShowAIChat(true)} aria-label="Open The Oracle">
-      <img src="/The_Oracle.png" alt="" />
-    </button>
   );
 };
 
@@ -597,7 +594,7 @@ function AppContent({
                 <img src={trackerLogo} alt="TitanTrack" className="app-logo" />
               </div>
               
-              {!isMobile && <HeaderNavigation />}
+              {!isMobile && <HeaderNavigation onOracleClick={() => setShowAIChat(true)} />}
               
               <div className="header-actions">
                 <ProfileButton userData={userData} />
@@ -606,8 +603,8 @@ function AppContent({
             
             {isMobile && (
               <MobileNavigation 
-                activeTab={activeTab} 
-                setActiveTab={setActiveTab}
+                onOracleClick={() => setShowAIChat(true)}
+                isOracleActive={showAIChat}
               />
             )}
             
@@ -619,10 +616,7 @@ function AppContent({
               suppress={!hasSubscription || subLoading}
             />
             
-            {/* Floating Oracle Eye - hidden on admin */}
-            <OracleButton showAIChat={showAIChat} setShowAIChat={setShowAIChat} />
-            
-            {/* AI Chat - Now triggered by floating Oracle eye */}
+            {/* AI Chat - Now triggered by nav Oracle icon */}
             <AIChat 
               isLoggedIn={isLoggedIn} 
               isOpen={showAIChat}
@@ -648,9 +642,6 @@ function AppContent({
                   } />
                   <Route path="/stats" element={
                     <Stats userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} openPlanModal={openPlanModal} />
-                  } />
-                  <Route path="/timeline" element={
-                    <EmotionalTimeline userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} openPlanModal={openPlanModal} />
                   } />
                   <Route path="/urge-toolkit" element={
                     <UrgeToolkit userData={userData} isPremium={effectivePremium} updateUserData={updateUserData} openPlanModal={openPlanModal} />
