@@ -99,7 +99,7 @@
   padding: 16px 24px;
   background: var(--surface-overlay);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 9999px;
   color: var(--text);
   font-size: 0.9375rem;
   font-weight: 600;
@@ -116,8 +116,8 @@
   flex: 1;
   padding: 16px 24px;
   background: transparent;
-  border: none;
-  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
   color: var(--text-secondary);
   font-size: 0.9375rem;
   font-weight: 500;
@@ -127,6 +127,7 @@
 }
 
 .date-actions .btn-ghost:hover {
+  border-color: var(--border);
   color: var(--text);
 }
 

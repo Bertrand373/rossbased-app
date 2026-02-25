@@ -624,6 +624,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
               onTouchEnd={handleSheetTouchEnd}
             />
             <div className="sheet">
+              <h3 className="sheet-title">Streak Options</h3>
               <div className="sheet-content">
                 <button onClick={() => closeSheet(() => { setShowStreakOptions(false); setShowDatePicker(true); })}>
                   Edit start date

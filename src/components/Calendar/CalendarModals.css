@@ -527,7 +527,7 @@
 .calendar-edit-options {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 9px;
 }
 
 .calendar-option-btn {
@@ -550,11 +550,11 @@
   position: relative;
 }
 
-/* Inset divider matching .sheet-divider: full width */
+/* Divider centered in gap to match tracker sheet spacing */
 .calendar-option-btn + .calendar-option-btn::before {
   content: '';
   position: absolute;
-  top: 0;
+  top: -5px;
   left: 0;
   right: 0;
   height: 1px;
