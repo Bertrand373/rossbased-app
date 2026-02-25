@@ -796,6 +796,13 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
             >
               {editingExistingTrigger ? 'Update Trigger' : 'Log Relapse'}
             </button>
+            <button className="calendar-trigger-back" onClick={() => {
+              setShowTriggerSelection(false);
+              setEditingExistingTrigger(false);
+              setSelectedTrigger('');
+            }}>
+              Back
+            </button>
           </div>
         </div>
       );
@@ -1240,15 +1247,6 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                   <div className="calendar-actions">
                     {!showTriggerSelection && getEditOptions().type !== 'future' && (
                       <button className="calendar-btn-back" onClick={backToDayInfo}>
-                        Back
-                      </button>
-                    )}
-                    {showTriggerSelection && (
-                      <button className="calendar-btn-back" onClick={() => {
-                        setShowTriggerSelection(false);
-                        setEditingExistingTrigger(false);
-                        setSelectedTrigger('');
-                      }}>
                         Back
                       </button>
                     )}

@@ -532,7 +532,7 @@
 
 .calendar-option-btn {
   width: 100%;
-  padding: 16px 24px;
+  padding: 20px 24px;
   border-radius: 0;
   font-size: 0.9375rem;
   font-weight: 500;
@@ -685,14 +685,14 @@
 
 .calendar-trigger-actions {
   display: flex;
-  flex-direction: column;
-  gap: 0;
+  flex-direction: row;
+  gap: 10px;
   flex-shrink: 0;
   padding-top: 24px;
 }
 
 .calendar-trigger-confirm {
-  width: 100%;
+  flex: 1;
   padding: 16px 24px;
   border-radius: 12px;
   font-size: 0.9375rem;
@@ -708,6 +708,28 @@
 .calendar-trigger-confirm:hover:not(:disabled) { border-color: rgba(255, 255, 255, 0.25); }
 .calendar-trigger-confirm:active:not(:disabled) { transform: scale(0.98); }
 .calendar-trigger-confirm:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.calendar-trigger-back {
+  flex: 1;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-secondary);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.calendar-trigger-back:hover {
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.calendar-trigger-back:active { transform: scale(0.98); }
 
 /* =============================================================================
    TRIGGER DISPLAY IN DAY INFO MODAL
@@ -805,7 +827,7 @@
   .calendar-status-badge { font-size: 0.875rem; }
   .calendar-benefit-label { font-size: 0.8125rem; min-width: 90px; }
   .calendar-benefit-value { width: 28px; height: 28px; min-width: 28px; font-size: 0.875rem; }
-  .calendar-option-btn { padding: 14px 20px; font-size: 0.875rem; }
+  .calendar-option-btn { padding: 18px 20px; font-size: 0.875rem; }
   .calendar-trigger { padding: 12px 0; font-size: 0.8125rem; }
   .calendar-journal-textarea { min-height: 100px; }
   .calendar-actions { margin-top: 32px; }
@@ -819,11 +841,11 @@
   .calendar-benefit-row { gap: 12px; }
   .calendar-benefit-label { font-size: 0.75rem; min-width: 80px; }
   .calendar-benefit-value { width: 26px; height: 26px; min-width: 26px; font-size: 0.8125rem; }
-  .calendar-option-btn { padding: 12px 18px; font-size: 0.8125rem; }
+  .calendar-option-btn { padding: 16px 18px; font-size: 0.8125rem; }
   .calendar-trigger { padding: 12px 0; font-size: 0.75rem; }
   .calendar-triggers-label { font-size: 0.6875rem; }
   .calendar-trigger-actions { padding-top: 20px; }
-  .calendar-trigger-confirm { padding: 14px 20px; font-size: 0.875rem; }
+  .calendar-trigger-confirm, .calendar-trigger-back { padding: 14px 20px; font-size: 0.875rem; }
   .calendar-journal-textarea { min-height: 80px; padding: 14px; font-size: 0.8125rem; }
   .calendar-journal-save, .calendar-journal-cancel { font-size: 0.75rem; }
   .calendar-btn-primary, .calendar-btn-ghost, .calendar-btn-back { padding: 12px 16px; font-size: 0.875rem; border-radius: 12px; }
@@ -839,7 +861,7 @@
   .calendar-benefit-row { gap: 20px; }
   .calendar-benefit-label { font-size: 0.9375rem; min-width: 110px; }
   .calendar-benefit-value { width: 36px; height: 36px; min-width: 36px; font-size: 1.0625rem; }
-  .calendar-option-btn { padding: 18px 28px; font-size: 1rem; }
+  .calendar-option-btn { padding: 22px 28px; font-size: 1rem; }
   .calendar-option-btn .option-dot { width: 16px; height: 3px; }
   .calendar-trigger { padding: 16px 0; font-size: 0.9375rem; }
   .calendar-btn-primary, .calendar-btn-ghost, .calendar-btn-back { padding: 14px 20px; font-size: 0.9375rem; }
