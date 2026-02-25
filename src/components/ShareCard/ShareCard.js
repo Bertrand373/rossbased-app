@@ -95,7 +95,10 @@ const ShareCard = ({ userData, isVisible = true }) => {
 
   // Generate the card image using Canvas API - theme-aware
   const generateCardImage = useCallback(() => {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
+      // Ensure Outfit font is loaded before drawing
+      await document.fonts.ready;
+      
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       
@@ -127,12 +130,22 @@ const ShareCard = ({ userData, isVisible = true }) => {
       const hasExtra = hasScore || isMilestone;
       const dayY = hasExtra ? height * 0.36 : height * 0.45;
 
-      // Day number - large, commanding, centered
+      // Day number - Outfit 200, matching hero streak
       ctx.fillStyle = textColor;
-      ctx.font = '600 320px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.font = '200 320px "Outfit", -apple-system, BlinkMacSystemFont, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(streak.toString(), width / 2, dayY);
+      // Draw characters individually for consistent spacing
+      const streakStr = streak.toString();
+      const charSpacing = 12;
+      const chars = streakStr.split('');
+      const charWidths = chars.map(c => ctx.measureText(c).width);
+      const totalWidth = charWidths.reduce((a, b) => a + b, 0) + charSpacing * (chars.length - 1);
+      let cursorX = (width - totalWidth) / 2;
+      chars.forEach((char, i) => {
+        ctx.fillText(char, cursorX + charWidths[i] / 2, dayY);
+        cursorX += charWidths[i] + charSpacing;
+      });
 
       // "DAYS" label
       ctx.fillStyle = subtleColor;

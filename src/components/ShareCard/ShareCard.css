@@ -76,8 +76,9 @@
 }
 
 .share-mini-day {
+  font-family: 'Outfit', var(--font-base);
   font-size: 4rem;
-  font-weight: 600;
+  font-weight: 200;
   color: var(--text);
   line-height: 1;
   letter-spacing: -0.02em;
@@ -160,8 +161,9 @@
 }
 
 .share-modal-day {
+  font-family: 'Outfit', var(--font-base);
   font-size: 6rem;
-  font-weight: 600;
+  font-weight: 200;
   color: var(--text);
   line-height: 1;
   letter-spacing: -0.02em;

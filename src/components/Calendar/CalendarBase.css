@@ -8,7 +8,7 @@
   /* No min-height - parent .app-content handles layout */
   flex: 1;
   background-color: var(--background);
-  padding: 48px 16px 100px;
+  padding: 48px 16px 148px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -19,8 +19,7 @@
 /* Content wrapper - wider on desktop */
 .calendar-container > .calendar-header-minimal,
 .calendar-container > .calendar-legend-minimal,
-.calendar-container > .calendar-main-section,
-.calendar-container > .calendar-moon-phase {
+.calendar-container > .calendar-main-section {
   width: 100%;
   max-width: 900px;
 }
@@ -213,46 +212,59 @@
 }
 
 /* =============================================================================
-   MOON PHASE - Below grid, month view only
+   MOON BAR - Sticky above bottom nav, both views
    ============================================================================= */
 
-.calendar-moon-phase {
+.calendar-moon-bar {
+  position: fixed;
+  bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+  left: 0;
+  right: 0;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  margin-top: 32px;
-  padding-top: 24px;
+  padding: 10px 16px;
+  background: var(--surface-overlay);
   border-top: 1px solid var(--border-subtle);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: opacity 150ms ease;
-  position: relative;
-  z-index: 1;
-  animation: fadeInUp 500ms ease 100ms forwards;
+  z-index: 100;
+  animation: moonBarIn 400ms cubic-bezier(0.16, 1, 0.3, 1) 200ms forwards;
   opacity: 0;
+  transform: translateY(8px);
 }
 
-.calendar-moon-phase:hover {
-  opacity: 0.7;
+@keyframes moonBarIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.calendar-moon-phase:active {
-  opacity: 0.5;
+.calendar-moon-bar:active {
+  opacity: 0.6;
 }
 
-.calendar-moon-phase-emoji {
+.moon-bar-emoji {
   line-height: 1;
+  display: flex;
+  align-items: center;
 }
 
-.calendar-moon-phase-name {
-  font-size: 0.875rem;
+.moon-bar-label {
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-secondary);
   letter-spacing: 0.01em;
 }
 
-.calendar-moon-phase-meta {
+.moon-bar-separator {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.moon-bar-meta {
   font-size: 0.6875rem;
   font-weight: 400;
   color: var(--text-tertiary);
@@ -821,7 +833,7 @@
 
 @media (max-width: 480px) {
   .calendar-container {
-    padding: 32px 8px 100px;
+    padding: 32px 8px 148px;
   }
   
   /* Minimal header adjustments */
@@ -1062,7 +1074,7 @@
 
 @media (min-width: 1024px) {
   .calendar-container {
-    padding: 56px 48px 80px;
+    padding: 56px 48px 128px;
   }
   
   .calendar-container > .calendar-header-minimal,
@@ -1251,9 +1263,11 @@
 @media (prefers-reduced-motion: reduce) {
   .calendar-header-minimal,
   .calendar-legend-minimal,
-  .calendar-main-section {
+  .calendar-main-section,
+  .calendar-moon-bar {
     animation: none;
     opacity: 1;
+    transform: none;
   }
   
   .toggle-option,

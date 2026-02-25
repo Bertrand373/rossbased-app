@@ -1129,8 +1129,8 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         {viewMode === 'month' ? renderMonthView() : renderWeekView()}
       </div>
 
-      {/* Moon Phase - Month view only, tappable quick-reference */}
-      {viewMode === 'month' && (() => {
+      {/* Moon Phase - Sticky bar above nav, both views */}
+      {(() => {
         const lunar = getLunarData(new Date());
         const synodicMonth = 29.53058867;
         const cycleDayRaw = lunar.lunarAge;
@@ -1138,16 +1138,17 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         const cycleTotal = Math.round(synodicMonth);
         return (
           <div 
-            className="calendar-moon-phase"
+            className="calendar-moon-bar"
             onClick={(e) => openMoonDetail(new Date(), e)}
           >
-            <span className="calendar-moon-phase-emoji">
-              <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={48} />
+            <span className="moon-bar-emoji">
+              <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={24} />
             </span>
-            <span className="calendar-moon-phase-name">{lunar.label}</span>
-            <span className="calendar-moon-phase-meta">
-              Day {cycleDay}/{cycleTotal} · {lunar.illumination}% illumination
-            </span>
+            <span className="moon-bar-label">{lunar.label}</span>
+            <span className="moon-bar-separator">·</span>
+            <span className="moon-bar-meta">Day {cycleDay}/{cycleTotal}</span>
+            <span className="moon-bar-separator">·</span>
+            <span className="moon-bar-meta">{lunar.illumination}%</span>
           </div>
         );
       })()}
@@ -1294,10 +1295,16 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                   
                   <div className="moon-detail-insight">
                     <p>
-                      {lunar.phase === 'full' 
-                        ? "The full moon often correlates with heightened energy and stronger urges. Many practitioners report peak vitality during this phase."
-                        : "The new moon marks a time of renewal and introspection. Some find this a powerful period for setting intentions and deepening practice."
-                      }
+                      {({
+                        'new': "The new moon is a time of new beginnings. Set intentions, recommit to your practice, and plant the seeds for what you want to grow this cycle.",
+                        'waxing-crescent': "The waxing crescent fuels motivation and desire. Your intentions are taking root — channel rising energy into disciplined action.",
+                        'first-quarter': "The first quarter tests your resolve. Obstacles surface now to strengthen you. Push forward with discipline — don't waver.",
+                        'waxing-gibbous': "Energy is accumulating rapidly. Refine your habits and stay locked in. Momentum is building toward a peak — maintain focus.",
+                        'full': "The full moon amplifies everything — vitality, magnetism, and urges. Many practitioners report peak energy. Stay vigilant. This is where discipline matters most.",
+                        'waning-gibbous': "Time to turn inward. Reflect on your progress, practice gratitude, and observe what this cycle has revealed about your patterns.",
+                        'last-quarter': "Release what no longer serves you. Let go of habits, thoughts, and triggers that hold you back. This is a phase of conscious shedding.",
+                        'waning-crescent': "Rest and surrender. Recuperate before the next cycle begins. It's okay to feel low energy — you're preparing for renewal."
+                      })[lunar.phase] || "Track your journey through each lunar cycle. The moon's rhythm mirrors your own internal patterns."}
                     </p>
                   </div>
                   <div className="moon-detail-footer">
