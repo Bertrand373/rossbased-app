@@ -530,28 +530,52 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       {/* Analytics view — existing Stats content */}
       {activeView === 'analytics' && (
       <>
-      {/* Stat Cards - Hero primary stats, subdued secondary stats */}
-      <div className="stat-grid">
-        <div className="stat-row-primary">
-          <button className="stat-card stat-card-primary" onClick={() => handleStatCardClick('currentStreak')}>
-            <span className="stat-num">{safeUserData.currentStreak || 0}</span>
-            <span className="stat-label">Current</span>
-          </button>
-          <button className="stat-card stat-card-primary" onClick={() => handleStatCardClick('longestStreak')}>
-            <span className="stat-num">{safeUserData.longestStreak || 0}</span>
-            <span className="stat-label">Longest</span>
-          </button>
-        </div>
-        <div className="stat-row-secondary">
-          <button className="stat-card stat-card-secondary" onClick={() => handleStatCardClick('wetDreams')}>
-            <span className="stat-num">{safeUserData.wetDreamCount || 0}</span>
-            <span className="stat-label">Wet Dreams</span>
-          </button>
-          <button className="stat-card stat-card-secondary" onClick={() => handleStatCardClick('relapses')}>
-            <span className="stat-num">{safeUserData.relapseCount || 0}</span>
-            <span className="stat-label">Relapses</span>
-          </button>
-        </div>
+      {/* Hero Streak */}
+      <div className="stat-hero">
+        <div className="stat-hero-glow" />
+        <button className="stat-hero-num" onClick={() => handleStatCardClick('currentStreak')}>
+          {safeUserData.currentStreak || 0}
+        </button>
+        <span className="stat-hero-label">DAYS RETAINED</span>
+      </div>
+
+      {/* Next Milestone Progress */}
+      {(() => {
+        const nextM = milestones.find(m => !m.earned);
+        if (!nextM) return null;
+        const prevM = milestones.filter(m => m.earned).pop();
+        const prevDays = prevM ? prevM.days : 0;
+        const current = safeUserData.currentStreak || 0;
+        const pct = Math.min(((current - prevDays) / (nextM.days - prevDays)) * 100, 100);
+        const remaining = nextM.days - current;
+        return (
+          <div className="stat-progress">
+            <div className="stat-progress-meta">
+              <span className="stat-progress-text">{remaining} days to {nextM.days.toLocaleString()}</span>
+            </div>
+            <div className="stat-progress-track">
+              <div className="stat-progress-fill" style={{ width: `${pct}%` }} />
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Supporting Stats */}
+      <div className="stat-supporting">
+        <button className="stat-supporting-card" onClick={() => handleStatCardClick('longestStreak')}>
+          <span className="stat-supporting-num">{safeUserData.longestStreak || 0}</span>
+          <span className="stat-supporting-label">Longest</span>
+        </button>
+        <div className="stat-supporting-divider" />
+        <button className="stat-supporting-card" onClick={() => handleStatCardClick('wetDreams')}>
+          <span className="stat-supporting-num">{safeUserData.wetDreamCount || 0}</span>
+          <span className="stat-supporting-label">Wet Dreams</span>
+        </button>
+        <div className="stat-supporting-divider" />
+        <button className="stat-supporting-card" onClick={() => handleStatCardClick('relapses')}>
+          <span className="stat-supporting-num">{safeUserData.relapseCount || 0}</span>
+          <span className="stat-supporting-label">Relapses</span>
+        </button>
       </div>
 
       <StatCardModal
@@ -565,17 +589,24 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       <section className="stats-section">
         <h2>Milestones</h2>
         <div className="milestone-grid">
-          {milestones.map((m) => (
-            <button
-              key={m.days}
-              className={`milestone-card ${m.earned ? 'earned' : ''}`}
-              onClick={() => handleMilestoneClick(m)}
-              disabled={!m.earned}
-            >
-              <span className="milestone-num">{m.days}</span>
-              <span className="milestone-label">{m.label}</span>
-            </button>
-          ))}
+          {milestones.map((m, i) => {
+            const nextIdx = milestones.findIndex(ms => !ms.earned);
+            const mostRecentIdx = nextIdx > 0 ? nextIdx - 1 : nextIdx === -1 ? milestones.length - 1 : -1;
+            const isMostRecent = i === mostRecentIdx;
+            const isNext = i === nextIdx;
+            const cardClass = `milestone-card ${m.earned ? 'earned' : ''} ${isMostRecent ? 'most-recent' : ''} ${isNext ? 'next-target' : ''}`;
+            return (
+              <button
+                key={m.days}
+                className={cardClass}
+                onClick={() => handleMilestoneClick(m)}
+                disabled={!m.earned}
+              >
+                <span className="milestone-num">{m.days}</span>
+                <span className="milestone-label">{m.label}</span>
+              </button>
+            );
+          })}
         </div>
       </section>
 

@@ -56,12 +56,7 @@
   .stats-page { padding: 56px 24px 80px; }
   .stats-page > *:not(.sheet-backdrop) { max-width: 520px; }
   .stats-page > .overlay { max-width: none; }
-  .stat-grid { max-width: 520px; }
 }
-
-/* =============================================================================
-   STAT CARDS
-   ============================================================================= */
 
 /* =============================================================================
    SUB-TAB NAVIGATION — Analytics | Timeline
@@ -112,86 +107,160 @@
 }
 
 /* =============================================================================
-   STAT CARDS
+   HERO STREAK — The one number
    ============================================================================= */
 
-.stat-grid {
+.stat-hero {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-  margin-bottom: 48px;
+  margin-bottom: 8px;
+  padding: 16px 0 20px;
+  animation: fadeInUp 500ms ease forwards;
 }
 
-.stat-row-primary {
-  display: flex;
-  justify-content: center;
-  gap: 48px;
+.stat-hero-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 180px;
+  background: radial-gradient(ellipse at center, rgba(201, 169, 100, 0.045) 0%, rgba(201, 169, 100, 0.015) 45%, transparent 72%);
+  pointer-events: none;
+  filter: blur(8px);
 }
 
-.stat-row-secondary {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border-subtle);
-}
-
-.stat-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
+.stat-hero-num {
+  font-family: 'Outfit', var(--font-base);
+  font-size: 5rem;
+  font-weight: 200;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-feature-settings: 'tnum' 1;
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
   background: transparent;
   border: none;
-  padding: 12px;
+  padding: 8px 24px;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 150ms ease;
+}
+
+.stat-hero-num:hover { opacity: 0.7; }
+.stat-hero-num:active { opacity: 0.5; }
+
+.stat-hero-label {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.2em;
+  margin-top: 14px;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 1;
+}
+
+/* =============================================================================
+   NEXT MILESTONE PROGRESS
+   ============================================================================= */
+
+.stat-progress {
+  width: 100%;
+  margin-bottom: 32px;
+  padding: 0 4px;
+}
+
+.stat-progress-meta {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.stat-progress-text {
+  font-size: 0.625rem;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  letter-spacing: 0.03em;
+  font-feature-settings: 'tnum' 1;
+}
+
+.stat-progress-track {
+  width: 100%;
+  height: 2px;
+  background: var(--border-prominent);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.stat-progress-fill {
+  height: 100%;
+  background-color: var(--text);
+  border-radius: 1px;
+  transition: width 1200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* =============================================================================
+   SUPPORTING STATS ROW
+   ============================================================================= */
+
+.stat-supporting {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 48px;
+  padding: 20px 0;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.stat-supporting-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  border: none;
+  padding: 6px 16px;
   cursor: pointer;
+  flex: 1;
   transition: opacity 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.stat-card:hover { opacity: 0.7; }
-.stat-card:active { opacity: 0.5; }
+.stat-supporting-card:hover { opacity: 0.7; }
+.stat-supporting-card:active { opacity: 0.5; }
 
-.stat-card-primary .stat-num {
-  font-size: 3.5rem;
-  font-weight: 500;
-  color: var(--text);
-  line-height: 1;
-  letter-spacing: -0.03em;
-  font-feature-settings: 'tnum' 1;
-}
-
-.stat-card-primary .stat-label {
-  font-size: 0.6875rem;
-  font-weight: 400;
-  color: var(--text-muted);
-  letter-spacing: 0.02em;
-}
-
-.stat-card-secondary .stat-num {
-  font-size: 1.5rem;
+.stat-supporting-num {
+  font-size: 1.25rem;
   font-weight: 500;
   color: var(--text-secondary);
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   font-feature-settings: 'tnum' 1;
 }
 
-.stat-card-secondary .stat-label {
-  font-size: 0.625rem;
+.stat-supporting-label {
+  font-size: 0.5625rem;
   font-weight: 400;
   color: var(--text-tertiary);
   letter-spacing: 0.02em;
 }
 
-.stat-divider { display: none; }
+.stat-supporting-divider {
+  width: 1px;
+  height: 30px;
+  background: var(--border-subtle);
+  flex-shrink: 0;
+}
 
 @media (min-width: 768px) {
-  .stat-row-primary { gap: 64px; }
-  .stat-row-secondary { gap: 56px; }
-  .stat-card-primary .stat-num { font-size: 4rem; }
-  .stat-card-secondary .stat-num { font-size: 1.75rem; }
+  .stat-hero-num { font-size: 5.5rem; }
+  .stat-supporting-num { font-size: 1.5rem; }
 }
 
 /* =============================================================================
@@ -246,6 +315,7 @@
   transform: scale(0.98);
 }
 
+/* Past earned — settled, collected */
 .milestone-card.earned {
   background: var(--accent-gold-bg);
   border-color: var(--accent-gold-border);
@@ -266,6 +336,39 @@
   font-weight: 600;
 }
 
+/* Most recent earned — "you are here" highlight */
+.milestone-card.most-recent {
+  background: var(--accent-gold-bg-hover);
+  border-color: var(--accent-gold-border-hover);
+  box-shadow: 0 0 20px rgba(255, 221, 0, 0.03), inset 0 1px 0 rgba(255, 221, 0, 0.04);
+}
+
+.milestone-card.most-recent:hover {
+  background: var(--accent-gold-bg-hover);
+  border-color: var(--accent-gold-border-hover);
+}
+
+.milestone-card.most-recent .milestone-num { color: var(--text); }
+.milestone-card.most-recent .milestone-label { color: var(--accent-gold-text); }
+
+/* Next target — subtle ring indicator */
+.milestone-card.next-target {
+  background: transparent;
+  border-color: var(--border-subtle);
+}
+
+.milestone-card.next-target::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  border: 1px solid var(--border-prominent);
+  background: transparent;
+}
+
 .milestone-num {
   display: block;
   font-size: 1.5rem;
@@ -275,7 +378,7 @@
   font-feature-settings: 'tnum' 1;
 }
 
-.milestone-card.earned .milestone-num { color: var(--text); }
+.milestone-card.earned .milestone-num { color: var(--text-secondary); }
 
 .milestone-label {
   display: block;
@@ -798,7 +901,7 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-.stat-grid { animation: fadeInUp 500ms ease forwards; }
+.stat-hero { animation: fadeInUp 500ms ease forwards; }
 
 .stats-section:nth-of-type(1) {
   animation: fadeInUp 500ms ease 50ms forwards;
@@ -867,10 +970,8 @@
 
 @media (max-width: 480px) {
   .stats-page { padding: 32px 16px 100px; }
-  .stat-row-primary { gap: 40px; }
-  .stat-row-secondary { gap: 32px; }
-  .stat-card-primary .stat-num { font-size: 3rem; }
-  .stat-card-secondary .stat-num { font-size: 1.25rem; }
+  .stat-hero-num { font-size: 4rem; }
+  .stat-supporting-num { font-size: 1.125rem; }
   .stats-section h2 { font-size: 0.625rem; }
   .milestone-grid { gap: 6px; }
   .milestone-card { padding: 16px 6px; border-radius: 10px; }
@@ -892,10 +993,8 @@
 
 @media (max-width: 360px) {
   .stats-page { padding: 28px 12px 90px; }
-  .stat-row-primary { gap: 32px; }
-  .stat-row-secondary { gap: 24px; }
-  .stat-card-primary .stat-num { font-size: 2.5rem; }
-  .stat-card-secondary .stat-num { font-size: 1.125rem; }
+  .stat-hero-num { font-size: 3.5rem; }
+  .stat-supporting-num { font-size: 1rem; }
   .milestone-card { padding: 14px 4px; }
   .milestone-num { font-size: 1.125rem; }
   .average-num { font-size: 3.5rem; }
@@ -912,8 +1011,8 @@
 }
 
 @media (min-width: 1024px) {
-  .stat-card-primary .stat-num { font-size: 4.5rem; }
-  .stat-card-secondary .stat-num { font-size: 2rem; }
+  .stat-hero-num { font-size: 6rem; }
+  .stat-supporting-num { font-size: 1.5rem; }
   .milestone-grid { gap: 12px; }
   .milestone-card { padding: 24px 12px; }
   .milestone-num { font-size: 1.75rem; }
@@ -931,12 +1030,12 @@
    ============================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .stat-grid, .stats-section, .reset-menu, .stats-page .overlay, .stats-page .modal, .insight-loading-spinner {
+  .stat-hero, .stat-supporting, .stats-section, .reset-menu, .stats-page .overlay, .stats-page .modal, .insight-loading-spinner {
     animation: none;
     opacity: 1;
   }
   
-  .stats-page .toggle-btn, .milestone-card, .stat-card, .reset-btn {
+  .stats-page .toggle-btn, .milestone-card, .stat-hero-num, .stat-supporting-card, .reset-btn {
     transition: none;
   }
 }

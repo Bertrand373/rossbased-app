@@ -192,7 +192,8 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     if (!token) return;
 
     try {
-      const response = await fetch(`${API_URL}/api/ai/usage`, {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const response = await fetch(`${API_URL}/api/ai/usage?timezone=${encodeURIComponent(tz)}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

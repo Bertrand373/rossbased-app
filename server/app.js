@@ -996,17 +996,16 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     const FREE_WEEKLY_LIMIT = 3;
     const PREMIUM_DAILY_LIMIT = 25;
 
-    // Weekly limit tracking for free users (resets every Monday UTC)
-    const getWeekStartUTC = () => {
-      const d = new Date();
-      const day = d.getUTCDay(); // 0=Sun, 1=Mon
+    // Weekly limit tracking for free users (timezone-aware)
+    const getWeekStartLocal = () => {
+      const localNow = new Date(now.toLocaleString('en-US', { timeZone: userTimezone }));
+      const day = localNow.getDay(); // 0=Sun, 1=Mon
       const diff = day === 0 ? 6 : day - 1; // days since Monday
-      const monday = new Date(d);
-      monday.setUTCDate(d.getUTCDate() - diff);
-      monday.setUTCHours(0, 0, 0, 0);
+      const monday = new Date(localNow);
+      monday.setDate(localNow.getDate() - diff);
       return monday.toISOString().split('T')[0];
     };
-    const currentWeekStart = getWeekStartUTC();
+    const currentWeekStart = getWeekStartLocal();
     const storedWeekStart = user.aiUsage?.weekStart || '';
     const isNewWeek = storedWeekStart !== currentWeekStart;
     const currentWeeklyCount = isNewWeek ? 0 : (user.aiUsage?.weeklyCount || 0);
@@ -1414,8 +1413,10 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    const userTimezone = req.query.timezone || 'UTC';
     const now = new Date();
-    const userLocalDate = now.toISOString().split('T')[0];
+    const userLocalDate = new Date(now.toLocaleString('en-US', { timeZone: userTimezone }))
+      .toISOString().split('T')[0];
     const storedDate = user.aiUsage?.date || '';
     const isNewDay = storedDate !== userLocalDate;
     const currentCount = isNewDay ? 0 : (user.aiUsage?.count || 0);
@@ -1427,17 +1428,16 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
     const FREE_WEEKLY_LIMIT = 3;
     const PREMIUM_DAILY_LIMIT = 25;
 
-    // Weekly tracking for free users
-    const getWeekStartUTC = () => {
-      const d = new Date();
-      const day = d.getUTCDay();
-      const diff = day === 0 ? 6 : day - 1;
-      const monday = new Date(d);
-      monday.setUTCDate(d.getUTCDate() - diff);
-      monday.setUTCHours(0, 0, 0, 0);
+    // Weekly tracking for free users (timezone-aware)
+    const getWeekStartLocal = () => {
+      const localNow = new Date(now.toLocaleString('en-US', { timeZone: userTimezone }));
+      const day = localNow.getDay(); // 0=Sun, 1=Mon
+      const diff = day === 0 ? 6 : day - 1; // days since Monday
+      const monday = new Date(localNow);
+      monday.setDate(localNow.getDate() - diff);
       return monday.toISOString().split('T')[0];
     };
-    const currentWeekStart = getWeekStartUTC();
+    const currentWeekStart = getWeekStartLocal();
     const storedWeekStart = user.aiUsage?.weekStart || '';
     const isNewWeek = storedWeekStart !== currentWeekStart;
     const currentWeeklyCount = isNewWeek ? 0 : (user.aiUsage?.weeklyCount || 0);
@@ -1483,8 +1483,10 @@ app.get('/api/ai-usage/:username', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
+    const userTimezone = req.query.timezone || 'UTC';
     const now = new Date();
-    const userLocalDate = now.toISOString().split('T')[0];
+    const userLocalDate = new Date(now.toLocaleString('en-US', { timeZone: userTimezone }))
+      .toISOString().split('T')[0];
     const storedDate = user.aiUsage?.date || '';
     const isNewDay = storedDate !== userLocalDate;
     const currentCount = isNewDay ? 0 : (user.aiUsage?.count || 0);
@@ -1497,17 +1499,16 @@ app.get('/api/ai-usage/:username', authenticate, async (req, res) => {
     const FREE_WEEKLY_LIMIT = 3;
     const PREMIUM_DAILY_LIMIT = 25;
 
-    // Weekly tracking for free users
-    const getWeekStartUTC = () => {
-      const d = new Date();
-      const day = d.getUTCDay();
-      const diff = day === 0 ? 6 : day - 1;
-      const monday = new Date(d);
-      monday.setUTCDate(d.getUTCDate() - diff);
-      monday.setUTCHours(0, 0, 0, 0);
+    // Weekly tracking for free users (timezone-aware)
+    const getWeekStartLocal = () => {
+      const localNow = new Date(now.toLocaleString('en-US', { timeZone: userTimezone }));
+      const day = localNow.getDay(); // 0=Sun, 1=Mon
+      const diff = day === 0 ? 6 : day - 1; // days since Monday
+      const monday = new Date(localNow);
+      monday.setDate(localNow.getDate() - diff);
       return monday.toISOString().split('T')[0];
     };
-    const currentWeekStart = getWeekStartUTC();
+    const currentWeekStart = getWeekStartLocal();
     const storedWeekStart = user.aiUsage?.weekStart || '';
     const isNewWeek = storedWeekStart !== currentWeekStart;
     const currentWeeklyCount = isNewWeek ? 0 : (user.aiUsage?.weeklyCount || 0);
