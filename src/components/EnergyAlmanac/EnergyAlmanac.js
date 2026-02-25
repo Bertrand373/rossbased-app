@@ -401,7 +401,7 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
         onClick={() => setIsExpanded(true)}
       >
         <div className="almanac-header">
-          <span className="almanac-icon">◈</span>
+          <span className="almanac-icon"></span>
           <span className="almanac-label">Today's Alignment</span>
           <span className="almanac-expand">+</span>
         </div>
