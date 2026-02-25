@@ -527,30 +527,40 @@
 .calendar-edit-options {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 0;
 }
 
 .calendar-option-btn {
   width: 100%;
   padding: 16px 24px;
-  border-radius: 12px;
+  border-radius: 0;
   font-size: 0.9375rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: background-color 100ms ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
   border: none;
-  background: var(--surface-overlay);
-  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.calendar-option-btn:last-child {
+  border-bottom: none;
 }
 
 .calendar-option-btn:hover {
-  background: var(--border);
+  background: var(--surface-overlay);
   color: var(--text);
+}
+
+.calendar-option-btn:active {
+  background: var(--border);
 }
 
 .calendar-option-btn .option-dot {
@@ -564,30 +574,30 @@
 .calendar-option-btn .option-dot.wet-dream { background-color: var(--status-wetdream); }
 
 .calendar-option-btn.calendar-option-danger {
-  background: var(--status-relapse-bg);
+  background: transparent;
   color: var(--status-relapse);
 }
 
 .calendar-option-btn.calendar-option-danger:hover {
-  background: var(--status-relapse-bg-hover);
+  background: var(--surface-overlay);
 }
 
 .calendar-option-btn.calendar-option-warning {
-  background: var(--status-wetdream-bg);
-  color: var(--status-wetdream);
+  background: transparent;
+  color: var(--text);
 }
 
 .calendar-option-btn.calendar-option-warning:hover {
-  background: var(--status-wetdream-bg-hover);
+  background: var(--surface-overlay);
 }
 
 .calendar-option-edit {
-  background: var(--surface-overlay);
-  color: var(--text-secondary);
+  background: transparent;
+  color: var(--text);
 }
 
 .calendar-option-edit:hover {
-  background: var(--border);
+  background: var(--surface-overlay);
   color: var(--text);
 }
 
@@ -809,7 +819,7 @@
   .calendar-benefit-row { gap: 12px; }
   .calendar-benefit-label { font-size: 0.75rem; min-width: 80px; }
   .calendar-benefit-value { width: 26px; height: 26px; min-width: 26px; font-size: 0.8125rem; }
-  .calendar-option-btn { padding: 12px 18px; font-size: 0.8125rem; border-radius: 10px; }
+  .calendar-option-btn { padding: 12px 18px; font-size: 0.8125rem; }
   .calendar-trigger { padding: 12px 0; font-size: 0.75rem; }
   .calendar-triggers-label { font-size: 0.6875rem; }
   .calendar-trigger-actions { padding-top: 20px; }

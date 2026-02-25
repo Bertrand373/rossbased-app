@@ -3,6 +3,7 @@
 // Now controlled by header button instead of floating FAB
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './AIChat.css';
+import '../../styles/BottomSheet.css';
 
 // Mixpanel tracking
 import { trackAIChatOpened, trackAIMessageSent, trackAIChatCleared, trackAILimitReached } from '../../utils/mixpanel';
@@ -59,11 +60,13 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   });
   const [error, setError] = useState(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [clearSheetReady, setClearSheetReady] = useState(false);
   
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const chatBodyRef = useRef(null);
   const panelRef = useRef(null);
+  const clearSheetRef = useRef(null);
   const hasTrackedOpen = useRef(false);
   
   // Swipe-to-close refs
@@ -136,6 +139,59 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
       trackAILimitReached();
     }
   }, [usage.messagesRemaining, usage.messagesLimit]);
+
+  // Clear sheet animation
+  useEffect(() => {
+    if (showClearConfirm) {
+      requestAnimationFrame(() => requestAnimationFrame(() => setClearSheetReady(true)));
+    } else {
+      setClearSheetReady(false);
+    }
+  }, [showClearConfirm]);
+
+  const closeClearSheet = useCallback((cb) => {
+    setClearSheetReady(false);
+    setTimeout(() => {
+      setShowClearConfirm(false);
+      cb?.();
+    }, 300);
+  }, []);
+
+  // Clear sheet swipe
+  const clearTouchStart = useRef(0);
+  const clearTouchDelta = useRef(0);
+  const clearDragging = useRef(false);
+
+  const handleClearSheetTouchStart = useCallback((e) => {
+    clearTouchStart.current = e.touches[0].clientY;
+    clearTouchDelta.current = 0;
+    clearDragging.current = false;
+  }, []);
+
+  const handleClearSheetTouchMove = useCallback((e) => {
+    const delta = e.touches[0].clientY - clearTouchStart.current;
+    if (delta < 0) return;
+    if (delta > 10) {
+      clearDragging.current = true;
+      clearTouchDelta.current = delta;
+      if (clearSheetRef.current) {
+        clearSheetRef.current.style.transition = 'none';
+        clearSheetRef.current.style.transform = `translateY(${delta}px)`;
+      }
+    }
+  }, []);
+
+  const handleClearSheetTouchEnd = useCallback(() => {
+    if (!clearDragging.current) return;
+    if (clearSheetRef.current) {
+      clearSheetRef.current.style.transition = '';
+      clearSheetRef.current.style.transform = '';
+    }
+    if (clearTouchDelta.current > 80) {
+      closeClearSheet();
+    }
+    clearDragging.current = false;
+  }, [closeClearSheet]);
 
   // Swipe-to-close (mobile drawer)
   const handleTouchStart = useCallback((e) => {
@@ -379,10 +435,11 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
 
   // Clear chat history
   const handleClearChat = () => {
-    setMessages([]);
-    localStorage.removeItem(CHAT_HISTORY_KEY);
-    setShowClearConfirm(false);
-    trackAIChatCleared();
+    closeClearSheet(() => {
+      setMessages([]);
+      localStorage.removeItem(CHAT_HISTORY_KEY);
+      trackAIChatCleared();
+    });
   };
 
   // Get theme-aware loading icon
@@ -512,15 +569,27 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Clear Chat Confirmation Modal */}
+          {/* Clear Chat Confirmation - Bottom Sheet */}
           {showClearConfirm && (
-            <div className="overlay" onClick={() => setShowClearConfirm(false)}>
-              <div className="modal" onClick={e => e.stopPropagation()}>
-                <h2>Clear chat history?</h2>
-                <p className="modal-text">This will delete all messages in this conversation.</p>
-                <div className="modal-buttons">
-                  <button className="btn-danger" onClick={handleClearChat}>Clear</button>
-                  <button className="btn-ghost" onClick={() => setShowClearConfirm(false)}>Cancel</button>
+            <div className={`sheet-backdrop${clearSheetReady ? ' open' : ''}`} onClick={() => closeClearSheet()}>
+              <div 
+                ref={clearSheetRef} 
+                className={`sheet-panel ai-clear-sheet${clearSheetReady ? ' open' : ''}`} 
+                onClick={e => e.stopPropagation()}
+              >
+                <div 
+                  className="sheet-header"
+                  onTouchStart={handleClearSheetTouchStart}
+                  onTouchMove={handleClearSheetTouchMove}
+                  onTouchEnd={handleClearSheetTouchEnd}
+                />
+                <div className="confirm-modal">
+                  <h2>Clear chat history?</h2>
+                  <p>This will delete all messages in this conversation.</p>
+                  <div className="confirm-actions">
+                    <button className="btn-danger" onClick={handleClearChat}>Clear</button>
+                    <button className="btn-ghost" onClick={() => closeClearSheet()}>Cancel</button>
+                  </div>
                 </div>
               </div>
             </div>
