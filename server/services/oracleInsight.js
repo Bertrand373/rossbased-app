@@ -4,6 +4,7 @@
 
 const Anthropic = require('@anthropic-ai/sdk');
 const ServerPulse = require('../models/ServerPulse');
+const KnowledgeChunk = require('../models/KnowledgeChunk');
 const { retrieveKnowledge } = require('./knowledgeRetrieval');
 
 const anthropic = new Anthropic({
@@ -233,4 +234,156 @@ async function getPulseStats() {
   return { total, unprocessed, thisWeek, uniqueAuthors, topTopics };
 }
 
-module.exports = { logIfRelevant, generateWeeklyInsight, getPulseStats };
+/**
+ * Generate durable observations from conversation patterns and store in knowledge base.
+ * Called after weekly insight. Reads the same processed pulse data and extracts
+ * generalizable learnings that the Oracle can reference in future conversations.
+ * 
+ * This is how the Oracle builds institutional knowledge from lived experience.
+ */
+async function generateObservations(daysBack = 7) {
+  try {
+    const since = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000);
+    
+    // Fetch recently processed observations (weekly insight just processed these)
+    const observations = await ServerPulse.find({
+      processed: true,
+      updatedAt: { $gte: since }
+    })
+      .sort({ createdAt: -1 })
+      .limit(200)
+      .lean();
+    
+    if (observations.length < 10) {
+      console.log(`[Observations] Only ${observations.length} processed — need 10+ for pattern extraction`);
+      return [];
+    }
+    
+    // Fetch existing oracle observations to avoid duplicates
+    const existingObs = await KnowledgeChunk.find({
+      'source.name': 'oracle-observation',
+      enabled: true
+    })
+      .sort({ createdAt: -1 })
+      .limit(30)
+      .select('content')
+      .lean();
+    
+    const existingSummary = existingObs.length > 0
+      ? existingObs.map(o => o.content).join('\n---\n')
+      : 'None yet. This is the first observation cycle.';
+    
+    // Build anonymized conversation data
+    const uniqueAuthors = new Set(observations.map(o => o.author)).size;
+    const summaryLines = observations.map(obs => `[#${obs.channel}]: "${obs.content}"`);
+    
+    // Topic frequency
+    const topicCounts = {};
+    for (const obs of observations) {
+      for (const topic of obs.topics) {
+        topicCounts[topic] = (topicCounts[topic] || 0) + 1;
+      }
+    }
+    const topTopics = Object.entries(topicCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([topic, count]) => `${topic} (${count})`);
+    
+    const response = await anthropic.messages.create({
+      model: 'claude-opus-4-20250514',
+      max_tokens: 800,
+      system: `You are an analytical system extracting durable observations from a semen retention community's conversations. Your job is to identify patterns that would be useful knowledge for advising future practitioners.
+
+IMPORTANT: Extract only observations that are DURABLE and GENERALIZABLE. Not "this week people felt tired" but "Practitioners between days 30-50 consistently report a creative surge that precedes the commonly reported flatline by approximately one week."
+
+Each observation should:
+- Reference specific streak phases, timeframes, or conditions when possible
+- Describe the pattern clearly enough that it could help someone currently experiencing it
+- Connect to underlying mechanisms (hormonal, energetic, psychological) when the data supports it
+- Be written as a factual observation in third person, not advice
+
+EXISTING OBSERVATIONS ALREADY STORED (do NOT repeat these or rephrase the same idea):
+${existingSummary}
+
+Respond with ONLY valid JSON. No markdown backticks, no preamble, no explanation:
+{
+  "observations": [
+    {
+      "content": "The full observation (2-4 sentences max)",
+      "keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
+      "category": "one of: science, esoteric, spiritual, practical, community"
+    }
+  ]
+}
+
+Return 1-3 observations ONLY if genuinely new patterns exist. If nothing novel emerges beyond what is already stored, return: {"observations": []}`,
+      messages: [{
+        role: 'user',
+        content: `OBSERVATION WINDOW: ${observations.length} messages from ${uniqueAuthors} unique members over ${daysBack} days
+
+TOP PATTERNS:
+${topTopics.join('\n')}
+
+RAW CONVERSATIONS (anonymized):
+${summaryLines.slice(0, 100).join('\n\n')}`
+      }]
+    });
+    
+    // Parse response
+    const raw = response.content[0].text.trim();
+    let parsed;
+    try {
+      parsed = JSON.parse(raw);
+    } catch (e) {
+      const clean = raw.replace(/```json\s?|```/g, '').trim();
+      parsed = JSON.parse(clean);
+    }
+    
+    if (!parsed.observations || parsed.observations.length === 0) {
+      console.log('[Observations] No new patterns detected — nothing stored');
+      return [];
+    }
+    
+    // Valid categories from KnowledgeChunk schema
+    const validCategories = [
+      'esoteric', 'science', 'spiritual', 'practical', 'angel-numbers',
+      'transmutation', 'chrism', 'kundalini', 'samael-aun-weor',
+      'community', 'general', 'other'
+    ];
+    
+    // Store each observation as a KnowledgeChunk
+    const stored = [];
+    const parentId = `oracle-obs-${Date.now()}`;
+    
+    for (let i = 0; i < parsed.observations.length; i++) {
+      const obs = parsed.observations[i];
+      if (!obs.content || obs.content.length < 20) continue;
+      
+      const category = validCategories.includes(obs.category) ? obs.category : 'community';
+      
+      const chunk = await KnowledgeChunk.create({
+        content: obs.content,
+        source: { type: 'text', name: 'oracle-observation' },
+        category,
+        chunkIndex: i,
+        parentId,
+        keywords: (obs.keywords || []).map(k => k.toLowerCase()).slice(0, 10),
+        tokenEstimate: Math.ceil(obs.content.length / 4),
+        enabled: true,
+        author: null
+      });
+      
+      stored.push(chunk);
+      console.log(`[Observations] Stored: "${obs.content.substring(0, 80)}..." [${category}]`);
+    }
+    
+    console.log(`[Observations] ${stored.length} new observation(s) added to knowledge base`);
+    return stored;
+    
+  } catch (error) {
+    console.error('[Observations] Generation error:', error);
+    return [];
+  }
+}
+
+module.exports = { logIfRelevant, generateWeeklyInsight, generateObservations, getPulseStats };

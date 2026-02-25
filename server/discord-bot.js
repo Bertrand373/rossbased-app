@@ -6,7 +6,7 @@
 const { Client, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.js');
 const Anthropic = require('@anthropic-ai/sdk');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
-const { logIfRelevant, generateWeeklyInsight, getPulseStats } = require('./services/oracleInsight');
+const { logIfRelevant, generateWeeklyInsight, generateObservations, getPulseStats } = require('./services/oracleInsight');
 const KnowledgeChunk = require('./models/KnowledgeChunk');
 const OracleUsage = require('./models/OracleUsage');
 const User = require('./models/User');
@@ -240,6 +240,24 @@ const client = new Client({
 const anthropic = new Anthropic({
   apiKey: ANTHROPIC_API_KEY,
 });
+
+/**
+ * Call Claude API with 1 silent retry on overload errors.
+ * Waits 3 seconds before retrying. If retry also fails, throws.
+ */
+async function callClaude(params) {
+  try {
+    return await anthropic.messages.create(params);
+  } catch (err) {
+    const isOverloaded = err.error?.error?.type === 'overloaded_error' || err.status === 529;
+    if (isOverloaded) {
+      console.log('🔮 API overloaded — retrying in 3s...');
+      await new Promise(r => setTimeout(r, 3000));
+      return await anthropic.messages.create(params);
+    }
+    throw err;
+  }
+}
 
 // ============================================================
 // CHANNEL INGESTION ENGINE
@@ -1065,8 +1083,8 @@ NUMEROLOGY:
 Use this awareness naturally. Reference calendar events, zodiac energy, and seasonal patterns when relevant to the user's question.\n`;
     const systemWithKnowledge = SYSTEM_PROMPT + dateContext + personalContext + ragContext;
     
-    // Call Claude
-    const response = await anthropic.messages.create({
+    // Call Claude (with silent retry on overload)
+    const response = await callClaude({
       model: 'claude-sonnet-4-20250514',
       max_tokens: maxTokens,
       system: systemWithKnowledge,
@@ -1162,7 +1180,11 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
     if (error.status === 429) {
       console.log('Anthropic rate limit hit — waiting');
     } else {
-      await message.reply({ embeds: [buildOracleEmbed('The Oracle is momentarily between dimensions. Try again shortly.')] }).catch(() => {});
+      // Send error embed, then auto-delete it after 15 seconds
+      try {
+        const errorMsg = await message.reply({ embeds: [buildOracleEmbed('The Oracle is momentarily between dimensions. Try again shortly.')] });
+        setTimeout(() => errorMsg.delete().catch(() => {}), 15000);
+      } catch (e) { /* silent */ }
     }
   }
 });
@@ -1316,6 +1338,11 @@ client.once('ready', () => {
       
       await targetChannel.send({ embeds: [buildInsightEmbed(insight, 7)] });
       console.log(`🔮 Weekly insight auto-posted to #${INSIGHT_CHANNEL}`);
+      
+      // Fire-and-forget: extract durable observations into knowledge base
+      generateObservations(7).catch(err => {
+        console.error('[Observations] Post-insight generation failed:', err.message);
+      });
       
     } catch (err) {
       console.error('[Insight] Scheduler error:', err);

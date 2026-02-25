@@ -5,8 +5,6 @@
   max-width: 280px;
   text-align: center;
   margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border-subtle);
   animation: quoteIn 600ms ease 200ms forwards;
   opacity: 0;
 }
@@ -14,7 +12,6 @@
 .quote-text {
   font-size: 0.8125rem;
   font-weight: 400;
-  font-style: italic;
   color: var(--text-tertiary);
   line-height: 1.6;
   margin: 0 0 8px 0;
@@ -48,7 +45,6 @@
   .daily-quote {
     max-width: 240px;
     margin-top: 20px;
-    padding-top: 20px;
   }
   
   .quote-text {
@@ -64,7 +60,6 @@
 @media (max-height: 700px) {
   .daily-quote {
     margin-top: 16px;
-    padding-top: 16px;
   }
 }
 
