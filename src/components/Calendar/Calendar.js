@@ -342,10 +342,17 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   };
 
   const showEditFromInfo = () => {
-    setSheetView('edit');
-    setSelectedTrigger('');
-    setShowTriggerSelection(false);
-    setEditingExistingTrigger(false);
+    // Slide info sheet down, then switch view and slide edit sheet up
+    setCalSheetReady(false);
+    setTimeout(() => {
+      setSheetView('edit');
+      setSelectedTrigger('');
+      setShowTriggerSelection(false);
+      setEditingExistingTrigger(false);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setCalSheetReady(true));
+      });
+    }, 300);
   };
 
   const closeEditModal = () => {
@@ -362,10 +369,17 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   };
 
   const backToDayInfo = () => {
-    setShowTriggerSelection(false);
-    setEditingExistingTrigger(false);
-    setSelectedTrigger('');
-    setSheetView('info');
+    // Slide edit sheet down, then switch view and slide info sheet up
+    setCalSheetReady(false);
+    setTimeout(() => {
+      setShowTriggerSelection(false);
+      setEditingExistingTrigger(false);
+      setSelectedTrigger('');
+      setSheetView('info');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setCalSheetReady(true));
+      });
+    }, 300);
   };
 
   // Moon detail modal handlers
