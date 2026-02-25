@@ -662,6 +662,55 @@
   cursor: pointer;
 }
 
+/* Reset confirm — type-to-confirm input */
+.reset-confirm-input {
+  margin: -12px 0 20px;
+  text-align: left;
+}
+
+.reset-confirm-input label {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.reset-confirm-input label strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.reset-confirm-input input {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 0.9375rem;
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-align: center;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.reset-confirm-input input:focus {
+  outline: none;
+  border-color: var(--border-prominent);
+  background: var(--surface-raised);
+}
+
+.reset-confirm-input input::placeholder {
+  color: var(--text-tertiary);
+  letter-spacing: 0.15em;
+}
+
+.modal-buttons .btn-danger:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
 /* Stat detail breakdown */
 .stat-detail-breakdown {
   margin: 32px 0;
@@ -721,6 +770,7 @@
 .stats-sheet {
   align-items: center;
   padding: 0 20px 20px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
   text-align: center;
 }
 

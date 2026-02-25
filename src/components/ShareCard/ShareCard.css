@@ -137,6 +137,7 @@
 .share-sheet {
   align-items: center;
   padding: 0 20px 20px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
 }
 
 /* ============================================================
@@ -243,7 +244,7 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   color: var(--text);
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -301,7 +302,7 @@
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
   color: var(--text-secondary);
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;

@@ -55,6 +55,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [selectedMilestone, setSelectedMilestone] = useState(null);
   const [showResetStreakModal, setShowResetStreakModal] = useState(false);
   const [showResetAllModal, setShowResetAllModal] = useState(false);
+  const [resetConfirmText, setResetConfirmText] = useState('');
   const [showStatModal, setShowStatModal] = useState(false);
   const [selectedStatCard, setSelectedStatCard] = useState(null);
   
@@ -481,6 +482,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         startDate: new Date()
       });
       setShowResetAllModal(false);
+      setResetConfirmText('');
       toast.success('All data reset');
     } catch (error) {
       toast.error('Failed to reset data');
@@ -743,17 +745,28 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         </div>
       )}
 
-      {/* Reset All Sheet */}
+      {/* Reset All Sheet — type-to-confirm */}
       {showResetAllModal && (
-        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowResetAllModal(false))}>
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => { setShowResetAllModal(false); setResetConfirmText(''); })}>
           <div ref={sheetPanelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd} />
             <div className="modal" style={{ animation: 'none' }}>
               <h2>Reset All Data?</h2>
               <p className="modal-text">This will permanently delete all progress data including streaks, benefits, and milestones. This cannot be undone.</p>
+              <div className="reset-confirm-input">
+                <label>Type <strong>RESET</strong> to confirm</label>
+                <input
+                  type="text"
+                  value={resetConfirmText}
+                  onChange={(e) => setResetConfirmText(e.target.value)}
+                  placeholder="RESET"
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+              </div>
               <div className="modal-buttons">
-                <button className="btn-danger" onClick={confirmResetAll}>Reset All</button>
-                <button className="btn-ghost" onClick={() => closeSheet(() => setShowResetAllModal(false))}>Cancel</button>
+                <button className="btn-danger" onClick={confirmResetAll} disabled={resetConfirmText !== 'RESET'}>Reset All</button>
+                <button className="btn-ghost" onClick={() => closeSheet(() => { setShowResetAllModal(false); setResetConfirmText(''); })}>Cancel</button>
               </div>
             </div>
           </div>
