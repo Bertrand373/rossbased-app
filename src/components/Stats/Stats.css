@@ -104,7 +104,16 @@
   background-color: var(--border-prominent);
 }
 
+/* EmotionalTimeline embedded — remove its own page padding when inside Stats */
+.stats-page .et-container {
+  padding-top: 0;
+  padding-bottom: 0;
+  min-height: auto;
+}
+
 /* =============================================================================
+   STAT CARDS
+   ============================================================================= */
 
 .stat-grid {
   display: flex;

@@ -23,6 +23,16 @@
   align-items: center;
   justify-content: center;
   gap: 0;
+  position: relative;
+}
+
+/* Groups — each side takes equal space, centering Oracle */
+.mobile-nav-group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
 }
 
 /* ============================================================
@@ -51,6 +61,24 @@
 .mobile-nav-item.active .mobile-nav-label {
   color: var(--text);
   font-weight: 600;
+}
+
+/* ============================================================
+   SLIDING DASH — Tracks active route tab
+   ============================================================ */
+
+.mobile-nav-dash {
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 16px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 1px;
+  opacity: 0;
+  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 150ms ease;
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* Hover - only on devices that support it */
@@ -186,6 +214,10 @@
   }
   
   .mobile-nav-oracle-img {
+    transition: none;
+  }
+  
+  .mobile-nav-dash {
     transition: none;
   }
 }
