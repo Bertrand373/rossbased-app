@@ -50,7 +50,14 @@
   transform: translateY(100%);
   transition: transform 300ms ease;
   pointer-events: none;
+  /* Hide scrollbars globally for all sheets */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+
+.sheet-panel::-webkit-scrollbar { display: none; }
+.sheet-panel *::-webkit-scrollbar { display: none; }
+.sheet-panel * { scrollbar-width: none; }
 
 .sheet-panel::before {
   content: '';
