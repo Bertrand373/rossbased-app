@@ -1076,6 +1076,20 @@
   animation: slideInFromLeft 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* After initial entrance, kill fadeInUp so swipe doesn't re-trigger it */
+.calendar-main-section.anim-done {
+  animation: none;
+  opacity: 1;
+}
+
+.calendar-main-section.anim-done.swipe-left {
+  animation: slideInFromRight 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.calendar-main-section.anim-done.swipe-right {
+  animation: slideInFromLeft 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 .calendar-header-minimal {
   animation: fadeInUp 500ms ease forwards;
 }

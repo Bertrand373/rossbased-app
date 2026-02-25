@@ -118,9 +118,16 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
   // Swipe navigation state
   const [swipeAnim, setSwipeAnim] = useState(null); // 'left' | 'right' | null
+  const [initialAnimDone, setInitialAnimDone] = useState(false);
   const swipeStartX = useRef(0);
   const swipeStartY = useRef(0);
   const swipeLocked = useRef(false);
+
+  // Mark initial entrance animation as complete
+  useEffect(() => {
+    const timer = setTimeout(() => setInitialAnimDone(true), 600);
+    return () => clearTimeout(timer);
+  }, []);
   // Sheet animation: trigger .open class for Day Info + Moon Detail
   useEffect(() => {
     if (dayInfoModal || moonDetailModal) {
@@ -1186,7 +1193,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
       {/* Calendar Grid */}
       <div 
-        className={`calendar-main-section${swipeAnim ? ` swipe-${swipeAnim}` : ''}`}
+        className={`calendar-main-section${initialAnimDone ? ' anim-done' : ''}${swipeAnim ? ` swipe-${swipeAnim}` : ''}`}
         onTouchStart={handleSwipeStart}
         onTouchEnd={handleSwipeEnd}
       >
