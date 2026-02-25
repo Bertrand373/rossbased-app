@@ -550,13 +550,13 @@
   position: relative;
 }
 
-/* Inset divider matching .sheet-divider: margin 4px 12px */
+/* Inset divider matching .sheet-divider: full width */
 .calendar-option-btn + .calendar-option-btn::before {
   content: '';
   position: absolute;
   top: 0;
-  left: 12px;
-  right: 12px;
+  left: 0;
+  right: 0;
   height: 1px;
   background-color: var(--border);
 }
