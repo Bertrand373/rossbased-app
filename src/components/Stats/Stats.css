@@ -768,6 +768,7 @@
    ============================================================================= */
 
 .stats-sheet {
+  align-items: center;
   padding: 0 20px 20px;
   padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
   text-align: center;
@@ -777,6 +778,10 @@
   animation: none !important;
   width: 100%;
   max-width: none;
+}
+
+.stats-sheet .confirm-modal {
+  width: 100%;
 }
 
 /* =============================================================================

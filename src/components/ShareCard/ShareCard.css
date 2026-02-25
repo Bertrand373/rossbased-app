@@ -238,7 +238,7 @@
   justify-content: center;
   gap: 10px;
   width: 100%;
-  padding: 16px 24px;
+  padding: 14px 20px;
   background: var(--surface-overlay);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -288,6 +288,7 @@
   flex-direction: row;
   gap: 10px;
   width: 100%;
+  padding-top: 24px;
 }
 
 .share-sheet-actions .share-modal-btn {
@@ -296,7 +297,7 @@
 
 .share-btn-ghost {
   flex: 1;
-  padding: 16px 24px;
+  padding: 14px 20px;
   background: transparent;
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
@@ -305,7 +306,7 @@
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: color 150ms ease;
+  transition: border-color 150ms ease, color 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
