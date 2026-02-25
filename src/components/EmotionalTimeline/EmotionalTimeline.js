@@ -401,6 +401,7 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
   }, []);
 
   return (
+    <>
     <div className="et-container">
 
       {/* Current Phase — Hero card */}
@@ -496,6 +497,8 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
               </div>
             </div>
           )}
+      </div>
+
       </div>
 
       {/* Phase Modal - Bottom sheet on mobile, centered card on desktop */}
@@ -618,7 +621,7 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

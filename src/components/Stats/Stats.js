@@ -127,12 +127,12 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     if (sheetDeltaY.current > 100 && sheetPanelRef.current) {
       sheetPanelRef.current.style.transition = 'transform 250ms ease-out';
       sheetPanelRef.current.style.transform = 'translateY(100%)';
+      setSheetReady(false);
       setTimeout(() => {
         if (sheetPanelRef.current) {
           sheetPanelRef.current.style.transition = '';
           sheetPanelRef.current.style.transform = '';
         }
-        setSheetReady(false);
         setShowMilestoneModal(false);
         setShowResetStreakModal(false);
         setShowResetAllModal(false);

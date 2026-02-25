@@ -88,12 +88,12 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
     if (deltaY.current > 100 && panelRef.current) {
       panelRef.current.style.transition = 'transform 250ms ease-out';
       panelRef.current.style.transform = 'translateY(100%)';
+      setSheetReady(false);
       setTimeout(() => {
         if (panelRef.current) {
           panelRef.current.style.transition = '';
           panelRef.current.style.transform = '';
         }
-        setSheetReady(false);
         onClose();
       }, 250);
     } else if (panelRef.current) {

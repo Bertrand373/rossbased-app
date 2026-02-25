@@ -164,12 +164,12 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
       // Threshold met — animate out and close
       panelRef.current.style.transition = 'transform 250ms ease-out';
       panelRef.current.style.transform = 'translateY(100%)';
+      onClose();
       setTimeout(() => {
         if (panelRef.current) {
           panelRef.current.style.transition = '';
           panelRef.current.style.transform = '';
         }
-        onClose();
       }, 250);
     } else if (panelRef.current) {
       // Below threshold — snap back

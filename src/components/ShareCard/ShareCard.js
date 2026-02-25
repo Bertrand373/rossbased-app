@@ -235,12 +235,12 @@ const ShareCard = ({ userData, isVisible = true }) => {
       // Threshold met — animate out and close
       panelRef.current.style.transition = 'transform 250ms ease-out';
       panelRef.current.style.transform = 'translateY(100%)';
+      setPreviewOpen(false);
       setTimeout(() => {
         if (panelRef.current) {
           panelRef.current.style.transition = '';
           panelRef.current.style.transform = '';
         }
-        setPreviewOpen(false);
         setShowPreview(false);
         document.body.style.overflow = '';
       }, 250);
@@ -274,22 +274,21 @@ const ShareCard = ({ userData, isVisible = true }) => {
         }
 
         // Try native share first (mobile)
-        if (navigator.share && navigator.canShare) {
-          const file = new File([blob], 'titantrack-progress.png', { type: 'image/png' });
-          const shareData = { files: [file] };
-          
-          if (navigator.canShare(shareData)) {
-            try {
-              await navigator.share(shareData);
+        if (navigator.share) {
+          try {
+            const file = new File([blob], 'titantrack-progress.png', { type: 'image/png' });
+            await navigator.share({ files: [file] });
+            setIsGenerating(false);
+            closePreview();
+            return;
+          } catch (err) {
+            if (err.name === 'AbortError') {
+              // User cancelled — stay on sheet
               setIsGenerating(false);
-              closePreview();
               return;
-            } catch (err) {
-              // User cancelled or share failed, fall through to download
-              if (err.name !== 'AbortError') {
-                console.log('Share failed, falling back to download');
-              }
             }
+            // Share failed — fall through to download
+            console.log('Share failed, falling back to download');
           }
         }
 
@@ -304,7 +303,6 @@ const ShareCard = ({ userData, isVisible = true }) => {
         URL.revokeObjectURL(url);
         
         setIsGenerating(false);
-        closePreview();
       }, 'image/png', 1.0);
     } catch (err) {
       console.error('Error generating card:', err);

@@ -281,13 +281,13 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     if (sheetTouchDeltaY.current > 100 && sheetPanelRef.current) {
       sheetPanelRef.current.style.transition = 'transform 250ms ease-out';
       sheetPanelRef.current.style.transform = 'translateY(100%)';
+      setSheetReady(false);
+      setBenefitsReady(false);
       setTimeout(() => {
         if (sheetPanelRef.current) {
           sheetPanelRef.current.style.transition = '';
           sheetPanelRef.current.style.transform = '';
         }
-        setSheetReady(false);
-        setBenefitsReady(false);
         setShowStreakOptions(false);
         setShowResetConfirm(false);
         setShowLogLock(false);

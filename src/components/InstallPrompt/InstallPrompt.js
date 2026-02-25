@@ -171,12 +171,12 @@ const InstallPrompt = ({
     if (touchDeltaY.current > 100 && panelRef.current) {
       panelRef.current.style.transition = 'transform 250ms ease-out';
       panelRef.current.style.transform = 'translateY(100%)';
+      setSheetReady(false);
       setTimeout(() => {
         if (panelRef.current) {
           panelRef.current.style.transition = '';
           panelRef.current.style.transform = '';
         }
-        setSheetReady(false);
         setIsVisible(false);
         onClose?.();
       }, 250);

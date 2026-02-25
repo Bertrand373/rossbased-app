@@ -160,12 +160,12 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     if (calSheetTouchDeltaY.current > 100 && calSheetPanelRef.current) {
       calSheetPanelRef.current.style.transition = 'transform 250ms ease-out';
       calSheetPanelRef.current.style.transform = 'translateY(100%)';
+      setCalSheetReady(false);
       setTimeout(() => {
         if (calSheetPanelRef.current) {
           calSheetPanelRef.current.style.transition = '';
           calSheetPanelRef.current.style.transform = '';
         }
-        setCalSheetReady(false);
         setDayInfoModal(false);
         setMoonDetailModal(false);
         setSelectedDate(null);
