@@ -162,7 +162,10 @@
   height: 22px;
   width: auto;
   object-fit: contain;
+  object-position: left center;
   opacity: 0.85;
+  align-self: flex-start;
+  margin-left: -2px;
 }
 
 [data-theme="light"] .ai-chat-header-wordmark {

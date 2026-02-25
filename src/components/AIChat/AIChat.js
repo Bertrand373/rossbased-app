@@ -437,7 +437,6 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                 <p className="ai-chat-empty-subtitle">
                   Ask about your journey, phases, flatlines, transmutation, or anything on your mind.
                 </p>
-                <img src="/oracle-wordmark.png" alt="" className="ai-chat-empty-wordmark" />
               </div>
             )}
 

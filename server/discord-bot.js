@@ -72,7 +72,7 @@ function buildOracleEmbed(text) {
   return new EmbedBuilder()
     .setColor(ORACLE_COLOR)
     .setDescription(desc)
-    .setFooter({ text: 'ORACLE', iconURL: 'https://titantrack.app/The_Oracle.png' });
+    .setFooter({ text: 'Oracle · titantrack.app', iconURL: 'https://titantrack.app/The_Oracle.png' });
 }
 
 /**
@@ -86,7 +86,7 @@ function buildInsightEmbed(text, daysBack = 7) {
     .setColor(ORACLE_COLOR)
     .setAuthor({ name: 'Oracle Observes' })
     .setDescription(desc)
-    .setFooter({ text: `ORACLE · Pattern analysis · last ${daysBack} days`, iconURL: 'https://titantrack.app/The_Oracle.png' })
+    .setFooter({ text: `Oracle · titantrack.app · Pattern analysis · last ${daysBack} days`, iconURL: 'https://titantrack.app/The_Oracle.png' })
     .setTimestamp();
   
   // Use bot avatar if available (set at runtime)
@@ -1055,7 +1055,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       
       // Only add footer to the LAST chunk
       if (i === chunks.length - 1 && remaining <= 5 && remaining > 0) {
-        embed.setFooter({ text: `ORACLE · ${remaining} remaining today`, iconURL: 'https://titantrack.app/The_Oracle.png' });
+        embed.setFooter({ text: `Oracle · titantrack.app · ${remaining} remaining today`, iconURL: 'https://titantrack.app/The_Oracle.png' });
       }
       
       if (i === 0) {
@@ -1263,7 +1263,7 @@ client.once('ready', () => {
               const quietEmbed = new EmbedBuilder()
                 .setColor(ORACLE_COLOR)
                 .setDescription('Quiet week. Not enough signal to read a pattern. Scheduler fired but nothing posted.')
-                .setFooter({ text: 'ORACLE', iconURL: 'https://titantrack.app/The_Oracle.png' });
+                .setFooter({ text: 'Oracle · titantrack.app', iconURL: 'https://titantrack.app/The_Oracle.png' });
               await admin.send({ embeds: [quietEmbed] });
             }
           }
