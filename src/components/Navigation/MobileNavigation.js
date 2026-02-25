@@ -61,26 +61,28 @@ const MobileNavigation = ({ onOracleClick, isOracleActive }) => {
       dashRef.current.style.transition = '';
     };
 
-    // Delayed recalc — gives layout time to settle after orientation change
-    const delayedRecalc = () => {
-      setTimeout(recalc, 100);
-      setTimeout(recalc, 300);
+    // On orientation/visibility change: hide immediately, recalc after layout settles
+    const hideAndRecalc = () => {
+      if (dashRef.current) {
+        dashRef.current.style.transition = 'none';
+        dashRef.current.style.opacity = '0';
+      }
+      setTimeout(recalc, 200);
+      setTimeout(recalc, 500);
     };
 
-    window.addEventListener('resize', recalc);
-    window.addEventListener('orientationchange', delayedRecalc);
+    window.addEventListener('resize', hideAndRecalc);
+    window.addEventListener('orientationchange', hideAndRecalc);
 
-    // Also catch visibility changes (e.g. landscape blocker hiding)
-    const observer = new MutationObserver(delayedRecalc);
-    const blocker = document.querySelector('.landscape-blocker');
-    if (blocker) {
-      observer.observe(blocker, { attributes: true, attributeFilter: ['style', 'class'] });
-    }
+    // matchMedia is more reliable than orientationchange on modern devices
+    const mql = window.matchMedia('(orientation: portrait)');
+    const onOrientationMedia = () => hideAndRecalc();
+    mql.addEventListener('change', onOrientationMedia);
 
     return () => {
-      window.removeEventListener('resize', recalc);
-      window.removeEventListener('orientationchange', delayedRecalc);
-      observer.disconnect();
+      window.removeEventListener('resize', hideAndRecalc);
+      window.removeEventListener('orientationchange', hideAndRecalc);
+      mql.removeEventListener('change', onOrientationMedia);
     };
   }, []);
 
