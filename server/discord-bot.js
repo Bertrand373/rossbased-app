@@ -54,7 +54,7 @@ const CHANNEL_HISTORY = new Map();
 const MAX_HISTORY = 8; // Last 8 messages for context
 
 // Oracle embed styling
-const ORACLE_COLOR = 0xF5F5F5; // Clean white (slightly off-white renders better on Discord dark mode)
+const ORACLE_COLOR = 0xBDA300; // Gold (matches Oracle eye branding)
 
 // ============================================================
 // EMBED BUILDERS
