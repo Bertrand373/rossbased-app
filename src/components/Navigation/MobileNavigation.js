@@ -42,22 +42,46 @@ const MobileNavigation = ({ onOracleClick, isOracleActive }) => {
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
-  // Re-measure on resize
+  // Re-measure on resize and orientation change
   useEffect(() => {
-    const handleResize = () => {
+    const recalc = () => {
       if (!navRef.current || !dashRef.current) return;
       const active = navRef.current.querySelector('.mobile-nav-item.active');
-      if (!active) return;
+      if (!active) {
+        dashRef.current.style.opacity = '0';
+        return;
+      }
       const navRect = navRef.current.getBoundingClientRect();
       const itemRect = active.getBoundingClientRect();
       const x = itemRect.left + itemRect.width / 2 - navRect.left - 8;
       dashRef.current.style.transition = 'none';
       dashRef.current.style.transform = `translateX(${x}px)`;
+      dashRef.current.style.opacity = '1';
       dashRef.current.offsetHeight; // eslint-disable-line no-unused-expressions
       dashRef.current.style.transition = '';
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+
+    // Delayed recalc — gives layout time to settle after orientation change
+    const delayedRecalc = () => {
+      setTimeout(recalc, 100);
+      setTimeout(recalc, 300);
+    };
+
+    window.addEventListener('resize', recalc);
+    window.addEventListener('orientationchange', delayedRecalc);
+
+    // Also catch visibility changes (e.g. landscape blocker hiding)
+    const observer = new MutationObserver(delayedRecalc);
+    const blocker = document.querySelector('.landscape-blocker');
+    if (blocker) {
+      observer.observe(blocker, { attributes: true, attributeFilter: ['style', 'class'] });
+    }
+
+    return () => {
+      window.removeEventListener('resize', recalc);
+      window.removeEventListener('orientationchange', delayedRecalc);
+      observer.disconnect();
+    };
   }, []);
 
   return (
