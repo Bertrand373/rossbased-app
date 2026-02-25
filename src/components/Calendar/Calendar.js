@@ -116,6 +116,11 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [noteText, setNoteText] = useState('');
 
+  // Swipe navigation state
+  const [swipeAnim, setSwipeAnim] = useState(null); // 'left' | 'right' | null
+  const swipeStartX = useRef(0);
+  const swipeStartY = useRef(0);
+  const swipeLocked = useRef(false);
   // Sheet animation: trigger .open class for Day Info + Moon Detail
   useEffect(() => {
     if (dayInfoModal || moonDetailModal) {
@@ -197,13 +202,21 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     label: t.label
   }));
 
-  // Navigation
+  // Navigation with slide animation
   const prevPeriod = () => {
-    setCurrentDate(viewMode === 'month' ? subMonths(currentDate, 1) : subWeeks(currentDate, 1));
+    setSwipeAnim('right');
+    setTimeout(() => {
+      setCurrentDate(viewMode === 'month' ? subMonths(currentDate, 1) : subWeeks(currentDate, 1));
+      setTimeout(() => setSwipeAnim(null), 300);
+    }, 10);
   };
 
   const nextPeriod = () => {
-    setCurrentDate(viewMode === 'month' ? addMonths(currentDate, 1) : addWeeks(currentDate, 1));
+    setSwipeAnim('left');
+    setTimeout(() => {
+      setCurrentDate(viewMode === 'month' ? addMonths(currentDate, 1) : addWeeks(currentDate, 1));
+      setTimeout(() => setSwipeAnim(null), 300);
+    }, 10);
   };
 
   const getWeekRange = (date) => {
@@ -211,6 +224,39 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     const weekEnd = addDays(weekStart, 6);
     return { weekStart, weekEnd };
   };
+
+  // Swipe navigation on calendar grid
+  const handleSwipeStart = useCallback((e) => {
+    swipeStartX.current = e.touches[0].clientX;
+    swipeStartY.current = e.touches[0].clientY;
+    swipeLocked.current = false;
+  }, []);
+
+  const handleSwipeEnd = useCallback((e) => {
+    if (swipeLocked.current) return;
+    const deltaX = e.changedTouches[0].clientX - swipeStartX.current;
+    const deltaY = e.changedTouches[0].clientY - swipeStartY.current;
+    
+    // Only trigger if horizontal swipe is dominant and exceeds threshold
+    if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+      swipeLocked.current = true;
+      if (deltaX < 0) {
+        // Swiped left → next period
+        setSwipeAnim('left');
+        setTimeout(() => {
+          setCurrentDate(prev => viewMode === 'month' ? addMonths(prev, 1) : addWeeks(prev, 1));
+          setTimeout(() => setSwipeAnim(null), 300);
+        }, 10);
+      } else {
+        // Swiped right → previous period
+        setSwipeAnim('right');
+        setTimeout(() => {
+          setCurrentDate(prev => viewMode === 'month' ? subMonths(prev, 1) : subWeeks(prev, 1));
+          setTimeout(() => setSwipeAnim(null), 300);
+        }, 10);
+      }
+    }
+  }, [viewMode]);
 
   // Check if day is in the future
   const isFutureDay = (day) => {
@@ -1139,7 +1185,11 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       </div>
 
       {/* Calendar Grid */}
-      <div className="calendar-main-section">
+      <div 
+        className={`calendar-main-section${swipeAnim ? ` swipe-${swipeAnim}` : ''}`}
+        onTouchStart={handleSwipeStart}
+        onTouchEnd={handleSwipeEnd}
+      >
         {viewMode === 'month' ? renderMonthView() : renderWeekView()}
       </div>
 

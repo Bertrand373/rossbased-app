@@ -558,7 +558,7 @@ function AppContent({
           },
           success: {
             duration: 2500,
-            icon: <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />,
+            icon: <span style={{ width: 16, height: 3, borderRadius: 2, background: '#22c55e', flexShrink: 0 }} />,
           },
           error: {
             duration: 3500,
@@ -566,7 +566,7 @@ function AppContent({
               background: '#1a1a1a',
               border: '1px solid rgba(255, 59, 48, 0.15)',
             },
-            icon: <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ff3b30', flexShrink: 0 }} />,
+            icon: <span style={{ width: 16, height: 3, borderRadius: 2, background: '#ff3b30', flexShrink: 0 }} />,
           },
         }}
       />
