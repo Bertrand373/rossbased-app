@@ -773,6 +773,10 @@
   text-align: center;
 }
 
+.stats-sheet > * {
+  width: 100%;
+}
+
 .stats-sheet .modal {
   animation: none !important;
   width: 100%;
