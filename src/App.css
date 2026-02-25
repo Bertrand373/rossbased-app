@@ -389,7 +389,7 @@ h4 { font-size: 0.875rem; }
   font-weight: 500;
   line-height: 1;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: 9999px;
   cursor: pointer;
   transition: all var(--transition-fast);
   -webkit-tap-highlight-color: transparent;
