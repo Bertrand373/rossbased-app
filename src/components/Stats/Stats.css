@@ -494,7 +494,7 @@
   padding: 16px 24px;
   background: var(--surface-overlay);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 9999px;
   color: var(--text);
   font-size: 0.9375rem;
   font-weight: 600;
@@ -511,7 +511,7 @@
   padding: 16px 24px;
   background: transparent;
   border: none;
-  border-radius: 12px;
+  border-radius: 9999px;
   color: var(--text-secondary);
   font-size: 0.9375rem;
   font-weight: 600;
@@ -527,7 +527,7 @@
   padding: 16px 24px;
   background: var(--status-relapse-bg);
   border: none;
-  border-radius: 12px;
+  border-radius: 9999px;
   color: var(--status-relapse);
   font-size: 0.9375rem;
   font-weight: 600;
@@ -637,7 +637,7 @@
 .modal-buttons .btn-ghost {
   background: transparent;
   border: 1px solid var(--border-subtle);
-  border-radius: 12px;
+  border-radius: 9999px;
   color: var(--text-secondary);
   font-size: 0.9375rem;
   font-weight: 500;
@@ -655,7 +655,7 @@
   background: var(--status-relapse-bg);
   color: var(--status-relapse);
   border: none;
-  border-radius: 12px;
+  border-radius: 9999px;
   font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
@@ -835,7 +835,7 @@
   .stats-page .modal h2 { font-size: 1.25rem; }
   .modal-text { font-size: 0.875rem; margin-bottom: 32px; }
   .modal-buttons .btn-danger, .modal-buttons .btn-ghost { padding: 12px 16px; font-size: 0.875rem; }
-  .stats-page .btn-primary, .stats-page .btn-ghost, .stats-page .btn-danger { padding: 14px 20px; font-size: 0.875rem; border-radius: 12px; }
+  .stats-page .btn-primary, .stats-page .btn-ghost, .stats-page .btn-danger { padding: 14px 20px; font-size: 0.875rem; border-radius: 9999px; }
 }
 
 @media (max-width: 360px) {

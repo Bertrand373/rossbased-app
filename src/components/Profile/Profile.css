@@ -116,7 +116,7 @@
   padding: 10px 20px;
   background: transparent;
   border: none;
-  border-radius: 10px;
+  border-radius: 9999px;
   color: var(--text-muted);
   font-size: 0.8125rem;
   font-weight: 500;
@@ -521,7 +521,7 @@
   padding: 14px 24px;
   background: transparent;
   border: 1px solid var(--border-prominent);
-  border-radius: 12px;
+  border-radius: 9999px;
   color: var(--text-secondary);
   font-size: 0.8125rem;
   font-weight: 500;
@@ -591,7 +591,7 @@
   padding: 16px 24px;
   background: var(--surface-overlay);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 9999px;
   color: var(--text);
   font-size: 0.9375rem;
   font-weight: 600;
@@ -609,7 +609,7 @@
   padding: 16px 24px;
   background: transparent;
   border: 1px solid var(--border-prominent);
-  border-radius: 12px;
+  border-radius: 9999px;
   color: var(--text-secondary);
   font-size: 0.9375rem;
   font-weight: 500;
@@ -628,7 +628,7 @@
   padding: 16px 24px;
   background: rgba(255, 71, 87, 0.15);
   border: 1px solid rgba(255, 71, 87, 0.3);
-  border-radius: 12px;
+  border-radius: 9999px;
   color: #ff4757;
   font-size: 0.9375rem;
   font-weight: 600;
@@ -699,7 +699,7 @@
   padding: 12px 24px;
   background: transparent;
   border: 1px solid var(--border-prominent);
-  border-radius: 10px;
+  border-radius: 9999px;
   color: var(--text-secondary);
   font-size: 0.8125rem;
   font-weight: 500;
@@ -752,7 +752,7 @@
   padding: 12px 24px;
   background: transparent;
   border: 1px solid var(--border-prominent);
-  border-radius: 10px;
+  border-radius: 9999px;
   color: var(--text-secondary);
   font-size: 0.8125rem;
   font-weight: 500;
@@ -848,7 +848,7 @@
   padding: 12px 16px;
   background: transparent;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 9999px;
   color: var(--text-muted);
   font-size: 0.8125rem;
   font-weight: 500;
@@ -1577,7 +1577,7 @@
   margin-top: 16px;
   background: var(--surface-overlay);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 9999px;
   color: var(--text);
   font-size: 0.875rem;
   font-weight: 600;
@@ -1657,7 +1657,7 @@
   padding: 14px 16px;
   background: transparent;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 9999px;
   color: var(--text);
   font-size: 0.875rem;
   font-weight: 500;

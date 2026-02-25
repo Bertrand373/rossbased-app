@@ -241,7 +241,7 @@
   padding: 14px 20px;
   background: var(--surface-overlay);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 9999px;
   color: var(--text);
   font-size: 0.9375rem;
   font-weight: 600;
@@ -300,7 +300,7 @@
   padding: 14px 20px;
   background: transparent;
   border: 1px solid var(--border-subtle);
-  border-radius: 12px;
+  border-radius: 9999px;
   color: var(--text-secondary);
   font-size: 0.9375rem;
   font-weight: 500;
