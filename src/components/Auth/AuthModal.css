@@ -176,7 +176,7 @@
   padding: 14px 12px;
   background-color: transparent;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  border-radius: 9999px;
   color: #ffffff;
   font-size: 0.875rem;
   font-weight: 500;
@@ -327,7 +327,7 @@
   margin-top: 8px;
   background: var(--surface-overlay);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 9999px;
   color: var(--text);
   font-size: 1rem;
   font-weight: 600;
@@ -527,7 +527,7 @@
   
   .auth-social-btn {
     padding: 12px 8px;
-    border-radius: 10px;
+    border-radius: 9999px;
     font-size: 0.75rem;
   }
   
@@ -538,7 +538,7 @@
   
   .auth-submit {
     padding: 14px 16px;
-    border-radius: 12px;
+    border-radius: 9999px;
   }
   
   .auth-error {
