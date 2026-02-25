@@ -386,4 +386,167 @@ ${summaryLines.slice(0, 100).join('\n\n')}`
   }
 }
 
-module.exports = { logIfRelevant, generateWeeklyInsight, generateObservations, getPulseStats };
+/**
+ * Detect anomalous topic spikes in the last 24 hours.
+ * Compares recent topic frequency against 28-day daily baseline.
+ * Returns anomaly data if any topic hits 3x+ its normal rate
+ * with 5+ mentions from 3+ unique authors.
+ */
+async function detectAnomaly() {
+  try {
+    const now = Date.now();
+    const last24h = new Date(now - 24 * 60 * 60 * 1000);
+    const last28d = new Date(now - 28 * 24 * 60 * 60 * 1000);
+    
+    // Recent window: last 24 hours
+    const recent = await ServerPulse.find({
+      createdAt: { $gte: last24h }
+    }).lean();
+    
+    if (recent.length < 5) return null;
+    
+    // Baseline window: last 28 days (all, including processed)
+    const baseline = await ServerPulse.find({
+      createdAt: { $gte: last28d, $lt: last24h }
+    }).select('topics').lean();
+    
+    // Calculate baseline daily averages per topic
+    const baselineDays = Math.max(1, 27); // 28 days minus the current day
+    const baselineTopicCounts = {};
+    for (const obs of baseline) {
+      for (const topic of obs.topics) {
+        baselineTopicCounts[topic] = (baselineTopicCounts[topic] || 0) + 1;
+      }
+    }
+    const baselineDailyAvg = {};
+    for (const [topic, count] of Object.entries(baselineTopicCounts)) {
+      baselineDailyAvg[topic] = count / baselineDays;
+    }
+    
+    // Count last 24h topics with author tracking
+    const recentTopicCounts = {};
+    const recentTopicAuthors = {};
+    const recentTopicMessages = {};
+    for (const obs of recent) {
+      for (const topic of obs.topics) {
+        recentTopicCounts[topic] = (recentTopicCounts[topic] || 0) + 1;
+        if (!recentTopicAuthors[topic]) recentTopicAuthors[topic] = new Set();
+        recentTopicAuthors[topic].add(obs.author);
+        if (!recentTopicMessages[topic]) recentTopicMessages[topic] = [];
+        recentTopicMessages[topic].push(obs);
+      }
+    }
+    
+    // Find anomalies: 3x+ baseline, 5+ mentions, 3+ unique authors
+    const anomalies = [];
+    for (const [topic, count] of Object.entries(recentTopicCounts)) {
+      const avg = baselineDailyAvg[topic] || 0;
+      const uniqueAuthors = recentTopicAuthors[topic]?.size || 0;
+      
+      // New topic with no baseline: needs 8+ mentions from 4+ authors
+      const isNewTopicSpike = avg === 0 && count >= 8 && uniqueAuthors >= 4;
+      // Existing topic: 3x baseline rate
+      const isBaselineSpike = avg > 0 && count >= avg * 3 && count >= 5 && uniqueAuthors >= 3;
+      
+      if (isNewTopicSpike || isBaselineSpike) {
+        anomalies.push({
+          topic,
+          count,
+          baseline: avg,
+          multiplier: avg > 0 ? (count / avg).toFixed(1) : 'new',
+          uniqueAuthors,
+          messages: recentTopicMessages[topic] || []
+        });
+      }
+    }
+    
+    if (anomalies.length === 0) return null;
+    
+    // Sort by multiplier (strongest anomaly first)
+    anomalies.sort((a, b) => (b.count / Math.max(b.baseline, 0.1)) - (a.count / Math.max(a.baseline, 0.1)));
+    
+    console.log(`[Pulse] Anomaly detected: ${anomalies.map(a => `${a.topic} (${a.multiplier}x, ${a.count} mentions, ${a.uniqueAuthors} authors)`).join(', ')}`);
+    
+    return anomalies;
+    
+  } catch (error) {
+    console.error('[Pulse] Anomaly detection error:', error.message);
+    return null;
+  }
+}
+
+/**
+ * Generate a pulse alert for an anomalous pattern.
+ * Shorter and more immediate than the weekly insight.
+ * Does NOT mark messages as processed — Sunday still needs them.
+ */
+async function generatePulseAlert(anomalies) {
+  try {
+    const topAnomaly = anomalies[0];
+    
+    // Collect all unique messages from all anomalous topics
+    const allMessages = [];
+    const seenContent = new Set();
+    for (const anomaly of anomalies) {
+      for (const msg of anomaly.messages) {
+        if (!seenContent.has(msg.content)) {
+          seenContent.add(msg.content);
+          allMessages.push(msg);
+        }
+      }
+    }
+    
+    const uniqueAuthors = new Set(allMessages.map(m => m.author)).size;
+    const summaryLines = allMessages.slice(0, 50).map(m => `[#${m.channel}]: "${m.content}"`);
+    
+    const anomalySummary = anomalies.map(a => 
+      `${a.topic}: ${a.count} mentions in 24h (${a.multiplier}x normal, ${a.uniqueAuthors} people)`
+    ).join('\n');
+    
+    const ragContext = await retrieveKnowledge(
+      anomalies.map(a => a.topic).join(' '),
+      { limit: 5, maxTokens: 2000 }
+    );
+    
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 400,
+      system: `You are The Oracle, the AI guide for a semen retention community. Something unusual is happening right now in the server. Multiple members are independently experiencing or discussing the same thing in a short window. You need to address it.
+
+## YOUR TASK
+A pattern has spiked significantly above its normal frequency. This isn't a scheduled reflection. You sensed something and you're speaking up because it matters.
+
+## RULES
+- NEVER name or reference any individual member
+- 100-150 words. This is a brief interjection, not a weekly essay.
+- Lead with the pattern. What are you sensing?
+- Explain why it's happening right now (connect to retention science, cycles, astrology, season, collective energy)
+- End with the mechanism or teaching. Not encouragement.
+- NEVER use em dashes
+- Do NOT start with "I've noticed" or "Something is happening"
+- Start with the observation itself. State it like a fact.
+- Tone: calm but present. You felt something shift and you're naming it.
+- Do NOT use bullet points, lists, or emojis
+
+${ragContext}`,
+      messages: [{
+        role: 'user',
+        content: `ANOMALY DETECTED in last 24 hours:
+${anomalySummary}
+
+${uniqueAuthors} unique members contributing to this pattern.
+
+RAW MESSAGES (anonymized):
+${summaryLines.join('\n\n')}`
+      }]
+    });
+    
+    return response.content[0].text;
+    
+  } catch (error) {
+    console.error('[Pulse] Alert generation error:', error);
+    return null;
+  }
+}
+
+module.exports = { logIfRelevant, generateWeeklyInsight, generateObservations, detectAnomaly, generatePulseAlert, getPulseStats };

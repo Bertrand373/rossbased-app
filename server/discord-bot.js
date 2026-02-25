@@ -6,7 +6,7 @@
 const { Client, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.js');
 const Anthropic = require('@anthropic-ai/sdk');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
-const { logIfRelevant, generateWeeklyInsight, generateObservations, getPulseStats } = require('./services/oracleInsight');
+const { logIfRelevant, generateWeeklyInsight, generateObservations, detectAnomaly, generatePulseAlert, getPulseStats } = require('./services/oracleInsight');
 const KnowledgeChunk = require('./models/KnowledgeChunk');
 const OracleUsage = require('./models/OracleUsage');
 const User = require('./models/User');
@@ -43,6 +43,7 @@ const USER_COOLDOWNS = new Map();
 const COOLDOWN_MS = 10000; // 10 seconds between messages per user
 const MAX_DAILY_PER_USER = 10;
 const DAILY_USAGE = new Map();
+const PULSE_COOLDOWN_DAYS = 3;
 
 // Get today's date string in Eastern Time (resets at midnight ET, not UTC)
 function getTodayET() {
@@ -94,6 +95,28 @@ function buildInsightEmbed(text, daysBack = 7) {
     const avatarURL = client.user.displayAvatarURL({ size: 64 });
     embed.setAuthor({ name: 'Oracle Observes', iconURL: avatarURL });
     embed.setThumbnail(avatarURL);
+  }
+  
+  return embed;
+}
+
+/**
+ * Build a pulse alert embed (mid-week anomaly detection)
+ * Same visual language as weekly insight but with "Oracle Senses" label
+ */
+function buildPulseEmbed(text) {
+  const desc = text.length > 4096 ? text.substring(0, 4093) + '...' : text;
+  
+  const embed = new EmbedBuilder()
+    .setColor(ORACLE_COLOR)
+    .setAuthor({ name: 'Oracle Senses' })
+    .setDescription(desc)
+    .setFooter({ text: 'Oracle · titantrack.app · Anomaly detected', iconURL: 'https://titantrack.app/The_Oracle.png' })
+    .setTimestamp();
+  
+  if (client?.user) {
+    const avatarURL = client.user.displayAvatarURL({ size: 64 });
+    embed.setAuthor({ name: 'Oracle Senses', iconURL: avatarURL });
   }
   
   return embed;
@@ -1273,6 +1296,7 @@ client.once('ready', () => {
   console.log(`👥 Serving ${client.guilds.cache.size} server(s)`);
   console.log(`🧠 Pulse observation: ACTIVE`);
   console.log(`📊 Weekly insight: ${['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][INSIGHT_DAY]} at ${INSIGHT_HOUR}:00 UTC → #${INSIGHT_CHANNEL}`);
+  console.log(`⚡ Pulse check: every 4h, ${PULSE_COOLDOWN_DAYS}-day cooldown between alerts`);
   
   // Set bot status
   client.user.setActivity('the frequencies', { type: 3 }); // "Watching the frequencies"
@@ -1348,6 +1372,58 @@ client.once('ready', () => {
       console.error('[Insight] Scheduler error:', err);
     }
   }, 60 * 60 * 1000); // Check every hour
+  
+  // ============================================================
+  // MID-WEEK PULSE CHECK
+  // Every 4 hours, check for anomalous topic spikes.
+  // Only posts if a topic hits 3x+ its normal daily rate.
+  // 3-day cooldown between pulse alerts to avoid noise.
+  // ============================================================
+  
+  let lastPulseDate = null;
+  
+  setInterval(async () => {
+    try {
+      const today = getTodayET();
+      
+      // 3-day cooldown: don't fire if we posted a pulse alert recently
+      if (lastPulseDate) {
+        const daysSince = (Date.now() - new Date(lastPulseDate).getTime()) / (1000 * 60 * 60 * 24);
+        if (daysSince < PULSE_COOLDOWN_DAYS) return;
+      }
+      
+      // Don't fire on the same day as the weekly insight
+      const now = new Date();
+      if (now.getUTCDay() === INSIGHT_DAY) return;
+      
+      // Check for anomalies
+      const anomalies = await detectAnomaly();
+      if (!anomalies) return;
+      
+      console.log('[Pulse] Anomaly confirmed — generating alert...');
+      
+      const alert = await generatePulseAlert(anomalies);
+      if (!alert) return;
+      
+      // Find the target channel (same as weekly insight)
+      const guild = client.guilds.cache.first();
+      if (!guild) return;
+      
+      const targetChannel = guild.channels.cache.find(
+        ch => ch.name.toLowerCase() === INSIGHT_CHANNEL && (ch.type === 0 || ch.type === 5)
+      );
+      
+      if (!targetChannel) return;
+      
+      await targetChannel.send({ embeds: [buildPulseEmbed(alert)] });
+      lastPulseDate = today;
+      
+      console.log(`🔮 Pulse alert posted to #${INSIGHT_CHANNEL} — topics: ${anomalies.map(a => a.topic).join(', ')}`);
+      
+    } catch (err) {
+      console.error('[Pulse] Check error:', err.message);
+    }
+  }, 4 * 60 * 60 * 1000); // Check every 4 hours
 });
 
 // ============================================================
