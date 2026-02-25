@@ -1865,7 +1865,7 @@ app.get('/api/admin/oracle-health', authenticate, async (req, res) => {
       },
       communityPulse: {
         active: !!pulse,
-        preview: pulse ? pulse.substring(0, 200) + '...' : 'No pulse data yet'
+        preview: pulse || 'No pulse data yet'
       },
       recentNotes: recentNotes.slice(0, 15),
       health: {
