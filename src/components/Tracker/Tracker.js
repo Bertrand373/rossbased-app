@@ -422,7 +422,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     // Update fill bar visually - use ((value - 1) / 9) to match slider thumb position
     // Range is 1-10, so value 1 = 0% fill, value 10 = 100% fill
     if (fillRefs.current[key]) {
-      fillRefs.current[key].style.width = `${((newValue - 1) / 9) * 100}%`;
+      fillRefs.current[key].style.transform = `scaleX(${(newValue - 1) / 9})`;
     }
   }, []);
 
@@ -603,7 +603,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                       <div 
                         className="benefit-fill" 
                         ref={el => fillRefs.current[key] = el}
-                        style={{ width: `${((benefits[key] - 1) / 9) * 100}%` }}
+                        style={{ transform: `scaleX(${(benefits[key] - 1) / 9})` }}
                       />
                       <input
                         type="range"
@@ -632,7 +632,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                       <div 
                         className="benefit-fill" 
                         ref={el => fillRefs.current[key] = el}
-                        style={{ width: `${((benefits[key] - 1) / 9) * 100}%` }}
+                        style={{ transform: `scaleX(${(benefits[key] - 1) / 9})` }}
                       />
                       <input
                         type="range"
