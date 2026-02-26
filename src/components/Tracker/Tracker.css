@@ -533,7 +533,7 @@
   -webkit-appearance: none !important;
   appearance: none !important;
   -webkit-tap-highlight-color: transparent;
-  touch-action: none;
+  touch-action: pan-y;
 }
 
 .benefit-slider input[type="range"]::-webkit-slider-runnable-track {

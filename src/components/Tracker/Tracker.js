@@ -94,6 +94,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   const fillRefs = useRef({});
   const snapRafRef = useRef({});
   const benefitsRef = useRef(benefits);
+  const sliderTouchRef = useRef({ startX: 0, startY: 0, axis: null, key: null });
   
   // Post-log insight flash
   const [postLogInsight, setPostLogInsight] = useState(null);
@@ -445,14 +446,45 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     }
   }, []);
 
-  // Force-drag: iOS sometimes shows :active but won't fire onChange during touchmove
-  const handleSliderTouch = useCallback((key, e) => {
-    const touch = e.touches[0];
+  // Touch intent detection — lock to horizontal (slider) or vertical (scroll) axis
+  const handleSliderTouchStart = useCallback((key, e) => {
+    const t = e.touches[0];
+    sliderTouchRef.current = { startX: t.clientX, startY: t.clientY, axis: null, key };
+  }, []);
+
+  const handleSliderTouchMove = useCallback((key, e) => {
+    const ref = sliderTouchRef.current;
+    if (ref.key !== key) return;
+    const t = e.touches[0];
+    const dx = Math.abs(t.clientX - ref.startX);
+    const dy = Math.abs(t.clientY - ref.startY);
+
+    // Determine axis after 8px of movement
+    if (!ref.axis) {
+      if (dx < 8 && dy < 8) return; // Not enough movement yet
+      ref.axis = dx >= dy ? 'horizontal' : 'vertical';
+    }
+
+    // Vertical intent — let the list scroll, don't touch the slider
+    if (ref.axis === 'vertical') return;
+
+    // Horizontal intent — update slider, block scroll + sheet swipe
+    e.preventDefault();
+    e.stopPropagation();
     const input = e.currentTarget;
     const rect = input.getBoundingClientRect();
-    const ratio = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
+    const ratio = Math.max(0, Math.min(1, (t.clientX - rect.left) / rect.width));
     const val = 1 + ratio * 9;
     setBenefits(prev => ({ ...prev, [key]: val }));
+  }, []);
+
+  const handleSliderTouchEnd = useCallback((key) => {
+    const ref = sliderTouchRef.current;
+    if (ref.key !== key) return;
+    if (ref.axis === 'horizontal') {
+      handleSliderSnap(key);
+    }
+    sliderTouchRef.current = { startX: 0, startY: 0, axis: null, key: null };
   }, []);
 
   // Magnetic snap — on finger lift, glide thumb to nearest integer
@@ -757,7 +789,9 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                         step="any"
                         value={benefits[key]}
                         onChange={e => handleBenefitChange(key, e.target.value)}
-                        onTouchMove={e => handleSliderTouch(key, e)}
+                        onTouchStart={e => handleSliderTouchStart(key, e)}
+                        onTouchMove={e => handleSliderTouchMove(key, e)}
+                        onTouchEnd={() => handleSliderTouchEnd(key)}
                         onPointerUp={() => handleSliderSnap(key)}
                       />
                     </div>
@@ -789,7 +823,9 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                         step="any"
                         value={benefits[key]}
                         onChange={e => handleBenefitChange(key, e.target.value)}
-                        onTouchMove={e => handleSliderTouch(key, e)}
+                        onTouchStart={e => handleSliderTouchStart(key, e)}
+                        onTouchMove={e => handleSliderTouchMove(key, e)}
+                        onTouchEnd={() => handleSliderTouchEnd(key)}
                         onPointerUp={() => handleSliderSnap(key)}
                       />
                     </div>
