@@ -170,8 +170,8 @@ const userSchema = new mongoose.Schema({
         urgeSupport: true,
         weeklyProgress: true
       },
-      dailyReminderEnabled: false,
-      dailyReminderTime: '09:00'
+      dailyReminderEnabled: true,
+      dailyReminderTime: '20:00'
     }
   },
   

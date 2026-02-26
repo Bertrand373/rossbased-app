@@ -82,6 +82,18 @@ function scheduleDailyReminders() {
         
         // Check if current hour in user's timezone matches their reminder hour
         if (userCurrentHour === reminderHour) {
+          // Smart skip: don't nag if they already logged today
+          const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: timezone });
+          const alreadyLogged = user.benefitTracking?.some(b => {
+            try {
+              return new Date(b.date).toLocaleDateString('en-CA', { timeZone: timezone }) === todayStr;
+            } catch { return false; }
+          });
+          
+          if (alreadyLogged) {
+            continue; // They already logged — no reminder needed
+          }
+          
           const result = await sendNotificationToUser(user.username, 'daily_reminder');
           if (result.success) {
             sentCount++;
@@ -243,6 +255,56 @@ function scheduleLeaderboardPost() {
 }
 
 // ============================================================================
+// MORNING AWARENESS NOTIFICATION - TIMEZONE AWARE
+// ============================================================================
+
+/**
+ * Morning awareness notification — "Day X"
+ * Fires at 7 AM local time for users with daily reminders enabled.
+ * Not a log reminder — just puts TitanTrack in their awareness at start of day.
+ * Evening 8 PM reminder closes the loop with the action prompt.
+ */
+function scheduleMorningAwareness() {
+  // Run every hour (timezone check inside)
+  cron.schedule('0 * * * *', async () => {
+    try {
+      // Same user pool as daily reminders — one toggle controls both touchpoints
+      const users = await User.find({
+        'notificationPreferences.dailyReminderEnabled': true,
+        startDate: { $exists: true, $ne: null }
+      });
+      
+      let sentCount = 0;
+      
+      for (const user of users) {
+        const timezone = user.notificationPreferences?.timezone || 'America/New_York';
+        const userCurrentHour = getCurrentHourInTimezone(timezone);
+        
+        // Fire at 7 AM local time
+        if (userCurrentHour === 7) {
+          const streak = user.currentStreak || 1;
+          const result = await sendNotificationToUser(user.username, 'morning_awareness', {
+            streakDay: streak.toString()
+          });
+          if (result.success) {
+            sentCount++;
+          }
+        }
+      }
+      
+      if (sentCount > 0) {
+        console.log(`🌅 Sent morning awareness to ${sentCount} users`);
+      }
+      
+    } catch (error) {
+      console.error('❌ Error in morning awareness scheduler:', error);
+    }
+  });
+  
+  console.log('✅ Morning awareness scheduler started (timezone-aware)');
+}
+
+// ============================================================================
 // INITIALIZE ALL SCHEDULERS
 // ============================================================================
 
@@ -251,6 +313,7 @@ function initializeSchedulers() {
   console.log(`   Server timezone: UTC (${new Date().toISOString()})`);
   
   scheduleDailyReminders();
+  scheduleMorningAwareness();
   scheduleWeeklyMotivation();
   scheduleMilestoneChecks();
   scheduleLeaderboardPost();

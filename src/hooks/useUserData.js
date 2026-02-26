@@ -22,7 +22,7 @@ import comprehensiveMockData, {
 } from '../mockData';
 
 // ========== TOGGLE THIS FOR PRODUCTION ==========
-const MOCK_MODE = true; // PRODUCTION MODE - using real API
+const MOCK_MODE = false; // PRODUCTION MODE - using real API
 // ================================================
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
@@ -748,45 +748,6 @@ export const useUserData = () => {
 
     initializeUser();
   }, [fetchUserDataFromAPI]);
-
-  // ================================================================
-  // CROSS-DEVICE SYNC - Re-fetch from MongoDB when tab becomes visible
-  // Ensures data saved on phone appears on desktop and vice versa
-  // ================================================================
-  useEffect(() => {
-    if (MOCK_MODE) return;
-
-    let lastFetch = Date.now();
-
-    const handleVisibilityChange = async () => {
-      // Only fetch when page becomes visible, user is logged in, and enough time has passed
-      if (document.visibilityState !== 'visible') return;
-      if (!isLoggedIn) return;
-
-      const token = localStorage.getItem('token');
-      const username = localStorage.getItem('username');
-      if (!token || !username) return;
-
-      // Throttle: don't re-fetch if we fetched within the last 30 seconds
-      if (Date.now() - lastFetch < 30000) return;
-      lastFetch = Date.now();
-
-      try {
-        console.log('🔄 Tab visible — syncing fresh data from MongoDB');
-        const freshData = await fetchUserDataFromAPI(username, token);
-        if (freshData) {
-          setUserData(freshData);
-          localStorage.setItem('userData', JSON.stringify(freshData));
-          console.log('✅ Cross-device sync complete');
-        }
-      } catch (err) {
-        console.error('Cross-device sync failed:', err);
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [isLoggedIn, fetchUserDataFromAPI]);
 
   return { 
     userData, 

@@ -111,9 +111,14 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   const totalLogs = userData.benefitTracking?.length || 0;
   const canLogBenefits = isPremium || totalLogs < FREE_LOG_LIMIT;
 
-  const todayLogged = userData.benefitTracking?.some(
+  const todayEntry = userData.benefitTracking?.find(
     b => format(new Date(b.date), 'yyyy-MM-dd') === format(currentTime, 'yyyy-MM-dd')
   );
+  const todayLogged = !!todayEntry;
+  const todayScore = todayEntry 
+    ? (((todayEntry.energy || 5) + (todayEntry.focus || 5) + (todayEntry.confidence || 5) + 
+       (todayEntry.aura || 5) + (todayEntry.sleep || 5) + (todayEntry.workout || 5)) / 6).toFixed(1)
+    : null;
 
   // Live clock effect - updates every minute
   useEffect(() => {
@@ -1336,7 +1341,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
           className={`${todayLogged ? 'btn-logged' : 'btn-primary'} benefits-trigger`}
           onClick={() => canLogBenefits ? setShowBenefits(true) : setShowLogLock(true)}
         >
-          {todayLogged ? 'Logged ✓' : 'Log Today'}
+          {todayLogged ? `${todayScore} ✓` : 'Log Today'}
         </button>
       </footer>
 

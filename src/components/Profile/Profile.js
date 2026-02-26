@@ -87,8 +87,8 @@ const Profile = ({
     urgeSupport: true,
     weeklyProgress: true
   });
-  const [dailyReminderEnabled, setDailyReminderEnabled] = useState(false);
-  const [dailyReminderTime, setDailyReminderTime] = useState('09:00');
+  const [dailyReminderEnabled, setDailyReminderEnabled] = useState(true);
+  const [dailyReminderTime, setDailyReminderTime] = useState('20:00');
   
   // Feedback
   const [feedbackType, setFeedbackType] = useState('general');
@@ -256,8 +256,8 @@ const Profile = ({
         setQuietHoursStart(prefs.quietHoursStart || '22:00');
         setQuietHoursEnd(prefs.quietHoursEnd || '08:00');
         setNotifTypes(prefs.types || { milestones: true, urgeSupport: true, weeklyProgress: true });
-        setDailyReminderEnabled(prefs.dailyReminderEnabled || false);
-        setDailyReminderTime(prefs.dailyReminderTime || '09:00');
+        setDailyReminderEnabled(prefs.dailyReminderEnabled !== false);
+        setDailyReminderTime(prefs.dailyReminderTime || '20:00');
       }
     } catch (error) {
       console.error('Failed to load notification preferences:', error);

@@ -112,13 +112,14 @@ async function shouldSendNotification(username, notificationType) {
       'encouragement': 'weeklyProgress',
       'streak': 'milestones',
       'daily': 'dailyReminder',
+      'morning': 'dailyReminder',
       'motivational': 'weeklyProgress'
     };
     
     const prefKey = typeMapping[typeCategory];
     
-    // Special handling for daily reminder - check if specifically enabled
-    if (typeCategory === 'daily') {
+    // Special handling for daily reminder and morning awareness - check if specifically enabled
+    if (typeCategory === 'daily' || typeCategory === 'morning') {
       if (!prefs.dailyReminderEnabled) {
         console.log(`⏸️ Daily reminders disabled for ${username}`);
         return false;
@@ -163,11 +164,18 @@ async function shouldSendNotification(username, notificationType) {
 // iOS/Android shows app name automatically, so titles should be descriptive not "TitanTrack"
 // ============================================================================
 const notificationTemplates = {
-  // DAILY REMINDER
+  // DAILY REMINDER (Evening — log prompt)
   daily_reminder: {
     title: 'Daily Check-In',
     body: 'Log your day.',
     data: { url: '/', type: 'daily_reminder' }
+  },
+  
+  // MORNING AWARENESS (7 AM — streak awareness, not a log prompt)
+  morning_awareness: {
+    title: 'Day {streakDay}',
+    body: 'Stay locked in.',
+    data: { url: '/', type: 'morning_awareness' }
   },
   
   // WEEKLY MOTIVATIONAL (Monday)
@@ -271,13 +279,21 @@ async function sendNotification(fcmToken, notificationType, customData = {}) {
       return { success: false, error: `Unknown notification type: ${notificationType}` };
     }
 
+    // Replace template variables (e.g., {streakDay} → actual value)
+    let title = template.title;
+    let body = template.body;
+    for (const [key, value] of Object.entries(customData)) {
+      title = title.replace(`{${key}}`, value);
+      body = body.replace(`{${key}}`, value);
+    }
+
     // Prepare message - DATA ONLY (no top-level notification key)
     // This prevents Firebase from auto-displaying a duplicate notification
     const message = {
       token: fcmToken,
       data: {
-        title: template.title,
-        body: template.body,
+        title: title,
+        body: body,
         icon: '/icon-192.png',
         badge: '/icon-192.png',
         url: template.data?.url || '/',
