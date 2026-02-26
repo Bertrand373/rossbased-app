@@ -433,6 +433,26 @@
   letter-spacing: 0.02em;
 }
 
+/* Oracle demo screenshot — same treatment as video-wrap */
+.landing-oracle-demo {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.landing-oracle-img {
+  width: 100%;
+  max-width: 300px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.6),
+    0 0 80px rgba(100, 80, 200, 0.03),
+    0 0 160px rgba(100, 80, 200, 0.015);
+  background: #000;
+  display: block;
+}
+
 /* ============================================================
    TESTIMONIAL
    ============================================================ */

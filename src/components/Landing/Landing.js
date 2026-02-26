@@ -217,6 +217,9 @@ const Landing = ({ onLogin }) => {
         <p className="landing-oracle-sub">
           Available in the app and on Discord.
         </p>
+        <div className="landing-oracle-demo">
+          <img src="/oracle-demo.png" alt="Oracle AI responding to a retention question" className="landing-oracle-img" />
+        </div>
       </section>
 
       {/* ============================================================
