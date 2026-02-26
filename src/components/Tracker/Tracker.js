@@ -752,6 +752,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                         step="any"
                         value={benefits[key]}
                         onChange={e => handleBenefitChange(key, e.target.value)}
+                        onPointerDown={e => e.target.focus()}
                         onPointerUp={() => handleSliderSnap(key)}
                       />
                     </div>
@@ -783,6 +784,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                         step="any"
                         value={benefits[key]}
                         onChange={e => handleBenefitChange(key, e.target.value)}
+                        onPointerDown={e => e.target.focus()}
                         onPointerUp={() => handleSliderSnap(key)}
                       />
                     </div>
