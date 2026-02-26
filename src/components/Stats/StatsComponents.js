@@ -171,7 +171,7 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
           value: relapseVal,
           label: 'Relapses',
           description: relapseVal === 0 
-            ? 'Zero relapses on this streak.' 
+            ? 'None. Keep it that way.' 
             : 'Each one is a lesson. You\'re still here.',
           details: relapseVal > 0 ? [
             ...(daysSinceLast !== null ? [{ label: 'Since Last', value: `${daysSinceLast} days` }] : []),
