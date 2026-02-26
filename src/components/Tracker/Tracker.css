@@ -404,6 +404,7 @@
    ============================================================ */
 
 .benefits-modal {
+  position: relative;
   width: 100%;
   max-width: 360px;
   height: calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
@@ -674,10 +675,6 @@
 /* ============================================================
    POST-LOG INSIGHT — overlaid on same-height sheet after save
    ============================================================ */
-
-.benefits-modal {
-  position: relative;
-}
 
 .benefits-list.fading,
 .benefits-actions.fading,
