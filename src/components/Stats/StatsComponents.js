@@ -121,16 +121,35 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
             { label: 'Longest', value: `${userData?.longestStreak || 0} days` }
           ]
         };
-      case 'longestStreak':
+      case 'longestStreak': {
+        const current = userData?.currentStreak || 0;
+        const longest = userData?.longestStreak || 0;
+        const isActiveBest = current >= longest && current > 0;
+        const gap = longest - current;
+        
+        let details = [];
+        if (isActiveBest) {
+          // On their best streak — show start date
+          if (userData?.startDate) {
+            details.push({ label: 'Started', value: format(new Date(userData.startDate), 'MMM d, yyyy') });
+          }
+        } else {
+          // Had a better streak before — show current + gap
+          details.push({ label: 'Current', value: `${current} days` });
+          if (gap > 0) {
+            details.push({ label: 'Gap', value: `${gap} days` });
+          }
+        }
+        
         return {
-          value: userData?.longestStreak || 0,
+          value: longest,
           label: 'Longest Streak',
-          description: 'Your personal best.',
-          details: [
-            { label: 'Current', value: `${userData?.currentStreak || 0} days` },
-            { label: 'Attempts', value: `${(userData?.relapseCount || 0) + 1}` }
-          ]
+          description: isActiveBest 
+            ? 'You\'re on your personal best.' 
+            : 'Your personal best.',
+          details
         };
+      }
       case 'wetDreams':
         return {
           value: userData?.wetDreamCount || 0,
@@ -138,16 +157,28 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
           description: 'Natural emissions. These don\'t count as relapses.',
           details: []
         };
-      case 'relapses':
+      case 'relapses': {
+        const relapseVal = userData?.relapseCount || 0;
+        const attempts = relapseVal + 1;
+        const lastRelapse = (userData?.streakHistory || [])
+          .filter(s => s.reason === 'relapse' && s.end)
+          .sort((a, b) => new Date(b.end) - new Date(a.end))[0];
+        const daysSinceLast = lastRelapse 
+          ? Math.floor((new Date() - new Date(lastRelapse.end)) / (1000 * 60 * 60 * 24))
+          : null;
+        
         return {
-          value: userData?.relapseCount || 0,
+          value: relapseVal,
           label: 'Relapses',
-          description: 'Each one is a lesson. You\'re still here.',
-          details: [
-            { label: 'Current', value: `${userData?.currentStreak || 0} days` },
-            { label: 'Best', value: `${userData?.longestStreak || 0} days` }
-          ]
+          description: relapseVal === 0 
+            ? 'Zero relapses on this streak.' 
+            : 'Each one is a lesson. You\'re still here.',
+          details: relapseVal > 0 ? [
+            ...(daysSinceLast !== null ? [{ label: 'Since Last', value: `${daysSinceLast} days` }] : []),
+            { label: 'Attempts', value: `${attempts}` }
+          ] : []
         };
+      }
       default:
         return { value: 0, label: '', description: '', details: [] };
     }
