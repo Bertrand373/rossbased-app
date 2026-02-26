@@ -386,11 +386,8 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     trackAIChatCleared();
   };
 
-  // Get theme-aware loading icon
-  const getLoadingIcon = () => {
-    const theme = document.documentElement.getAttribute('data-theme') || 'dark';
-    return theme === 'light' ? '/tt-icon-black.png' : '/tt-icon-white.png';
-  };
+  // Get Oracle loading icon
+  const getLoadingIcon = () => '/The_Oracle.png';
 
   // Don't render if not logged in
   if (!isLoggedIn) return null;
