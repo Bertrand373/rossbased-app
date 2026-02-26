@@ -672,6 +672,59 @@
 }
 
 /* ============================================================
+   POST-LOG INSIGHT — brief feedback after save
+   ============================================================ */
+
+.post-log-insight {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex: 1;
+  min-height: 0;
+  padding: 40px 20px;
+  animation: insightFadeIn 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes insightFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.post-log-insight-phase {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.post-log-insight-line {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  max-width: 260px;
+}
+
+.post-log-insight-sub {
+  font-size: 0.8125rem;
+  color: var(--text-tertiary);
+  margin-top: 10px;
+}
+
+/* Crossfade: sliders out when insight shows */
+.benefits-modal .benefits-list.fading,
+.benefits-modal .benefits-actions.fading {
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+}
+
+/* ============================================================
    SHEET (Action sheet) - Floating, minimal
    ============================================================ */
 
@@ -1086,8 +1139,7 @@
 }
 
 /* ============================================================
-   SMOOTH OVERLAY CLOSE - Transition layer over .overlay
-   Benefits modal + Peak Prompt
+   SMOOTH OVERLAY CLOSE - Transition layer
    ============================================================ */
 
 .tracker-overlay {
@@ -1100,16 +1152,27 @@
   opacity: 1;
 }
 
-.tracker-overlay .peak-prompt {
-  animation: none !important;
-  opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 300ms cubic-bezier(0.16, 1, 0.3, 1), transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+/* ============================================================
+   PEAK STATE SHEET — bottom sheet for peak recordings
+   ============================================================ */
+
+.peak-sheet {
+  max-height: 85dvh;
+  padding: 0 20px 20px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
 }
 
-.tracker-overlay.ready .peak-prompt {
-  opacity: 1;
-  transform: translateY(0);
+.peak-sheet .peak-prompt {
+  animation: none;
+  text-align: center;
+}
+
+.peak-sheet .peak-prompt-header {
+  margin-bottom: 24px;
+}
+
+.peak-sheet .peak-prompt-input {
+  min-height: 100px;
 }
 
 /* ============================================================
