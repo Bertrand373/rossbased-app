@@ -728,20 +728,16 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         </div>
       )}
 
-      {/* Main */}
-      {/* Energy Almanac - Fixed at top */}
-      {/* Only shows when PatternInsightCard is NOT showing */}
-      <EnergyAlmanac 
-        userData={userData}
-        isPatternAlertShowing={isPatternAlertShowing}
-      />
-      
       {/* Main - Centers in remaining space */}
       <main className="tracker-main">
         {/* AI Pattern Insight - inside tracker-main so it's always visible */}
         <PatternInsightCard 
           userData={userData} 
           onVisibilityChange={handlePatternAlertVisibilityChange}
+        />
+        <EnergyAlmanac 
+          userData={userData}
+          isPatternAlertShowing={isPatternAlertShowing}
         />
         <p className="date">
           {format(currentTime, 'EEEE, MMMM d')}

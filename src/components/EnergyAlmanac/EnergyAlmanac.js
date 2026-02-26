@@ -395,31 +395,18 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
   
   return (
     <>
-      {/* Collapsed Card */}
-      <div 
-        className="energy-almanac"
-        onClick={() => setIsExpanded(true)}
-      >
-        <div className="almanac-header">
-          <span className="almanac-icon"></span>
-          <span className="almanac-label">Today's Alignment</span>
-          <span className="almanac-expand">+</span>
-        </div>
-        
-        <div className="almanac-quick">
-          <span className="quick-item">{moon.emoji} {moon.phase}</span>
-          <span className="quick-dot">·</span>
-          <span className="quick-item">Day {sperma.position}/72</span>
-          {personalDay && (
-            <>
-              <span className="quick-dot">·</span>
-              <span className="quick-item">{personalDay.number} {personalDay.theme}</span>
-            </>
-          )}
-        </div>
-        
-        <p className="almanac-preview">{aiSynthesis || forecast}</p>
-      </div>
+      {/* Ghost line — tappable metadata, same visual weight as date */}
+      <p className="almanac-ghost" onClick={() => setIsExpanded(true)}>
+        <span>{moon.emoji} {moon.phase}</span>
+        <span className="almanac-ghost-dot">·</span>
+        <span>Day {sperma.position}/72</span>
+        {personalDay && (
+          <>
+            <span className="almanac-ghost-dot">·</span>
+            <span>{personalDay.number} {personalDay.theme}</span>
+          </>
+        )}
+      </p>
       
       {/* Expanded Bottom Sheet */}
       {showContent && (
