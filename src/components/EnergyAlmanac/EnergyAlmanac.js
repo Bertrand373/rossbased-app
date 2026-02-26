@@ -395,17 +395,11 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
   
   return (
     <>
-      {/* Ghost line — tappable metadata, same visual weight as date */}
+      {/* Ghost line — single clean data point, tappable */}
       <p className="almanac-ghost" onClick={() => setIsExpanded(true)}>
-        <span>{moon.emoji} {moon.phase}</span>
+        <span className="almanac-ghost-phase">{sperma.phase}</span>
         <span className="almanac-ghost-dot">·</span>
-        <span>Day {sperma.position}/72</span>
-        {personalDay && (
-          <>
-            <span className="almanac-ghost-dot">·</span>
-            <span>{personalDay.number} {personalDay.theme}</span>
-          </>
-        )}
+        <span className="almanac-ghost-day">Day {sperma.position} of {sperma.cycleLength}</span>
       </p>
       
       {/* Expanded Bottom Sheet */}
