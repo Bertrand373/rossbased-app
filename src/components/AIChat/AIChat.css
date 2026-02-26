@@ -369,11 +369,12 @@
 }
 
 .ai-chat-message.user .ai-chat-message-content {
-  background-color: var(--surface-overlay);
-  color: var(--text-secondary);
+  background-color: transparent;
+  color: var(--text-muted);
   border-radius: 12px 12px 4px 12px;
   max-width: 85%;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border);
+  font-size: 0.8125rem;
 }
 
 /* Assistant message */
@@ -381,15 +382,17 @@
   color: var(--text);
   background: transparent;
   max-width: 100%;
-  padding: 0;
+  padding: 2px 0 2px 14px;
   font-size: 0.875rem;
-  line-height: 1.75;
-  letter-spacing: 0.01em;
+  font-weight: 300;
+  line-height: 1.85;
+  letter-spacing: 0.015em;
+  border-left: 1px solid var(--border-subtle);
 }
 
 /* Oracle markdown typography */
 .ai-chat-message.assistant .ai-chat-message-content strong {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
 }
 

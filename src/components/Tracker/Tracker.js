@@ -92,6 +92,8 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   
   const fillRefs = useRef({});
+  const snapRafRef = useRef({});
+  const benefitsRef = useRef(benefits);
   
   // Body scroll lock removed - parent containers now have overflow:hidden
   
@@ -190,6 +192,16 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       }
     }
   }, [userData.benefitTracking, currentTime]);
+
+  // Keep benefitsRef in sync for snap animation (avoids stale closures)
+  useEffect(() => { benefitsRef.current = benefits; }, [benefits]);
+
+  // Cleanup snap animations on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(snapRafRef.current).forEach(id => cancelAnimationFrame(id));
+    };
+  }, []);
 
   // Milestone calculation
   const getNextMilestone = () => {
@@ -409,21 +421,59 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     { key: 'processing', label: 'Processing', desc: '1 = blocked · 10 = flowing' }
   ];
 
-  // Handle benefit change
+  // Handle benefit change — stores raw float for continuous drag movement
   const handleBenefitChange = useCallback((key, value) => {
-    const newValue = parseInt(value);
-    setBenefits(prev => ({ ...prev, [key]: newValue }));
+    const rawValue = parseFloat(value);
+    setBenefits(prev => ({ ...prev, [key]: rawValue }));
     
     // Mark emotional sliders as touched if user interacts with one
     if (['anxiety', 'mood', 'clarity', 'processing'].includes(key)) {
       setEmotionalTouched(true);
     }
     
-    // Update fill bar visually - use ((value - 1) / 9) to match slider thumb position
-    // Range is 1-10, so value 1 = 0% fill, value 10 = 100% fill
+    // Update fill bar with raw value for continuous GPU-composited tracking
     if (fillRefs.current[key]) {
-      fillRefs.current[key].style.transform = `scaleX(${(newValue - 1) / 9})`;
+      fillRefs.current[key].style.transform = `scaleX(${(rawValue - 1) / 9})`;
     }
+  }, []);
+
+  // Magnetic snap — on finger lift, glide thumb to nearest integer
+  const handleSliderSnap = useCallback((key) => {
+    if (snapRafRef.current[key]) cancelAnimationFrame(snapRafRef.current[key]);
+    
+    const rawValue = benefitsRef.current[key];
+    const targetValue = Math.round(rawValue);
+    
+    // Already at integer — just clean up state
+    if (Math.abs(rawValue - targetValue) < 0.01) {
+      setBenefits(prev => ({ ...prev, [key]: targetValue }));
+      return;
+    }
+    
+    const startValue = rawValue;
+    const distance = targetValue - startValue;
+    const duration = 140; // ms — fast but perceptible glide
+    const startTime = performance.now();
+    
+    const animate = (now) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease-out cubic — fast start, gentle landing into the notch
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const val = progress < 1 ? startValue + distance * eased : targetValue;
+      
+      // Update both thumb (via state) and fill bar (via DOM) each frame
+      setBenefits(prev => ({ ...prev, [key]: val }));
+      if (fillRefs.current[key]) {
+        fillRefs.current[key].style.transform = `scaleX(${(val - 1) / 9})`;
+      }
+      
+      if (progress < 1) {
+        snapRafRef.current[key] = requestAnimationFrame(animate);
+      }
+    };
+    
+    snapRafRef.current[key] = requestAnimationFrame(animate);
   }, []);
 
   // Save benefits
@@ -437,17 +487,17 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     // Only include emotional fields if user actually touched them
     const entry = { 
       date: new Date(), 
-      energy: benefits.energy,
-      focus: benefits.focus,
-      confidence: benefits.confidence,
-      aura: benefits.aura,
-      sleep: benefits.sleep,
-      workout: benefits.workout,
+      energy: Math.round(benefits.energy),
+      focus: Math.round(benefits.focus),
+      confidence: Math.round(benefits.confidence),
+      aura: Math.round(benefits.aura),
+      sleep: Math.round(benefits.sleep),
+      workout: Math.round(benefits.workout),
       ...(emotionalTouched ? {
-        anxiety: benefits.anxiety,
-        mood: benefits.mood,
-        clarity: benefits.clarity,
-        processing: benefits.processing
+        anxiety: Math.round(benefits.anxiety),
+        mood: Math.round(benefits.mood),
+        clarity: Math.round(benefits.clarity),
+        processing: Math.round(benefits.processing)
       } : {}),
       streakDay: streak 
     };
@@ -597,7 +647,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                   <div key={key} className="benefit-row">
                     <div className="benefit-info">
                       <span>{label}</span>
-                      <span className="benefit-num">{benefits[key]}/10</span>
+                      <span className="benefit-num">{Math.round(benefits[key])}/10</span>
                     </div>
                     <div className="benefit-slider">
                       <div 
@@ -609,8 +659,10 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                         type="range"
                         min="1"
                         max="10"
+                        step="any"
                         value={benefits[key]}
                         onChange={e => handleBenefitChange(key, e.target.value)}
+                        onPointerUp={() => handleSliderSnap(key)}
                       />
                     </div>
                     <span className="benefit-desc">{desc}</span>
@@ -626,7 +678,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                   <div key={key} className="benefit-row">
                     <div className="benefit-info">
                       <span>{label}</span>
-                      <span className="benefit-num">{benefits[key]}/10</span>
+                      <span className="benefit-num">{Math.round(benefits[key])}/10</span>
                     </div>
                     <div className="benefit-slider">
                       <div 
@@ -638,8 +690,10 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                         type="range"
                         min="1"
                         max="10"
+                        step="any"
                         value={benefits[key]}
                         onChange={e => handleBenefitChange(key, e.target.value)}
+                        onPointerUp={() => handleSliderSnap(key)}
                       />
                     </div>
                     <span className="benefit-desc">{desc}</span>
