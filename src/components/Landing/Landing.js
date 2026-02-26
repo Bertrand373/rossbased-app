@@ -319,6 +319,8 @@ const Landing = ({ onLogin }) => {
         </div>
 
         <div className="landing-footer-legal">
+          <Link to="/timeline">Free Timeline Tool</Link>
+          <span className="landing-footer-dot">·</span>
           <Link to="/privacy">Privacy</Link>
           <span className="landing-footer-dot">·</span>
           <Link to="/terms">Terms</Link>
