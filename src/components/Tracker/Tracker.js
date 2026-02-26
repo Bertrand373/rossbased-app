@@ -526,61 +526,232 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     snapRafRef.current[key] = requestAnimationFrame(animate);
   }, []);
 
-  // Compute post-log insight
+  // Compute post-log insight — scored engine
+  // Every possible insight gets a surprise score. Highest wins.
+  // More data = richer insights. This is what makes logging addictive.
   const computePostLogInsight = useCallback((savedBenefits, allLogs) => {
     const phase = getCurrentPhaseName(streak);
     const dayLabel = `Day ${streak} · ${phase}`;
     const coreKeys = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
-    
+    const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+    // === FIRST LOG — no candidates possible ===
     if (allLogs.length <= 1) {
       return { phase: dayLabel, line: 'Pattern recognition begins', sub: 'Your first data point is locked in' };
     }
-    
+
     const previousLogs = allLogs.slice(0, -1);
+    const candidates = [];
+
+    // ------------------------------------------------------------------
+    // 1. ALL-TIME PEAK (score: 95) — single metric highest ever
+    // ------------------------------------------------------------------
     for (const key of coreKeys) {
       const prevMax = Math.max(...previousLogs.map(l => l[key] || 0));
       if (savedBenefits[key] > prevMax && savedBenefits[key] >= 8) {
-        const label = key.charAt(0).toUpperCase() + key.slice(1);
-        return { phase: dayLabel, line: `${label} at its highest`, sub: `All-time peak · ${savedBenefits[key]}/10` };
+        candidates.push({ score: 95, insight: {
+          phase: dayLabel,
+          line: `${cap(key)} at its highest`,
+          sub: `All-time peak · ${savedBenefits[key]}/10`
+        }});
+        break; // Only report one peak
       }
     }
-    
-    const sortedDates = allLogs
-      .map(l => format(new Date(l.date), 'yyyy-MM-dd'))
-      .sort()
-      .reverse();
+
+    // ------------------------------------------------------------------
+    // 2. ELITE DAY (score: 90) — all 6 core metrics ≥ 7
+    // ------------------------------------------------------------------
+    if (coreKeys.every(k => savedBenefits[k] >= 7)) {
+      const priorElite = previousLogs.filter(l => coreKeys.every(k => (l[k] || 0) >= 7)).length;
+      const total = priorElite + 1;
+      candidates.push({ score: 90, insight: {
+        phase: dayLabel,
+        line: 'All 6 metrics above 7',
+        sub: total <= 1 ? 'First time. Remember this state.' : `${total} elite days out of ${allLogs.length} logs`
+      }});
+    }
+
+    // ------------------------------------------------------------------
+    // 3. CROSS-METRIC CORRELATION (score: 85) — needs 10+ logs
+    //    "When Sleep is 8+, Confidence averages 8.4"
+    // ------------------------------------------------------------------
+    if (allLogs.length >= 10) {
+      const pairs = [
+        ['sleep','energy'],['sleep','focus'],['sleep','confidence'],
+        ['workout','energy'],['workout','confidence'],['workout','aura'],
+        ['energy','confidence'],['energy','aura'],['focus','clarity']
+      ];
+      let best = null;
+      for (const [a, b] of pairs) {
+        const highA = previousLogs.filter(l => (l[a] || 0) >= 8);
+        const lowA = previousLogs.filter(l => (l[a] || 0) <= 4);
+        if (highA.length >= 3 && lowA.length >= 2) {
+          const avgHigh = highA.reduce((s, l) => s + (l[b] || 5), 0) / highA.length;
+          const avgLow = lowA.reduce((s, l) => s + (l[b] || 5), 0) / lowA.length;
+          const gap = avgHigh - avgLow;
+          if (gap >= 2 && (!best || gap > best.gap)) {
+            best = { a, b, avgHigh: avgHigh.toFixed(1), gap };
+          }
+        }
+      }
+      if (best) {
+        candidates.push({ score: 85, insight: {
+          phase: dayLabel,
+          line: `When ${cap(best.a)} is 8+, ${cap(best.b)} averages ${best.avgHigh}`,
+          sub: 'Your data reveals the connection'
+        }});
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // 4. BEST WEEK EVER (score: 82) — highest 7-day composite average
+    // ------------------------------------------------------------------
+    if (allLogs.length >= 14) {
+      const last7 = allLogs.slice(-7);
+      const weekAvg = last7.reduce((s, l) => s + coreKeys.reduce((a, k) => a + (l[k] || 5), 0) / coreKeys.length, 0) / last7.length;
+      let isBest = true;
+      for (let i = 0; i <= allLogs.length - 14; i++) {
+        const w = allLogs.slice(i, i + 7);
+        const wAvg = w.reduce((s, l) => s + coreKeys.reduce((a, k) => a + (l[k] || 5), 0) / coreKeys.length, 0) / w.length;
+        if (wAvg >= weekAvg) { isBest = false; break; }
+      }
+      if (isBest) {
+        candidates.push({ score: 82, insight: {
+          phase: dayLabel,
+          line: 'Best 7-day average yet',
+          sub: `Overall score: ${weekAvg.toFixed(1)}`
+        }});
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // 5. LOG STREAK (score: 80/65) — consecutive days logged
+    // ------------------------------------------------------------------
+    const sortedDates = allLogs.map(l => format(new Date(l.date), 'yyyy-MM-dd')).sort().reverse();
     const uniqueDates = [...new Set(sortedDates)];
     let logStreak = 1;
     for (let i = 1; i < uniqueDates.length; i++) {
       const curr = new Date(uniqueDates[i - 1]);
       const prev = new Date(uniqueDates[i]);
-      const diffDays = Math.round((curr - prev) / (1000 * 60 * 60 * 24));
-      if (diffDays === 1) { logStreak++; } else { break; }
+      if (Math.round((curr - prev) / (1000 * 60 * 60 * 24)) === 1) { logStreak++; } else { break; }
     }
-    if (logStreak >= 3) {
-      return { phase: dayLabel, line: `${logStreak} days logged in a row`, sub: 'Consistency builds clarity' };
+    if (logStreak >= 7) {
+      candidates.push({ score: 80, insight: {
+        phase: dayLabel,
+        line: `${logStreak} days logged straight`,
+        sub: 'The data compounds. So do you.'
+      }});
+    } else if (logStreak >= 3) {
+      candidates.push({ score: 65, insight: {
+        phase: dayLabel,
+        line: `${logStreak} days logged in a row`,
+        sub: 'Consistency builds clarity'
+      }});
     }
-    
+
+    // ------------------------------------------------------------------
+    // 6. DAY-OF-WEEK PATTERN (score: 75/60) — needs 14+ logs
+    //    "You peak on Tuesdays" or "Mondays are your toughest"
+    // ------------------------------------------------------------------
+    if (allLogs.length >= 14) {
+      const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const buckets = {};
+      allLogs.forEach(l => {
+        const dow = new Date(l.date).getDay();
+        if (!buckets[dow]) buckets[dow] = [];
+        buckets[dow].push(coreKeys.reduce((s, k) => s + (l[k] || 5), 0) / coreKeys.length);
+      });
+      let bestD = null, worstD = null;
+      for (const [dow, scores] of Object.entries(buckets)) {
+        if (scores.length < 2) continue;
+        const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+        if (!bestD || avg > bestD.avg) bestD = { dow: parseInt(dow), avg };
+        if (!worstD || avg < worstD.avg) worstD = { dow: parseInt(dow), avg };
+      }
+      if (bestD && worstD && bestD.avg - worstD.avg >= 1.5) {
+        const todayDow = new Date().getDay();
+        if (todayDow === bestD.dow) {
+          candidates.push({ score: 75, insight: {
+            phase: dayLabel,
+            line: `${dayNames[bestD.dow]}s are your strongest day`,
+            sub: `Average score: ${bestD.avg.toFixed(1)}`
+          }});
+        } else if (todayDow === worstD.dow) {
+          candidates.push({ score: 75, insight: {
+            phase: dayLabel,
+            line: `${dayNames[worstD.dow]}s tend to be your toughest`,
+            sub: 'Awareness is your edge'
+          }});
+        } else {
+          candidates.push({ score: 60, insight: {
+            phase: dayLabel,
+            line: `You peak on ${dayNames[bestD.dow]}s`,
+            sub: `${bestD.avg.toFixed(1)} vs ${worstD.avg.toFixed(1)} on ${dayNames[worstD.dow]}s`
+          }});
+        }
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // 7. PHASE TRANSITION PROXIMITY (score: 72)
+    //    "2 days from Emotional Processing"
+    // ------------------------------------------------------------------
+    for (const threshold of [14, 45, 90, 180]) {
+      const daysLeft = threshold - streak;
+      if (daysLeft > 0 && daysLeft <= 3) {
+        candidates.push({ score: 72, insight: {
+          phase: dayLabel,
+          line: `${daysLeft} day${daysLeft > 1 ? 's' : ''} from ${getCurrentPhaseName(threshold + 1)}`,
+          sub: 'New territory ahead'
+        }});
+        break;
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // 8. WEEKLY TREND SHIFT (score: 70) — ±1.5 from last week's avg
+    // ------------------------------------------------------------------
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
     const recentLogs = previousLogs.filter(l => new Date(l.date) >= weekAgo);
     if (recentLogs.length >= 2) {
       let biggestShift = { key: null, delta: 0 };
       for (const key of coreKeys) {
-        const avg = recentLogs.reduce((sum, l) => sum + (l[key] || 5), 0) / recentLogs.length;
+        const avg = recentLogs.reduce((s, l) => s + (l[key] || 5), 0) / recentLogs.length;
         const delta = savedBenefits[key] - avg;
         if (Math.abs(delta) > Math.abs(biggestShift.delta) && Math.abs(delta) >= 1.5) {
           biggestShift = { key, delta };
         }
       }
       if (biggestShift.key) {
-        const label = biggestShift.key.charAt(0).toUpperCase() + biggestShift.key.slice(1);
         const arrow = biggestShift.delta > 0 ? '↑' : '↓';
         const val = Math.abs(biggestShift.delta).toFixed(1);
-        return { phase: dayLabel, line: `${label} ${arrow} ${val} from last week`, sub: biggestShift.delta > 0 ? 'The practice is working' : 'Awareness is the first step' };
+        candidates.push({ score: 70, insight: {
+          phase: dayLabel,
+          line: `${cap(biggestShift.key)} ${arrow} ${val} from last week`,
+          sub: biggestShift.delta > 0 ? 'The practice is working' : 'Awareness is the first step'
+        }});
       }
     }
-    
+
+    // ------------------------------------------------------------------
+    // 9. TOTAL LOG MILESTONES (score: 68) — 10, 25, 50, 100, etc.
+    // ------------------------------------------------------------------
+    const logMilestones = [10, 25, 50, 100, 150, 200, 365];
+    if (logMilestones.includes(allLogs.length)) {
+      candidates.push({ score: 68, insight: {
+        phase: dayLabel,
+        line: `${allLogs.length} logs recorded`,
+        sub: allLogs.length >= 100 ? 'Deep data. Deep self-knowledge.' : 'Every log sharpens the picture'
+      }});
+    }
+
+    // === RETURN HIGHEST SCORING, or phase fallback ===
+    if (candidates.length > 0) {
+      candidates.sort((a, b) => b.score - a.score);
+      return candidates[0].insight;
+    }
+
     const phaseMessages = {
       'Initial Adaptation': 'Building the foundation',
       'Emotional Processing': 'Old patterns releasing',
