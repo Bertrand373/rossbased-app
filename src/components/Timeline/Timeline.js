@@ -255,6 +255,95 @@ const Timeline = () => {
     return () => observer.disconnect();
   }, []);
 
+  // SEO — dynamic title, meta, canonical, OG tags, FAQ JSON-LD
+  useEffect(() => {
+    const originalTitle = document.title;
+
+    // Page title — primary keyword front-loaded
+    document.title = 'Semen Retention Timeline — Personalized Day-by-Day Projections | TitanTrack';
+
+    // Meta description — replace existing from index.html
+    const existingMeta = document.querySelector('meta[name="description"]');
+    const originalDesc = existingMeta ? existingMeta.content : '';
+    if (existingMeta) {
+      existingMeta.content = 'Free personalized semen retention timeline based on your age, exercise, and streak position. See what to expect at day 7, 30, 90+ with phase-by-phase projections.';
+    }
+
+    // Canonical URL
+    const canonical = document.createElement('link');
+    canonical.rel = 'canonical';
+    canonical.href = 'https://titantrack.app/timeline';
+    document.head.appendChild(canonical);
+
+    // Open Graph tags
+    const ogTags = [
+      { property: 'og:title', content: 'Semen Retention Timeline — What Will Retention Do For You?' },
+      { property: 'og:description', content: 'Free personalized timeline showing your semen retention phases, risk windows, and projected benefits. Takes 30 seconds.' },
+      { property: 'og:url', content: 'https://titantrack.app/timeline' },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:site_name', content: 'TitanTrack' }
+    ];
+    const ogElements = ogTags.map(tag => {
+      const el = document.createElement('meta');
+      el.setAttribute('property', tag.property);
+      el.content = tag.content;
+      document.head.appendChild(el);
+      return el;
+    });
+
+    // FAQ JSON-LD structured data (Google prefers this over microdata)
+    const jsonLd = document.createElement('script');
+    jsonLd.type = 'application/ld+json';
+    jsonLd.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      'mainEntity': [
+        {
+          '@type': 'Question',
+          'name': 'How long until semen retention benefits start?',
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': 'Most practitioners report noticeable changes within 7-14 days, particularly increased energy and sharper mental clarity. Deeper benefits like emotional stability and sustained confidence typically develop between days 30-90. The timeline varies based on your starting point, age, and lifestyle factors.'
+          }
+        },
+        {
+          '@type': 'Question',
+          'name': 'What happens at day 30 of semen retention?',
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': 'Day 30 typically falls within the Emotional Processing phase (days 15-45). You may experience a period known as a "flatline" where benefits seem to plateau. This is actually your system recalibrating at a deeper level. Practitioners who push through the flatline consistently report the most significant breakthroughs in the weeks that follow.'
+          }
+        },
+        {
+          '@type': 'Question',
+          'name': 'What does 90 days of semen retention feel like?',
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': 'At 90 days, most practitioners have transitioned through Mental Expansion and into early Integration. Commonly reported experiences include deep cognitive clarity, internally-sourced confidence, emotional stability, and a clear sense of purpose. Many describe feeling fundamentally different from who they were at day one.'
+          }
+        },
+        {
+          '@type': 'Question',
+          'name': 'Is semen retention different from NoFap?',
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': 'While they overlap, semen retention and NoFap have different focuses. NoFap primarily addresses pornography addiction and compulsive behavior. Semen retention is a broader practice focused on conserving sexual energy for physical, mental, and spiritual benefit. Many practitioners combine elements of both approaches.'
+          }
+        }
+      ]
+    });
+    document.head.appendChild(jsonLd);
+
+    // Cleanup on unmount — restore original title, remove injected tags
+    return () => {
+      document.title = originalTitle;
+      if (existingMeta) existingMeta.content = originalDesc;
+      canonical.remove();
+      ogElements.forEach(el => el.remove());
+      jsonLd.remove();
+    };
+  }, []);
+
   // Handle streak bucket selection → map to day number
   const handleBucketSelect = (bucket) => {
     const dayMap = { 'start': '1', 'week1': '5', 'building': '18', 'deep': '' };
@@ -476,7 +565,7 @@ const Timeline = () => {
           <div className="tl-result-block tl-phase-block">
             <p className="tl-result-label">Your Current Phase</p>
             <div className="tl-phase-header">
-              <h2 className="tl-phase-name" style={{ color: projection.currentPhase.color }}>
+              <h2 className="tl-phase-name">
                 {projection.currentPhase.name}
               </h2>
               <span className="tl-phase-day">Day {projection.streakDay}</span>
@@ -488,10 +577,7 @@ const Timeline = () => {
               <div className="tl-progress-bar">
                 <div
                   className="tl-progress-fill"
-                  style={{
-                    width: `${projection.progressPercent}%`,
-                    backgroundColor: projection.currentPhase.color
-                  }}
+                  style={{ width: `${projection.progressPercent}%` }}
                 />
               </div>
               <div className="tl-progress-meta">
@@ -509,7 +595,7 @@ const Timeline = () => {
               <p className="tl-expect-label">What to expect in this phase</p>
               {projection.currentPhase.expect.map((item, i) => (
                 <div className="tl-expect-item" key={i}>
-                  <span className="tl-expect-dot" style={{ backgroundColor: projection.currentPhase.color }} />
+                  <span className="tl-expect-dot" />
                   <span>{item}</span>
                 </div>
               ))}
