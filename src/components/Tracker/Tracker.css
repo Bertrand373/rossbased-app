@@ -15,11 +15,24 @@
 }
 
 /* ============================================================
-   CENTER WRAPPER - Counter always vertically centered
-   Ghost line + main content group as a unit
+   CENTER WRAPPER - Takes all space between header and nav
    ============================================================ */
 
 .tracker-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 0;
+}
+
+/* ============================================================
+   CONTENT GROUP - Counter centered in full available space
+   Footer + quote stay at bottom, this takes the rest
+   ============================================================ */
+
+.tracker-content {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -30,7 +43,7 @@
 }
 
 /* ============================================================
-   MAIN - Content group centered by .tracker-center
+   MAIN - Content group centered by .tracker-content
    ============================================================ */
 
 .tracker-main {
@@ -858,6 +871,7 @@
   }
   
   .tracker-center { flex: none; }
+  .tracker-content { flex: none; }
   .tracker-main { flex: none; }
   .streak-num { font-size: 4rem; }
   
