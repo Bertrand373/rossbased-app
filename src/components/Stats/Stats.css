@@ -54,7 +54,7 @@
 
 @media (min-width: 1025px) {
   .stats-page { padding: 56px 24px 80px; }
-  .stats-page > *:not(.sheet-backdrop) { max-width: 520px; }
+  .stats-page > *:not(.sheet-backdrop) { max-width: 700px; }
   .stats-page > .overlay { max-width: none; }
 }
 

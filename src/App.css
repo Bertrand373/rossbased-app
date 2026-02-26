@@ -244,6 +244,23 @@ h4 { font-size: 0.875rem; }
   -webkit-tap-highlight-color: transparent;
 }
 
+.header-nav .nav-oracle-eye {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  opacity: 0.45;
+  transition: opacity 150ms ease;
+  margin-right: 2px;
+}
+
+[data-theme="light"] .header-nav .nav-oracle-eye {
+  filter: invert(1);
+}
+
+.header-nav .nav-link-oracle:hover .nav-oracle-eye {
+  opacity: 0.7;
+}
+
 .header-nav .nav-divider {
   width: 1px;
   height: 14px;

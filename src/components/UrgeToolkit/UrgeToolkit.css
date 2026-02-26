@@ -20,6 +20,10 @@
     min-height: calc(100dvh - 64px);
     padding: 56px 24px 80px;
   }
+  
+  .urge-toolkit > * {
+    max-width: 560px;
+  }
 }
 
 .urge-toolkit > * {
