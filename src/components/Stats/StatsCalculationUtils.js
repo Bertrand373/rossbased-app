@@ -178,8 +178,24 @@ export const generateChartData = (userData, selectedMetric, timeRange) => {
       }
     }
     
+    // For quarter view, aggregate daily data into weekly averages for cleaner visualization
+    // This reduces 90 noisy dots to ~13 clean data points
+    let displayArray = timeRangeArray;
+    if (timeRange === 'quarter') {
+      const weeklyBuckets = [];
+      for (let w = 0; w < timeRangeArray.length; w += 7) {
+        const weekSlice = timeRangeArray.slice(w, w + 7);
+        const validValues = weekSlice.filter(d => d.value !== null).map(d => d.value);
+        const avgValue = validValues.length > 0 
+          ? Math.round(validValues.reduce((a, b) => a + b, 0) / validValues.length * 10) / 10
+          : null;
+        weeklyBuckets.push({ date: weekSlice[weekSlice.length - 1].date, value: avgValue });
+      }
+      displayArray = weeklyBuckets;
+    }
+
     // Format labels based on time range
-    const labels = timeRangeArray.map(item => {
+    const labels = displayArray.map(item => {
       try {
         if (timeRange === 'week') {
           return format(item.date, 'EEE');
@@ -194,7 +210,7 @@ export const generateChartData = (userData, selectedMetric, timeRange) => {
       }
     });
     
-    const data = timeRangeArray.map(item => item.value);
+    const data = displayArray.map(item => item.value);
     
     const datasets = [{
       label: selectedMetric ? selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1) : 'Data',

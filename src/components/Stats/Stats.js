@@ -402,9 +402,10 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     
     // Find first and last valid data points for endpoint dots
     const data = rawData.datasets[0].data;
-    const pointRadii = data.map((value, index) => {
+    const pointRadii = data.map((value) => {
       if (value === null) return 0;
-      return 4;
+      if (timeRange === 'week') return 4;  // Dots visible for week view
+      return 0;  // Month & quarter: smooth line only, tap to reveal values
     });
     
     return {
