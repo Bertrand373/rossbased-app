@@ -52,6 +52,105 @@ const Landing = ({ onLogin }) => {
     return () => observer.disconnect();
   }, []);
 
+  // SEO — dynamic title, meta, canonical, OG tags, SoftwareApplication schema
+  useEffect(() => {
+    const originalTitle = document.title;
+
+    // Page title — keyword-rich for the landing page
+    document.title = 'TitanTrack — AI-Powered Semen Retention Tracker App';
+
+    // Meta description — replace generic one from index.html
+    const existingMeta = document.querySelector('meta[name="description"]');
+    const originalDesc = existingMeta ? existingMeta.content : '';
+    if (existingMeta) {
+      existingMeta.content = 'Track your semen retention streak with AI predictions, 6-metric benefit tracking, emotional timeline mapping, and crisis tools. Free to start. Built by a 2,400+ day practitioner.';
+    }
+
+    // Canonical URL
+    const canonical = document.createElement('link');
+    canonical.rel = 'canonical';
+    canonical.href = 'https://titantrack.app/';
+    document.head.appendChild(canonical);
+
+    // Open Graph tags
+    const ogTags = [
+      { property: 'og:title', content: 'TitanTrack — AI-Powered Semen Retention Tracker' },
+      { property: 'og:description', content: 'The retention tracker that learns your patterns and predicts when you\'re vulnerable. 6-metric tracking, emotional timeline, AI crisis intervention. Free to start.' },
+      { property: 'og:url', content: 'https://titantrack.app/' },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:site_name', content: 'TitanTrack' },
+      { property: 'og:image', content: 'https://titantrack.app/icon-512.png' }
+    ];
+    const ogElements = ogTags.map(tag => {
+      const el = document.createElement('meta');
+      el.setAttribute('property', tag.property);
+      el.content = tag.content;
+      document.head.appendChild(el);
+      return el;
+    });
+
+    // Twitter card
+    const twitterTags = [
+      { name: 'twitter:card', content: 'summary' },
+      { name: 'twitter:title', content: 'TitanTrack — AI-Powered Semen Retention Tracker' },
+      { name: 'twitter:description', content: 'Track your retention streak with AI predictions, benefit tracking, and crisis tools. Built by a 2,400+ day practitioner.' }
+    ];
+    const twitterElements = twitterTags.map(tag => {
+      const el = document.createElement('meta');
+      el.name = tag.name;
+      el.content = tag.content;
+      document.head.appendChild(el);
+      return el;
+    });
+
+    // SoftwareApplication structured data — for Google rich results
+    const jsonLd = document.createElement('script');
+    jsonLd.type = 'application/ld+json';
+    jsonLd.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      'name': 'TitanTrack',
+      'description': 'AI-powered semen retention tracker with neural network predictions, 6-metric benefit tracking, emotional timeline mapping, and crisis intervention tools.',
+      'url': 'https://titantrack.app',
+      'applicationCategory': 'HealthApplication',
+      'operatingSystem': 'Web, iOS, Android',
+      'offers': [
+        {
+          '@type': 'Offer',
+          'price': '0',
+          'priceCurrency': 'USD',
+          'description': 'Free tier with core tracking features'
+        },
+        {
+          '@type': 'Offer',
+          'price': '8.00',
+          'priceCurrency': 'USD',
+          'billingIncrement': 'P1M',
+          'description': 'Premium monthly with AI predictions, Oracle, and advanced analytics'
+        },
+        {
+          '@type': 'Offer',
+          'price': '62.00',
+          'priceCurrency': 'USD',
+          'billingIncrement': 'P1Y',
+          'description': 'Premium yearly — save 35%'
+        }
+      ],
+      'featureList': 'AI pattern recognition, 6-metric benefit tracking, Emotional timeline, Crisis intervention, Subliminal mind program, Oracle AI guide'
+    });
+    document.head.appendChild(jsonLd);
+
+    // Cleanup on unmount
+    return () => {
+      document.title = originalTitle;
+      if (existingMeta) existingMeta.content = originalDesc;
+      canonical.remove();
+      ogElements.forEach(el => el.remove());
+      twitterElements.forEach(el => el.remove());
+      jsonLd.remove();
+    };
+  }, []);
+
   return (
     <div className="landing">
       <div className="landing-bg" />
