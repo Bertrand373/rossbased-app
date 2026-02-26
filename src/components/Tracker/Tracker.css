@@ -672,23 +672,36 @@
 }
 
 /* ============================================================
-   POST-LOG INSIGHT — brief feedback after save
+   POST-LOG INSIGHT — overlaid on same-height sheet after save
    ============================================================ */
 
+.benefits-modal {
+  position: relative;
+}
+
+.benefits-list.fading,
+.benefits-actions.fading,
+.benefits-modal h2.fading {
+  opacity: 0;
+  transition: opacity 250ms ease;
+  pointer-events: none;
+}
+
 .post-log-insight {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  flex: 1;
-  min-height: 0;
   padding: 40px 20px;
-  animation: insightFadeIn 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  animation: insightFadeIn 500ms cubic-bezier(0.16, 1, 0.3, 1) 200ms forwards;
 }
 
 @keyframes insightFadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -714,14 +727,6 @@
   font-size: 0.8125rem;
   color: var(--text-tertiary);
   margin-top: 10px;
-}
-
-/* Crossfade: sliders out when insight shows */
-.benefits-modal .benefits-list.fading,
-.benefits-modal .benefits-actions.fading {
-  opacity: 0;
-  transition: opacity 200ms ease;
-  pointer-events: none;
 }
 
 /* ============================================================
