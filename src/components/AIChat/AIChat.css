@@ -309,12 +309,12 @@
 }
 
 .ai-chat-avatar {
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
   flex-shrink: 0;
-  margin-top: 1px;
-  opacity: 0.45;
+  margin-top: 0;
+  opacity: 0.6;
 }
 
 [data-theme="light"] .ai-chat-avatar {
@@ -370,9 +370,10 @@
 
 .ai-chat-message.user .ai-chat-message-content {
   background-color: var(--surface-overlay);
-  color: var(--text);
+  color: var(--text-secondary);
   border-radius: 12px 12px 4px 12px;
   max-width: 85%;
+  border: 1px solid var(--border-subtle);
 }
 
 /* Assistant message */
@@ -381,6 +382,9 @@
   background: transparent;
   max-width: 100%;
   padding: 0;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  letter-spacing: 0.01em;
 }
 
 /* Oracle markdown typography */
@@ -391,7 +395,7 @@
 
 .ai-chat-message.assistant .ai-chat-message-content em {
   font-style: italic;
-  opacity: 0.85;
+  color: var(--text-secondary);
 }
 
 .ai-chat-message-content {
@@ -409,17 +413,18 @@
 
 .ai-chat-cursor {
   display: inline-block;
-  width: 2px;
-  height: 1em;
-  background-color: var(--text-secondary);
-  margin-left: 2px;
-  vertical-align: text-bottom;
-  animation: cursorBlink 0.8s ease infinite;
+  width: 6px;
+  height: 6px;
+  background-color: var(--text-muted);
+  margin-left: 4px;
+  vertical-align: middle;
+  border-radius: 50%;
+  animation: cursorBreathe 1.5s ease-in-out infinite;
 }
 
-@keyframes cursorBlink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+@keyframes cursorBreathe {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
 }
 
 /* ============================================================
@@ -440,6 +445,10 @@
   animation: loadingPulse 2s ease-in-out infinite;
 }
 
+[data-theme="light"] .ai-chat-loading-icon {
+  filter: invert(1);
+}
+
 @keyframes loadingPulse {
   0%, 100% { 
     opacity: 0.6; 
@@ -449,10 +458,6 @@
     opacity: 0.3; 
     transform: scale(0.95);
   }
-}
-
-[data-theme="light"] .ai-chat-loading-icon {
-  filter: invert(1);
 }
 
 /* ============================================================
@@ -752,7 +757,7 @@
   
   .ai-chat-cursor {
     animation: none;
-    opacity: 0.6;
+    opacity: 0.5;
   }
   
   .ai-chat-loading-icon {

@@ -478,7 +478,6 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
             {isLoading && !streamingText && (
               <div className="ai-chat-message assistant">
                 <div className="ai-chat-message-row">
-                  <img src="/The_Oracle.png" alt="" className="ai-chat-avatar" />
                   <div className="ai-chat-loading">
                     <img 
                       src={getLoadingIcon()} 
@@ -537,7 +536,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                 <textarea
                   ref={inputRef}
                   className="ai-chat-input"
-                  placeholder="Ask anything..."
+                  placeholder="What's on your mind?"
                   value={inputValue}
                   onChange={(e) => {
                     setInputValue(e.target.value);
