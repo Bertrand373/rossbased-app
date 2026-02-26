@@ -36,6 +36,7 @@ import PlanModal from './components/Subscription/PlanModal';
 import DiscordLinkCallback from './components/Auth/DiscordLinkCallback';
 import Privacy from './components/Legal/Privacy';
 import Terms from './components/Legal/Terms';
+import Timeline from './components/Timeline/Timeline';
 
 // AMBIENT AI HOOKS - Auto-train only (risk indicator removed, floating card handles alerts)
 import { useAutoTrain } from './hooks/useAutoTrain';
@@ -673,6 +674,7 @@ function AppContent({
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/terms" element={<Terms />} />
+                  <Route path="/timeline" element={<Timeline />} />
                   <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
               </div>
@@ -695,6 +697,7 @@ function AppContent({
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/timeline" element={<Timeline />} />
             <Route path="*" element={<Landing onLogin={handleLogin} />} />
           </Routes>
         )}

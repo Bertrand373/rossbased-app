@@ -30,6 +30,7 @@ const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 const { getCommunityPulse } = require('./services/communityPulse');
 const stripeRoutes = require('./routes/stripeRoutes');
 const discordLinkRoutes = require('./routes/discordLink');
+const timelineRoutes = require('./routes/timelineRoutes');
 const { expireStaleTrials, expireStaleCanceled, checkPremiumAccess } = require('./middleware/subscriptionMiddleware');
 const { checkAndSendOnboardingNotification } = require('./services/notificationService');
 
@@ -2065,6 +2066,7 @@ app.use('/api/analytics', authenticate, analyticsRoutes);
 app.use('/api/admin', authenticate, adminRevenueRoutes);
 app.use('/api/stripe', stripeRoutes);
 app.use('/api/discord', discordLinkRoutes);
+app.use('/api/timeline', timelineRoutes);
 
 // Serve frontend build in production
 if (process.env.NODE_ENV === 'production') {
