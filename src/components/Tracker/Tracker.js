@@ -445,6 +445,16 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     }
   }, []);
 
+  // Force-drag: iOS sometimes shows :active but won't fire onChange during touchmove
+  const handleSliderTouch = useCallback((key, e) => {
+    const touch = e.touches[0];
+    const input = e.currentTarget;
+    const rect = input.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
+    const val = 1 + ratio * 9;
+    setBenefits(prev => ({ ...prev, [key]: val }));
+  }, []);
+
   // Magnetic snap — on finger lift, glide thumb to nearest integer
   const handleSliderSnap = useCallback((key) => {
     if (snapRafRef.current[key]) cancelAnimationFrame(snapRafRef.current[key]);
@@ -609,7 +619,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
           }
         }
       });
-    }, 3500);
+    }, 2000);
     
     trackDailyLog(rounded, streak);
   };
@@ -747,6 +757,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                         step="any"
                         value={benefits[key]}
                         onChange={e => handleBenefitChange(key, e.target.value)}
+                        onTouchMove={e => handleSliderTouch(key, e)}
                         onPointerUp={() => handleSliderSnap(key)}
                       />
                     </div>
@@ -778,6 +789,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                         step="any"
                         value={benefits[key]}
                         onChange={e => handleBenefitChange(key, e.target.value)}
+                        onTouchMove={e => handleSliderTouch(key, e)}
                         onPointerUp={() => handleSliderSnap(key)}
                       />
                     </div>
