@@ -1,5 +1,5 @@
 // App.js - TITANTRACK MODERN MINIMAL
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
 import './App.css';
@@ -16,7 +16,8 @@ import UrgeToolkit from './components/UrgeToolkit/UrgeToolkit';
 import Profile from './components/Profile/Profile';
 import Landing from './components/Landing/Landing';
 
-// AI Prediction Display removed — now lives as bottom sheet in Tracker
+// AI Prediction Display (PatternInsightCard handles floating alerts, this handles full view)
+import PredictionDisplay from './components/PredictionDisplay/PredictionDisplay';
 
 // Shared components
 import AuthModal from './components/Auth/AuthModal';
@@ -130,8 +131,13 @@ const ProfileButton = ({ userData }) => {
   );
 };
 
-// Desktop Navigation - Text only with dividers, Oracle opens AI chat
+// Desktop Navigation - Text only with dividers, sliding dash, Oracle center
 const HeaderNavigation = ({ onOracleClick }) => {
+  const location = useLocation();
+  const navRef = useRef(null);
+  const dashRef = useRef(null);
+  const deskInitialized = useRef(false);
+
   const navItems = [
     { path: '/', label: 'Tracker' },
     { path: '/calendar', label: 'Calendar' },
@@ -140,9 +146,65 @@ const HeaderNavigation = ({ onOracleClick }) => {
     { path: '/urge-toolkit', label: 'Urges' }
   ];
 
+  // Position the dash under the active route tab
+  useEffect(() => {
+    const positionDash = () => {
+      if (!navRef.current || !dashRef.current) return;
+
+      const active = navRef.current.querySelector('.nav-link.active');
+      if (!active) {
+        dashRef.current.style.opacity = '0';
+        return;
+      }
+
+      const navRect = navRef.current.getBoundingClientRect();
+      const itemRect = active.getBoundingClientRect();
+      const x = itemRect.left + itemRect.width / 2 - navRect.left - 10;
+
+      if (!deskInitialized.current) {
+        dashRef.current.style.transition = 'none';
+        dashRef.current.style.transform = `translateX(${x}px)`;
+        dashRef.current.style.opacity = '1';
+        dashRef.current.offsetHeight; // eslint-disable-line no-unused-expressions
+        dashRef.current.style.transition = '';
+        deskInitialized.current = true;
+      } else {
+        dashRef.current.style.transform = `translateX(${x}px)`;
+        dashRef.current.style.opacity = '1';
+      }
+    };
+
+    const timer = setTimeout(positionDash, 30);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
+
+  // Re-measure on resize
+  useEffect(() => {
+    const recalc = () => {
+      if (!navRef.current || !dashRef.current) return;
+      const active = navRef.current.querySelector('.nav-link.active');
+      if (!active) {
+        dashRef.current.style.opacity = '0';
+        return;
+      }
+      const navRect = navRef.current.getBoundingClientRect();
+      const itemRect = active.getBoundingClientRect();
+      const x = itemRect.left + itemRect.width / 2 - navRect.left - 10;
+      dashRef.current.style.transition = 'none';
+      dashRef.current.style.transform = `translateX(${x}px)`;
+      dashRef.current.style.opacity = '1';
+      dashRef.current.offsetHeight; // eslint-disable-line no-unused-expressions
+      dashRef.current.style.transition = '';
+    };
+
+    window.addEventListener('resize', recalc);
+    return () => window.removeEventListener('resize', recalc);
+  }, []);
+
   return (
     <nav className="header-nav">
-      <div className="nav-container">
+      <div className="nav-container" ref={navRef}>
+        <span ref={dashRef} className="nav-dash" />
         {navItems.map((item, index) => (
           <React.Fragment key={item.path || item.type}>
             {item.type === 'oracle' ? (
@@ -205,7 +267,7 @@ const ServiceWorkerListener = () => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener('message', (event) => {
         if (event.data?.type === 'NAVIGATE_TO_PREDICTION') {
-          navigate('/'); // Pattern alert sheet auto-opens on tracker
+          navigate('/urge-prediction');
         }
       });
     }
@@ -662,6 +724,9 @@ function AppContent({
                       createCheckout={createCheckout}
                       openPlanModal={openPlanModal}
                     />
+                  } />
+                  <Route path="/urge-prediction" element={
+                    <PredictionDisplay mode="full" userData={userData} />
                   } />
                   <Route path="/admin" element={
                     <AdminCockpit />

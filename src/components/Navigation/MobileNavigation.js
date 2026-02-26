@@ -23,7 +23,7 @@ const MobileNavigation = ({ onOracleClick, isOracleActive }) => {
 
       const navRect = navRef.current.getBoundingClientRect();
       const itemRect = active.getBoundingClientRect();
-      const x = itemRect.left + itemRect.width / 2 - navRect.left - 8;
+      const x = itemRect.left + itemRect.width / 2 - navRect.left - 10;
 
       if (!initialized.current) {
         dashRef.current.style.transition = 'none';
@@ -53,7 +53,7 @@ const MobileNavigation = ({ onOracleClick, isOracleActive }) => {
       }
       const navRect = navRef.current.getBoundingClientRect();
       const itemRect = active.getBoundingClientRect();
-      const x = itemRect.left + itemRect.width / 2 - navRect.left - 8;
+      const x = itemRect.left + itemRect.width / 2 - navRect.left - 10;
       dashRef.current.style.transition = 'none';
       dashRef.current.style.transform = `translateX(${x}px)`;
       dashRef.current.style.opacity = '1';
