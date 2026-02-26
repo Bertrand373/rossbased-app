@@ -235,22 +235,23 @@ h4 { font-size: 0.875rem; }
   font-weight: 600;
 }
 
-/* Oracle button in desktop nav - styled like a nav link */
+/* Oracle button in desktop nav - icon only, centered */
 .header-nav .nav-link-oracle {
   background: none;
   border: none;
   font-family: inherit;
   cursor: pointer;
+  padding: 8px 16px;
   -webkit-tap-highlight-color: transparent;
 }
 
 .header-nav .nav-oracle-eye {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   object-fit: contain;
   opacity: 0.45;
   transition: opacity 150ms ease;
-  margin-right: 2px;
+  display: block;
 }
 
 [data-theme="light"] .header-nav .nav-oracle-eye {

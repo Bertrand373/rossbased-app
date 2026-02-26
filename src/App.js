@@ -150,9 +150,9 @@ const HeaderNavigation = ({ onOracleClick }) => {
               <button 
                 className="nav-link nav-link-oracle"
                 onClick={onOracleClick}
+                aria-label="Oracle"
               >
                 <img src="/The_Oracle.png" alt="" className="nav-oracle-eye" />
-                {item.label}
               </button>
             ) : (
               <NavLink 
