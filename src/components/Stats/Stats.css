@@ -67,7 +67,7 @@
   justify-content: center;
   align-items: center;
   gap: 0;
-  margin-bottom: 48px;
+  margin-bottom: 24px;
   animation: fadeInUp 500ms ease forwards;
 }
 
@@ -212,7 +212,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin-bottom: 48px;
+  margin-bottom: 24px;
   padding: 20px 0;
   border-top: 1px solid var(--border-subtle);
   border-bottom: 1px solid var(--border-subtle);
@@ -267,7 +267,7 @@
    SECTIONS
    ============================================================================= */
 
-.stats-section { margin-bottom: 48px; }
+.stats-section { margin-bottom: 24px; }
 
 .stats-section h2 {
   font-size: 0.6875rem;
