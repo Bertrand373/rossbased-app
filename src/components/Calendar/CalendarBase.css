@@ -1290,6 +1290,12 @@
     width: 16px;
     height: 16px;
   }
+  
+  /* Moon bar - no mobile nav offset on desktop */
+  .calendar-moon-bar {
+    bottom: 0;
+    padding: 12px 24px;
+  }
 }
 
 /* =============================================================================
