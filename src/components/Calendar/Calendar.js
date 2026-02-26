@@ -1197,7 +1197,9 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         onTouchStart={handleSwipeStart}
         onTouchEnd={handleSwipeEnd}
       >
-        {viewMode === 'month' ? renderMonthView() : renderWeekView()}
+        <div key={viewMode} className="calendar-view-transition">
+          {viewMode === 'month' ? renderMonthView() : renderWeekView()}
+        </div>
       </div>
 
       {/* Moon Phase - Sticky bar above nav, both views */}

@@ -1043,6 +1043,19 @@
 }
 
 /* =============================================================================
+   VIEW TRANSITION - Month/Week toggle cross-fade
+   ============================================================================= */
+
+.calendar-view-transition {
+  animation: viewFadeIn 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes viewFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* =============================================================================
    ANIMATIONS - Entrance effects matching Landing
    ============================================================================= */
 
@@ -1308,6 +1321,7 @@
   .calendar-main-section,
   .calendar-main-section.swipe-left,
   .calendar-main-section.swipe-right,
+  .calendar-view-transition,
   .calendar-moon-bar {
     animation: none;
     opacity: 1;
