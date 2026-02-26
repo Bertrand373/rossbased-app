@@ -443,7 +443,8 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   text-align: left;
-  padding: 8px 0;
+  padding: 8px 14px;
+  margin: 0 -14px;
   mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
 }
@@ -494,8 +495,8 @@
 .benefit-slider::before {
   content: '';
   position: absolute;
-  left: 22px;
-  right: 22px;
+  left: 10px;
+  right: 10px;
   height: 2px;
   background-color: var(--border-prominent);
   border-radius: 1px;
@@ -504,8 +505,8 @@
 
 .benefit-fill {
   position: absolute;
-  left: 22px;
-  width: calc(100% - 44px);
+  left: 10px;
+  width: calc(100% - 20px);
   height: 2px;
   background-color: var(--text);
   border-radius: 1px;
@@ -585,12 +586,12 @@
 }
 
 .benefit-slider input[type="range"]:active::-webkit-slider-thumb {
-  transform: scale(1.25);
+  transform: scale(1.15);
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
 }
 
 .benefit-slider input[type="range"]:active::-moz-range-thumb {
-  transform: scale(1.25);
+  transform: scale(1.15);
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
 }
 
