@@ -1014,6 +1014,7 @@
   padding: 0;
   animation: none;
   width: 100%;
+  max-width: none;
 }
 
 /* Remove nested backgrounds — sheet-panel already provides the bg */

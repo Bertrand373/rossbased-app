@@ -10,7 +10,7 @@
   font-size: 0.75rem;
   font-weight: 400;
   color: var(--text-tertiary);
-  margin: 0 0 0 0;
+  margin: 0 0 10px 0;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: color 150ms ease;
