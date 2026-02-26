@@ -728,56 +728,50 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         </div>
       )}
 
-      {/* Center wrapper — fills all available space between header and nav */}
-      <div className="tracker-center">
-        {/* Content group — vertically centered within tracker-center */}
-        <div className="tracker-content">
-          {/* Energy Almanac ghost line */}
-          <EnergyAlmanac 
-            userData={userData}
-            isPatternAlertShowing={isPatternAlertShowing}
-          />
+      {/* Energy Almanac ghost line */}
+      <EnergyAlmanac 
+        userData={userData}
+        isPatternAlertShowing={isPatternAlertShowing}
+      />
 
-          {/* Main content group */}
-          <main className="tracker-main">
-            {/* AI Pattern Insight - inside tracker-main so it's always visible */}
-            <PatternInsightCard 
-              userData={userData} 
-              onVisibilityChange={handlePatternAlertVisibilityChange}
-            />
-            <p className="date">
-              {format(currentTime, 'EEEE, MMMM d')}
-              <span className="time-separator">·</span>
-              <span className="time">{format(currentTime, 'h:mm a')}</span>
-            </p>
-            
-            {/* ONBOARDING TARGET: streak-counter */}
-            <button className="streak streak-counter" onClick={() => setShowStreakOptions(true)}>
-              <span className="streak-num">{streak}</span>
-              <span className="streak-unit">days</span>
-            </button>
-            
-            {milestone && (
-              <p className="milestone">{milestone}</p>
-            )}
-            
-          </main>
-        </div>
+      {/* Main content group */}
+      <main className="tracker-main">
+        {/* AI Pattern Insight - inside tracker-main so it's always visible */}
+        <PatternInsightCard 
+          userData={userData} 
+          onVisibilityChange={handlePatternAlertVisibilityChange}
+        />
+        <p className="date">
+          {format(currentTime, 'EEEE, MMMM d')}
+          <span className="time-separator">·</span>
+          <span className="time">{format(currentTime, 'h:mm a')}</span>
+        </p>
+        
+        {/* ONBOARDING TARGET: streak-counter */}
+        <button className="streak streak-counter" onClick={() => setShowStreakOptions(true)}>
+          <span className="streak-num">{streak}</span>
+          <span className="streak-unit">days</span>
+        </button>
+        
+        {milestone && (
+          <p className="milestone">{milestone}</p>
+        )}
+        
+      </main>
 
-        {/* Footer */}
-        <footer className="tracker-footer">
-          {/* ONBOARDING TARGET: benefits-trigger */}
-          <button 
-            className={`${todayLogged ? 'btn-logged' : 'btn-primary'} benefits-trigger`}
-            onClick={() => canLogBenefits ? setShowBenefits(true) : setShowLogLock(true)}
-          >
-            {todayLogged ? 'Logged Today ✓' : 'Log Today'}
-          </button>
-        </footer>
+      {/* Footer */}
+      <footer className="tracker-footer">
+        {/* ONBOARDING TARGET: benefits-trigger */}
+        <button 
+          className={`${todayLogged ? 'btn-logged' : 'btn-primary'} benefits-trigger`}
+          onClick={() => canLogBenefits ? setShowBenefits(true) : setShowLogLock(true)}
+        >
+          {todayLogged ? 'Logged Today ✓' : 'Log Today'}
+        </button>
+      </footer>
 
-        {/* Daily Quote - visual floor */}
-        <DailyQuote />
-      </div>
+      {/* Daily Quote - visual floor */}
+      <DailyQuote />
       
     </div>
   );

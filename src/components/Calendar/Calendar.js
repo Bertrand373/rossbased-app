@@ -97,6 +97,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [dayInfoModal, setDayInfoModal] = useState(false);
   const [sheetView, setSheetView] = useState('info'); // 'info' | 'edit'
   const [viewMode, setViewMode] = useState('month');
+  const [viewFading, setViewFading] = useState(false);
   const [selectedTrigger, setSelectedTrigger] = useState('');
   const [showTriggerSelection, setShowTriggerSelection] = useState(false);
   const [editingExistingTrigger, setEditingExistingTrigger] = useState(false);
@@ -128,6 +129,16 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     const timer = setTimeout(() => setInitialAnimDone(true), 600);
     return () => clearTimeout(timer);
   }, []);
+
+  // Smooth view toggle with fade transition
+  const handleViewToggle = (newMode) => {
+    if (newMode === viewMode || viewFading) return;
+    setViewFading(true);
+    setTimeout(() => {
+      setViewMode(newMode);
+      setViewFading(false);
+    }, 180);
+  };
   // Sheet animation: trigger .open class for Day Info + Moon Detail
   useEffect(() => {
     if (dayInfoModal || moonDetailModal) {
@@ -1153,14 +1164,14 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         <div className="view-toggle-minimal">
           <button 
             className={`toggle-option ${viewMode === 'month' ? 'active' : ''}`}
-            onClick={() => setViewMode('month')}
+            onClick={() => handleViewToggle('month')}
           >
             Month
           </button>
           <span className="toggle-divider" />
           <button 
             className={`toggle-option ${viewMode === 'week' ? 'active' : ''}`}
-            onClick={() => setViewMode('week')}
+            onClick={() => handleViewToggle('week')}
           >
             Week
           </button>
@@ -1193,13 +1204,11 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
       {/* Calendar Grid */}
       <div 
-        className={`calendar-main-section${initialAnimDone ? ' anim-done' : ''}${swipeAnim ? ` swipe-${swipeAnim}` : ''}`}
+        className={`calendar-main-section${initialAnimDone ? ' anim-done' : ''}${swipeAnim ? ` swipe-${swipeAnim}` : ''}${viewFading ? ' view-fading' : ''}`}
         onTouchStart={handleSwipeStart}
         onTouchEnd={handleSwipeEnd}
       >
-        <div key={viewMode} className="calendar-view-transition">
-          {viewMode === 'month' ? renderMonthView() : renderWeekView()}
-        </div>
+        {viewMode === 'month' ? renderMonthView() : renderWeekView()}
       </div>
 
       {/* Moon Phase - Sticky bar above nav, both views */}

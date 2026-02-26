@@ -7,43 +7,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   padding: 0 24px;
-  padding-top: 36px;
   padding-bottom: 80px;
   background-color: var(--background);
 }
 
 /* ============================================================
-   CENTER WRAPPER - Takes all space between header and nav
-   ============================================================ */
-
-.tracker-center {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  min-height: 0;
-}
-
-/* ============================================================
-   CONTENT GROUP - Counter centered in full available space
-   Footer + quote stay at bottom, this takes the rest
-   ============================================================ */
-
-.tracker-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 0;
-}
-
-/* ============================================================
-   MAIN - Content group centered by .tracker-content
+   MAIN - Content group, all centered by .tracker
    ============================================================ */
 
 .tracker-main {
@@ -870,8 +841,6 @@
     padding-bottom: 24px;
   }
   
-  .tracker-center { flex: none; }
-  .tracker-content { flex: none; }
   .tracker-main { flex: none; }
   .streak-num { font-size: 4rem; }
   
