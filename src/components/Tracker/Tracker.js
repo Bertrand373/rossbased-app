@@ -728,36 +728,39 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         </div>
       )}
 
-      {/* Energy Almanac ghost line — above tracker-main so sheet overlay renders correctly */}
-      <EnergyAlmanac 
-        userData={userData}
-        isPatternAlertShowing={isPatternAlertShowing}
-      />
-
-      {/* Main - Centers in remaining space */}
-      <main className="tracker-main">
-        {/* AI Pattern Insight - inside tracker-main so it's always visible */}
-        <PatternInsightCard 
-          userData={userData} 
-          onVisibilityChange={handlePatternAlertVisibilityChange}
+      {/* Center wrapper — counter is always vertically centered, everything groups around it */}
+      <div className="tracker-center">
+        {/* Energy Almanac ghost line */}
+        <EnergyAlmanac 
+          userData={userData}
+          isPatternAlertShowing={isPatternAlertShowing}
         />
-        <p className="date">
-          {format(currentTime, 'EEEE, MMMM d')}
-          <span className="time-separator">·</span>
-          <span className="time">{format(currentTime, 'h:mm a')}</span>
-        </p>
-        
-        {/* ONBOARDING TARGET: streak-counter */}
-        <button className="streak streak-counter" onClick={() => setShowStreakOptions(true)}>
-          <span className="streak-num">{streak}</span>
-          <span className="streak-unit">days</span>
-        </button>
-        
-        {milestone && (
-          <p className="milestone">{milestone}</p>
-        )}
-        
-      </main>
+
+        {/* Main content group */}
+        <main className="tracker-main">
+          {/* AI Pattern Insight - inside tracker-main so it's always visible */}
+          <PatternInsightCard 
+            userData={userData} 
+            onVisibilityChange={handlePatternAlertVisibilityChange}
+          />
+          <p className="date">
+            {format(currentTime, 'EEEE, MMMM d')}
+            <span className="time-separator">·</span>
+            <span className="time">{format(currentTime, 'h:mm a')}</span>
+          </p>
+          
+          {/* ONBOARDING TARGET: streak-counter */}
+          <button className="streak streak-counter" onClick={() => setShowStreakOptions(true)}>
+            <span className="streak-num">{streak}</span>
+            <span className="streak-unit">days</span>
+          </button>
+          
+          {milestone && (
+            <p className="milestone">{milestone}</p>
+          )}
+          
+        </main>
+      </div>
 
       {/* Footer */}
       <footer className="tracker-footer">

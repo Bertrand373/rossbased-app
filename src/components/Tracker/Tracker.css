@@ -15,15 +15,28 @@
 }
 
 /* ============================================================
-   MAIN - Content flows naturally below transmission
+   CENTER WRAPPER - Counter always vertically centered
+   Ghost line + main content group as a unit
    ============================================================ */
 
-.tracker-main {
+.tracker-center {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  min-height: 0;
+}
+
+/* ============================================================
+   MAIN - Content group centered by .tracker-center
+   ============================================================ */
+
+.tracker-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
   animation: fadeInUp 500ms ease 50ms forwards;
   opacity: 0;
@@ -844,6 +857,7 @@
     padding-bottom: 24px;
   }
   
+  .tracker-center { flex: none; }
   .tracker-main { flex: none; }
   .streak-num { font-size: 4rem; }
   
