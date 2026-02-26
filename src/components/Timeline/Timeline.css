@@ -99,7 +99,7 @@
 }
 
 .tl-header-logo {
-  height: 20px;
+  height: 24px;
   width: auto;
   opacity: 0.7;
   transition: opacity 200ms ease;
@@ -323,13 +323,13 @@
 }
 
 .tl-option-active {
-  border-color: rgba(255, 221, 0, 0.4);
-  background: rgba(255, 221, 0, 0.06);
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .tl-option-active:hover {
-  border-color: rgba(255, 221, 0, 0.5);
-  background: rgba(255, 221, 0, 0.08);
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .tl-option-compact {
@@ -375,7 +375,7 @@
 }
 
 .tl-day-input:focus {
-  border-color: rgba(255, 221, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 /* Generate button */
@@ -473,6 +473,7 @@
   height: 100%;
   border-radius: 2px;
   transition: width 800ms ease;
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .tl-progress-meta {
@@ -510,14 +511,14 @@
   border-radius: 50%;
   flex-shrink: 0;
   margin-top: 7px;
-  opacity: 0.7;
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* Insight box */
 .tl-insight-box {
   padding: 16px 20px;
   background: rgba(255, 255, 255, 0.03);
-  border-left: 2px solid rgba(255, 221, 0, 0.3);
+  border-left: 2px solid rgba(255, 255, 255, 0.15);
   border-radius: 0 8px 8px 0;
 }
 
@@ -553,13 +554,13 @@
 }
 
 .tl-priority-marker-mid {
-  background: rgba(255, 221, 0, 0.15);
-  border-color: rgba(255, 221, 0, 0.4);
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.45);
 }
 
 .tl-priority-marker-full {
-  background: rgba(255, 221, 0, 0.3);
-  border-color: #ffdd00;
+  background: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.7);
 }
 
 .tl-priority-line {
@@ -636,23 +637,23 @@
 }
 
 .tl-risk-critical {
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .tl-risk-high {
-  background: rgba(249, 115, 22, 0.15);
-  color: #f97316;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .tl-risk-moderate {
-  background: rgba(245, 158, 11, 0.15);
-  color: #f59e0b;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .tl-risk-lowmoderate {
-  background: rgba(34, 197, 94, 0.15);
-  color: #22c55e;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .tl-risk-desc {
@@ -696,7 +697,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: rgba(255, 221, 0, 0.5);
+  color: rgba(255, 255, 255, 0.5);
   margin: 0 0 16px 0;
 }
 
@@ -747,7 +748,7 @@
 }
 
 .tl-gate-input:focus {
-  border-color: rgba(255, 221, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .tl-cta-gate {
@@ -768,12 +769,12 @@
 
 /* Email confirmed state */
 .tl-gate-confirmed .tl-gate-inner {
-  border-color: rgba(34, 197, 94, 0.2);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .tl-gate-check {
   font-size: 1.5rem;
-  color: #22c55e;
+  color: rgba(255, 255, 255, 0.7);
   margin: 0 0 12px 0;
 }
 
