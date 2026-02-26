@@ -443,11 +443,6 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     if (['anxiety', 'mood', 'clarity', 'processing'].includes(key)) {
       setEmotionalTouched(true);
     }
-    
-    // Update fill bar with raw value for continuous GPU-composited tracking
-    if (fillRefs.current[key]) {
-      fillRefs.current[key].style.transform = `scaleX(${(rawValue - 1) / 9})`;
-    }
   }, []);
 
   // Magnetic snap — on finger lift, glide thumb to nearest integer
@@ -752,7 +747,6 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                         step="any"
                         value={benefits[key]}
                         onChange={e => handleBenefitChange(key, e.target.value)}
-                        onPointerDown={e => e.target.focus()}
                         onPointerUp={() => handleSliderSnap(key)}
                       />
                     </div>
@@ -784,7 +778,6 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                         step="any"
                         value={benefits[key]}
                         onChange={e => handleBenefitChange(key, e.target.value)}
-                        onPointerDown={e => e.target.focus()}
                         onPointerUp={() => handleSliderSnap(key)}
                       />
                     </div>
