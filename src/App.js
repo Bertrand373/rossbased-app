@@ -16,8 +16,7 @@ import UrgeToolkit from './components/UrgeToolkit/UrgeToolkit';
 import Profile from './components/Profile/Profile';
 import Landing from './components/Landing/Landing';
 
-// AI Prediction Display (PatternInsightCard handles floating alerts, this handles full view)
-import PredictionDisplay from './components/PredictionDisplay/PredictionDisplay';
+// AI Prediction Display removed — now lives as bottom sheet in Tracker
 
 // Shared components
 import AuthModal from './components/Auth/AuthModal';
@@ -206,7 +205,7 @@ const ServiceWorkerListener = () => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener('message', (event) => {
         if (event.data?.type === 'NAVIGATE_TO_PREDICTION') {
-          navigate('/urge-prediction');
+          navigate('/'); // Pattern alert sheet auto-opens on tracker
         }
       });
     }
@@ -663,9 +662,6 @@ function AppContent({
                       createCheckout={createCheckout}
                       openPlanModal={openPlanModal}
                     />
-                  } />
-                  <Route path="/urge-prediction" element={
-                    <PredictionDisplay mode="full" userData={userData} />
                   } />
                   <Route path="/admin" element={
                     <AdminCockpit />

@@ -1,63 +1,46 @@
 // src/components/PatternInsight/PatternInsightCard.js
-// Ambient AI pattern awareness - floating minimal design
-// Integrated with InterventionService for outcome tracking
-// UPDATED: Added onVisibilityChange callback for mutual exclusion with DailyTransmission
-// UPDATED: sessionStorage caching to prevent almanac flash on tab switches
+// Headless AI pattern detector — no visible UI
+// Runs ML prediction on mount, calls onAlert() when risk is elevated
+// Sheet rendering handled by Tracker (bottom sheet)
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './PatternInsightCard.css';
+import { useEffect, useRef } from 'react';
 import mlPredictionService from '../../services/MLPredictionService';
 import interventionService from '../../services/InterventionService';
 
-const PatternInsightCard = ({ userData, onVisibilityChange }) => {
-  const navigate = useNavigate();
-  const [insight, setInsight] = useState(null);
-  const [isDismissed, setIsDismissed] = useState(false);
-  const [isDismissing, setIsDismissing] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const interventionIdRef = useRef(null);
+const ALERT_THRESHOLD = 60; // Only force-open sheet for meaningful risk
+
+const PatternInsightCard = ({ userData, onAlert }) => {
+  const hasAlerted = useRef(false);
 
   useEffect(() => {
     checkForInsight();
   }, [userData]);
 
-  // Notify parent of visibility changes
-  useEffect(() => {
-    if (onVisibilityChange) {
-      const isShowing = insight && isVisible && !isDismissed;
-      onVisibilityChange(isShowing);
-    }
-  }, [insight, isVisible, isDismissed, onVisibilityChange]);
-
   const checkForInsight = async () => {
-    // Don't show if already dismissed this session
-    const dismissedToday = sessionStorage.getItem('pattern_insight_dismissed');
-    if (dismissedToday) {
-      setIsDismissed(true);
-      // Clear the active flag since it's dismissed
+    // Only fire once per mount
+    if (hasAlerted.current) return;
+
+    // Don't alert if already dismissed this session
+    if (sessionStorage.getItem('pattern_insight_dismissed')) {
       sessionStorage.removeItem('pattern_alert_active');
       return;
     }
 
-    // Ensure we have valid userData
-    if (!userData?.benefitTracking?.length) {
-      return;
-    }
+    // Need benefit data to analyze
+    if (!userData?.benefitTracking?.length) return;
 
     try {
       await mlPredictionService.initialize();
-      
-      // Only show if model has been trained or has seeded data
+
+      // Only run if model is trained or has seeded data
       const modelInfo = mlPredictionService.getModelInfo();
       const trainingHistory = localStorage.getItem('ml_training_history');
       const hasSeededData = trainingHistory && JSON.parse(trainingHistory).lastTrained;
-      if (!modelInfo?.isReady && !hasSeededData) {
-        return;
-      }
+      if (!modelInfo?.isReady && !hasSeededData) return;
 
       const prediction = await mlPredictionService.predict(userData);
-      
+
+      // Cache prediction for other components
       try {
         localStorage.setItem('titantrack_ml_prediction', JSON.stringify({
           riskScore: prediction.riskScore / 100,
@@ -66,81 +49,31 @@ const PatternInsightCard = ({ userData, onVisibilityChange }) => {
           timestamp: Date.now()
         }));
       } catch (e) { /* silent */ }
-      
-      // Only show card for elevated risk (50%+)
-      if (prediction.riskScore < 50) {
+
+      // Below threshold — no alert
+      if (prediction.riskScore < ALERT_THRESHOLD) {
         sessionStorage.removeItem('pattern_alert_active');
         return;
       }
 
-      setInsight(prediction);
-      
-      // Cache that the alert is active — prevents almanac flash on tab switches
+      // Create intervention for ML feedback loop
+      const interventionId = interventionService.createIntervention(prediction);
+
       sessionStorage.setItem('pattern_alert_active', 'true');
-      
-      interventionIdRef.current = interventionService.createIntervention(prediction);
+      hasAlerted.current = true;
 
-      // Show immediately — no delay
-      setIsVisible(true);
-
+      // Notify Tracker to open the pattern alert sheet
+      if (onAlert) {
+        onAlert({ prediction, interventionId });
+      }
     } catch (error) {
       console.error('Pattern insight check error:', error);
       sessionStorage.removeItem('pattern_alert_active');
     }
   };
 
-  const handleDismiss = () => {
-    if (interventionIdRef.current) {
-      interventionService.recordResponse(interventionIdRef.current, 'dismissed');
-    }
-    
-    setIsVisible(false);
-    setIsDismissing(true);
-    
-    // Clear the active flag and set dismissed flag
-    sessionStorage.removeItem('pattern_alert_active');
-    
-    setTimeout(() => {
-      setIsDismissed(true);
-      sessionStorage.setItem('pattern_insight_dismissed', 'true');
-    }, 400);
-  };
-
-  const handleViewInsights = () => {
-    navigate('/urge-prediction', { 
-      state: { 
-        prediction: insight,
-        interventionId: interventionIdRef.current
-      } 
-    });
-  };
-
-  if (isDismissed || !insight) {
-    return null;
-  }
-
-  return (
-    <div className={`pattern-insight ${isVisible ? 'visible' : ''} ${isDismissing ? 'dismissing' : ''}`}>
-      <p className="pattern-insight-label">Pattern Alert</p>
-      <p className="pattern-insight-message">
-        Your patterns suggest today may require extra awareness.
-      </p>
-      <div className="pattern-insight-actions">
-        <button 
-          className="pattern-insight-view"
-          onClick={handleViewInsights}
-        >
-          View Insights
-        </button>
-        <button 
-          className="pattern-insight-dismiss"
-          onClick={handleDismiss}
-        >
-          Dismiss
-        </button>
-      </div>
-    </div>
-  );
+  // Headless — renders nothing
+  return null;
 };
 
 export default PatternInsightCard;

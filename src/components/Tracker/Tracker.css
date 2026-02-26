@@ -132,6 +132,16 @@
   transition: opacity 150ms ease, transform 150ms ease, border-color 150ms ease;
 }
 
+/* Breathing pulse — unlogged Log Today button only */
+.tracker .btn-primary.benefits-trigger {
+  animation: btnBreathe 4s ease-in-out infinite;
+}
+
+@keyframes btnBreathe {
+  0%, 100% { border-color: var(--border); }
+  50% { border-color: rgba(255, 255, 255, 0.22); }
+}
+
 .tracker .btn-primary:hover {
   border-color: rgba(255, 255, 255, 0.25);
 }
@@ -867,7 +877,8 @@
   .tracker-footer,
   .benefits-modal,
   .confirm-modal,
-  .streak-num {
+  .streak-num,
+  .tracker .btn-primary.benefits-trigger {
     animation: none;
     opacity: 1;
   }
@@ -1085,4 +1096,76 @@
 .tracker-overlay.ready .peak-prompt {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* ============================================================
+   PATTERN ALERT SHEET — AI prediction bottom sheet
+   Inherits from BottomSheet.css + PredictionDisplay.css
+   ============================================================ */
+
+.prediction-sheet {
+  max-height: 85dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  text-align: center;
+}
+
+/* Tighter spacing for sheet context */
+.prediction-sheet .prediction-header {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+}
+
+.prediction-sheet .prediction-label {
+  margin-bottom: 16px;
+}
+
+.prediction-sheet .prediction-score {
+  font-size: 3.5rem;
+}
+
+.prediction-sheet .prediction-percent {
+  font-size: 1.25rem;
+}
+
+.prediction-sheet .prediction-insights {
+  margin-bottom: 20px;
+}
+
+.prediction-sheet .insight-section-label {
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+}
+
+.prediction-sheet .prediction-disclaimer {
+  margin-bottom: 24px;
+  font-size: 0.6875rem;
+}
+
+/* Side-by-side actions */
+.prediction-sheet .prediction-actions {
+  flex-direction: row;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.prediction-sheet .prediction-actions .btn-primary,
+.prediction-sheet .prediction-actions .btn-ghost {
+  flex: 1;
+  padding: 14px 16px;
+  font-size: 0.875rem;
+}
+
+.prediction-sheet .prediction-actions .btn-ghost {
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+}
+
+@media (max-width: 480px) {
+  .prediction-sheet .prediction-score {
+    font-size: 3rem;
+  }
+  .prediction-sheet .prediction-percent {
+    font-size: 1.125rem;
+  }
 }

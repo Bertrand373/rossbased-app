@@ -1,12 +1,14 @@
 // Tracker.js - TITANTRACK
-// UPDATED: Replaced DailyTransmission with EnergyAlmanac
-// UPDATED: Added mutual exclusion between PatternInsightCard and EnergyAlmanac
+// UPDATED: AI pattern alert now uses bottom sheet (force-open when risk elevated)
+// UPDATED: Added mutual exclusion between pattern alert sheet and EnergyAlmanac
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
 import './Tracker.css';
 import '../../styles/BottomSheet.css';
+import '../PredictionDisplay/PredictionDisplay.css';
 import DatePicker from '../Shared/DatePicker';
 import PatternInsightCard from '../PatternInsight/PatternInsightCard';
 import EnergyAlmanac from '../EnergyAlmanac/EnergyAlmanac';
@@ -20,12 +22,20 @@ import interventionService from '../../services/InterventionService';
 import { trackDailyLog, trackStreakReset } from '../../utils/mixpanel';
 
 const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
+  const navigate = useNavigate();
+  
   // FIXED: Only show date picker if user has completed onboarding but hasn't set date
   const [showDatePicker, setShowDatePicker] = useState(!userData.startDate && userData.hasSeenOnboarding);
   const [showBenefits, setShowBenefits] = useState(false);
   const [showStreakOptions, setShowStreakOptions] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [resetType, setResetType] = useState(null);
+  
+  // Pattern alert sheet — forced open by headless AI detector
+  const [showPatternAlert, setShowPatternAlert] = useState(false);
+  const [patternSheetReady, setPatternSheetReady] = useState(false);
+  const [patternPrediction, setPatternPrediction] = useState(null);
+  const patternInterventionIdRef = useRef(null);
   
   // Onboarding starts hidden — only shows after user clears the paywall
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -117,6 +127,22 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       setSheetReady(false);
     }
   }, [showStreakOptions, showResetConfirm, showLogLock, showDatePicker]);
+
+  // Pattern alert sheet animation
+  useEffect(() => {
+    if (showPatternAlert) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setPatternSheetReady(true));
+      });
+    } else {
+      setPatternSheetReady(false);
+    }
+  }, [showPatternAlert]);
+
+  // Sync almanac visibility with pattern alert sheet
+  useEffect(() => {
+    setIsPatternAlertShowing(showPatternAlert);
+  }, [showPatternAlert]);
 
   // Benefits sheet - dedicated state to prevent race conditions
   useEffect(() => {
@@ -283,6 +309,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       sheetPanelRef.current.style.transform = 'translateY(100%)';
       setSheetReady(false);
       setBenefitsReady(false);
+      setPatternSheetReady(false);
       setTimeout(() => {
         if (sheetPanelRef.current) {
           sheetPanelRef.current.style.transition = '';
@@ -292,6 +319,15 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         setShowResetConfirm(false);
         setShowLogLock(false);
         setShowBenefits(false);
+        // Pattern alert cleanup (only if it was the active sheet)
+        if (patternInterventionIdRef.current) {
+          interventionService.recordResponse(patternInterventionIdRef.current, 'dismissed');
+          patternInterventionIdRef.current = null;
+          sessionStorage.setItem('pattern_insight_dismissed', 'true');
+          sessionStorage.removeItem('pattern_alert_active');
+          setIsPatternAlertShowing(false);
+        }
+        setShowPatternAlert(false);
       }, 250);
     } else if (sheetPanelRef.current) {
       sheetPanelRef.current.style.transition = 'transform 250ms ease-out';
@@ -445,10 +481,58 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     trackDailyLog(benefits, streak);
   };
 
-  // NEW: Callback for PatternInsightCard visibility changes
-  const handlePatternAlertVisibilityChange = useCallback((isShowing) => {
-    setIsPatternAlertShowing(isShowing);
+  // Pattern alert: headless detector callback — opens sheet
+  const handlePatternAlert = useCallback(({ prediction, interventionId }) => {
+    setPatternPrediction(prediction);
+    patternInterventionIdRef.current = interventionId;
+    setShowPatternAlert(true);
+    setIsPatternAlertShowing(true);
   }, []);
+
+  // Pattern alert: close sheet and record response
+  const closePatternAlert = useCallback((response = 'dismissed') => {
+    if (patternInterventionIdRef.current) {
+      interventionService.recordResponse(patternInterventionIdRef.current, response);
+      patternInterventionIdRef.current = null;
+    }
+    sessionStorage.setItem('pattern_insight_dismissed', 'true');
+    sessionStorage.removeItem('pattern_alert_active');
+    setPatternSheetReady(false);
+    setIsPatternAlertShowing(false);
+    setTimeout(() => {
+      setShowPatternAlert(false);
+      setPatternPrediction(null);
+    }, 300);
+  }, []);
+
+  // Pattern alert: user tapped "I'm struggling" → urge toolkit
+  const handlePatternStruggling = () => {
+    const riskScore = patternPrediction?.riskScore;
+    closePatternAlert('struggling');
+    setTimeout(() => {
+      navigate('/urge-toolkit', {
+        state: {
+          fromPrediction: true,
+          riskScore
+        }
+      });
+    }, 350);
+  };
+
+  // Helpers for prediction sheet content
+  const getRiskLevel = (score) => {
+    if (score >= 70) return 'High';
+    if (score >= 50) return 'Elevated';
+    return 'Low';
+  };
+
+  const getCurrentPhaseName = (streakDay) => {
+    if (streakDay <= 14) return 'Initial Adaptation';
+    if (streakDay <= 45) return 'Emotional Processing';
+    if (streakDay <= 90) return 'Mental Expansion';
+    if (streakDay <= 180) return 'Spiritual Integration';
+    return 'Mastery & Purpose';
+  };
 
   // Save Peak State Recording
   const savePeakRecording = () => {
@@ -728,6 +812,123 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         </div>
       )}
 
+      {/* AI Pattern Detector — headless, opens sheet when risk elevated */}
+      <PatternInsightCard 
+        userData={userData} 
+        onAlert={handlePatternAlert}
+      />
+
+      {/* Pattern Alert Sheet — AI prediction bottom sheet */}
+      {showPatternAlert && patternPrediction && (() => {
+        const riskScore = patternPrediction.riskScore || 0;
+        const patterns = patternPrediction.patterns;
+        const currentPhaseName = getCurrentPhaseName(streak);
+        const hasPatterns = patterns?.streak?.isHighRiskDay || 
+                            patterns?.time?.isHighRiskTime || 
+                            patterns?.benefits?.hasSignificantDrop || 
+                            patternPrediction?.factors?.inPurgePhase ||
+                            patternPrediction?.factors?.emotionalProcessingPhase;
+        return (
+          <div className={`sheet-backdrop${patternSheetReady ? ' open' : ''}`} onClick={() => closePatternAlert('dismissed')}>
+            <div ref={sheetPanelRef} className={`sheet-panel prediction-sheet${patternSheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+              <div 
+                className="sheet-header"
+                onTouchStart={handleSheetTouchStart}
+                onTouchMove={handleSheetTouchMove}
+                onTouchEnd={handleSheetTouchEnd}
+              />
+
+              {/* Score */}
+              <div className="prediction-header">
+                <p className="prediction-label">Pattern Analysis</p>
+                <div className="prediction-score-row">
+                  <span className="prediction-score">{riskScore}</span>
+                  <span className="prediction-percent">%</span>
+                </div>
+                <p className="prediction-level">{getRiskLevel(riskScore)} Risk</p>
+              </div>
+
+              {/* Why this alert */}
+              {hasPatterns && (
+                <div className="prediction-insights">
+                  <p className="insight-section-label">Why this alert</p>
+
+                  {patterns?.streak?.isHighRiskDay && (
+                    <div className="insight-block">
+                      <p className="insight-title">Day {patterns.streak.currentDay}</p>
+                      <p className="insight-detail">
+                        You've relapsed {patterns.streak.relapsesInRange} of {patterns.streak.totalRelapses} times between days {patterns.streak.rangeDays[0]}-{patterns.streak.rangeDays[1]}
+                      </p>
+                    </div>
+                  )}
+
+                  {patterns?.time?.isHighRiskTime && (
+                    <div className="insight-block">
+                      <p className="insight-title">Evening hours</p>
+                      <p className="insight-detail">
+                        {patterns.time.eveningPercentage}% of your relapses happened after 8pm
+                      </p>
+                    </div>
+                  )}
+
+                  {patterns?.benefits?.hasSignificantDrop && patterns.benefits.drops.map((drop, i) => (
+                    <div className="insight-block" key={i}>
+                      <p className="insight-title">{drop.metric} dropped</p>
+                      <p className="insight-detail">
+                        From {drop.from} → {drop.to} over the last {patterns.benefits.daysCovered} days
+                      </p>
+                    </div>
+                  ))}
+
+                  {(patternPrediction?.factors?.inPurgePhase || patternPrediction?.factors?.emotionalProcessingPhase) && !patterns?.streak?.isHighRiskDay && (
+                    <div className="insight-block">
+                      <p className="insight-title">{currentPhaseName} phase</p>
+                      <p className="insight-detail">
+                        {streak <= 45 
+                          ? 'Days 15-45 often bring intense emotional processing as suppressed feelings surface'
+                          : `You're in the ${currentPhaseName} phase of your journey`
+                        }
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Historical match */}
+              {patterns?.historical && (
+                <div className="prediction-insights">
+                  <p className="insight-section-label">Historical match</p>
+                  <p className="historical-line">
+                    Similar conditions on Day {patterns.historical.matchDay}
+                  </p>
+                  <p className="historical-outcome">
+                    {patterns.historical.daysUntilRelapse > 0 
+                      ? `Relapsed ${patterns.historical.daysUntilRelapse} days later`
+                      : 'Relapsed same day'
+                    }
+                  </p>
+                </div>
+              )}
+
+              {/* Disclaimer */}
+              <p className="prediction-disclaimer">
+                Pattern awareness, not prediction. Dismiss if you're feeling fine.
+              </p>
+
+              {/* Actions */}
+              <div className="prediction-actions">
+                <button className="btn-primary" onClick={handlePatternStruggling}>
+                  I'm struggling
+                </button>
+                <button className="btn-ghost" onClick={() => closePatternAlert('fine')}>
+                  I'm fine
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Energy Almanac ghost line */}
       <EnergyAlmanac 
         userData={userData}
@@ -736,11 +937,6 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
       {/* Main content group */}
       <main className="tracker-main">
-        {/* AI Pattern Insight - inside tracker-main so it's always visible */}
-        <PatternInsightCard 
-          userData={userData} 
-          onVisibilityChange={handlePatternAlertVisibilityChange}
-        />
         <p className="date">
           {format(currentTime, 'EEEE, MMMM d')}
           <span className="time-separator">·</span>
@@ -766,7 +962,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
           className={`${todayLogged ? 'btn-logged' : 'btn-primary'} benefits-trigger`}
           onClick={() => canLogBenefits ? setShowBenefits(true) : setShowLogLock(true)}
         >
-          {todayLogged ? 'Logged Today ✓' : 'Log Today'}
+          {todayLogged ? 'Logged ✓' : 'Log Today'}
         </button>
       </footer>
 
