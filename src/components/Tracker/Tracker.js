@@ -82,7 +82,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   // Bottom sheet animation state
   const [sheetReady, setSheetReady] = useState(false);
   const [benefitsReady, setBenefitsReady] = useState(false);
-  const [overlayReady, setOverlayReady] = useState(false);
+  const [peakSheetReady, setPeakSheetReady] = useState(false);
   const sheetPanelRef = useRef(null);
   const sheetTouchStartY = useRef(0);
   const sheetTouchDeltaY = useRef(0);
@@ -94,6 +94,10 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   const fillRefs = useRef({});
   const snapRafRef = useRef({});
   const benefitsRef = useRef(benefits);
+  
+  // Post-log insight flash
+  const [postLogInsight, setPostLogInsight] = useState(null);
+  const insightTimerRef = useRef(null);
   
   // Body scroll lock removed - parent containers now have overflow:hidden
   
@@ -154,17 +158,22 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       });
     } else {
       setBenefitsReady(false);
+      setPostLogInsight(null);
+      if (insightTimerRef.current) {
+        clearTimeout(insightTimerRef.current);
+        insightTimerRef.current = null;
+      }
     }
   }, [showBenefits]);
 
-  // Full-screen overlay animation: trigger .ready class after mount
+  // Peak state sheet animation
   useEffect(() => {
     if (showPeakPrompt) {
       requestAnimationFrame(() => {
-        requestAnimationFrame(() => setOverlayReady(true));
+        requestAnimationFrame(() => setPeakSheetReady(true));
       });
     } else {
-      setOverlayReady(false);
+      setPeakSheetReady(false);
     }
   }, [showPeakPrompt]);
 
@@ -200,6 +209,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   useEffect(() => {
     return () => {
       Object.values(snapRafRef.current).forEach(id => cancelAnimationFrame(id));
+      if (insightTimerRef.current) clearTimeout(insightTimerRef.current);
     };
   }, []);
 
@@ -286,9 +296,9 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     }, 300);
   }, []);
 
-  // Full-screen overlay: animate out then run callback
-  const closeOverlay = useCallback((callback) => {
-    setOverlayReady(false);
+  // Peak state sheet: animate close then run callback
+  const closePeakSheet = useCallback((callback) => {
+    setPeakSheetReady(false);
     setTimeout(() => {
       callback();
     }, 300);
@@ -322,6 +332,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       setSheetReady(false);
       setBenefitsReady(false);
       setPatternSheetReady(false);
+      setPeakSheetReady(false);
       setTimeout(() => {
         if (sheetPanelRef.current) {
           sheetPanelRef.current.style.transition = '';
@@ -331,6 +342,8 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         setShowResetConfirm(false);
         setShowLogLock(false);
         setShowBenefits(false);
+        setShowPeakPrompt(false);
+        setPeakMessage('');
         // Pattern alert cleanup (only if it was the active sheet)
         if (patternInterventionIdRef.current) {
           interventionService.recordResponse(patternInterventionIdRef.current, 'dismissed');
@@ -476,6 +489,71 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     snapRafRef.current[key] = requestAnimationFrame(animate);
   }, []);
 
+  // Compute post-log insight
+  const computePostLogInsight = useCallback((savedBenefits, allLogs) => {
+    const phase = getCurrentPhaseName(streak);
+    const dayLabel = `Day ${streak} · ${phase}`;
+    const coreKeys = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+    
+    if (allLogs.length <= 1) {
+      return { phase: dayLabel, line: 'Pattern recognition begins', sub: 'Your first data point is locked in' };
+    }
+    
+    const previousLogs = allLogs.slice(0, -1);
+    for (const key of coreKeys) {
+      const prevMax = Math.max(...previousLogs.map(l => l[key] || 0));
+      if (savedBenefits[key] > prevMax && savedBenefits[key] >= 8) {
+        const label = key.charAt(0).toUpperCase() + key.slice(1);
+        return { phase: dayLabel, line: `${label} at its highest`, sub: `All-time peak · ${savedBenefits[key]}/10` };
+      }
+    }
+    
+    const sortedDates = allLogs
+      .map(l => format(new Date(l.date), 'yyyy-MM-dd'))
+      .sort()
+      .reverse();
+    const uniqueDates = [...new Set(sortedDates)];
+    let logStreak = 1;
+    for (let i = 1; i < uniqueDates.length; i++) {
+      const curr = new Date(uniqueDates[i - 1]);
+      const prev = new Date(uniqueDates[i]);
+      const diffDays = Math.round((curr - prev) / (1000 * 60 * 60 * 24));
+      if (diffDays === 1) { logStreak++; } else { break; }
+    }
+    if (logStreak >= 3) {
+      return { phase: dayLabel, line: `${logStreak} days logged in a row`, sub: 'Consistency builds clarity' };
+    }
+    
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const recentLogs = previousLogs.filter(l => new Date(l.date) >= weekAgo);
+    if (recentLogs.length >= 2) {
+      let biggestShift = { key: null, delta: 0 };
+      for (const key of coreKeys) {
+        const avg = recentLogs.reduce((sum, l) => sum + (l[key] || 5), 0) / recentLogs.length;
+        const delta = savedBenefits[key] - avg;
+        if (Math.abs(delta) > Math.abs(biggestShift.delta) && Math.abs(delta) >= 1.5) {
+          biggestShift = { key, delta };
+        }
+      }
+      if (biggestShift.key) {
+        const label = biggestShift.key.charAt(0).toUpperCase() + biggestShift.key.slice(1);
+        const arrow = biggestShift.delta > 0 ? '↑' : '↓';
+        const val = Math.abs(biggestShift.delta).toFixed(1);
+        return { phase: dayLabel, line: `${label} ${arrow} ${val} from last week`, sub: biggestShift.delta > 0 ? 'The practice is working' : 'Awareness is the first step' };
+      }
+    }
+    
+    const phaseMessages = {
+      'Initial Adaptation': 'Building the foundation',
+      'Emotional Processing': 'Old patterns releasing',
+      'Mental Expansion': 'Clarity is compounding',
+      'Spiritual Integration': 'Deep transformation in progress',
+      'Mastery & Purpose': 'Operating at a different level'
+    };
+    return { phase: dayLabel, line: phaseMessages[phase] || 'Data locked in', sub: `${allLogs.length} logs recorded` };
+  }, [streak]);
+
   // Save benefits
   const saveBenefits = () => {
     const today = format(currentTime, 'yyyy-MM-dd');
@@ -484,15 +562,18 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       format(new Date(b.date), 'yyyy-MM-dd') === today
     );
     
-    // Only include emotional fields if user actually touched them
-    const entry = { 
-      date: new Date(), 
+    const rounded = {
       energy: Math.round(benefits.energy),
       focus: Math.round(benefits.focus),
       confidence: Math.round(benefits.confidence),
       aura: Math.round(benefits.aura),
       sleep: Math.round(benefits.sleep),
-      workout: Math.round(benefits.workout),
+      workout: Math.round(benefits.workout)
+    };
+    
+    const entry = { 
+      date: new Date(), 
+      ...rounded,
       ...(emotionalTouched ? {
         anxiety: Math.round(benefits.anxiety),
         mood: Math.round(benefits.mood),
@@ -509,26 +590,33 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     }
     
     updateUserData({ benefitTracking: existing });
-    setShowBenefits(false);
-    toast.success('Benefits logged.');
     
-    // Peak State Detection — average of 6 core benefits ≥ 7 triggers prompt
-    // Throttle: only show if no recordings exist OR most recent is 7+ days old
-    const coreAvg = (benefits.energy + benefits.focus + benefits.confidence + benefits.aura + benefits.sleep + benefits.workout) / 6;
-    if (coreAvg >= 7) {
-      const recordings = userData.peakRecordings || [];
-      const lastRecording = recordings.length > 0 ? recordings[recordings.length - 1] : null;
-      const daysSinceLast = lastRecording 
-        ? Math.floor((Date.now() - new Date(lastRecording.date).getTime()) / (1000 * 60 * 60 * 24)) 
-        : Infinity;
-      
-      if (daysSinceLast >= 7) {
-        setTimeout(() => setShowPeakPrompt(true), 400);
-      }
-    }
+    // Show post-log insight (sliders fade, insight overlays same-height sheet)
+    const insight = computePostLogInsight(rounded, existing);
+    setPostLogInsight(insight);
     
-    // Track with Mixpanel
-    trackDailyLog(benefits, streak);
+    // Auto-dismiss after 3.5s → close sheet → fire peak prompt if needed
+    insightTimerRef.current = setTimeout(() => {
+      setPostLogInsight(null);
+      closeBenefits(() => {
+        setShowBenefits(false);
+        
+        const coreAvg = (rounded.energy + rounded.focus + rounded.confidence + rounded.aura + rounded.sleep + rounded.workout) / 6;
+        if (coreAvg >= 7) {
+          const recordings = userData.peakRecordings || [];
+          const lastRecording = recordings.length > 0 ? recordings[recordings.length - 1] : null;
+          const daysSinceLast = lastRecording 
+            ? Math.floor((Date.now() - new Date(lastRecording.date).getTime()) / (1000 * 60 * 60 * 24)) 
+            : Infinity;
+          
+          if (daysSinceLast >= 7) {
+            setTimeout(() => setShowPeakPrompt(true), 400);
+          }
+        }
+      });
+    }, 3500);
+    
+    trackDailyLog(rounded, streak);
   };
 
   // Pattern alert: headless detector callback — opens sheet
@@ -597,9 +685,11 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     });
     
     updateUserData({ peakRecordings: recordings });
-    setShowPeakPrompt(false);
-    setPeakMessage('');
-    toast.success('Transmission recorded.');
+    closePeakSheet(() => {
+      setShowPeakPrompt(false);
+      setPeakMessage('');
+      toast.success('Transmission recorded.');
+    });
   };
 
   // Show date picker overlay if no start date set (initial setup only)
@@ -640,9 +730,9 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
               onTouchEnd={handleSheetTouchEnd}
             />
             <div className="benefits-modal">
-              <h2>Log Benefits</h2>
+              <h2 className={postLogInsight ? 'fading' : ''}>Log Benefits</h2>
               
-              <div className="benefits-list">
+              <div className={`benefits-list${postLogInsight ? ' fading' : ''}`}>
                 {benefitsList.map(({ key, label, desc }) => (
                   <div key={key} className="benefit-row">
                     <div className="benefit-info">
@@ -701,51 +791,67 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                 ))}
               </div>
               
-              <div className="benefits-actions">
+              <div className={`benefits-actions${postLogInsight ? ' fading' : ''}`}>
                 <button className="btn-primary" onClick={saveBenefits}>Save</button>
                 <button className="btn-ghost" onClick={() => closeBenefits(() => setShowBenefits(false))}>Cancel</button>
               </div>
+              
+              {postLogInsight && (
+                <div className="post-log-insight">
+                  <span className="post-log-insight-phase">{postLogInsight.phase}</span>
+                  <span className="post-log-insight-line">{postLogInsight.line}</span>
+                  {postLogInsight.sub && <span className="post-log-insight-sub">{postLogInsight.sub}</span>}
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
 
-      {/* Peak State Recording Prompt */}
+      {/* Peak State Recording — Bottom Sheet */}
       {showPeakPrompt && (
-        <div className={`overlay tracker-overlay${overlayReady ? ' ready' : ''}`}>
-          <div className="peak-prompt" onClick={e => e.stopPropagation()}>
-            <div className="peak-prompt-header">
-              <span className="peak-prompt-signal">PEAK STATE DETECTED</span>
-              <h2 className="peak-prompt-title">Leave a transmission</h2>
-              <p className="peak-prompt-desc">Record a message for when the noise returns. Your future self will see this during moments of weakness.</p>
-            </div>
-            
-            <textarea
-              className="peak-prompt-input"
-              placeholder="Write to your future self..."
-              value={peakMessage}
-              onChange={e => setPeakMessage(e.target.value)}
-              maxLength={500}
-              rows={4}
-              autoFocus
+        <div className={`sheet-backdrop${peakSheetReady ? ' open' : ''}`} onClick={() => closePeakSheet(() => { setShowPeakPrompt(false); setPeakMessage(''); })}>
+          <div ref={sheetPanelRef} className={`sheet-panel peak-sheet${peakSheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div 
+              className="sheet-header"
+              onTouchStart={handleSheetTouchStart}
+              onTouchMove={handleSheetTouchMove}
+              onTouchEnd={handleSheetTouchEnd}
             />
-            
-            <div className="peak-prompt-meta">
-              <span>Day {streak}</span>
-              <span>{peakMessage.length}/500</span>
-            </div>
-            
-            <div className="peak-prompt-actions">
-              <button 
-                className="btn-primary" 
-                onClick={savePeakRecording}
-                disabled={!peakMessage.trim()}
-              >
-                Save Transmission
-              </button>
-              <button className="btn-ghost" onClick={() => closeOverlay(() => { setShowPeakPrompt(false); setPeakMessage(''); })}>
-                Skip
-              </button>
+            <div className="peak-prompt">
+              <div className="peak-prompt-header">
+                <span className="peak-prompt-signal">PEAK STATE DETECTED</span>
+                <h2 className="peak-prompt-title">Leave a transmission</h2>
+                <p className="peak-prompt-desc">Record a message for when the noise returns. Your future self will see this during moments of weakness.</p>
+              </div>
+              
+              <textarea
+                className="peak-prompt-input"
+                placeholder="Write to your future self..."
+                value={peakMessage}
+                onChange={e => setPeakMessage(e.target.value)}
+                maxLength={500}
+                rows={4}
+                autoFocus
+              />
+              
+              <div className="peak-prompt-meta">
+                <span>Day {streak}</span>
+                <span>{peakMessage.length}/500</span>
+              </div>
+              
+              <div className="peak-prompt-actions">
+                <button 
+                  className="btn-primary" 
+                  onClick={savePeakRecording}
+                  disabled={!peakMessage.trim()}
+                >
+                  Save Transmission
+                </button>
+                <button className="btn-ghost" onClick={() => closePeakSheet(() => { setShowPeakPrompt(false); setPeakMessage(''); })}>
+                  Skip
+                </button>
+              </div>
             </div>
           </div>
         </div>
