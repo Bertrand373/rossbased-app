@@ -1794,9 +1794,11 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                     </button>
                   </div>
                   {getDayWorkout(selectedDate) && (
-                    <button className="workout-delete-btn" onClick={deleteWorkout}>
-                      Delete Workout
-                    </button>
+                    <div className="calendar-edit-options" style={{ marginTop: '16px' }}>
+                      <button className="calendar-option-btn calendar-option-danger" onClick={deleteWorkout}>
+                        Delete Workout
+                      </button>
+                    </div>
                   )}
                 </div>
               )}
