@@ -30,6 +30,7 @@ const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 const { getCommunityPulse } = require('./services/communityPulse');
 const { classifyInteraction, backfillRelapseFlag } = require('./services/interactionClassifier');
 const OracleInteraction = require('./models/OracleInteraction');
+const OracleUsage = require('./models/OracleUsage');
 const stripeRoutes = require('./routes/stripeRoutes');
 const discordLinkRoutes = require('./routes/discordLink');
 const timelineRoutes = require('./routes/timelineRoutes');
@@ -1059,6 +1060,30 @@ function buildOracleContext(user, timezone) {
   return lines.join('\n');
 }
 
+// ============================================
+// SHARED ORACLE POOL (Grandfathered users)
+// OG lifetime users share a single daily pool across Discord + App
+// ============================================
+const GRANDFATHERED_DAILY_LIMIT = 15;
+
+// Get today's date in Eastern Time (matches Discord bot's reset boundary)
+function getTodayET() {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+}
+
+// Get Discord Oracle usage for a linked user (returns 0 if not linked or no usage today)
+async function getDiscordUsageForUser(user) {
+  if (!user.discordId || user.subscription?.status !== 'grandfathered') return 0;
+  try {
+    const todayET = getTodayET();
+    const discordUsage = await OracleUsage.findOne({ discordUserId: user.discordId, date: todayET });
+    return discordUsage?.count || 0;
+  } catch (err) {
+    console.error('Discord usage cross-check failed (non-blocking):', err.message);
+    return 0;
+  }
+}
+
 // AI Chat Streaming Endpoint
 app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
   const { message, conversationHistory, timezone } = req.body;
@@ -1101,12 +1126,22 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     const currentWeeklyCount = isNewWeek ? 0 : (user.aiUsage?.weeklyCount || 0);
 
     // Check limits
+    // --- SHARED POOL: Grandfathered users have a combined Discord+App daily limit ---
+    const isGrandfathered = user.subscription?.status === 'grandfathered';
+    const discordUsageToday = isGrandfathered ? await getDiscordUsageForUser(user) : 0;
+    const combinedCount = currentCount + discordUsageToday;
+    
     if (isBetaPeriod && currentCount >= BETA_DAILY_LIMIT) {
       return res.status(429).json({ 
         error: 'Daily limit reached',
         message: `You've used all ${BETA_DAILY_LIMIT} daily messages. Resets at midnight.`
       });
-    } else if (!isBetaPeriod && user.isPremium && currentCount >= PREMIUM_DAILY_LIMIT) {
+    } else if (!isBetaPeriod && isGrandfathered && combinedCount >= GRANDFATHERED_DAILY_LIMIT) {
+      return res.status(429).json({ 
+        error: 'Daily limit reached',
+        message: `You've used all ${GRANDFATHERED_DAILY_LIMIT} daily messages. Resets at midnight.`
+      });
+    } else if (!isBetaPeriod && user.isPremium && !isGrandfathered && currentCount >= PREMIUM_DAILY_LIMIT) {
       return res.status(429).json({ 
         error: 'Daily limit reached',
         message: `You've used all ${PREMIUM_DAILY_LIMIT} daily messages. Resets at midnight.`
@@ -1483,20 +1518,30 @@ Examples:
     })();
 
     // Calculate remaining
-    let messagesRemaining;
+    let messagesRemaining, effectiveLimit, effectiveUsed;
     if (isBetaPeriod) {
-      messagesRemaining = BETA_DAILY_LIMIT - (currentCount + 1);
+      effectiveUsed = currentCount + 1;
+      effectiveLimit = BETA_DAILY_LIMIT;
+      messagesRemaining = BETA_DAILY_LIMIT - effectiveUsed;
+    } else if (isGrandfathered) {
+      effectiveUsed = combinedCount + 1; // app + discord combined
+      effectiveLimit = GRANDFATHERED_DAILY_LIMIT;
+      messagesRemaining = GRANDFATHERED_DAILY_LIMIT - effectiveUsed;
     } else if (user.isPremium) {
-      messagesRemaining = PREMIUM_DAILY_LIMIT - (currentCount + 1);
+      effectiveUsed = currentCount + 1;
+      effectiveLimit = PREMIUM_DAILY_LIMIT;
+      messagesRemaining = PREMIUM_DAILY_LIMIT - effectiveUsed;
     } else {
-      messagesRemaining = FREE_WEEKLY_LIMIT - (isNewWeek ? 1 : currentWeeklyCount + 1);
+      effectiveUsed = isNewWeek ? 1 : currentWeeklyCount + 1;
+      effectiveLimit = FREE_WEEKLY_LIMIT;
+      messagesRemaining = FREE_WEEKLY_LIMIT - effectiveUsed;
     }
 
     // Send usage update and done signal
     res.write(`data: ${JSON.stringify({ 
       type: 'usage', 
-      messagesUsed: currentCount + 1,
-      messagesLimit: isBetaPeriod ? BETA_DAILY_LIMIT : (user.isPremium ? PREMIUM_DAILY_LIMIT : FREE_WEEKLY_LIMIT),
+      messagesUsed: effectiveUsed,
+      messagesLimit: effectiveLimit,
       messagesRemaining: Math.max(0, messagesRemaining),
       isBetaPeriod,
       isPremium: user.isPremium || false
@@ -1553,11 +1598,18 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
     const currentWeeklyCount = isNewWeek ? 0 : (user.aiUsage?.weeklyCount || 0);
 
     let messagesUsed, messagesLimit, messagesRemaining, resetsAt;
+    const isGrandfathered = user.subscription?.status === 'grandfathered';
+    const discordUsageToday = isGrandfathered ? await getDiscordUsageForUser(user) : 0;
 
     if (isBetaPeriod) {
       messagesUsed = currentCount;
       messagesLimit = BETA_DAILY_LIMIT;
       messagesRemaining = BETA_DAILY_LIMIT - currentCount;
+      resetsAt = 'midnight';
+    } else if (isGrandfathered) {
+      messagesUsed = currentCount + discordUsageToday;
+      messagesLimit = GRANDFATHERED_DAILY_LIMIT;
+      messagesRemaining = GRANDFATHERED_DAILY_LIMIT - messagesUsed;
       resetsAt = 'midnight';
     } else if (user.isPremium) {
       messagesUsed = currentCount;
@@ -1624,11 +1676,18 @@ app.get('/api/ai-usage/:username', authenticate, async (req, res) => {
     const currentWeeklyCount = isNewWeek ? 0 : (user.aiUsage?.weeklyCount || 0);
 
     let messagesUsed, messagesLimit, messagesRemaining, resetsAt;
+    const isGrandfathered = user.subscription?.status === 'grandfathered';
+    const discordUsageToday = isGrandfathered ? await getDiscordUsageForUser(user) : 0;
 
     if (isBetaPeriod) {
       messagesUsed = currentCount;
       messagesLimit = BETA_DAILY_LIMIT;
       messagesRemaining = BETA_DAILY_LIMIT - currentCount;
+      resetsAt = 'midnight';
+    } else if (isGrandfathered) {
+      messagesUsed = currentCount + discordUsageToday;
+      messagesLimit = GRANDFATHERED_DAILY_LIMIT;
+      messagesRemaining = GRANDFATHERED_DAILY_LIMIT - messagesUsed;
       resetsAt = 'midnight';
     } else if (user.isPremium) {
       messagesUsed = currentCount;

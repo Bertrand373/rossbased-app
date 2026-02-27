@@ -44,6 +44,7 @@ const ALLOWED_CHANNELS = ['retention-ai-chat', 'oracle', 'ai-chat', 'ask-oracle'
 const USER_COOLDOWNS = new Map();
 const COOLDOWN_MS = 10000; // 10 seconds between messages per user
 const MAX_DAILY_PER_USER = 10;
+const GRANDFATHERED_DAILY_POOL = 15; // Shared pool across Discord + App for OG lifetime users
 const DAILY_USAGE = new Map();
 const PULSE_COOLDOWN_DAYS = 3;
 
@@ -605,7 +606,23 @@ const isRateLimited = async (userId, username) => {
   const today = getTodayET();
   try {
     const usage = await OracleUsage.findOne({ discordUserId: userId, date: today });
-    if (usage && usage.count >= MAX_DAILY_PER_USER) {
+    const discordCount = usage?.count || 0;
+    
+    // --- SHARED POOL: Cross-check app usage for grandfathered linked users ---
+    // OG lifetime users share a single pool across Discord + App to prevent gaming
+    const linkedUser = await User.findOne({ discordId: userId });
+    if (linkedUser && linkedUser.subscription?.status === 'grandfathered') {
+      // Read app usage — aiUsage.date is in user's local TZ, but close enough for daily pooling
+      const appCount = (linkedUser.aiUsage?.date === today) ? (linkedUser.aiUsage?.count || 0) : 0;
+      const combinedCount = discordCount + appCount;
+      if (combinedCount >= GRANDFATHERED_DAILY_POOL) {
+        return { limited: true, reason: 'daily' };
+      }
+      return { limited: false };
+    }
+    
+    // Non-grandfathered: standard Discord-only limit
+    if (discordCount >= MAX_DAILY_PER_USER) {
       return { limited: true, reason: 'daily' };
     }
   } catch (err) {
@@ -1294,11 +1311,19 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
     // Get remaining count for footer
     const todayStr = getTodayET();
     let used = 0;
+    let poolLimit = MAX_DAILY_PER_USER;
     try {
       const usage = await OracleUsage.findOne({ discordUserId: message.author.id, date: todayStr });
       if (usage) used = usage.count;
+      
+      // Shared pool: include app usage for grandfathered linked users
+      if (linkedUser && linkedUser.subscription?.status === 'grandfathered') {
+        poolLimit = GRANDFATHERED_DAILY_POOL;
+        const appCount = (linkedUser.aiUsage?.date === todayStr) ? (linkedUser.aiUsage?.count || 0) : 0;
+        used = used + appCount;
+      }
     } catch (err) { /* silent */ }
-    const remaining = MAX_DAILY_PER_USER - used;
+    const remaining = poolLimit - used;
     
     // Send first chunk as reply, rest as follow-ups
     for (let i = 0; i < chunks.length; i++) {
