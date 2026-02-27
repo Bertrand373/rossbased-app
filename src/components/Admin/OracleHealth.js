@@ -11,6 +11,7 @@ const OracleHealth = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showNotes, setShowNotes] = useState(false);
+  const [showUsage, setShowUsage] = useState(false);
 
   const token = localStorage.getItem('token');
 
@@ -52,7 +53,7 @@ const OracleHealth = () => {
 
   if (!data) return null;
 
-  const { users, memoryNotes, mlRisk, outcomes, communityPulse, health, recentNotes } = data;
+  const { users, memoryNotes, mlRisk, outcomes, communityPulse, health, recentNotes, oracleUsage } = data;
 
   const timeAgo = (dateStr) => {
     if (!dateStr) return '—';
@@ -110,6 +111,15 @@ const OracleHealth = () => {
           <span className="oh-card-count">{memoryNotes.total} total</span>
         </div>
 
+        {/* Diagnostic: when was the last note generated? */}
+        {health.lastNoteDate && (
+          <div className={`oh-diagnostic ${memoryNotes.last24h.total === 0 ? 'warn' : 'ok'}`}>
+            <span className="oh-diag-label">Last note:</span>
+            <span className="oh-diag-val">{timeAgo(health.lastNoteDate)}</span>
+            {memoryNotes.last7d === 0 && <span className="oh-diag-alert">⚠ No notes in 7d</span>}
+          </div>
+        )}
+
         <div className="oh-notes-grid">
           <div className="oh-notes-stat">
             <span className="oh-notes-num">{memoryNotes.last24h.total}</span>
@@ -150,12 +160,59 @@ const OracleHealth = () => {
         )}
       </div>
 
+      {/* Oracle Usage Today */}
+      {oracleUsage && (
+        <div className="oh-card">
+          <div className="oh-card-head oh-clickable" onClick={() => setShowUsage(!showUsage)}>
+            <h3>Oracle Usage Today</h3>
+            <span className="oh-card-count">{oracleUsage.totalToday} messages</span>
+          </div>
+          <div className="oh-usage-row">
+            <div className="oh-usage-stat">
+              <span className="oh-usage-num">{oracleUsage.app}</span>
+              <span className="oh-usage-label">App ({oracleUsage.activeAppUsers})</span>
+            </div>
+            <div className="oh-usage-stat">
+              <span className="oh-usage-num oh-usage-discord">{oracleUsage.discord}</span>
+              <span className="oh-usage-label">Discord ({oracleUsage.activeDiscordUsers})</span>
+            </div>
+          </div>
+
+          {/* Grandfathered shared pool */}
+          {showUsage && oracleUsage.grandfathered && oracleUsage.grandfathered.length > 0 && (
+            <div className="oh-pool-section">
+              <span className="oh-pool-title">Shared Pool (Grandfathered)</span>
+              {oracleUsage.grandfathered.map((gf, i) => (
+                <div key={i} className="oh-pool-row">
+                  <span className="oh-pool-user">{gf.username}</span>
+                  <div className="oh-pool-bar-wrap">
+                    <div className="oh-pool-bar">
+                      <div className="oh-pool-fill app" style={{ width: `${(gf.app / gf.limit) * 100}%` }} />
+                      <div className="oh-pool-fill discord" style={{ width: `${(gf.discord / gf.limit) * 100}%` }} />
+                    </div>
+                    <span className="oh-pool-count">{gf.combined}/{gf.limit}</span>
+                  </div>
+                </div>
+              ))}
+              {oracleUsage.grandfathered.length === 0 && (
+                <span className="oh-pool-empty">No grandfathered usage today</span>
+              )}
+            </div>
+          )}
+          {showUsage && (!oracleUsage.grandfathered || oracleUsage.grandfathered.length === 0) && (
+            <div className="oh-pool-section">
+              <span className="oh-pool-empty">No grandfathered usage today</span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Outcomes + Pulse row */}
       <div className="oh-row-2">
         <div className="oh-card oh-card-compact">
           <h3 className="oh-card-title-sm">Outcomes (Layer 2)</h3>
           <span className="oh-big-num">{outcomes.measured}</span>
-          <span className="oh-big-sub">of {outcomes.total} measured</span>
+          <span className="oh-big-sub">of {outcomes.total} measured{outcomes.pending > 0 && ` · ${outcomes.pending} pending`}</span>
           {outcomes.readyForAggregation && (
             <span className="oh-ready-badge">Ready for aggregation</span>
           )}

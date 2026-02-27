@@ -52,6 +52,11 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+// Model strings — env vars so you can update from Render without redeploying
+// Alias defaults (no date pin) auto-update when Anthropic releases new versions
+const ORACLE_MODEL = process.env.ORACLE_MODEL || 'claude-sonnet-4-5-20250514';
+const NOTE_MODEL = process.env.NOTE_MODEL || 'claude-haiku-4-5-20251001';
+
 // Initialize Resend client for password reset emails
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -1315,7 +1320,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
 
     // Stream from Claude with natural pacing
     const stream = await anthropic.messages.stream({
-      model: 'claude-sonnet-4-20250514',
+      model: ORACLE_MODEL,
       max_tokens: 500,
       system: systemWithKnowledge,
       messages: messages
@@ -1358,7 +1363,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
         if (message.trim().split(/\s+/).length < 4) return;
 
         const noteResponse = await anthropic.messages.create({
-          model: 'claude-3-5-haiku-20241022',
+          model: NOTE_MODEL,
           max_tokens: 150,
           system: `You are generating a private observation note for an AI guide called "The Oracle." This note is for YOUR future reference only — the user will never see it.
 
@@ -1513,7 +1518,7 @@ Examples:
           streakDay
         });
       } catch (err) {
-        // Silent — never impacts user experience
+        console.error('🔮 Oracle memory/outcome generation failed:', err.message || err);
       }
     })();
 
@@ -1996,17 +2001,60 @@ app.get('/api/admin/oracle-health', authenticate, async (req, res) => {
 
     // --- ML RISK SNAPSHOTS ---
     const usersWithML = await User.countDocuments({ 
-      'mlRiskSnapshot.timestamp': { $exists: true, $gt: oneDayAgo } 
+      'mlRiskSnapshot.updatedAt': { $exists: true, $gt: oneDayAgo } 
     });
 
     // --- OUTCOME TRACKING (Layer 2) ---
     const OracleOutcome = require('./models/OracleOutcome');
     const totalOutcomes = await OracleOutcome.countDocuments({});
     const measuredOutcomes = await OracleOutcome.countDocuments({ 'outcome.measured': true });
+    const pendingOutcomes = await OracleOutcome.countDocuments({ 'outcome.measured': false });
+
+    // --- DIAGNOSTIC: Last note generated timestamp ---
+    let lastNoteDate = null;
+    if (recentNotes.length > 0) {
+      lastNoteDate = recentNotes[0].date; // Already sorted newest first
+    }
 
     // --- COMMUNITY PULSE ---
     const { getCommunityPulse } = require('./services/communityPulse');
     const pulse = await getCommunityPulse();
+
+    // --- ORACLE USAGE TODAY (Shared Pool Visibility) ---
+    const todayET = getTodayET();
+    
+    // Discord usage today
+    const discordUsageToday = await OracleUsage.find({ date: todayET });
+    const totalDiscordToday = discordUsageToday.reduce((sum, u) => sum + (u.count || 0), 0);
+    
+    // App usage today (users who used Oracle today, based on aiUsage.date)
+    const appUsersToday = await User.find(
+      { 'aiUsage.date': todayET, 'aiUsage.count': { $gt: 0 } },
+      { username: 1, 'aiUsage.count': 1, 'subscription.status': 1, discordId: 1 }
+    ).lean();
+    const totalAppToday = appUsersToday.reduce((sum, u) => sum + (u.aiUsage?.count || 0), 0);
+    
+    // Grandfathered users — shared pool check
+    const grandfatheredUsers = await User.find(
+      { 'subscription.status': 'grandfathered', discordId: { $exists: true, $ne: null, $ne: '' } },
+      { username: 1, discordId: 1, 'aiUsage.count': 1, 'aiUsage.date': 1 }
+    ).lean();
+    
+    const grandfatheredUsage = [];
+    for (const gf of grandfatheredUsers) {
+      const appCount = gf.aiUsage?.date === todayET ? (gf.aiUsage?.count || 0) : 0;
+      const discordRecord = discordUsageToday.find(d => d.discordUserId === gf.discordId);
+      const discordCount = discordRecord?.count || 0;
+      if (appCount > 0 || discordCount > 0) {
+        grandfatheredUsage.push({
+          username: gf.username,
+          app: appCount,
+          discord: discordCount,
+          combined: appCount + discordCount,
+          limit: 15
+        });
+      }
+    }
 
     res.json({
       timestamp: now.toISOString(),
@@ -2024,6 +2072,15 @@ app.get('/api/admin/oracle-health', authenticate, async (req, res) => {
         last7d: notes7d,
         usersWithNotes: usersWithNotes.length
       },
+      oracleUsage: {
+        date: todayET,
+        totalToday: totalDiscordToday + totalAppToday,
+        discord: totalDiscordToday,
+        app: totalAppToday,
+        activeDiscordUsers: discordUsageToday.length,
+        activeAppUsers: appUsersToday.length,
+        grandfathered: grandfatheredUsage
+      },
       mlRisk: {
         freshSnapshots: usersWithML,
         description: 'Users with ML risk snapshot updated in last 24h'
@@ -2031,6 +2088,7 @@ app.get('/api/admin/oracle-health', authenticate, async (req, res) => {
       outcomes: {
         total: totalOutcomes,
         measured: measuredOutcomes,
+        pending: pendingOutcomes,
         readyForAggregation: measuredOutcomes >= 100
       },
       communityPulse: {
@@ -2041,6 +2099,7 @@ app.get('/api/admin/oracle-health', authenticate, async (req, res) => {
       health: {
         bridgeWorking: discordNotes > 0,
         notesFlowing: notes24h > 0,
+        lastNoteDate,
         syncStatus: discordNotes > 0 ? '🟢 LIVE' : linkedDiscord > 0 ? '🟡 LINKED BUT NO DISCORD NOTES YET' : '🔴 NO LINKED USERS'
       }
     });
@@ -2202,7 +2261,7 @@ app.post('/api/admin/oracle-voice-review', authenticate, async (req, res) => {
     }
 
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: ORACLE_MODEL,
       max_tokens: 1000,
       system: `You are reviewing conversation summaries from an AI called "The Oracle" to identify moments where it fell into generic AI patterns. The Oracle should sound like a perceptive spiritual teacher — calm, direct, slightly unsettling in its accuracy. Never sycophantic, never generic.
 

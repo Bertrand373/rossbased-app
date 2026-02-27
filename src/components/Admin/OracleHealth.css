@@ -387,6 +387,146 @@
   display: block;
 }
 
+/* Diagnostic inline */
+.oh-diagnostic {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  margin-bottom: 10px;
+}
+
+.oh-diagnostic.ok {
+  background: rgba(34,197,94,0.05);
+  color: rgba(34,197,94,0.7);
+}
+
+.oh-diagnostic.warn {
+  background: rgba(239,68,68,0.05);
+  color: rgba(239,68,68,0.6);
+}
+
+.oh-diag-label {
+  font-weight: 600;
+  color: rgba(255,255,255,0.3);
+}
+
+.oh-diag-val {
+  font-weight: 700;
+}
+
+.oh-diag-alert {
+  font-weight: 700;
+  color: rgba(239,68,68,0.7);
+  margin-left: auto;
+}
+
+/* Oracle Usage */
+.oh-usage-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.oh-usage-stat {
+  text-align: center;
+  padding: 10px 4px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+}
+
+.oh-usage-num {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.oh-usage-discord {
+  color: rgba(114,137,218,0.8);
+}
+
+.oh-usage-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.25);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-top: 4px;
+}
+
+/* Shared Pool */
+.oh-pool-section {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.oh-pool-title {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.25);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.oh-pool-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.oh-pool-user {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  min-width: 80px;
+}
+
+.oh-pool-bar-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.oh-pool-bar {
+  flex: 1;
+  display: flex;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.04);
+}
+
+.oh-pool-fill.app {
+  background: rgba(255,255,255,0.2);
+}
+
+.oh-pool-fill.discord {
+  background: rgba(114,137,218,0.5);
+}
+
+.oh-pool-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.35);
+  white-space: nowrap;
+}
+
+.oh-pool-empty {
+  font-size: 11px;
+  color: rgba(255,255,255,0.15);
+}
+
 /* Loading / Error */
 .oh-loading {
   display: flex;
@@ -519,3 +659,23 @@
   border-color: rgba(239,68,68,0.15);
   color: rgba(220,38,38,0.8);
 }
+
+/* Light theme: Diagnostic */
+[data-theme="light"] .oh-diagnostic.ok { background: rgba(34,197,94,0.05); }
+[data-theme="light"] .oh-diagnostic.warn { background: rgba(239,68,68,0.04); }
+[data-theme="light"] .oh-diag-label { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .oh-diag-alert { color: rgba(220,38,38,0.7); }
+
+/* Light theme: Usage */
+[data-theme="light"] .oh-usage-stat { background: rgba(0,0,0,0.02); }
+[data-theme="light"] .oh-usage-num { color: rgba(0,0,0,0.7); }
+[data-theme="light"] .oh-usage-label { color: rgba(0,0,0,0.3); }
+
+/* Light theme: Pool */
+[data-theme="light"] .oh-pool-section { border-top-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .oh-pool-title { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .oh-pool-user { color: rgba(0,0,0,0.5); }
+[data-theme="light"] .oh-pool-bar { background: rgba(0,0,0,0.05); }
+[data-theme="light"] .oh-pool-fill.app { background: rgba(0,0,0,0.15); }
+[data-theme="light"] .oh-pool-count { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .oh-pool-empty { color: rgba(0,0,0,0.2); }

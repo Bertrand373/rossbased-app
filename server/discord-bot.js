@@ -315,6 +315,10 @@ const anthropic = new Anthropic({
   apiKey: ANTHROPIC_API_KEY,
 });
 
+// Model strings — env vars so you can update from Render without redeploying
+const ORACLE_MODEL = process.env.ORACLE_MODEL || 'claude-sonnet-4-5-20250514';
+const NOTE_MODEL = process.env.NOTE_MODEL || 'claude-haiku-4-5-20251001';
+
 /**
  * Call Claude API with 1 silent retry on overload errors.
  * Waits 3 seconds before retrying. If retry also fails, throws.
@@ -1296,7 +1300,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
     
     // Call Claude (with silent retry on overload)
     const response = await callClaude({
-      model: 'claude-sonnet-4-20250514',
+      model: ORACLE_MODEL,
       max_tokens: maxTokens,
       system: systemWithKnowledge,
       messages: messages,
@@ -1358,7 +1362,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       (async () => {
         try {
           const noteResponse = await anthropic.messages.create({
-            model: 'claude-3-5-haiku-20241022',
+            model: NOTE_MODEL,
             max_tokens: 100,
             system: 'You are a silent observer. Given a user message and an AI response, write 1-2 sentences capturing what this reveals about the user\'s current state, mindset, or journey. Be specific, not generic. Write in third person. Never start with "The user". Just the observation.',
             messages: [{
@@ -1392,7 +1396,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
             );
           }
         } catch (noteErr) {
-          // Silent — never block or fail for memory notes
+          console.error('🔮 Discord memory note generation failed:', noteErr.message || noteErr);
         }
       })();
     }
