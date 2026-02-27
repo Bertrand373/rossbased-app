@@ -91,29 +91,35 @@ const MoonIcon = ({ phase, size = 11, emoji }) => {
   );
 };
 
-// Tiny dumbbell SVG for calendar day cells
+// Tiny dumbbell SVG for calendar day cells — pyramid plates
 const DumbbellGlyph = ({ size = 9 }) => (
-  <svg width={size} height={Math.round(size * 0.6)} viewBox="0 0 18 10" fill="currentColor" style={{ display: 'block' }}>
-    <rect x="0" y="1.5" width="4" height="7" rx="1.5" />
-    <rect x="4" y="3.5" width="10" height="3" rx="1" />
-    <rect x="14" y="1.5" width="4" height="7" rx="1.5" />
+  <svg width={size} height={Math.round(size * 0.55)} viewBox="0 0 22 12" fill="currentColor" style={{ display: 'block' }}>
+    <rect x="0" y="0.5" width="3" height="11" rx="1" />
+    <rect x="3" y="2.5" width="3" height="7" rx="0.8" />
+    <rect x="6" y="4.5" width="10" height="3" rx="1" />
+    <rect x="16" y="2.5" width="3" height="7" rx="0.8" />
+    <rect x="19" y="0.5" width="3" height="11" rx="1" />
   </svg>
 );
 
-// Dumbbell icon for day info sheet header
-const DumbbellIcon = ({ size = 16, filled = false }) => (
-  <svg width={size} height={Math.round(size * 0.65)} viewBox="0 0 24 14" style={{ display: 'block' }}>
+// Dumbbell icon for day info sheet header — pyramid plates, outlined/filled
+const DumbbellIcon = ({ size = 18, filled = false }) => (
+  <svg width={size} height={Math.round(size * 0.57)} viewBox="0 0 28 16" style={{ display: 'block' }}>
     {filled ? (
       <g fill="currentColor">
-        <rect x="0" y="2" width="5" height="10" rx="2" />
-        <rect x="5" y="5" width="14" height="4" rx="1.5" />
-        <rect x="19" y="2" width="5" height="10" rx="2" />
+        <rect x="0" y="1" width="4" height="14" rx="1.5" />
+        <rect x="4" y="3" width="3" height="10" rx="1" />
+        <rect x="7" y="6" width="14" height="4" rx="1.5" />
+        <rect x="21" y="3" width="3" height="10" rx="1" />
+        <rect x="24" y="1" width="4" height="14" rx="1.5" />
       </g>
     ) : (
-      <g fill="none" stroke="currentColor" strokeWidth="1.5">
-        <rect x="0.75" y="2.75" width="3.5" height="8.5" rx="1.25" />
-        <rect x="5.75" y="5.75" width="12.5" height="2.5" rx="0.75" />
-        <rect x="19.75" y="2.75" width="3.5" height="8.5" rx="1.25" />
+      <g fill="none" stroke="currentColor" strokeWidth="1.4">
+        <rect x="0.7" y="1.7" width="2.6" height="12.6" rx="1" />
+        <rect x="4.7" y="3.7" width="1.6" height="8.6" rx="0.6" />
+        <rect x="7.7" y="6.7" width="12.6" height="2.6" rx="1" />
+        <rect x="21.7" y="3.7" width="1.6" height="8.6" rx="0.6" />
+        <rect x="24.7" y="1.7" width="2.6" height="12.6" rx="1" />
       </g>
     )}
   </svg>
