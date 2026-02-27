@@ -87,6 +87,7 @@
    ============================================================================= */
 
 .calendar-modal-header {
+  position: relative;
   flex-shrink: 0;
   text-align: center;
   padding-bottom: 8px;
@@ -1197,32 +1198,32 @@
    WORKOUT BUTTON — Day Info Header
    ============================================================================= */
 
-.calendar-workout-btn {
-  display: inline-flex;
+.calendar-workout-icon {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin-top: 16px;
-  padding: 8px 16px;
+  width: 36px;
+  height: 36px;
   background: transparent;
-  border: 1px solid var(--border-subtle);
-  border-radius: 9999px;
+  border: none;
   color: var(--text-muted);
-  font-size: 0.75rem;
-  font-weight: 500;
-  font-family: inherit;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: color 150ms ease, transform 150ms ease;
   -webkit-tap-highlight-color: transparent;
+  padding: 0;
+  font-family: inherit;
 }
 
-.calendar-workout-btn:hover {
-  border-color: var(--border);
+.calendar-workout-icon:hover {
   color: var(--text-secondary);
 }
 
-.calendar-workout-btn:active {
-  transform: scale(0.97);
+.calendar-workout-icon:active {
+  transform: translateY(-50%) scale(0.92);
 }
 
 /* =============================================================================

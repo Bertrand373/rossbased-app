@@ -610,14 +610,16 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
     // ------------------------------------------------------------------
     // 4. BEST WEEK EVER (score: 82) — highest 7-day composite average
+    //    Excludes 'workout' — prevents training frequency from biasing composite
     // ------------------------------------------------------------------
     if (allLogs.length >= 14) {
+      const compKeys = coreKeys.filter(k => k !== 'workout');
       const last7 = allLogs.slice(-7);
-      const weekAvg = last7.reduce((s, l) => s + coreKeys.reduce((a, k) => a + (l[k] || 5), 0) / coreKeys.length, 0) / last7.length;
+      const weekAvg = last7.reduce((s, l) => s + compKeys.reduce((a, k) => a + (l[k] || 5), 0) / compKeys.length, 0) / last7.length;
       let isBest = true;
       for (let i = 0; i <= allLogs.length - 14; i++) {
         const w = allLogs.slice(i, i + 7);
-        const wAvg = w.reduce((s, l) => s + coreKeys.reduce((a, k) => a + (l[k] || 5), 0) / coreKeys.length, 0) / w.length;
+        const wAvg = w.reduce((s, l) => s + compKeys.reduce((a, k) => a + (l[k] || 5), 0) / compKeys.length, 0) / w.length;
         if (wAvg >= weekAvg) { isBest = false; break; }
       }
       if (isBest) {
@@ -657,14 +659,16 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     // ------------------------------------------------------------------
     // 6. DAY-OF-WEEK PATTERN (score: 75/60) — needs 14+ logs
     //    "You peak on Tuesdays" or "Mondays are your toughest"
+    //    Excludes 'workout' metric — prevents training schedule from biasing results
     // ------------------------------------------------------------------
     if (allLogs.length >= 14) {
       const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const dowKeys = coreKeys.filter(k => k !== 'workout');
       const buckets = {};
       allLogs.forEach(l => {
         const dow = new Date(l.date).getDay();
         if (!buckets[dow]) buckets[dow] = [];
-        buckets[dow].push(coreKeys.reduce((s, k) => s + (l[k] || 5), 0) / coreKeys.length);
+        buckets[dow].push(dowKeys.reduce((s, k) => s + (l[k] || 5), 0) / dowKeys.length);
       });
       let bestD = null, worstD = null;
       for (const [dow, scores] of Object.entries(buckets)) {
@@ -715,13 +719,15 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
     // ------------------------------------------------------------------
     // 8. WEEKLY TREND SHIFT (score: 70) — ±1.5 from last week's avg
+    //    Excludes 'workout' — lift-day comparisons handled by candidate #10
     // ------------------------------------------------------------------
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
     const recentLogs = previousLogs.filter(l => new Date(l.date) >= weekAgo);
     if (recentLogs.length >= 2) {
+      const trendKeys = coreKeys.filter(k => k !== 'workout');
       let biggestShift = { key: null, delta: 0 };
-      for (const key of coreKeys) {
+      for (const key of trendKeys) {
         const avg = recentLogs.reduce((s, l) => s + (l[key] || 5), 0) / recentLogs.length;
         const delta = savedBenefits[key] - avg;
         if (Math.abs(delta) > Math.abs(biggestShift.delta) && Math.abs(delta) >= 1.5) {
@@ -751,6 +757,314 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       }});
     }
 
+    // ==================================================================
+    // WORKOUT-AWARE INSIGHTS (10-16)
+    // Mine userData.workoutLog for spermatogenesis cycle correlations,
+    // PRs, emotional cross-refs, and streak-long performance trends
+    // ==================================================================
+    const workoutLog = userData.workoutLog || [];
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    const todayWorkout = workoutLog.find(w => format(new Date(w.date), 'yyyy-MM-dd') === todayStr);
+
+    // ------------------------------------------------------------------
+    // 10. LIFT-DAY BENEFIT BOOST (score: 86) — needs 5+ workout days
+    //     "Days you lift, Energy averages 8.1 vs 6.2"
+    //     Scans core + emotional metrics (anxiety inverted: lower on lift days = boost)
+    // ------------------------------------------------------------------
+    if (workoutLog.length >= 5 && allLogs.length >= 10) {
+      const workoutDates = new Set(workoutLog.map(w => format(new Date(w.date), 'yyyy-MM-dd')));
+      const liftDayLogs = previousLogs.filter(l => workoutDates.has(format(new Date(l.date), 'yyyy-MM-dd')));
+      const restDayLogs = previousLogs.filter(l => !workoutDates.has(format(new Date(l.date), 'yyyy-MM-dd')));
+      
+      if (liftDayLogs.length >= 3 && restDayLogs.length >= 3) {
+        const allMetrics = [...coreKeys, 'mood', 'clarity', 'processing'];
+        let bestBoost = null;
+        for (const key of allMetrics) {
+          const liftWith = liftDayLogs.filter(l => typeof l[key] === 'number');
+          const restWith = restDayLogs.filter(l => typeof l[key] === 'number');
+          if (liftWith.length < 3 || restWith.length < 3) continue;
+          const liftAvg = liftWith.reduce((s, l) => s + l[key], 0) / liftWith.length;
+          const restAvg = restWith.reduce((s, l) => s + l[key], 0) / restWith.length;
+          const boost = liftAvg - restAvg;
+          if (boost >= 1.0 && (!bestBoost || boost > bestBoost.boost)) {
+            bestBoost = { key, liftAvg: liftAvg.toFixed(1), restAvg: restAvg.toFixed(1), boost };
+          }
+        }
+        // Anxiety is inverted — lower on lift days is the insight
+        const anxLift = liftDayLogs.filter(l => typeof l.anxiety === 'number');
+        const anxRest = restDayLogs.filter(l => typeof l.anxiety === 'number');
+        if (anxLift.length >= 3 && anxRest.length >= 3) {
+          const anxLiftAvg = anxLift.reduce((s, l) => s + l.anxiety, 0) / anxLift.length;
+          const anxRestAvg = anxRest.reduce((s, l) => s + l.anxiety, 0) / anxRest.length;
+          const anxDrop = anxRestAvg - anxLiftAvg; // positive = anxiety lower on lift days
+          if (anxDrop >= 1.0 && (!bestBoost || anxDrop > bestBoost.boost)) {
+            bestBoost = { key: 'anxiety', liftAvg: anxLiftAvg.toFixed(1), restAvg: anxRestAvg.toFixed(1), boost: anxDrop, inverted: true };
+          }
+        }
+        if (bestBoost) {
+          const line = bestBoost.inverted
+            ? `Anxiety: ${bestBoost.liftAvg} on lift days vs ${bestBoost.restAvg} on rest days`
+            : `${cap(bestBoost.key)}: ${bestBoost.liftAvg} on lift days vs ${bestBoost.restAvg} on rest days`;
+          candidates.push({ score: 86, insight: {
+            phase: dayLabel,
+            line,
+            sub: `Across ${liftDayLogs.length} training days`
+          }});
+        }
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // 11. SPERMA CYCLE PHASE STRENGTH (score: 88) — needs 8+ workouts
+    //     "Your lifts peak during Maturation (days 37-72)"
+    //     Groups workouts into 3 sperma phases, compares total volume
+    // ------------------------------------------------------------------
+    if (workoutLog.length >= 8) {
+      const phases = [
+        { name: 'Formation', min: 1, max: 24 },
+        { name: 'Development', min: 25, max: 48 },
+        { name: 'Maturation', min: 49, max: 72 }
+      ];
+      const phaseData = phases.map(p => {
+        const workouts = workoutLog.filter(w => w.spermaDay >= p.min && w.spermaDay <= p.max);
+        if (workouts.length === 0) return { ...p, avgVolume: 0, count: 0 };
+        const volumes = workouts.map(w => 
+          (w.exercises || []).reduce((s, e) => {
+            const sets = e.sets || 0, reps = e.reps || 0;
+            return s + (e.weight > 0 ? e.weight * sets * reps : sets * reps);
+          }, 0)
+        );
+        return { ...p, avgVolume: volumes.reduce((a, b) => a + b, 0) / volumes.length, count: workouts.length };
+      });
+      
+      const validPhases = phaseData.filter(p => p.count >= 2);
+      if (validPhases.length >= 2) {
+        validPhases.sort((a, b) => b.avgVolume - a.avgVolume);
+        const strongest = validPhases[0];
+        const weakest = validPhases[validPhases.length - 1];
+        if (strongest.avgVolume > 0 && weakest.avgVolume > 0) {
+          const ratio = strongest.avgVolume / weakest.avgVolume;
+          if (ratio >= 1.15) {
+            candidates.push({ score: 88, insight: {
+              phase: dayLabel,
+              line: `Lifts peak during ${strongest.name} phase`,
+              sub: `Days ${strongest.min}-${strongest.max} of your cycle · ${strongest.count} sessions`
+            }});
+          }
+        }
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // 12. WORKOUT + TODAY CROSS-REFERENCE (score: 78) — if logged today
+    //     "You lifted today — Workout metric: 9/10"
+    // ------------------------------------------------------------------
+    if (todayWorkout && todayWorkout.exercises?.length > 0) {
+      const exerciseCount = todayWorkout.exercises.length;
+      const totalVolume = todayWorkout.exercises.reduce((s, e) => {
+        const sets = e.sets || 0, reps = e.reps || 0;
+        return s + (e.weight > 0 ? e.weight * sets * reps : sets * reps);
+      }, 0);
+      const hasWeighted = todayWorkout.exercises.some(e => e.weight > 0);
+      const workoutScore = savedBenefits.workout || 5;
+      
+      if (workoutScore >= 8) {
+        candidates.push({ score: 78, insight: {
+          phase: dayLabel,
+          line: `${exerciseCount} exercises logged · Workout rated ${workoutScore}/10`,
+          sub: totalVolume > 0 ? `${totalVolume.toLocaleString()}${hasWeighted ? ' lbs' : ' reps'} total volume` : 'Training data locked in'
+        }});
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // 13. EXERCISE PR DETECTION (score: 92) — weight PR or volume PR
+    //     Weight PR: "Bench Press PR: 225 lbs"
+    //     Volume PR: "Push-ups PR: 100 reps (4×25)" — for bodyweight exercises
+    // ------------------------------------------------------------------
+    if (todayWorkout && todayWorkout.exercises?.length > 0 && workoutLog.length >= 2) {
+      let prFound = false;
+      for (const exercise of todayWorkout.exercises) {
+        if (!exercise.name) continue;
+        const nameLower = exercise.name.toLowerCase();
+        const priorExercises = workoutLog
+          .filter(w => format(new Date(w.date), 'yyyy-MM-dd') !== todayStr)
+          .flatMap(w => (w.exercises || []))
+          .filter(e => e.name && e.name.toLowerCase() === nameLower);
+        
+        if (priorExercises.length < 1) continue;
+
+        // Weight PR — highest weight ever
+        if (exercise.weight > 0) {
+          const priorWeights = priorExercises.filter(e => e.weight > 0).map(e => e.weight);
+          if (priorWeights.length >= 1) {
+            const prevMax = Math.max(...priorWeights);
+            if (exercise.weight > prevMax) {
+              candidates.push({ score: 92, insight: {
+                phase: dayLabel,
+                line: `${exercise.name} PR: ${exercise.weight} lbs`,
+                sub: `Previous best: ${prevMax} lbs · Day ${streak}`
+              }});
+              prFound = true; break;
+            }
+          }
+        }
+        
+        // Volume PR — highest sets × reps (for bodyweight or any exercise)
+        const todayVol = (exercise.sets || 0) * (exercise.reps || 0);
+        if (todayVol > 0) {
+          const priorVols = priorExercises
+            .map(e => (e.sets || 0) * (e.reps || 0))
+            .filter(v => v > 0);
+          if (priorVols.length >= 1) {
+            const prevMaxVol = Math.max(...priorVols);
+            if (todayVol > prevMaxVol) {
+              candidates.push({ score: 91, insight: {
+                phase: dayLabel,
+                line: `${exercise.name} volume PR: ${todayVol} reps`,
+                sub: `Previous best: ${prevMaxVol} reps · ${exercise.sets}×${exercise.reps}`
+              }});
+              prFound = true; break;
+            }
+          }
+        }
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // 14. TRAINING CONSISTENCY (score: 73) — weekly frequency
+    //     "3 workouts this week — your most consistent stretch"
+    // ------------------------------------------------------------------
+    if (workoutLog.length >= 3) {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      const thisWeek = workoutLog.filter(w => new Date(w.date) >= oneWeekAgo);
+      
+      if (thisWeek.length >= 3) {
+        // Check if this is the most workouts in any 7-day window
+        let isBestWeek = true;
+        for (let i = 0; i < workoutLog.length; i++) {
+          const windowStart = new Date(workoutLog[i].date);
+          const windowEnd = new Date(windowStart);
+          windowEnd.setDate(windowEnd.getDate() + 7);
+          const windowCount = workoutLog.filter(w => {
+            const d = new Date(w.date);
+            return d >= windowStart && d < windowEnd;
+          }).length;
+          if (windowCount > thisWeek.length) { isBestWeek = false; break; }
+        }
+        
+        if (isBestWeek && thisWeek.length >= 4) {
+          candidates.push({ score: 73, insight: {
+            phase: dayLabel,
+            line: `${thisWeek.length} workouts in 7 days`,
+            sub: 'Most consistent training week yet'
+          }});
+        } else {
+          candidates.push({ score: 62, insight: {
+            phase: dayLabel,
+            line: `${thisWeek.length} workouts this week`,
+            sub: 'Training + retention = compounding power'
+          }});
+        }
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // 15. STREAK-LONG VOLUME TREND (score: 84) — needs 6+ workouts
+    //     "Total volume up 34% since Day 1" — THE retention proof
+    // ------------------------------------------------------------------
+    if (workoutLog.length >= 6) {
+      const sorted = [...workoutLog].sort((a, b) => new Date(a.date) - new Date(b.date));
+      const calcVolume = (w) => (w.exercises || []).reduce((s, e) => {
+        const sets = e.sets || 0, reps = e.reps || 0;
+        return s + (e.weight > 0 ? e.weight * sets * reps : sets * reps);
+      }, 0);
+      
+      // Compare first 3 workouts avg vs last 3 workouts avg
+      const early = sorted.slice(0, 3);
+      const recent = sorted.slice(-3);
+      const earlyAvg = early.reduce((s, w) => s + calcVolume(w), 0) / early.length;
+      const recentAvg = recent.reduce((s, w) => s + calcVolume(w), 0) / recent.length;
+      
+      if (earlyAvg > 0 && recentAvg > earlyAvg) {
+        const pctIncrease = Math.round(((recentAvg - earlyAvg) / earlyAvg) * 100);
+        if (pctIncrease >= 10) {
+          candidates.push({ score: 84, insight: {
+            phase: dayLabel,
+            line: `Training volume up ${pctIncrease}% since you started`,
+            sub: `${workoutLog.length} sessions tracked · retention fuels performance`
+          }});
+        }
+      }
+    }
+
+    // ------------------------------------------------------------------
+    // 16. WEEKLY TRAINING FREQUENCY × EMOTIONAL STATE (score: 83)
+    //     "Weeks with 3+ workouts, Anxiety averages 3.1 vs 5.8"
+    //     Buckets weeks by training count, compares emotional metrics
+    // ------------------------------------------------------------------
+    if (workoutLog.length >= 6 && allLogs.length >= 14) {
+      // Build weekly buckets (ISO week)
+      const getWeekKey = (d) => {
+        const dt = new Date(d);
+        const jan1 = new Date(dt.getFullYear(), 0, 1);
+        const weekNum = Math.ceil(((dt - jan1) / 86400000 + jan1.getDay() + 1) / 7);
+        return `${dt.getFullYear()}-W${weekNum}`;
+      };
+      
+      const weekWorkoutCounts = {};
+      workoutLog.forEach(w => {
+        const wk = getWeekKey(w.date);
+        weekWorkoutCounts[wk] = (weekWorkoutCounts[wk] || 0) + 1;
+      });
+      
+      const highTrainWeeks = new Set(Object.entries(weekWorkoutCounts).filter(([, c]) => c >= 3).map(([k]) => k));
+      const lowTrainWeeks = new Set(Object.entries(weekWorkoutCounts).filter(([, c]) => c <= 1).map(([k]) => k));
+      
+      if (highTrainWeeks.size >= 2 && lowTrainWeeks.size >= 2) {
+        const emotionalKeys = ['anxiety', 'mood', 'clarity', 'processing'];
+        const highLogs = previousLogs.filter(l => highTrainWeeks.has(getWeekKey(l.date)) && typeof l.anxiety === 'number');
+        const lowLogs = previousLogs.filter(l => lowTrainWeeks.has(getWeekKey(l.date)) && typeof l.anxiety === 'number');
+        
+        if (highLogs.length >= 3 && lowLogs.length >= 3) {
+          let bestEmotional = null;
+          
+          // Anxiety — lower is better (inverted)
+          const anxHigh = highLogs.reduce((s, l) => s + l.anxiety, 0) / highLogs.length;
+          const anxLow = lowLogs.reduce((s, l) => s + l.anxiety, 0) / lowLogs.length;
+          const anxDrop = anxLow - anxHigh;
+          if (anxDrop >= 1.0) {
+            bestEmotional = { key: 'Anxiety', highAvg: anxHigh.toFixed(1), lowAvg: anxLow.toFixed(1), delta: anxDrop, inverted: true };
+          }
+          
+          // Mood, Clarity, Processing — higher is better
+          for (const key of ['mood', 'clarity', 'processing']) {
+            const hWith = highLogs.filter(l => typeof l[key] === 'number');
+            const lWith = lowLogs.filter(l => typeof l[key] === 'number');
+            if (hWith.length < 3 || lWith.length < 3) continue;
+            const hAvg = hWith.reduce((s, l) => s + l[key], 0) / hWith.length;
+            const lAvg = lWith.reduce((s, l) => s + l[key], 0) / lWith.length;
+            const boost = hAvg - lAvg;
+            if (boost >= 1.0 && (!bestEmotional || boost > bestEmotional.delta)) {
+              bestEmotional = { key: cap(key), highAvg: hAvg.toFixed(1), lowAvg: lAvg.toFixed(1), delta: boost, inverted: false };
+            }
+          }
+          
+          if (bestEmotional) {
+            const line = bestEmotional.inverted
+              ? `${bestEmotional.key}: ${bestEmotional.highAvg} in heavy training weeks vs ${bestEmotional.lowAvg} in light weeks`
+              : `${bestEmotional.key}: ${bestEmotional.highAvg} in heavy training weeks vs ${bestEmotional.lowAvg} in light weeks`;
+            candidates.push({ score: 83, insight: {
+              phase: dayLabel,
+              line,
+              sub: 'Weeks with 3+ sessions vs 0-1'
+            }});
+          }
+        }
+      }
+    }
+
     // === RETURN HIGHEST SCORING, or phase fallback ===
     if (candidates.length > 0) {
       candidates.sort((a, b) => b.score - a.score);
@@ -765,7 +1079,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       'Mastery & Purpose': 'Operating at a different level'
     };
     return { phase: dayLabel, line: phaseMessages[phase] || 'Data locked in', sub: `${allLogs.length} logs recorded` };
-  }, [streak]);
+  }, [streak, userData.workoutLog]);
 
   // Save benefits
   const saveBenefits = () => {

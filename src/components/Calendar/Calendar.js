@@ -1282,7 +1282,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                 className="day-moon-indicator"
                 onClick={(e) => openMoonDetail(currentDay, e)}
               >
-                <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={11} />
+                <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={9} />
               </span>
             )}
           </div>
@@ -1505,11 +1505,10 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                         <div className="calendar-status-info">
                           {renderStatusBadge()}
                         </div>
-                        {/* Workout dumbbell icon */}
+                        {/* Workout dumbbell icon — standalone, no text */}
                         {!isFuture && (
-                          <button className="calendar-workout-btn" onClick={openWorkoutSheet}>
-                            <DumbbellIcon size={16} filled={!!getDayWorkout(selectedDate)} />
-                            <span>{getDayWorkout(selectedDate) ? 'View Workout' : 'Log Workout'}</span>
+                          <button className="calendar-workout-icon" onClick={openWorkoutSheet} aria-label={getDayWorkout(selectedDate) ? 'View Workout' : 'Log Workout'}>
+                            <DumbbellIcon size={18} filled={!!getDayWorkout(selectedDate)} />
                           </button>
                         )}
                       </div>
