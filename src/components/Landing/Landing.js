@@ -325,12 +325,24 @@ const Landing = ({ onLogin }) => {
           TESTIMONIAL
           ============================================================ */}
       <section className="landing-testimonial" ref={testimonialRef}>
-        <blockquote className="landing-quote">
-          "Your app has potential to be one of the best quitting apps. Already it's amazing.
-          It's great to not only track days and have access to overall progress within
-          your being. A habit-share style app specifically for this is monumental."
-        </blockquote>
-        <p className="landing-quote-attr">— Community member, daily user since launch</p>
+        <div className="landing-testimonial-grid">
+          <div className="landing-testimonial-item">
+            <blockquote className="landing-quote">
+              "Your app has potential to be one of the best quitting apps. Already it's amazing.
+              It's great to not only track days and have access to overall progress within
+              your being. A habit-share style app specifically for this is monumental."
+            </blockquote>
+            <p className="landing-quote-attr">— Community member, daily user since launch</p>
+          </div>
+          <div className="landing-testimonial-item">
+            <blockquote className="landing-quote">
+              "This Titan App is cool. Just logging the days is good reassurance.
+              Love the Oracle as well, made me so aware of where my energy is
+              being wasted. So useful to know!"
+            </blockquote>
+            <p className="landing-quote-attr">— Chris, Discord member</p>
+          </div>
+        </div>
       </section>
 
       {/* ============================================================

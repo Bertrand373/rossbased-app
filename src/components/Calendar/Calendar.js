@@ -91,35 +91,35 @@ const MoonIcon = ({ phase, size = 11, emoji }) => {
   );
 };
 
-// Tiny dumbbell SVG for calendar day cells — pyramid plates
-const DumbbellGlyph = ({ size = 9 }) => (
-  <svg width={size} height={Math.round(size * 0.55)} viewBox="0 0 22 12" fill="currentColor" style={{ display: 'block' }}>
-    <rect x="0" y="0.5" width="3" height="11" rx="1" />
-    <rect x="3" y="2.5" width="3" height="7" rx="0.8" />
-    <rect x="6" y="4.5" width="10" height="3" rx="1" />
-    <rect x="16" y="2.5" width="3" height="7" rx="0.8" />
-    <rect x="19" y="0.5" width="3" height="11" rx="1" />
+// Tiny dumbbell SVG for calendar day cells — two-plate clean
+const DumbbellGlyph = ({ size = 10 }) => (
+  <svg width={size} height={Math.round(size * 0.56)} viewBox="0 0 32 18" fill="currentColor" style={{ display: 'block' }}>
+    <rect x="0" y="0" width="4" height="18" rx="2" />
+    <rect x="5.5" y="3" width="3.5" height="12" rx="1.75" />
+    <rect x="9" y="6.5" width="14" height="5" rx="2.5" />
+    <rect x="23" y="3" width="3.5" height="12" rx="1.75" />
+    <rect x="28" y="0" width="4" height="18" rx="2" />
   </svg>
 );
 
-// Dumbbell icon for day info sheet header — pyramid plates, outlined/filled
+// Dumbbell icon for day info sheet header — two-plate clean, outlined/filled
 const DumbbellIcon = ({ size = 18, filled = false }) => (
-  <svg width={size} height={Math.round(size * 0.57)} viewBox="0 0 28 16" style={{ display: 'block' }}>
+  <svg width={size} height={Math.round(size * 0.56)} viewBox="0 0 32 18" style={{ display: 'block' }}>
     {filled ? (
       <g fill="currentColor">
-        <rect x="0" y="1" width="4" height="14" rx="1.5" />
-        <rect x="4" y="3" width="3" height="10" rx="1" />
-        <rect x="7" y="6" width="14" height="4" rx="1.5" />
-        <rect x="21" y="3" width="3" height="10" rx="1" />
-        <rect x="24" y="1" width="4" height="14" rx="1.5" />
+        <rect x="0" y="0" width="4" height="18" rx="2" />
+        <rect x="5.5" y="3" width="3.5" height="12" rx="1.75" />
+        <rect x="9" y="6.5" width="14" height="5" rx="2.5" />
+        <rect x="23" y="3" width="3.5" height="12" rx="1.75" />
+        <rect x="28" y="0" width="4" height="18" rx="2" />
       </g>
     ) : (
-      <g fill="none" stroke="currentColor" strokeWidth="1.4">
-        <rect x="0.7" y="1.7" width="2.6" height="12.6" rx="1" />
-        <rect x="4.7" y="3.7" width="1.6" height="8.6" rx="0.6" />
-        <rect x="7.7" y="6.7" width="12.6" height="2.6" rx="1" />
-        <rect x="21.7" y="3.7" width="1.6" height="8.6" rx="0.6" />
-        <rect x="24.7" y="1.7" width="2.6" height="12.6" rx="1" />
+      <g fill="none" stroke="currentColor" strokeWidth="1.3">
+        <rect x="0.65" y="0.65" width="2.7" height="16.7" rx="1.35" />
+        <rect x="6.15" y="3.65" width="2.2" height="10.7" rx="1.1" />
+        <rect x="9.65" y="7.15" width="12.7" height="3.7" rx="1.85" />
+        <rect x="23.65" y="3.65" width="2.2" height="10.7" rx="1.1" />
+        <rect x="28.65" y="0.65" width="2.7" height="16.7" rx="1.35" />
       </g>
     )}
   </svg>
@@ -503,12 +503,44 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   };
 
   // Open workout sheet from day info — staggered transition
+  // Smart template — learns your routine per day of week
+  // After 1 workout on the same weekday, auto-fills exercises from most recent
+  const getTemplateForDay = (date) => {
+    const workoutLog = userData.workoutLog || [];
+    const dayOfWeek = new Date(date).getDay();
+    const dateStr = format(new Date(date), 'yyyy-MM-dd');
+    
+    // Find all workouts on same day of week (excluding current day)
+    const sameDayWorkouts = workoutLog
+      .filter(w => new Date(w.date).getDay() === dayOfWeek && format(new Date(w.date), 'yyyy-MM-dd') !== dateStr)
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    // Need 1+ entry on this weekday to establish pattern
+    if (sameDayWorkouts.length < 1) return null;
+    
+    const mostRecent = sameDayWorkouts[0];
+    if (!mostRecent.exercises || mostRecent.exercises.length === 0) return null;
+    
+    // Return template with names + last values (user adjusts as needed)
+    return mostRecent.exercises.map((e, i) => ({
+      id: `ex-${i}-${Date.now()}`,
+      name: e.name || '',
+      weight: e.weight || '',
+      sets: e.sets || '',
+      reps: e.reps || '',
+      restMinutes: e.restMinutes || ''
+    }));
+  };
+
   const openWorkoutSheet = () => {
     const existing = getDayWorkout(selectedDate);
     if (existing && existing.exercises && existing.exercises.length > 0) {
+      // Existing workout — load it
       setWorkoutExercises(existing.exercises.map((e, i) => ({ ...e, id: `ex-${i}-${Date.now()}` })));
     } else {
-      setWorkoutExercises([]);
+      // No existing workout — check for day-of-week template
+      const template = getTemplateForDay(selectedDate);
+      setWorkoutExercises(template || []);
     }
     setShowSuggestions(null);
     setSwipedExerciseId(null);
@@ -1507,16 +1539,18 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                     <>
                       {/* STICKY HEADER */}
                       <div className="calendar-modal-header">
-                        <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
+                        <div className="calendar-header-row">
+                          <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
+                          {/* Workout dumbbell — inline with date */}
+                          {!isFuture && (
+                            <button className="calendar-workout-icon" onClick={openWorkoutSheet} aria-label={getDayWorkout(selectedDate) ? 'View Workout' : 'Log Workout'}>
+                              <DumbbellIcon size={16} filled={!!getDayWorkout(selectedDate)} />
+                            </button>
+                          )}
+                        </div>
                         <div className="calendar-status-info">
                           {renderStatusBadge()}
                         </div>
-                        {/* Workout dumbbell icon — standalone, no text */}
-                        {!isFuture && (
-                          <button className="calendar-workout-icon" onClick={openWorkoutSheet} aria-label={getDayWorkout(selectedDate) ? 'View Workout' : 'Log Workout'}>
-                            <DumbbellIcon size={18} filled={!!getDayWorkout(selectedDate)} />
-                          </button>
-                        )}
                       </div>
 
                       {/* SCROLLABLE CONTENT */}

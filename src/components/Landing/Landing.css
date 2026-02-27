@@ -459,12 +459,31 @@
 
 .landing-testimonial {
   padding: 80px 24px;
-  max-width: 560px;
+  max-width: 800px;
   margin: 0 auto;
   text-align: center;
   position: relative;
   z-index: 1;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.landing-testimonial-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+}
+
+@media (min-width: 769px) {
+  .landing-testimonial-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+  }
+}
+
+.landing-testimonial-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .landing-quote {

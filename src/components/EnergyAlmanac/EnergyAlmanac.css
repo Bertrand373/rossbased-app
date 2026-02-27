@@ -14,7 +14,7 @@
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: color 150ms ease;
-  animation: almanacFadeIn 600ms ease forwards;
+  animation: fadeInUp 500ms ease forwards;
   opacity: 0;
   letter-spacing: 0.04em;
 }
