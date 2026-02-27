@@ -1584,6 +1584,14 @@
   line-height: 1;
 }
 
+.workout-swipe-hint {
+  margin: 10px 0 0;
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
 /* Footer */
 .workout-sheet-footer {
   flex-shrink: 0;

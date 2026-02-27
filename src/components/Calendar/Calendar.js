@@ -1787,6 +1787,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                         <button className="workout-add-btn" onClick={addExerciseRow}>
                           <span>+</span> Add Exercise
                         </button>
+                        <p className="workout-swipe-hint">Swipe left to remove</p>
                       </div>
                     )}
                   </div>
