@@ -105,7 +105,7 @@
   margin: 0;
 }
 
-/* Workout icon — Oracle sheet button treatment */
+/* Workout icon — naked like AI chat buttons */
 .calendar-workout-icon {
   position: absolute;
   right: 0;
@@ -116,18 +116,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface-raised);
+  background: transparent;
   border: none;
-  border-radius: 10px;
-  color: var(--accent-gold-text);
+  border-radius: 12px;
+  color: var(--text-tertiary);
   cursor: pointer;
   padding: 0;
   -webkit-tap-highlight-color: transparent;
-  transition: background 150ms ease, color 150ms ease;
-}
-
-.calendar-workout-icon:hover {
-  background: var(--surface-overlay);
+  transition: color 150ms ease;
 }
 
 .calendar-workout-icon:active {
@@ -135,7 +131,7 @@
 }
 
 .calendar-workout-icon.has-workout {
-  color: var(--accent-gold);
+  color: var(--accent-gold-text);
 }
 
 .calendar-modal-header h3 {
@@ -1286,6 +1282,7 @@
   flex-shrink: 0;
   text-align: center;
   padding-bottom: 8px;
+  position: relative;
 }
 
 .workout-sheet-header h3 {
@@ -1295,6 +1292,31 @@
   color: var(--text-muted);
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+/* Trash icon — mirrors dumbbell position on day info sheet */
+.workout-trash-icon {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 150ms ease;
+}
+
+.workout-trash-icon:active {
+  color: var(--status-relapse);
+  transform: scale(0.93);
 }
 
 .workout-sheet-title {
@@ -1319,6 +1341,8 @@
   -ms-overflow-style: none;
   padding: 16px 0;
   max-height: 50dvh;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
 }
 
 .workout-sheet-content::-webkit-scrollbar { display: none; }

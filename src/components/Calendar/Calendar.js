@@ -1653,6 +1653,14 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                       <DumbbellIcon size={18} filled={true} />
                       <span>Workout Log</span>
                     </div>
+                    {getDayWorkout(selectedDate) && (
+                      <button className="workout-trash-icon" onClick={deleteWorkout} aria-label="Delete Workout">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                        </svg>
+                      </button>
+                    )}
                   </div>
 
                   <div className="workout-sheet-content">
@@ -1793,13 +1801,6 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                       {workoutExercises.length > 0 ? 'Cancel' : 'Back'}
                     </button>
                   </div>
-                  {getDayWorkout(selectedDate) && (
-                    <div className="calendar-edit-options" style={{ marginTop: '16px' }}>
-                      <button className="calendar-option-btn calendar-option-danger" onClick={deleteWorkout}>
-                        Delete Workout
-                      </button>
-                    </div>
-                  )}
                 </div>
               )}
 

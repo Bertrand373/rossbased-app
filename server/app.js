@@ -28,6 +28,8 @@ const adminRevenueRoutes = require('./routes/adminRevenue');
 const { initializeSchedulers } = require('./services/notificationScheduler');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 const { getCommunityPulse } = require('./services/communityPulse');
+const { classifyInteraction, backfillRelapseFlag } = require('./services/interactionClassifier');
+const OracleInteraction = require('./models/OracleInteraction');
 const stripeRoutes = require('./routes/stripeRoutes');
 const discordLinkRoutes = require('./routes/discordLink');
 const timelineRoutes = require('./routes/timelineRoutes');
@@ -461,6 +463,18 @@ app.put('/api/user/:username', authenticate, async (req, res) => {
       } catch (milestoneError) {
         console.error('Milestone check failed:', milestoneError);
         // Don't fail the request if milestone check fails
+      }
+    }
+    
+    // --- DATA PIPELINE: Detect relapse and backfill OracleInteraction flags ---
+    if (req.body.streakHistory && Array.isArray(req.body.streakHistory)) {
+      const latest = req.body.streakHistory[req.body.streakHistory.length - 1];
+      if (latest && latest.reason === 'relapse' && latest.date) {
+        const entryAge = Date.now() - new Date(latest.date).getTime();
+        // Only trigger if this relapse entry is fresh (within last 5 minutes)
+        if (entryAge < 5 * 60 * 1000) {
+          backfillRelapseFlag(user._id, new Date(latest.date)).catch(() => {});
+        }
       }
     }
     
@@ -1448,6 +1462,26 @@ Examples:
       }
     })();
 
+    // --- DATA PIPELINE: Classify interaction metadata (fire-and-forget) ---
+    (async () => {
+      try {
+        let streakDay = user.currentStreak || 0;
+        if (user.startDate) {
+          const s = new Date(user.startDate); s.setHours(0, 0, 0, 0);
+          const t = new Date(); t.setHours(0, 0, 0, 0);
+          streakDay = Math.max(1, Math.floor((t - s) / (1000 * 60 * 60 * 24)) + 1);
+        }
+        await classifyInteraction(message, {
+          source: 'app',
+          userId: user._id,
+          username: req.user.username,
+          streakDay
+        });
+      } catch (err) {
+        // Silent — never impacts user experience
+      }
+    })();
+
     // Calculate remaining
     let messagesRemaining;
     if (isBetaPeriod) {
@@ -1954,6 +1988,130 @@ app.get('/api/admin/oracle-health', authenticate, async (req, res) => {
   } catch (err) {
     console.error('Oracle health check error:', err);
     res.status(500).json({ error: 'Health check failed', details: err.message });
+  }
+});
+
+// ============================================
+// ORACLE DATA PIPELINE — Aggregate Insights (admin only)
+// No frontend UI — feeds Daily Transmissions and admin dashboards
+// ============================================
+
+app.get('/api/oracle-insights/topic-distribution', authenticate, async (req, res) => {
+  if (req.user.username.toLowerCase() !== 'rossbased' && req.user.username.toLowerCase() !== 'ross') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+  try {
+    const days = parseInt(req.query.days) || 7;
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const results = await OracleInteraction.aggregate([
+      { $match: { timestamp: { $gte: since } } },
+      { $unwind: '$topics' },
+      { $group: { _id: '$topics', count: { $sum: 1 } } },
+      { $sort: { count: -1 } }
+    ]);
+    const distribution = {};
+    results.forEach(r => { distribution[r._id] = r.count; });
+    res.json({ days, distribution, total: Object.values(distribution).reduce((a, b) => a + b, 0) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/oracle-insights/sentiment-by-phase', authenticate, async (req, res) => {
+  if (req.user.username.toLowerCase() !== 'rossbased' && req.user.username.toLowerCase() !== 'ross') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+  try {
+    const days = parseInt(req.query.days) || 30;
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const results = await OracleInteraction.aggregate([
+      { $match: { timestamp: { $gte: since }, phase: { $ne: null }, sentiment: { $ne: null } } },
+      { $group: { _id: { phase: '$phase', sentiment: '$sentiment' }, count: { $sum: 1 } } }
+    ]);
+    // Reshape into { phase: { sentiment: count } }
+    const byPhase = {};
+    results.forEach(r => {
+      if (!byPhase[r._id.phase]) byPhase[r._id.phase] = {};
+      byPhase[r._id.phase][r._id.sentiment] = r.count;
+    });
+    res.json({ days, phases: byPhase });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/oracle-insights/relapse-risk-patterns', authenticate, async (req, res) => {
+  if (req.user.username.toLowerCase() !== 'rossbased' && req.user.username.toLowerCase() !== 'ross') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+  try {
+    const flagged = await OracleInteraction.aggregate([
+      { $match: { relapseRiskLanguage: true } },
+      { $group: {
+        _id: '$relapseWithin48h',
+        count: { $sum: 1 },
+        avgStreakDay: { $avg: '$streakDay' },
+        topTopics: { $push: '$topics' }
+      }}
+    ]);
+    // Flatten topics for frequency count
+    const formatGroup = (group) => {
+      if (!group) return { count: 0 };
+      const allTopics = group.topTopics.flat();
+      const topicCounts = {};
+      allTopics.forEach(t => { topicCounts[t] = (topicCounts[t] || 0) + 1; });
+      return { count: group.count, avgStreakDay: Math.round(group.avgStreakDay || 0), topTopics: topicCounts };
+    };
+    res.json({
+      relapsedAfterFlag: formatGroup(flagged.find(f => f._id === true)),
+      didNotRelapse: formatGroup(flagged.find(f => f._id === false)),
+      pendingBackfill: formatGroup(flagged.find(f => f._id === null))
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/oracle-insights/trending-topics', authenticate, async (req, res) => {
+  if (req.user.username.toLowerCase() !== 'rossbased' && req.user.username.toLowerCase() !== 'ross') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+  try {
+    const days = parseInt(req.query.days) || 3;
+    const recentCutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const baselineCutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    // Recent topic counts
+    const recent = await OracleInteraction.aggregate([
+      { $match: { timestamp: { $gte: recentCutoff } } },
+      { $unwind: '$topics' },
+      { $group: { _id: '$topics', count: { $sum: 1 } } }
+    ]);
+    const recentTotal = recent.reduce((s, r) => s + r.count, 0) || 1;
+
+    // 30-day baseline topic counts
+    const baseline = await OracleInteraction.aggregate([
+      { $match: { timestamp: { $gte: baselineCutoff, $lt: recentCutoff } } },
+      { $unwind: '$topics' },
+      { $group: { _id: '$topics', count: { $sum: 1 } } }
+    ]);
+    const baselineTotal = baseline.reduce((s, r) => s + r.count, 0) || 1;
+    const baselineMap = {};
+    baseline.forEach(r => { baselineMap[r._id] = r.count / baselineTotal; });
+
+    // Find topics trending above baseline
+    const trending = recent
+      .map(r => {
+        const recentPct = r.count / recentTotal;
+        const baselinePct = baselineMap[r._id] || 0.01; // Default 1% if new
+        return { topic: r._id, recentCount: r.count, recentPct: Math.round(recentPct * 100), baselinePct: Math.round(baselinePct * 100), lift: Math.round((recentPct / baselinePct) * 100) / 100 };
+      })
+      .filter(t => t.lift > 1.2) // At least 20% above baseline
+      .sort((a, b) => b.lift - a.lift);
+
+    res.json({ days, trending, totalRecentInteractions: recentTotal });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

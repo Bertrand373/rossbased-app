@@ -7,8 +7,10 @@ const { Client, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.j
 const Anthropic = require('@anthropic-ai/sdk');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 const { logIfRelevant, generateWeeklyInsight, generateObservations, detectAnomaly, generatePulseAlert, getPulseStats } = require('./services/oracleInsight');
+const { classifyInteraction } = require('./services/interactionClassifier');
 const KnowledgeChunk = require('./models/KnowledgeChunk');
 const OracleUsage = require('./models/OracleUsage');
+const DiscordMemory = require('./models/DiscordMemory');
 const User = require('./models/User');
 const { randomUUID } = require('crypto');
 
@@ -50,9 +52,10 @@ function getTodayET() {
   return new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); // 'en-CA' gives YYYY-MM-DD
 }
 
-// Conversation memory - last N messages per channel for context
-const CHANNEL_HISTORY = new Map();
-const MAX_HISTORY = 8; // Last 8 messages for context
+// Conversation memory — persisted in MongoDB via DiscordMemory model
+// Survives deploys and restarts. Per-user, not per-channel.
+const MAX_STORED_MESSAGES = 50;  // Store 5 days (~50 msgs at 10/day) in MongoDB
+const MAX_CONTEXT_MESSAGES = 14; // Send last 7 exchanges to Claude (cost control)
 
 // Oracle embed styling
 const ORACLE_COLOR = 0xBDA300; // Gold (matches Oracle eye branding)
@@ -628,42 +631,147 @@ const recordUsage = async (userId) => {
   }
 };
 
-// Get channel conversation history
-const getChannelHistory = (channelId) => {
-  return CHANNEL_HISTORY.get(channelId) || [];
-};
+// ============================================================
+// CONVERSATION MEMORY (MongoDB-backed, per-user, survives deploys)
+// ============================================================
 
-// Add to channel history
-const addToHistory = (channelId, role, content, username = null) => {
-  const history = getChannelHistory(channelId);
-  history.push({ role, content, username, timestamp: Date.now() });
-  
-  // Keep only last N messages
-  while (history.length > MAX_HISTORY) {
-    history.shift();
+// Load conversation history for a Discord user from MongoDB
+const loadUserHistory = async (discordUserId) => {
+  try {
+    const mem = await DiscordMemory.findOne({ discordUserId }).lean();
+    return mem?.messages || [];
+  } catch {
+    return [];
   }
-  
-  CHANNEL_HISTORY.set(channelId, history);
 };
 
-// Build messages array for Claude
-const buildMessages = (channelId, currentMessage, username) => {
-  const history = getChannelHistory(channelId);
+// Save both user message and Oracle reply to MongoDB (fire-and-forget safe)
+const saveToHistory = async (discordUserId, username, userContent, assistantContent) => {
+  try {
+    const userMsg = { role: 'user', content: userContent.substring(0, 400), timestamp: new Date() };
+    const assistantMsg = { role: 'assistant', content: assistantContent.substring(0, 400), timestamp: new Date() };
+
+    await DiscordMemory.findOneAndUpdate(
+      { discordUserId },
+      {
+        $set: { username, updatedAt: new Date() },
+        $push: {
+          messages: {
+            $each: [userMsg, assistantMsg],
+            $slice: -MAX_STORED_MESSAGES  // Keep last 50 in storage
+          }
+        }
+      },
+      { upsert: true }
+    );
+  } catch (err) {
+    console.error('Discord memory save error (non-blocking):', err.message);
+  }
+};
+
+// Build messages array for Claude from persisted history + current message
+const buildMessages = async (discordUserId, currentMessage, username) => {
+  const allHistory = await loadUserHistory(discordUserId);
+  // Only send the most recent exchanges to Claude (cost control)
+  // Full history stays in MongoDB for persistence
+  const history = allHistory.slice(-MAX_CONTEXT_MESSAGES);
   const messages = [];
-  
-  // Add recent history as context
+
   for (const msg of history) {
     if (msg.role === 'user') {
-      messages.push({ role: 'user', content: `[${msg.username}]: ${msg.content}` });
+      messages.push({ role: 'user', content: msg.content });
     } else {
       messages.push({ role: 'assistant', content: msg.content });
     }
   }
-  
+
   // Add current message
   messages.push({ role: 'user', content: `[${username}]: ${currentMessage}` });
-  
+
   return messages;
+};
+
+// ============================================================
+// PASSIVE STREAK EXTRACTION
+// Picks up day counts from natural conversation ("I'm on day 45")
+// Stores against Discord user ID for non-linked users
+// ============================================================
+
+const STREAK_PATTERNS = [
+  /(?:i'?m|i am|currently)\s+(?:on|at)\s+day\s+(\d{1,4})/i,
+  /day\s+(\d{1,4})\s+(?:here|now|today|streak)/i,
+  /(?:hit|reached|passed)\s+(?:day\s+)?(\d{1,4})\s*(?:days?|today|!|\.)/i,
+  /(\d{1,4})\s+days?\s+(?:in|streak|strong|clean|retained|no\s*fap)/i,
+  /(?:my|current)\s+streak\s*(?:is|:)\s*(\d{1,4})/i,
+  /(?:been|going)\s+(\d{1,4})\s+days/i,
+  /(\d+)\s+(?:week|month)s?\s+(?:in|streak|strong|clean|retained)/i,
+];
+
+const WEEK_MONTH_PATTERN = /(\d+)\s+(week|month)s?\s+(?:in|streak|strong|clean|retained)/i;
+
+const extractStreak = (text) => {
+  // Try week/month pattern first for conversion
+  const wmMatch = text.match(WEEK_MONTH_PATTERN);
+  if (wmMatch) {
+    const num = parseInt(wmMatch[1]);
+    const unit = wmMatch[2].toLowerCase();
+    if (unit.startsWith('week')) return { day: num * 7, confidence: 'approximate' };
+    if (unit.startsWith('month')) return { day: num * 30, confidence: 'approximate' };
+  }
+
+  // Try exact day patterns
+  for (const pattern of STREAK_PATTERNS) {
+    const match = text.match(pattern);
+    if (match) {
+      const day = parseInt(match[1]);
+      // Sanity check: ignore numbers that are clearly not streak days
+      if (day > 0 && day < 3000) {
+        return { day, confidence: 'exact' };
+      }
+    }
+  }
+  return null;
+};
+
+// Save extracted streak to DiscordMemory (fire-and-forget)
+const saveExtractedStreak = async (discordUserId, username, streakData) => {
+  try {
+    await DiscordMemory.findOneAndUpdate(
+      { discordUserId },
+      {
+        $set: {
+          username,
+          updatedAt: new Date(),
+          lastKnownStreak: {
+            day: streakData.day,
+            mentionedAt: new Date(),
+            confidence: streakData.confidence
+          }
+        }
+      },
+      { upsert: true }
+    );
+    console.log(`📊 Streak extracted: ${username} → Day ${streakData.day} (${streakData.confidence})`);
+  } catch (err) {
+    // Silent
+  }
+};
+
+// Load last known streak for a Discord user (for non-linked context)
+const getDiscordUserStreak = async (discordUserId) => {
+  try {
+    const mem = await DiscordMemory.findOne({ discordUserId }).lean();
+    if (mem?.lastKnownStreak?.day && mem.lastKnownStreak.mentionedAt) {
+      const ageHours = (Date.now() - new Date(mem.lastKnownStreak.mentionedAt).getTime()) / (1000 * 60 * 60);
+      // If mentioned within last 14 days, it's still useful context
+      if (ageHours < 14 * 24) {
+        return mem.lastKnownStreak;
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  }
 };
 
 // Split response into chunks that fit Discord embed descriptions (4096 char limit)
@@ -1068,7 +1176,7 @@ client.on('messageCreate', async (message) => {
     
     // Build conversation with history
     const username = message.member?.displayName || message.author.username;
-    const messages = buildMessages(message.channel.id, content, username);
+    const messages = await buildMessages(message.author.id, content, username);
     
     // Flat token ceiling — let Claude self-regulate length via system prompt
     const maxTokens = 1024;
@@ -1134,6 +1242,22 @@ client.on('messageCreate', async (message) => {
       // Silent — proceed without personalization
     }
     
+    // --- NON-LINKED USER: Use passively extracted streak if available ---
+    if (!linkedUser) {
+      try {
+        const knownStreak = await getDiscordUserStreak(message.author.id);
+        if (knownStreak) {
+          const daysAgo = Math.round((Date.now() - new Date(knownStreak.mentionedAt).getTime()) / (1000 * 60 * 60 * 24));
+          const streakEstimate = knownStreak.day + (knownStreak.confidence === 'exact' ? daysAgo : 0);
+          const lines = [];
+          lines.push(`This user previously mentioned being on Day ${knownStreak.day} (${daysAgo} day${daysAgo !== 1 ? 's' : ''} ago). Estimated current: ~Day ${streakEstimate}. This is self-reported, not verified.`);
+          personalContext = '\n\n--- DISCORD USER CONTEXT (from past conversation, self-reported) ---\n' + lines.join('\n') + '\nReference naturally if relevant. Do not say "you told me" or reveal this is tracked.\n---\n';
+        }
+      } catch {
+        // Silent
+      }
+    }
+    
     // Inject current date and calendar awareness so Oracle has temporal context
     const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'America/New_York' });
     const dateContext = `\n\n## CURRENT DATE & CALENDAR AWARENESS
@@ -1193,9 +1317,14 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       }
     }
     
-    // Record in history (full response, not just first chunk)
-    addToHistory(message.channel.id, 'user', content, username);
-    addToHistory(message.channel.id, 'assistant', reply);
+    // Save conversation to MongoDB (survives deploys)
+    saveToHistory(message.author.id, username, `[${username}]: ${content}`, reply).catch(() => {});
+    
+    // --- PASSIVE STREAK EXTRACTION (fire-and-forget) ---
+    const extracted = extractStreak(content);
+    if (extracted) {
+      saveExtractedStreak(message.author.id, username, extracted).catch(() => {});
+    }
     
     console.log(`🔮 Oracle responded to ${username} in #${channelName} [${chunks.length} embed(s)]`);
     
@@ -1242,6 +1371,29 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
         }
       })();
     }
+    
+    // --- DATA PIPELINE: Classify interaction metadata (fire-and-forget) ---
+    (async () => {
+      try {
+        let streakDay = null;
+        if (linkedUser && linkedUser.startDate) {
+          const s = new Date(linkedUser.startDate); s.setHours(0, 0, 0, 0);
+          const t = new Date(); t.setHours(0, 0, 0, 0);
+          streakDay = Math.max(1, Math.floor((t - s) / (1000 * 60 * 60 * 24)) + 1);
+        } else if (linkedUser) {
+          streakDay = linkedUser.currentStreak || null;
+        }
+        await classifyInteraction(content, {
+          source: 'discord',
+          userId: linkedUser ? linkedUser._id : undefined,
+          discordUserId: message.author.id,
+          username: linkedUser ? linkedUser.username : username,
+          streakDay
+        });
+      } catch (err) {
+        // Silent
+      }
+    })();
     
   } catch (error) {
     console.error('Oracle error:', error);
