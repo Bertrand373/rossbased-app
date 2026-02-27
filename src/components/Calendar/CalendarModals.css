@@ -1192,3 +1192,390 @@
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
+
+/* =============================================================================
+   WORKOUT BUTTON — Day Info Header
+   ============================================================================= */
+
+.calendar-workout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.calendar-workout-btn:hover {
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.calendar-workout-btn:active {
+  transform: scale(0.97);
+}
+
+/* =============================================================================
+   WORKOUT SHEET — Exercise logging
+   ============================================================================= */
+
+.workout-sheet {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-align: center;
+}
+
+.workout-sheet-header {
+  flex-shrink: 0;
+  text-align: center;
+  padding-bottom: 8px;
+}
+
+.workout-sheet-header h3 {
+  margin: 0 0 12px 0;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.workout-sheet-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+/* Scrollable exercise list */
+.workout-sheet-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 16px 0;
+  max-height: 50dvh;
+}
+
+.workout-sheet-content::-webkit-scrollbar { display: none; }
+
+/* Empty state */
+.workout-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px 20px;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 150ms ease;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.workout-empty:hover {
+  border-color: var(--border-prominent);
+}
+
+.workout-empty-plus {
+  font-size: 1.5rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--text-tertiary);
+}
+
+/* Exercise rows container */
+.workout-exercises {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Single exercise row - swipeable */
+.workout-exercise-row {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  transition: transform 200ms ease;
+}
+
+.workout-exercise-row.swiped {
+  transform: translateX(-60px);
+}
+
+/* Main exercise content */
+.workout-exercise-main {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Exercise name input wrapper (for suggestions dropdown) */
+.workout-exercise-name-wrap {
+  position: relative;
+}
+
+/* Shared input styles */
+.workout-input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--background);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.875rem;
+  font-family: inherit;
+  font-weight: 500;
+  transition: border-color 150ms ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.workout-input:focus {
+  outline: none;
+  border-color: var(--border-prominent);
+}
+
+.workout-input::placeholder {
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+/* Name input - full width */
+.workout-input-name {
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+/* Number inputs - smaller */
+.workout-input-num {
+  text-align: center;
+  padding: 8px 6px;
+  font-size: 0.8125rem;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* Remove number input spinners */
+.workout-input-num::-webkit-inner-spin-button,
+.workout-input-num::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.workout-input-num { -moz-appearance: textfield; }
+
+/* Field grid - weight, sets, reps, rest */
+.workout-exercise-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.workout-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+
+.workout-field label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: center;
+}
+
+.workout-field-unit {
+  position: absolute;
+  bottom: 9px;
+  right: 8px;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  pointer-events: none;
+}
+
+/* Delete button - slides in from right */
+.workout-exercise-delete {
+  position: absolute;
+  top: 0;
+  right: -60px;
+  width: 60px;
+  height: 100%;
+  background: var(--status-relapse);
+  border: none;
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 400;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: right 200ms ease;
+}
+
+.workout-exercise-row.swiped .workout-exercise-delete {
+  right: 0;
+}
+
+/* Suggestions dropdown */
+.workout-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-top: 4px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.workout-suggestion-item {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 100ms ease;
+}
+
+.workout-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.workout-suggestion-item:hover {
+  background: var(--surface-overlay);
+  color: var(--text);
+}
+
+/* Add exercise button */
+.workout-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.workout-add-btn:hover {
+  border-color: var(--border-prominent);
+  color: var(--text-secondary);
+}
+
+.workout-add-btn span {
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1;
+}
+
+/* Footer */
+.workout-sheet-footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  padding-top: 16px;
+}
+
+/* =============================================================================
+   WORKOUT SHEET — Responsive
+   ============================================================================= */
+
+@media (max-width: 480px) {
+  .workout-sheet-title {
+    font-size: 0.9375rem;
+  }
+  
+  .workout-exercise-main {
+    padding: 12px;
+    gap: 10px;
+  }
+  
+  .workout-input-name {
+    font-size: 0.875rem;
+  }
+  
+  .workout-exercise-fields {
+    gap: 6px;
+  }
+  
+  .workout-input-num {
+    padding: 8px 4px;
+    font-size: 0.75rem;
+  }
+  
+  .workout-field label {
+    font-size: 0.5625rem;
+  }
+  
+  .workout-field-unit {
+    font-size: 0.5rem;
+    bottom: 8px;
+    right: 5px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .workout-sheet-title {
+    font-size: 1.0625rem;
+  }
+  
+  .workout-exercise-fields {
+    gap: 10px;
+  }
+  
+  .workout-input {
+    padding: 12px 14px;
+  }
+  
+  .workout-input-num {
+    padding: 10px 8px;
+    font-size: 0.875rem;
+  }
+}

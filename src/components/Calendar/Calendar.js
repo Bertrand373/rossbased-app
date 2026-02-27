@@ -91,11 +91,39 @@ const MoonIcon = ({ phase, size = 11, emoji }) => {
   );
 };
 
+// Tiny dumbbell SVG for calendar day cells
+const DumbbellGlyph = ({ size = 9 }) => (
+  <svg width={size} height={Math.round(size * 0.6)} viewBox="0 0 18 10" fill="currentColor" style={{ display: 'block' }}>
+    <rect x="0" y="1.5" width="4" height="7" rx="1.5" />
+    <rect x="4" y="3.5" width="10" height="3" rx="1" />
+    <rect x="14" y="1.5" width="4" height="7" rx="1.5" />
+  </svg>
+);
+
+// Dumbbell icon for day info sheet header
+const DumbbellIcon = ({ size = 16, filled = false }) => (
+  <svg width={size} height={Math.round(size * 0.65)} viewBox="0 0 24 14" style={{ display: 'block' }}>
+    {filled ? (
+      <g fill="currentColor">
+        <rect x="0" y="2" width="5" height="10" rx="2" />
+        <rect x="5" y="5" width="14" height="4" rx="1.5" />
+        <rect x="19" y="2" width="5" height="10" rx="2" />
+      </g>
+    ) : (
+      <g fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="0.75" y="2.75" width="3.5" height="8.5" rx="1.25" />
+        <rect x="5.75" y="5.75" width="12.5" height="2.5" rx="0.75" />
+        <rect x="19.75" y="2.75" width="3.5" height="8.5" rx="1.25" />
+      </g>
+    )}
+  </svg>
+);
+
 const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [dayInfoModal, setDayInfoModal] = useState(false);
-  const [sheetView, setSheetView] = useState('info'); // 'info' | 'edit'
+  const [sheetView, setSheetView] = useState('info'); // 'info' | 'edit' | 'workout'
   const [viewMode, setViewMode] = useState('month');
   const [viewFading, setViewFading] = useState(false);
   const [selectedTrigger, setSelectedTrigger] = useState('');
@@ -123,6 +151,12 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const swipeStartX = useRef(0);
   const swipeStartY = useRef(0);
   const swipeLocked = useRef(false);
+
+  // Workout log states
+  const [workoutExercises, setWorkoutExercises] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(null); // index of active suggestion dropdown
+  const [swipedExerciseId, setSwipedExerciseId] = useState(null); // exercise showing delete
+  const exerciseTouchStartX = useRef(0);
 
   // Mark initial entrance animation as complete
   useEffect(() => {
@@ -199,6 +233,9 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         setShowTriggerSelection(false);
         setEditingExistingTrigger(false);
         setSelectedTrigger('');
+        setWorkoutExercises([]);
+        setShowSuggestions(null);
+        setSwipedExerciseId(null);
       }, 250);
     } else if (calSheetPanelRef.current) {
       calSheetPanelRef.current.style.transition = 'transform 250ms ease-out';
@@ -328,6 +365,43 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     return { hasBenefits, hasJournal };
   };
 
+  // Check if a day has workout data
+  const getDayWorkout = (day) => {
+    if (!userData.workoutLog || userData.workoutLog.length === 0) return null;
+    const dayStr = format(day, 'yyyy-MM-dd');
+    return userData.workoutLog.find(w => 
+      format(new Date(w.date), 'yyyy-MM-dd') === dayStr
+    ) || null;
+  };
+
+  // Get exercise name suggestions from history
+  const getExerciseSuggestions = (input) => {
+    if (!userData.workoutLog || !input || input.length < 2) return [];
+    const allNames = userData.workoutLog.flatMap(w => 
+      (w.exercises || []).map(e => e.name)
+    ).filter(Boolean);
+    
+    // Count frequency
+    const freq = {};
+    allNames.forEach(name => {
+      const lower = name.toLowerCase();
+      if (!freq[lower]) freq[lower] = { count: 0, display: name };
+      freq[lower].count++;
+    });
+    
+    // Filter by input, sort by frequency, exclude exact matches
+    const inputLower = input.toLowerCase();
+    return Object.values(freq)
+      .filter(f => f.display.toLowerCase().includes(inputLower) && f.display.toLowerCase() !== inputLower)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5)
+      .map(f => f.display);
+  };
+
+  // Check if user has enough workout history for suggestions (3+ lifetime entries)
+  const hasEnoughWorkoutHistory = (userData.workoutLog || [])
+    .reduce((total, w) => total + (w.exercises || []).length, 0) >= 3;
+
   const getDayCount = (day) => {
     const dayStatus = getDayStatus(day);
     if (!dayStatus || (dayStatus.type !== 'current-streak' && dayStatus.type !== 'former-streak')) {
@@ -403,6 +477,9 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setShowTriggerSelection(false);
     setEditingExistingTrigger(false);
     setSelectedTrigger('');
+    setWorkoutExercises([]);
+    setShowSuggestions(null);
+    setSwipedExerciseId(null);
   };
 
   const showEditFromInfo = () => {
@@ -419,6 +496,143 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     }, 300);
   };
 
+  // Open workout sheet from day info — staggered transition
+  const openWorkoutSheet = () => {
+    const existing = getDayWorkout(selectedDate);
+    if (existing && existing.exercises && existing.exercises.length > 0) {
+      setWorkoutExercises(existing.exercises.map((e, i) => ({ ...e, id: `ex-${i}-${Date.now()}` })));
+    } else {
+      setWorkoutExercises([]);
+    }
+    setShowSuggestions(null);
+    setSwipedExerciseId(null);
+    
+    setCalSheetReady(false);
+    setTimeout(() => {
+      setSheetView('workout');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setCalSheetReady(true));
+      });
+    }, 300);
+  };
+
+  // Workout exercise CRUD
+  const addExerciseRow = () => {
+    setWorkoutExercises(prev => [...prev, {
+      id: `ex-${Date.now()}`,
+      name: '',
+      weight: '',
+      sets: '',
+      reps: '',
+      restMinutes: ''
+    }]);
+    setSwipedExerciseId(null);
+  };
+
+  const updateExercise = (id, field, value) => {
+    setWorkoutExercises(prev => prev.map(e => 
+      e.id === id ? { ...e, [field]: value } : e
+    ));
+  };
+
+  const deleteExercise = (id) => {
+    setWorkoutExercises(prev => prev.filter(e => e.id !== id));
+    setSwipedExerciseId(null);
+  };
+
+  // Swipe-to-reveal delete on exercise rows
+  const handleExerciseTouchStart = (e, id) => {
+    exerciseTouchStartX.current = e.touches[0].clientX;
+    setSwipedExerciseId(null); // Reset any previously swiped
+  };
+
+  const handleExerciseTouchEnd = (e, id) => {
+    const deltaX = e.changedTouches[0].clientX - exerciseTouchStartX.current;
+    if (deltaX < -60) {
+      setSwipedExerciseId(id); // Reveal delete button
+    }
+  };
+
+  // Save workout and transition back to day info
+  const saveWorkout = () => {
+    if (!selectedDate || !updateUserData) return;
+    
+    // Filter out empty rows
+    const validExercises = workoutExercises
+      .filter(e => e.name && e.name.trim())
+      .map(e => ({
+        name: e.name.trim(),
+        weight: Number(e.weight) || 0,
+        sets: Number(e.sets) || 0,
+        reps: Number(e.reps) || 0,
+        restMinutes: Number(e.restMinutes) || 0
+      }));
+    
+    const dayStr = format(selectedDate, 'yyyy-MM-dd');
+    
+    if (validExercises.length === 0) {
+      // Remove workout entry for this day
+      const updatedLog = (userData.workoutLog || []).filter(w => 
+        format(new Date(w.date), 'yyyy-MM-dd') !== dayStr
+      );
+      updateUserData({ workoutLog: updatedLog });
+      toast.success('Workout cleared');
+    } else {
+      // Calculate spermatogenesis cycle data
+      const dayCount = getDayCount(selectedDate);
+      const streakDay = dayCount?.dayNumber || 0;
+      const spermaDay = streakDay > 0 ? ((streakDay - 1) % 72) + 1 : 0;
+      const spermaCycle = streakDay > 0 ? Math.floor((streakDay - 1) / 72) + 1 : 0;
+      
+      const workoutEntry = {
+        date: selectedDate,
+        streakDay,
+        spermaDay,
+        spermaCycle,
+        exercises: validExercises
+      };
+      
+      const existingLog = [...(userData.workoutLog || [])];
+      const existingIdx = existingLog.findIndex(w => 
+        format(new Date(w.date), 'yyyy-MM-dd') === dayStr
+      );
+      
+      if (existingIdx !== -1) {
+        existingLog[existingIdx] = workoutEntry;
+      } else {
+        existingLog.push(workoutEntry);
+      }
+      
+      updateUserData({ workoutLog: existingLog });
+      toast.success('Workout saved');
+    }
+    
+    // Transition back to day info
+    setCalSheetReady(false);
+    setTimeout(() => {
+      setShowSuggestions(null);
+      setSwipedExerciseId(null);
+      setSheetView('info');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setCalSheetReady(true));
+      });
+    }, 300);
+  };
+
+  // Back from workout to day info (without saving)
+  const backFromWorkout = () => {
+    setCalSheetReady(false);
+    setTimeout(() => {
+      setShowSuggestions(null);
+      setSwipedExerciseId(null);
+      setWorkoutExercises([]);
+      setSheetView('info');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setCalSheetReady(true));
+      });
+    }, 300);
+  };
+
   const closeEditModal = () => {
     closeCalSheet(() => {
       setDayInfoModal(false);
@@ -429,6 +643,9 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       setSelectedTrigger('');
       setIsEditingNote(false);
       setNoteText('');
+      setWorkoutExercises([]);
+      setShowSuggestions(null);
+      setSwipedExerciseId(null);
     });
   };
 
@@ -1035,6 +1252,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         const wetDream = hasWetDream(currentDay);
         const lunar = getLunarData(currentDay);
         const isMoonDay = lunar.isSignificant && isCurrentMonth;
+        const hasWorkout = !!getDayWorkout(currentDay) && isCurrentMonth;
         
         const cellClasses = [
           'day-cell',
@@ -1051,6 +1269,12 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
             {/* Data indicator - single dash if day has any tracked data */}
             {(dayTracking.hasBenefits || dayTracking.hasJournal) && (
               <span className="day-data-dash"></span>
+            )}
+            {/* Workout indicator - tiny dumbbell glyph */}
+            {hasWorkout && (
+              <span className="day-workout-glyph">
+                <DumbbellGlyph size={9} />
+              </span>
             )}
             {/* Moon phase indicator - only on significant phases */}
             {isMoonDay && (
@@ -1085,6 +1309,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       const isToday = isSameDay(day, new Date());
       const lunar = getLunarData(day);
       const isMoonDay = lunar.isSignificant;
+      const hasWorkout = !!getDayWorkout(day);
       
       const cellClasses = [
         'week-day-cell',
@@ -1132,6 +1357,11 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
             <div className="week-data-indicators">
               {(dayTracking.hasBenefits || dayTracking.hasJournal) && (
                 <span className="week-data-dash"></span>
+              )}
+              {hasWorkout && (
+                <span className="week-workout-glyph">
+                  <DumbbellGlyph size={10} />
+                </span>
               )}
             </div>
           </div>
@@ -1275,6 +1505,13 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                         <div className="calendar-status-info">
                           {renderStatusBadge()}
                         </div>
+                        {/* Workout dumbbell icon */}
+                        {!isFuture && (
+                          <button className="calendar-workout-btn" onClick={openWorkoutSheet}>
+                            <DumbbellIcon size={16} filled={!!getDayWorkout(selectedDate)} />
+                            <span>{getDayWorkout(selectedDate) ? 'View Workout' : 'Log Workout'}</span>
+                          </button>
+                        )}
                       </div>
 
                       {/* SCROLLABLE CONTENT */}
@@ -1333,6 +1570,158 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                         Back
                       </button>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {/* ---- WORKOUT VIEW ---- */}
+              {sheetView === 'workout' && (
+                <div className="calendar-modal workout-sheet cal-view-animate" key="workout-view">
+                  <div className="workout-sheet-header">
+                    <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
+                    <div className="workout-sheet-title">
+                      <DumbbellIcon size={18} filled={true} />
+                      <span>Workout Log</span>
+                    </div>
+                  </div>
+
+                  <div className="workout-sheet-content">
+                    {workoutExercises.length === 0 ? (
+                      /* Empty state */
+                      <div className="workout-empty" onClick={addExerciseRow}>
+                        <span className="workout-empty-plus">+</span>
+                        <span>Add Exercise</span>
+                      </div>
+                    ) : (
+                      /* Exercise rows */
+                      <div className="workout-exercises">
+                        {workoutExercises.map((exercise, index) => (
+                          <div 
+                            key={exercise.id} 
+                            className={`workout-exercise-row${swipedExerciseId === exercise.id ? ' swiped' : ''}`}
+                            onTouchStart={(e) => handleExerciseTouchStart(e, exercise.id)}
+                            onTouchEnd={(e) => handleExerciseTouchEnd(e, exercise.id)}
+                          >
+                            <div className="workout-exercise-main">
+                              <div className="workout-exercise-name-wrap">
+                                <input
+                                  type="text"
+                                  className="workout-input workout-input-name"
+                                  placeholder="Exercise name"
+                                  value={exercise.name}
+                                  onChange={(e) => {
+                                    updateExercise(exercise.id, 'name', e.target.value);
+                                    if (hasEnoughWorkoutHistory && e.target.value.length >= 2) {
+                                      setShowSuggestions(index);
+                                    } else {
+                                      setShowSuggestions(null);
+                                    }
+                                  }}
+                                  onFocus={() => {
+                                    if (hasEnoughWorkoutHistory && exercise.name.length >= 2) {
+                                      setShowSuggestions(index);
+                                    }
+                                  }}
+                                  onBlur={() => setTimeout(() => setShowSuggestions(null), 200)}
+                                />
+                                {/* Suggestions dropdown */}
+                                {showSuggestions === index && (() => {
+                                  const suggestions = getExerciseSuggestions(exercise.name);
+                                  if (suggestions.length === 0) return null;
+                                  return (
+                                    <div className="workout-suggestions">
+                                      {suggestions.map((s, si) => (
+                                        <button 
+                                          key={si} 
+                                          className="workout-suggestion-item"
+                                          onMouseDown={(e) => {
+                                            e.preventDefault();
+                                            updateExercise(exercise.id, 'name', s);
+                                            setShowSuggestions(null);
+                                          }}
+                                        >
+                                          {s}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  );
+                                })()}
+                              </div>
+                              <div className="workout-exercise-fields">
+                                <div className="workout-field">
+                                  <label>Weight</label>
+                                  <input
+                                    type="number"
+                                    inputMode="decimal"
+                                    className="workout-input workout-input-num"
+                                    placeholder="0"
+                                    value={exercise.weight}
+                                    onChange={(e) => updateExercise(exercise.id, 'weight', e.target.value)}
+                                  />
+                                  <span className="workout-field-unit">lbs</span>
+                                </div>
+                                <div className="workout-field">
+                                  <label>Sets</label>
+                                  <input
+                                    type="number"
+                                    inputMode="numeric"
+                                    className="workout-input workout-input-num"
+                                    placeholder="0"
+                                    value={exercise.sets}
+                                    onChange={(e) => updateExercise(exercise.id, 'sets', e.target.value)}
+                                  />
+                                </div>
+                                <div className="workout-field">
+                                  <label>Reps</label>
+                                  <input
+                                    type="number"
+                                    inputMode="numeric"
+                                    className="workout-input workout-input-num"
+                                    placeholder="0"
+                                    value={exercise.reps}
+                                    onChange={(e) => updateExercise(exercise.id, 'reps', e.target.value)}
+                                  />
+                                </div>
+                                <div className="workout-field">
+                                  <label>Rest</label>
+                                  <input
+                                    type="number"
+                                    inputMode="decimal"
+                                    className="workout-input workout-input-num"
+                                    placeholder="0"
+                                    value={exercise.restMinutes}
+                                    onChange={(e) => updateExercise(exercise.id, 'restMinutes', e.target.value)}
+                                  />
+                                  <span className="workout-field-unit">min</span>
+                                </div>
+                              </div>
+                            </div>
+                            {/* Delete button - revealed on swipe left */}
+                            <button 
+                              className="workout-exercise-delete"
+                              onClick={() => deleteExercise(exercise.id)}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                        {/* Add another exercise */}
+                        <button className="workout-add-btn" onClick={addExerciseRow}>
+                          <span>+</span> Add Exercise
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="workout-sheet-footer">
+                    {workoutExercises.length > 0 && (
+                      <button className="calendar-btn-primary" onClick={saveWorkout}>
+                        Done
+                      </button>
+                    )}
+                    <button className="calendar-btn-ghost" onClick={backFromWorkout}>
+                      {workoutExercises.length > 0 ? 'Cancel' : 'Back'}
+                    </button>
                   </div>
                 </div>
               )}

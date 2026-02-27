@@ -212,6 +212,21 @@ const userSchema = new mongoose.Schema({
     avgScore: Number
   }],
   
+  // Workout Log — exercise data for spermatogenesis/lifting correlation
+  workoutLog: [{
+    date: Date,
+    streakDay: Number,
+    spermaDay: Number,        // position in 72-day cycle (for correlation)
+    spermaCycle: Number,       // which cycle number (for cross-cycle comparison)
+    exercises: [{
+      name: String,            // freeform, e.g. "Bench Press"
+      weight: Number,          // lbs
+      sets: Number,
+      reps: Number,
+      restMinutes: Number      // e.g. 3.5 for 3min 30sec rest
+    }]
+  }],
+  
   // Mind Program (Based30) — 30-night subliminal audio progress
   mindProgram: {
     nightsCompleted: { type: Number, default: 0 },
