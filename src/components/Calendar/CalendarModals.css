@@ -92,13 +92,6 @@
   padding-bottom: 8px;
 }
 
-.calendar-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
 .calendar-modal-header h3 {
   margin: 0 0 16px 0;
   font-size: 0.6875rem;
@@ -1204,38 +1197,32 @@
    WORKOUT BUTTON — Day Info Header
    ============================================================================= */
 
-.calendar-workout-icon {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
+.calendar-workout-btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: var(--surface-raised);
-  border: none;
-  border-radius: 10px;
-  color: var(--accent-gold-text);
-  cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease, transform 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-  padding: 0;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
   font-family: inherit;
-  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.calendar-workout-icon.has-workout {
-  color: var(--accent-gold);
+.calendar-workout-btn:hover {
+  border-color: var(--border);
+  color: var(--text-secondary);
 }
 
-.calendar-workout-icon:hover {
-  background: var(--surface-overlay);
-}
-
-.calendar-workout-icon:active {
-  transform: translateY(-50%) scale(0.93);
+.calendar-workout-btn:active {
+  transform: scale(0.97);
 }
 
 /* =============================================================================
@@ -1534,6 +1521,24 @@
   flex-direction: row;
   gap: 10px;
   padding-top: 16px;
+}
+
+.workout-delete-btn {
+  width: 100%;
+  padding: 12px 0 4px;
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
+  text-align: center;
+}
+
+.workout-delete-btn:active {
+  color: #ff4444;
 }
 
 /* =============================================================================

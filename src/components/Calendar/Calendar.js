@@ -686,6 +686,18 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     }, 300);
   };
 
+  // Delete entire workout for selected day
+  const deleteWorkout = () => {
+    if (!selectedDate || !updateUserData) return;
+    const dayStr = format(selectedDate, 'yyyy-MM-dd');
+    const updatedLog = (userData.workoutLog || []).filter(w => 
+      format(new Date(w.date), 'yyyy-MM-dd') !== dayStr
+    );
+    updateUserData({ workoutLog: updatedLog });
+    toast.success('Workout deleted');
+    backFromWorkout();
+  };
+
   const closeEditModal = () => {
     closeCalSheet(() => {
       setDayInfoModal(false);
@@ -1781,6 +1793,11 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                       {workoutExercises.length > 0 ? 'Cancel' : 'Back'}
                     </button>
                   </div>
+                  {getDayWorkout(selectedDate) && (
+                    <button className="workout-delete-btn" onClick={deleteWorkout}>
+                      Delete Workout
+                    </button>
+                  )}
                 </div>
               )}
 
