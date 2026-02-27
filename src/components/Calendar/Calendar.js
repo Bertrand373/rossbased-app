@@ -503,33 +503,48 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   };
 
   // Open workout sheet from day info — staggered transition
-  // Smart template — learns your routine per day of week
-  // After 1 workout on the same weekday, auto-fills exercises from most recent
+  // Smart template — learns your routine
+  // Priority: 1) same weekday match  2) most recent workout  3) empty
   const getTemplateForDay = (date) => {
     const workoutLog = userData.workoutLog || [];
+    if (workoutLog.length === 0) return null;
+    
     const dayOfWeek = new Date(date).getDay();
     const dateStr = format(new Date(date), 'yyyy-MM-dd');
     
-    // Find all workouts on same day of week (excluding current day)
+    const toTemplate = (workout) => {
+      if (!workout?.exercises?.length) return null;
+      return workout.exercises.map((e, i) => ({
+        id: `ex-${i}-${Date.now()}`,
+        name: e.name || '',
+        weight: e.weight || '',
+        sets: e.sets || '',
+        reps: e.reps || '',
+        restMinutes: e.restMinutes || ''
+      }));
+    };
+    
+    // 1) Same day of week — best match for fixed-schedule users
     const sameDayWorkouts = workoutLog
       .filter(w => new Date(w.date).getDay() === dayOfWeek && format(new Date(w.date), 'yyyy-MM-dd') !== dateStr)
       .sort((a, b) => new Date(b.date) - new Date(a.date));
     
-    // Need 1+ entry on this weekday to establish pattern
-    if (sameDayWorkouts.length < 1) return null;
+    if (sameDayWorkouts.length > 0) {
+      const t = toTemplate(sameDayWorkouts[0]);
+      if (t) return t;
+    }
     
-    const mostRecent = sameDayWorkouts[0];
-    if (!mostRecent.exercises || mostRecent.exercises.length === 0) return null;
+    // 2) Fallback — most recent workout regardless of day
+    //    Covers 48hr rotators, feel-based, random schedule users
+    const allSorted = workoutLog
+      .filter(w => format(new Date(w.date), 'yyyy-MM-dd') !== dateStr)
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
     
-    // Return template with names + last values (user adjusts as needed)
-    return mostRecent.exercises.map((e, i) => ({
-      id: `ex-${i}-${Date.now()}`,
-      name: e.name || '',
-      weight: e.weight || '',
-      sets: e.sets || '',
-      reps: e.reps || '',
-      restMinutes: e.restMinutes || ''
-    }));
+    if (allSorted.length > 0) {
+      return toTemplate(allSorted[0]);
+    }
+    
+    return null;
   };
 
   const openWorkoutSheet = () => {
@@ -1541,9 +1556,13 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                       <div className="calendar-modal-header">
                         <div className="calendar-header-row">
                           <h3>{format(selectedDate, 'EEEE, MMMM d')}</h3>
-                          {/* Workout dumbbell — inline with date */}
+                          {/* Workout dumbbell — right edge, inline with date, premium only */}
                           {!isFuture && (
-                            <button className="calendar-workout-icon" onClick={openWorkoutSheet} aria-label={getDayWorkout(selectedDate) ? 'View Workout' : 'Log Workout'}>
+                            <button 
+                              className={`calendar-workout-icon${!!getDayWorkout(selectedDate) ? ' has-workout' : ''}`}
+                              onClick={isPremium ? openWorkoutSheet : () => openPlanModal && openPlanModal()} 
+                              aria-label={!isPremium ? 'Upgrade to log workouts' : getDayWorkout(selectedDate) ? 'View Workout' : 'Log Workout'}
+                            >
                               <DumbbellIcon size={16} filled={!!getDayWorkout(selectedDate)} />
                             </button>
                           )}

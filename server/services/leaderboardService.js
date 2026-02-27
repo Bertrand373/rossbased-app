@@ -95,6 +95,7 @@ function generateLeaderboardHTML(users) {
     const truncatedName = displayName.length > 16 ? displayName.substring(0, 15) + '…' : displayName;
     const avatarUrl = getDiscordAvatarUrl(user.discordId, user.discordAvatar, 64);
     const days = user.currentStreak || 0;
+    const hasWorkouts = user.workoutLog && user.workoutLog.length > 0;
     
     // All ranks same subtle color - clean and uniform
     return `
@@ -102,7 +103,7 @@ function generateLeaderboardHTML(users) {
         <span style="width: 28px; font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.4);">${rank}</span>
         <img src="${avatarUrl}" style="width: 36px; height: 36px; border-radius: 50%; margin-right: 12px; object-fit: cover;" />
         <span style="flex: 1; font-size: 14px; color: #ffffff; font-weight: 500;">${truncatedName}</span>
-        <span style="font-size: 14px; color: rgba(255,255,255,0.7); font-weight: 500; font-variant-numeric: tabular-nums;">${days}d</span>
+        <span style="font-size: 14px; color: rgba(255,255,255,0.7); font-weight: 500; font-variant-numeric: tabular-nums;">${hasWorkouts ? '🏋️ ' : ''}${days}d</span>
       </div>
     `;
   }).join('');
@@ -199,7 +200,7 @@ async function getLeaderboardUsers() {
       discordUsername: { $exists: true, $ne: '', $ne: null },
       startDate: { $exists: true, $ne: null }
     })
-    .select('discordUsername discordDisplayName discordId discordAvatar startDate currentStreak longestStreak mentorEligible verifiedMentor')
+    .select('discordUsername discordDisplayName discordId discordAvatar startDate currentStreak longestStreak mentorEligible verifiedMentor workoutLog')
     .lean();
     
     // Calculate live streak for each user and sort
@@ -267,10 +268,12 @@ function formatTextLeaderboard(users) {
     const displayName = user.discordDisplayName || user.discordUsername || 'Unknown';
     const truncatedName = displayName.length > 14 ? displayName.substring(0, 13) + '…' : displayName;
     const days = user.currentStreak || 0;
+    const hasWorkouts = user.workoutLog && user.workoutLog.length > 0;
     const paddedRank = rank.toString().padStart(2, ' ');
     const paddedName = truncatedName.padEnd(14, ' ');
     const paddedDays = days.toString().padStart(4, ' ');
-    leaderboardText += `${paddedRank}  ${paddedName}  ${paddedDays}d\n`;
+    const gym = hasWorkouts ? ' 🏋️' : '';
+    leaderboardText += `${paddedRank}  ${paddedName}  ${paddedDays}d${gym}\n`;
   });
   
   return {
@@ -479,10 +482,12 @@ async function postLeaderboardToDiscord() {
  */
 function formatMilestoneEmbed(user, days) {
   const displayName = user.discordDisplayName || user.discordUsername;
+  const workoutCount = (user.workoutLog && user.workoutLog.length) || 0;
+  const workoutSuffix = workoutCount > 0 ? ` 🏋️ ${workoutCount} workouts logged.` : '';
   return {
     embeds: [{
       color: 0x2f3136,
-      description: `**${displayName}** just crossed **${days} days**.`
+      description: `**${displayName}** just crossed **${days} days**.${workoutSuffix}`
     }]
   };
 }

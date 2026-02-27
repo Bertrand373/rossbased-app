@@ -957,6 +957,81 @@ function buildOracleContext(user, timezone) {
     }
   }
 
+  // --- WORKOUT LOG ---
+  if (user.workoutLog && user.workoutLog.length > 0) {
+    const workouts = [...user.workoutLog].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const totalWorkouts = workouts.length;
+    
+    // Training frequency (last 30 days)
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const recentWorkouts = workouts.filter(w => new Date(w.date) > thirtyDaysAgo);
+    const weeksInWindow = Math.max(1, Math.min(4, Math.ceil((Date.now() - thirtyDaysAgo) / (7 * 24 * 60 * 60 * 1000))));
+    const freqPerWeek = recentWorkouts.length > 0 ? Math.round((recentWorkouts.length / weeksInWindow) * 10) / 10 : 0;
+    
+    lines.push(`Total workouts logged: ${totalWorkouts}. Training frequency: ${freqPerWeek} days/week (last 30 days).`);
+    
+    // Last workout
+    const lastWorkout = workouts[0];
+    const daysSinceWorkout = Math.floor((new Date() - new Date(lastWorkout.date)) / (1000 * 60 * 60 * 24));
+    const exerciseNames = (lastWorkout.exercises || []).map(e => e.name).filter(Boolean);
+    if (exerciseNames.length > 0) {
+      lines.push(`Last workout: ${daysSinceWorkout === 0 ? 'today' : daysSinceWorkout + ' day(s) ago'}. Exercises: ${exerciseNames.join(', ')}.`);
+    } else {
+      lines.push(`Last workout: ${daysSinceWorkout === 0 ? 'today' : daysSinceWorkout + ' day(s) ago'}.`);
+    }
+    
+    // Training gap detection
+    if (daysSinceWorkout >= 7 && freqPerWeek >= 2) {
+      lines.push(`Training gap detected: ${daysSinceWorkout} days since last workout (normally trains ${freqPerWeek}x/week). May be relevant to mood/energy changes.`);
+    }
+    
+    // Weight progression on key exercises (last 12 sessions)
+    if (totalWorkouts >= 4) {
+      const exerciseHistory = {};
+      workouts.slice(0, 12).forEach(w => {
+        (w.exercises || []).forEach(e => {
+          if (e.name && e.weight) {
+            if (!exerciseHistory[e.name]) exerciseHistory[e.name] = [];
+            exerciseHistory[e.name].push({ weight: Number(e.weight), date: w.date });
+          }
+        });
+      });
+      
+      const progressions = [];
+      Object.entries(exerciseHistory).forEach(([name, entries]) => {
+        if (entries.length >= 3) {
+          const recent = entries.slice(0, 2);
+          const older = entries.slice(-2);
+          const recentAvg = recent.reduce((s, e) => s + e.weight, 0) / recent.length;
+          const olderAvg = older.reduce((s, e) => s + e.weight, 0) / older.length;
+          if (olderAvg > 0) {
+            const pctChange = Math.round(((recentAvg - olderAvg) / olderAvg) * 100);
+            if (Math.abs(pctChange) >= 5) {
+              progressions.push(`${name}: ${pctChange > 0 ? '+' : ''}${pctChange}%`);
+            }
+          }
+        }
+      });
+      
+      if (progressions.length > 0) {
+        lines.push(`Strength trends: ${progressions.slice(0, 4).join(', ')}.`);
+      }
+    }
+    
+    // Training day pattern
+    if (recentWorkouts.length >= 4) {
+      const dayCounts = [0, 0, 0, 0, 0, 0, 0]; // Sun-Sat
+      recentWorkouts.forEach(w => dayCounts[new Date(w.date).getDay()]++);
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const trainingDays = dayCounts
+        .map((count, i) => count >= 2 ? dayNames[i] : null)
+        .filter(Boolean);
+      if (trainingDays.length >= 2) {
+        lines.push(`Typical training days: ${trainingDays.join(', ')}.`);
+      }
+    }
+  }
+
   // --- USER GOAL ---
   if (user.goal && user.goal.targetDays) {
     const daysRemaining = user.goal.targetDays - streak;
