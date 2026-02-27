@@ -14,14 +14,14 @@
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: color 150ms ease;
-  animation: fadeInUp 500ms ease forwards;
+  animation: almanacGhostIn 500ms ease 25ms forwards;
   opacity: 0;
   letter-spacing: 0.04em;
 }
 
-@keyframes almanacFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+@keyframes almanacGhostIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .almanac-ghost:active { color: var(--text-muted); }
