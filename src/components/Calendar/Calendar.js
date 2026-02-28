@@ -1318,6 +1318,8 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         const lunar = getLunarData(currentDay);
         const isMoonDay = lunar.isSignificant && isCurrentMonth;
         const hasWorkout = !!getDayWorkout(currentDay) && isCurrentMonth;
+        const isFuture = isCurrentMonth && isFutureDay(currentDay);
+        const isTracked = isCurrentMonth && (dayTracking.hasBenefits || dayTracking.hasJournal);
         
         const cellClasses = [
           'day-cell',
@@ -1325,15 +1327,17 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           isToday ? 'today' : '',
           dayStatus?.type || '',
           wetDream ? 'wet-dream' : '',
-          isMoonDay ? `moon-day moon-${lunar.phase}` : ''
+          isMoonDay ? `moon-day moon-${lunar.phase}` : '',
+          isTracked && !dayStatus && !wetDream ? 'tracked' : '',
+          isFuture ? 'future' : ''
         ].filter(Boolean).join(' ');
 
         week.push(
           <div key={i} className={cellClasses} onClick={() => openDayInfo(currentDay)}>
             <span className="day-number">{format(currentDay, 'd')}</span>
-            {/* Data indicator - single dash if day has any tracked data */}
-            {(dayTracking.hasBenefits || dayTracking.hasJournal) && (
-              <span className="day-data-dash"></span>
+            {/* Journal dot - small circle below number */}
+            {dayTracking.hasJournal && isCurrentMonth && (
+              <span className="day-journal-dot"></span>
             )}
             {/* Workout indicator - tiny dumbbell glyph */}
             {hasWorkout && (
