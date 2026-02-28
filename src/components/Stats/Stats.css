@@ -53,6 +53,13 @@
   position: fixed;
 }
 
+/* Timeline container — escapes 480px cap, stats-page provides horizontal padding */
+.stats-page > .et-container {
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
 @media (min-width: 1025px) {
   .stats-page { padding: 56px 24px 80px; }
   .stats-page > *:not(.sheet-backdrop) { max-width: 700px; }
