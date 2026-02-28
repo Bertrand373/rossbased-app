@@ -299,6 +299,11 @@
   opacity: 0.6;
 }
 
+/* Week view — hide moon bar, lunar data visible on individual day cells */
+.calendar-container:has(.week-view-grid) .calendar-moon-bar {
+  display: none;
+}
+
 .moon-bar-emoji {
   line-height: 1;
   display: flex;
@@ -1294,13 +1299,19 @@
    ============================================================================= */
 
 @media (max-width: 1024px) {
-  /* Browser default: tighter bottom padding (no safe-area in browser) */
+  /* Browser default: tighter month bottom padding (no safe-area in browser) */
   .calendar-container {
-    padding-bottom: 70px;
+    padding-bottom: 55px;
   }
 
+  /* Week view: no moon bar, just clear the nav */
+  .calendar-container:has(.week-view-grid) {
+    padding-bottom: 16px;
+  }
+
+  /* Week view: just clear the nav bar (no moon bar to dodge) */
   .week-view-grid {
-    padding-bottom: 52px;
+    padding-bottom: 16px;
   }
 }
 
@@ -1308,6 +1319,11 @@
 @media (display-mode: standalone) {
   .calendar-container {
     padding-bottom: 110px;
+  }
+
+  /* Week view: no moon bar, just clear the nav */
+  .calendar-container:has(.week-view-grid) {
+    padding-bottom: 20px;
   }
 
   .week-view-grid {
@@ -1318,6 +1334,10 @@
 @media (display-mode: standalone) and (max-width: 480px) {
   .calendar-container {
     padding-bottom: 110px;
+  }
+
+  .calendar-container:has(.week-view-grid) {
+    padding-bottom: 20px;
   }
 }
 
