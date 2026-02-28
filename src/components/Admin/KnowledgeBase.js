@@ -37,6 +37,9 @@ const KnowledgeBase = () => {
   const [urlForm, setUrlForm] = useState({ url: '', name: '', category: 'general' });
   const [fileForm, setFileForm] = useState({ file: null, category: 'general' });
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [docSource, setDocSource] = useState('all');         // all, uploaded, oracle, discord
+  const [filterCategory, setFilterCategory] = useState('all'); // all, or any category value
+  const [filterStatus, setFilterStatus] = useState('all');    // all, enabled, disabled
 
   const docsRef = useRef(null);
 
@@ -376,43 +379,129 @@ const KnowledgeBase = () => {
           )}
         </div>
 
-        {(!stats?.documents || stats.documents.length === 0) ? (
+        {stats?.documents?.length > 0 && (() => {
+          // Classify docs by source
+          const isOracle = d => d.author && d.author.toLowerCase().includes('oracle');
+          const isDiscord = d => d.type === 'channel';
+          const isUploaded = d => !isOracle(d) && !isDiscord(d);
+
+          const counts = {
+            all: stats.documents.length,
+            uploaded: stats.documents.filter(isUploaded).length,
+            oracle: stats.documents.filter(isOracle).length,
+            discord: stats.documents.filter(isDiscord).length,
+          };
+
+          // Source filter
+          let sourceFiltered = stats.documents;
+          if (docSource === 'uploaded') sourceFiltered = stats.documents.filter(isUploaded);
+          else if (docSource === 'oracle') sourceFiltered = stats.documents.filter(isOracle);
+          else if (docSource === 'discord') sourceFiltered = stats.documents.filter(isDiscord);
+
+          // Category filter
+          const cats = [...new Set(sourceFiltered.map(d => d.category))].sort();
+          const catLabelMap = Object.fromEntries(CATEGORIES.map(c => [c.value, c.label]));
+
+          let filtered = sourceFiltered;
+          if (filterCategory !== 'all') filtered = filtered.filter(d => d.category === filterCategory);
+          if (filterStatus === 'enabled') filtered = filtered.filter(d => d.enabled);
+          if (filterStatus === 'disabled') filtered = filtered.filter(d => !d.enabled);
+
+          const SOURCE_TABS = [
+            { key: 'all', label: 'All' },
+            { key: 'uploaded', label: 'Uploaded' },
+            { key: 'oracle', label: 'Oracle' },
+            { key: 'discord', label: 'Discord' },
+          ].filter(t => counts[t.key] > 0 || t.key === 'all');
+
+          return (
+            <>
+              {/* Source tabs */}
+              <div className="kb-source-tabs">
+                {SOURCE_TABS.map(t => (
+                  <button key={t.key}
+                    className={`kb-source-tab ${docSource === t.key ? 'active' : ''}`}
+                    onClick={() => { setDocSource(t.key); setFilterCategory('all'); }}>
+                    {t.label}
+                    <span className="kb-source-tab-count">{counts[t.key]}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Category + Status pills */}
+              {cats.length > 1 && (
+                <div className="kb-filters">
+                  <div className="kb-filter-pills kb-filter-pills-scroll">
+                    <button className={`kb-pill ${filterCategory === 'all' ? 'active' : ''}`} onClick={() => setFilterCategory('all')}>All</button>
+                    {cats.map(c => (
+                      <button key={c} className={`kb-pill ${filterCategory === c ? 'active' : ''}`} onClick={() => setFilterCategory(c)}>
+                        {catLabelMap[c] || c}
+                      </button>
+                    ))}
+                    <span className="kb-filter-sep" />
+                    <button className={`kb-pill kb-pill-status ${filterStatus === 'all' ? '' : 'active'}`}
+                      onClick={() => setFilterStatus(s => s === 'all' ? 'enabled' : s === 'enabled' ? 'disabled' : 'all')}>
+                      {filterStatus === 'all' ? 'All status' : filterStatus === 'enabled' ? 'Enabled' : 'Disabled'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Result count when filtered */}
+              {(filterCategory !== 'all' || filterStatus !== 'all') && (
+                <div className="kb-filter-summary">
+                  {filtered.length} of {sourceFiltered.length}
+                  <button className="kb-clear-filters" onClick={() => { setFilterCategory('all'); setFilterStatus('all'); }}>Clear</button>
+                </div>
+              )}
+
+              {filtered.length === 0 ? (
+                <div className="kb-empty">
+                  <p>No documents match</p>
+                  <p className="kb-empty-hint">Try a different tab or clear filters</p>
+                </div>
+              ) : (
+                <div className="kb-doc-list">
+                  {filtered.map(doc => (
+                    <div key={doc._id} className={`kb-doc ${!doc.enabled ? 'kb-doc-disabled' : ''}`}>
+                      <div className="kb-doc-left">
+                        <div className={`kb-doc-dot ${doc.enabled ? 'on' : 'off'}`} />
+                        <div className="kb-doc-info">
+                          <span className="kb-doc-name">{doc.name}</span>
+                          <span className="kb-doc-meta">
+                            {doc.type} · {doc.chunks} chunks · ~{doc.totalTokens.toLocaleString()} tokens{doc.author ? ` · by ${doc.author}` : ''}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="kb-doc-actions">
+                        <select value={doc.category} onChange={e => handleCategoryChange(doc._id, e.target.value)} className="kb-cat-select">
+                          {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                        </select>
+                        <button className={`kb-toggle ${doc.enabled ? 'on' : 'off'}`}
+                          onClick={() => handleToggle(doc._id, doc.enabled)}>
+                          {doc.enabled ? 'ON' : 'OFF'}
+                        </button>
+                        {deleteConfirm === doc._id ? (
+                          <div className="kb-confirm-row">
+                            <button onClick={() => handleDelete(doc._id)} className="kb-confirm-yes">Delete</button>
+                            <button onClick={() => setDeleteConfirm(null)} className="kb-confirm-no">×</button>
+                          </div>
+                        ) : (
+                          <button className="kb-remove" onClick={() => setDeleteConfirm(doc._id)}>Remove</button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          );
+        })()}
+
+        {(!stats?.documents || stats.documents.length === 0) && (
           <div className="kb-empty">
             <p>No documents yet</p>
             <p className="kb-empty-hint">Upload your first document above to build the Oracle's knowledge</p>
-          </div>
-        ) : (
-          <div className="kb-doc-list">
-            {stats.documents.map(doc => (
-              <div key={doc._id} className={`kb-doc ${!doc.enabled ? 'kb-doc-disabled' : ''}`}>
-                <div className="kb-doc-left">
-                  <div className={`kb-doc-dot ${doc.enabled ? 'on' : 'off'}`} />
-                  <div className="kb-doc-info">
-                    <span className="kb-doc-name">{doc.name}</span>
-                    <span className="kb-doc-meta">
-                      {doc.type} · {doc.chunks} chunks · ~{doc.totalTokens.toLocaleString()} tokens{doc.author ? ` · by ${doc.author}` : ''}
-                    </span>
-                  </div>
-                </div>
-                <div className="kb-doc-actions">
-                  <select value={doc.category} onChange={e => handleCategoryChange(doc._id, e.target.value)} className="kb-cat-select">
-                    {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-                  </select>
-                  <button className={`kb-toggle ${doc.enabled ? 'on' : 'off'}`}
-                    onClick={() => handleToggle(doc._id, doc.enabled)}>
-                    {doc.enabled ? 'ON' : 'OFF'}
-                  </button>
-                  {deleteConfirm === doc._id ? (
-                    <div className="kb-confirm-row">
-                      <button onClick={() => handleDelete(doc._id)} className="kb-confirm-yes">Delete</button>
-                      <button onClick={() => setDeleteConfirm(null)} className="kb-confirm-no">×</button>
-                    </div>
-                  ) : (
-                    <button className="kb-remove" onClick={() => setDeleteConfirm(doc._id)}>Remove</button>
-                  )}
-                </div>
-              </div>
-            ))}
           </div>
         )}
       </div>

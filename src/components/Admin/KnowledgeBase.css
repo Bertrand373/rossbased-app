@@ -394,39 +394,72 @@
 }
 
 /* ============================================================
-   FILTERS — Type, Category, Status pills
+   SOURCE TABS — All · Uploaded · Oracle · Discord
    ============================================================ */
 
-.kb-filters {
+.kb-source-tabs {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 14px;
-  padding: 14px;
+  gap: 2px;
+  margin-bottom: 12px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 10px;
+  padding: 3px;
 }
 
-.kb-filter-group {
+.kb-source-tab {
+  flex: 1;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 5px;
+  padding: 9px 8px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.kb-filter-label {
+.kb-source-tab:hover {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.kb-source-tab.active {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+}
+
+.kb-source-tab-count {
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.25);
-  min-width: 56px;
-  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 1px 5px;
+  border-radius: 4px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.kb-source-tab.active .kb-source-tab-count {
+  color: rgba(212, 168, 67, 0.7);
+  background: rgba(212, 168, 67, 0.08);
+}
+
+/* ============================================================
+   FILTERS — Category pills + status toggle (single row)
+   ============================================================ */
+
+.kb-filters {
+  margin-bottom: 10px;
 }
 
 .kb-filter-pills {
   display: flex;
-  flex-wrap: wrap;
   gap: 4px;
 }
 
@@ -436,6 +469,7 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
   -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
 }
 
 .kb-filter-pills-scroll::-webkit-scrollbar {
@@ -468,17 +502,37 @@
   font-weight: 600;
 }
 
+.kb-pill-status {
+  margin-left: 2px;
+}
+
+.kb-filter-sep {
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.kb-filter-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.25);
+  margin-bottom: 8px;
+}
+
 .kb-clear-filters {
-  padding: 5px 10px;
+  padding: 2px 8px;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   background: rgba(239, 68, 68, 0.06);
   color: rgba(239, 68, 68, 0.5);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
-  align-self: flex-start;
 }
 
 .kb-clear-filters:hover {
@@ -772,12 +826,31 @@
 [data-theme="light"] .kb-empty { color: rgba(0,0,0,0.3); }
 [data-theme="light"] .kb-empty-hint { color: rgba(0,0,0,0.2) !important; }
 
-/* Filters */
-[data-theme="light"] .kb-filters {
+/* Source tabs */
+[data-theme="light"] .kb-source-tabs {
   background: rgba(0,0,0,0.015);
   border-color: rgba(0,0,0,0.06);
 }
-[data-theme="light"] .kb-filter-label { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .kb-source-tab {
+  color: rgba(0,0,0,0.3);
+}
+[data-theme="light"] .kb-source-tab:hover {
+  color: rgba(0,0,0,0.5);
+}
+[data-theme="light"] .kb-source-tab.active {
+  background: rgba(0,0,0,0.05);
+  color: rgba(0,0,0,0.8);
+}
+[data-theme="light"] .kb-source-tab-count {
+  color: rgba(0,0,0,0.25);
+  background: rgba(0,0,0,0.04);
+}
+[data-theme="light"] .kb-source-tab.active .kb-source-tab-count {
+  color: rgba(170,130,40,0.7);
+  background: rgba(170,130,40,0.08);
+}
+
+/* Filter pills */
 [data-theme="light"] .kb-pill {
   background: rgba(0,0,0,0.02);
   border-color: rgba(0,0,0,0.06);
@@ -791,6 +864,12 @@
   background: rgba(170,130,40,0.08);
   border-color: rgba(170,130,40,0.2);
   color: rgba(170,130,40,0.8);
+}
+[data-theme="light"] .kb-filter-sep {
+  background: rgba(0,0,0,0.06);
+}
+[data-theme="light"] .kb-filter-summary {
+  color: rgba(0,0,0,0.25);
 }
 [data-theme="light"] .kb-clear-filters {
   background: rgba(220,50,50,0.04);
