@@ -1499,6 +1499,15 @@ Examples:
 
       } catch (noteErr) {
         console.error('Oracle memory note error (non-blocking):', noteErr.message);
+        // Alert admin if model-related failure (retired model, bad request, etc.)
+        if (noteErr.status === 404 || noteErr.status === 400 || noteErr.message?.toLowerCase().includes('model')) {
+          try {
+            const { alertAdmin } = require('./discord-bot');
+            alertAdmin('app-note-model', '⚠️ App Note Model Failure',
+              `Note generation failed: ${noteErr.message}\n\nCurrent NOTE_MODEL: \`${NOTE_MODEL}\`\n\nUpdate via Render → Environment → NOTE_MODEL`,
+              'error');
+          } catch (e) { /* bot not ready yet, ignore */ }
+        }
       }
     })();
 
@@ -1556,6 +1565,15 @@ Examples:
 
   } catch (err) {
     console.error('AI Chat Stream error:', err);
+    // Alert admin if model-related failure
+    if (err.status === 404 || err.status === 400 || err.message?.toLowerCase().includes('model')) {
+      try {
+        const { alertAdmin } = require('./discord-bot');
+        alertAdmin('app-oracle-model', '🚨 Oracle Model Down (App)',
+          `Oracle chat failed: ${err.message}\n\nCurrent ORACLE_MODEL: \`${ORACLE_MODEL}\`\n\nUpdate via Render → Environment → ORACLE_MODEL`,
+          'error');
+      } catch (e) { /* bot not ready yet */ }
+    }
     if (!res.headersSent) {
       res.status(500).json({ error: 'Failed to get AI response' });
     } else {

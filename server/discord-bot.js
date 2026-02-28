@@ -307,6 +307,7 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.DirectMessages,
   ],
   partials: [Partials.Message, Partials.Channel, Partials.ThreadMember, Partials.Reaction],
 });
@@ -842,12 +843,419 @@ const splitResponse = (text) => {
 };
 
 // ============================================================
+// ADMIN DM SYSTEM
+// Oracle DMs Ross with alerts, daily briefings, and on-demand commands.
+// Every DM includes a persistent command footer — no memorization needed.
+// ============================================================
+
+const ADMIN_DM_FOOTER = '!status · !revenue · !users · !pool · !models · !brief';
+const ORACLE_ICON = 'https://titantrack.app/The_Oracle.png';
+const BRIEFING_HOUR_ET = parseInt(process.env.BRIEFING_HOUR || '9'); // 9am ET default
+
+// Alert rate limiting — 4h cooldown per alert type to prevent spam
+const alertCooldowns = new Map();
+const ALERT_COOLDOWN_MS = 4 * 60 * 60 * 1000;
+
+// Lazy Stripe init (same key app.js uses, avoids circular deps)
+let _stripe = null;
+function getStripe() {
+  if (!_stripe && process.env.STRIPE_SECRET_KEY) {
+    try { _stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); }
+    catch { /* stripe package not available */ }
+  }
+  return _stripe;
+}
+
+function getETHour() {
+  return parseInt(new Date().toLocaleString('en-US', {
+    timeZone: 'America/New_York', hour: 'numeric', hour12: false
+  }));
+}
+
+function timeAgoShort(dateStr) {
+  if (!dateStr) return 'never';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+function fmtDollars(cents) {
+  if (!cents) return '$0';
+  const d = cents / 100;
+  return d >= 1000 ? `$${(d / 1000).toFixed(1)}k` : `$${d.toFixed(d % 1 === 0 ? 0 : 2)}`;
+}
+
+// Find admin guild member for DM sending
+async function findAdminMember() {
+  const guild = client.guilds.cache.first();
+  if (!guild) return null;
+  const members = await guild.members.fetch();
+  return members.find(m => ADMIN_DISCORD_USERS.includes(m.user.username.toLowerCase())) || null;
+}
+
+/**
+ * Alert admin via DM — rate-limited per alertKey.
+ * Called from both discord-bot.js and app.js (via require).
+ */
+async function alertAdmin(alertKey, title, description, level) {
+  level = level || 'warn';
+  const lastSent = alertCooldowns.get(alertKey);
+  if (lastSent && Date.now() - lastSent < ALERT_COOLDOWN_MS) return;
+
+  try {
+    if (!client.isReady()) return;
+    const admin = await findAdminMember();
+    if (!admin) return;
+
+    const colors = { warn: 0xD4A843, error: 0xEF4444, info: 0x22C55E };
+    const embed = new EmbedBuilder()
+      .setColor(colors[level] || ORACLE_COLOR)
+      .setTitle(title)
+      .setDescription(description)
+      .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
+      .setTimestamp();
+
+    await admin.send({ embeds: [embed] });
+    alertCooldowns.set(alertKey, Date.now());
+    console.log(`[Alert] DM sent: ${alertKey}`);
+  } catch (err) {
+    console.error('[Alert] DM failed:', err.message);
+  }
+}
+
+// ---- Shared data gatherers ----
+
+async function gatherHealthData() {
+  const now = new Date();
+  const oneDayAgo = new Date(now - 24 * 60 * 60 * 1000);
+  const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
+  const today = getTodayET();
+
+  const totalUsers = await User.countDocuments();
+  const linked = await User.countDocuments({ discordId: { $exists: true, $ne: null, $ne: '' } });
+  const activeUsers7d = await User.countDocuments({ lastLogin: { $gt: sevenDaysAgo } });
+
+  // Notes
+  const usersWithNotes = await User.find(
+    { 'oracleNotes.0': { $exists: true } },
+    { oracleNotes: 1 }
+  ).lean();
+
+  let totalNotes = 0, notes24h = 0, appNotes24h = 0, discordNotes24h = 0, lastNoteDate = null;
+  usersWithNotes.forEach(u => {
+    (u.oracleNotes || []).forEach(n => {
+      totalNotes++;
+      const d = new Date(n.date);
+      if (d > oneDayAgo) {
+        notes24h++;
+        n.source === 'discord' ? discordNotes24h++ : appNotes24h++;
+      }
+      if (!lastNoteDate || d > new Date(lastNoteDate)) lastNoteDate = n.date;
+    });
+  });
+
+  // Usage today
+  const discordUsageRecords = await OracleUsage.find({ date: today });
+  const discordMsgs = discordUsageRecords.reduce((s, u) => s + (u.count || 0), 0);
+  const appUsersToday = await User.find(
+    { 'aiUsage.date': today, 'aiUsage.count': { $gt: 0 } },
+    { 'aiUsage.count': 1 }
+  ).lean();
+  const appMsgs = appUsersToday.reduce((s, u) => s + (u.aiUsage?.count || 0), 0);
+
+  // Outcomes
+  const OracleOutcome = require('./models/OracleOutcome');
+  const measuredOutcomes = await OracleOutcome.countDocuments({ 'outcome.measured': true });
+  const pendingOutcomes = await OracleOutcome.countDocuments({ 'outcome.measured': false });
+
+  // Grandfathered pool
+  const grandfathered = await User.find(
+    { 'subscription.status': 'grandfathered', discordId: { $exists: true, $ne: null, $ne: '' } },
+    { username: 1, discordId: 1, 'aiUsage.count': 1, 'aiUsage.date': 1 }
+  ).lean();
+
+  const poolUsage = [];
+  for (const gf of grandfathered) {
+    const ac = gf.aiUsage?.date === today ? (gf.aiUsage?.count || 0) : 0;
+    const dr = discordUsageRecords.find(d => d.discordUserId === gf.discordId);
+    poolUsage.push({ username: gf.username, app: ac, discord: dr?.count || 0, combined: ac + (dr?.count || 0), limit: 15 });
+  }
+
+  // Streaks
+  const streakers = await User.find(
+    { startDate: { $exists: true } }, { username: 1, startDate: 1 }
+  ).lean();
+  const todayMid = new Date(); todayMid.setHours(0, 0, 0, 0);
+  const streakData = streakers.map(u => {
+    const s = new Date(u.startDate); s.setHours(0, 0, 0, 0);
+    return { username: u.username, days: Math.max(1, Math.floor((todayMid - s) / 86400000) + 1) };
+  }).sort((a, b) => b.days - a.days);
+
+  return {
+    totalUsers, linked, activeUsers7d,
+    totalNotes, notes24h, appNotes24h, discordNotes24h, lastNoteDate,
+    discordMsgs, appMsgs, discordUsers: discordUsageRecords.length, appUsers: appUsersToday.length,
+    measuredOutcomes, pendingOutcomes, poolUsage,
+    over30: streakData.filter(s => s.days >= 30).length,
+    over90: streakData.filter(s => s.days >= 90).length,
+    topStreak: streakData[0] || null
+  };
+}
+
+async function getRevenueData() {
+  const stripe = getStripe();
+  if (!stripe) return null;
+  try {
+    const [balance, active, trialing, recentCharges] = await Promise.all([
+      stripe.balance.retrieve(),
+      stripe.subscriptions.list({ status: 'active', limit: 100 }),
+      stripe.subscriptions.list({ status: 'trialing', limit: 100 }),
+      stripe.charges.list({ limit: 20 })
+    ]);
+    const available = balance.available.reduce((s, b) => s + b.amount, 0);
+    const pending = balance.pending.reduce((s, b) => s + b.amount, 0);
+    const mrr = active.data.reduce((s, sub) => s + (sub.items?.data[0]?.price?.unit_amount || 0), 0);
+    const failed = recentCharges.data.filter(c => !c.paid && c.created > Date.now() / 1000 - 7 * 24 * 60 * 60);
+    return { available, pending, mrr, activeSubs: active.data.length, trialingSubs: trialing.data.length, failedPayments: failed.length };
+  } catch (err) {
+    console.error('[Revenue] Stripe query failed:', err.message);
+    return null;
+  }
+}
+
+// ---- DM Command Handlers ----
+
+async function handleAdminDM(message) {
+  const cmd = message.content.trim().toLowerCase().split(/\s+/)[0];
+  try {
+    switch (cmd) {
+      case '!status': return await dmStatus(message);
+      case '!revenue': return await dmRevenue(message);
+      case '!users': return await dmUsers(message);
+      case '!pool': return await dmPool(message);
+      case '!models': return await dmModels(message);
+      case '!brief': return await dmBriefing(message);
+      default:
+        const embed = new EmbedBuilder()
+          .setColor(ORACLE_COLOR)
+          .setDescription('DM commands give you live TitanTrack data. Use any command below.')
+          .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON });
+        return await message.reply({ embeds: [embed] });
+    }
+  } catch (err) {
+    console.error('[Admin DM] Error:', err.message);
+    await message.reply(`Command failed: ${err.message}`).catch(() => {});
+  }
+}
+
+async function dmStatus(message) {
+  const d = await gatherHealthData();
+
+  // Live model test
+  let oracleOk = '✓', noteOk = '✓';
+  try { await anthropic.messages.create({ model: ORACLE_MODEL, max_tokens: 1, messages: [{ role: 'user', content: 'hi' }] }); }
+  catch { oracleOk = '✗ DOWN'; }
+  try { await anthropic.messages.create({ model: NOTE_MODEL, max_tokens: 1, messages: [{ role: 'user', content: 'hi' }] }); }
+  catch { noteOk = '✗ DOWN'; }
+
+  const warnings = [];
+  if (noteOk !== '✓') warnings.push('Note model is down — update NOTE_MODEL in Render');
+  if (oracleOk !== '✓') warnings.push('Oracle model is down — update ORACLE_MODEL in Render');
+  if (d.notes24h === 0 && (d.discordMsgs + d.appMsgs) > 0) warnings.push('Notes dead — conversations happening but nothing saving');
+
+  const embed = new EmbedBuilder()
+    .setColor(warnings.length > 0 ? 0xEF4444 : 0x22C55E)
+    .setTitle('🔮 Oracle Status')
+    .setDescription(
+      `**Models**\nOracle: \`${ORACLE_MODEL}\` ${oracleOk}\nNotes: \`${NOTE_MODEL}\` ${noteOk}\n\n` +
+      `**Notes (24h):** ${d.notes24h} (${d.appNotes24h} app · ${d.discordNotes24h} discord)\n` +
+      `**Last note:** ${timeAgoShort(d.lastNoteDate)}\n\n` +
+      `**Usage today:** ${d.appMsgs + d.discordMsgs} msgs (${d.appMsgs} app · ${d.discordMsgs} discord)\n` +
+      `**Outcomes:** ${d.measuredOutcomes} measured · ${d.pendingOutcomes} pending\n` +
+      `**Users:** ${d.totalUsers} total · ${d.linked} linked` +
+      (warnings.length > 0 ? `\n\n⚠️ **${warnings.join('\n⚠️ ')}**` : '')
+    )
+    .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
+    .setTimestamp();
+
+  await message.reply({ embeds: [embed] });
+}
+
+async function dmRevenue(message) {
+  const rev = await getRevenueData();
+  if (!rev) {
+    const e = new EmbedBuilder().setColor(0xEF4444)
+      .setDescription('Stripe not configured or query failed. Set STRIPE_SECRET_KEY in Render.')
+      .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON });
+    return await message.reply({ embeds: [e] });
+  }
+  const embed = new EmbedBuilder()
+    .setColor(0x22C55E)
+    .setTitle('💰 Revenue')
+    .setDescription(
+      `**Available:** ${fmtDollars(rev.available)}\n` +
+      `**Pending:** ${fmtDollars(rev.pending)}\n` +
+      `**MRR:** ${fmtDollars(rev.mrr)}\n\n` +
+      `**Subscribers:** ${rev.activeSubs} active · ${rev.trialingSubs} trialing\n` +
+      `**Failed payments (7d):** ${rev.failedPayments}` +
+      (rev.failedPayments > 0 ? '\n⚠️ Check admin panel for details' : '')
+    )
+    .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
+    .setTimestamp();
+
+  await message.reply({ embeds: [embed] });
+}
+
+async function dmUsers(message) {
+  const d = await gatherHealthData();
+  const embed = new EmbedBuilder()
+    .setColor(ORACLE_COLOR)
+    .setTitle('👥 Users')
+    .setDescription(
+      `**Total:** ${d.totalUsers}\n` +
+      `**Active (7d):** ${d.activeUsers7d}\n` +
+      `**Discord linked:** ${d.linked}\n\n` +
+      `**Streaks**\n` +
+      `30+ days: ${d.over30}\n` +
+      `90+ days: ${d.over90}\n` +
+      (d.topStreak ? `Top: **${d.topStreak.username}** (Day ${d.topStreak.days})` : 'No active streaks')
+    )
+    .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
+    .setTimestamp();
+
+  await message.reply({ embeds: [embed] });
+}
+
+async function dmPool(message) {
+  const d = await gatherHealthData();
+  let poolStr;
+  if (d.poolUsage.length === 0) {
+    poolStr = 'No grandfathered users with linked Discord accounts.';
+  } else {
+    poolStr = d.poolUsage.map(p => {
+      const filled = Math.round((p.combined / p.limit) * 10);
+      const bar = '█'.repeat(Math.min(filled, 10)) + '░'.repeat(Math.max(0, 10 - filled));
+      return `**${p.username}** ${bar} ${p.combined}/${p.limit} (${p.app} app + ${p.discord} discord)`;
+    }).join('\n');
+  }
+  const embed = new EmbedBuilder()
+    .setColor(ORACLE_COLOR)
+    .setTitle('🔒 Shared Pool (Grandfathered)')
+    .setDescription(poolStr)
+    .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
+    .setTimestamp();
+
+  await message.reply({ embeds: [embed] });
+}
+
+async function dmModels(message) {
+  await message.reply({ embeds: [new EmbedBuilder().setColor(ORACLE_COLOR).setDescription('⏳ Testing models...')] });
+
+  const t1 = Date.now();
+  let oracleResult;
+  try {
+    await anthropic.messages.create({ model: ORACLE_MODEL, max_tokens: 1, messages: [{ role: 'user', content: 'hi' }] });
+    oracleResult = `✓ responding (${Date.now() - t1}ms)`;
+  } catch (err) { oracleResult = `✗ ${err.message?.substring(0, 80)}`; }
+
+  const t2 = Date.now();
+  let noteResult;
+  try {
+    await anthropic.messages.create({ model: NOTE_MODEL, max_tokens: 1, messages: [{ role: 'user', content: 'hi' }] });
+    noteResult = `✓ responding (${Date.now() - t2}ms)`;
+  } catch (err) { noteResult = `✗ ${err.message?.substring(0, 80)}`; }
+
+  const allGood = oracleResult.startsWith('✓') && noteResult.startsWith('✓');
+  const embed = new EmbedBuilder()
+    .setColor(allGood ? 0x22C55E : 0xEF4444)
+    .setTitle('⚙️ Models')
+    .setDescription(
+      `**Oracle:** \`${ORACLE_MODEL}\`\n${oracleResult}\n\n` +
+      `**Notes:** \`${NOTE_MODEL}\`\n${noteResult}\n\n` +
+      `_Update via Render → Environment → ORACLE_MODEL / NOTE_MODEL_`
+    )
+    .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
+    .setTimestamp();
+
+  await message.channel.send({ embeds: [embed] });
+}
+
+async function buildDailyBriefing() {
+  const d = await gatherHealthData();
+  const rev = await getRevenueData();
+
+  const warnings = [];
+  // Test models
+  try { await anthropic.messages.create({ model: NOTE_MODEL, max_tokens: 1, messages: [{ role: 'user', content: 'hi' }] }); }
+  catch { warnings.push(`Note model (\`${NOTE_MODEL}\`) is down — update in Render`); }
+  try { await anthropic.messages.create({ model: ORACLE_MODEL, max_tokens: 1, messages: [{ role: 'user', content: 'hi' }] }); }
+  catch { warnings.push(`Oracle model (\`${ORACLE_MODEL}\`) is down — update in Render`); }
+  if (d.notes24h === 0 && (d.discordMsgs + d.appMsgs) > 0) warnings.push('Notes not generating — conversations happening but nothing saving');
+  if (rev && rev.failedPayments > 0) warnings.push(`${rev.failedPayments} failed payment(s) in last 7d`);
+
+  const dateStr = new Date().toLocaleDateString('en-US', {
+    timeZone: 'America/New_York', weekday: 'short', month: 'short', day: 'numeric'
+  });
+
+  let desc = `**📊 Activity**\n` +
+    `Oracle: ${d.appMsgs + d.discordMsgs} msgs (${d.appMsgs} app · ${d.discordMsgs} discord)\n` +
+    `Notes: ${d.notes24h} generated · last ${timeAgoShort(d.lastNoteDate)}\n` +
+    `Outcomes: ${d.measuredOutcomes} measured · ${d.pendingOutcomes} pending\n` +
+    `Active users (7d): ${d.activeUsers7d} of ${d.totalUsers}\n`;
+
+  if (rev) {
+    desc += `\n**💰 Revenue**\n` +
+      `MRR: ${fmtDollars(rev.mrr)} · ${rev.activeSubs} active subs\n` +
+      `Balance: ${fmtDollars(rev.available)} available · ${fmtDollars(rev.pending)} pending\n`;
+  }
+
+  const activePool = d.poolUsage.filter(p => p.combined > 0);
+  if (activePool.length > 0) {
+    desc += `\n**🔒 Pool**\n` +
+      activePool.map(p => `${p.username}: ${p.combined}/${p.limit}`).join(' · ') + '\n';
+  }
+
+  if (warnings.length > 0) {
+    desc += `\n**⚠️ Alerts**\n` + warnings.map(w => `• ${w}`).join('\n');
+  } else {
+    desc += `\n✅ All systems healthy`;
+  }
+
+  return new EmbedBuilder()
+    .setColor(warnings.length > 0 ? 0xEF4444 : ORACLE_COLOR)
+    .setTitle(`☀️ Daily Briefing — ${dateStr}`)
+    .setDescription(desc)
+    .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
+    .setTimestamp();
+}
+
+async function dmBriefing(message) {
+  await message.reply({ embeds: [new EmbedBuilder().setColor(ORACLE_COLOR).setDescription('⏳ Generating briefing...')] });
+  const embed = await buildDailyBriefing();
+  await message.channel.send({ embeds: [embed] });
+}
+
+// ============================================================
 // MESSAGE HANDLER
 // ============================================================
 
 client.on('messageCreate', async (message) => {
   // Ignore bot messages
   if (message.author.bot) return;
+
+  // ============================================================
+  // ADMIN DM COMMANDS — Oracle responds to Ross in DMs
+  // ============================================================
+  if (!message.guild) {
+    const isAdmin = ADMIN_DISCORD_USERS.includes(message.author.username?.toLowerCase());
+    if (!isAdmin) return; // Ignore DMs from non-admins
+    await handleAdminDM(message);
+    return;
+  }
   
   const channelName = message.channel.name?.toLowerCase();
   const authorUsername = message.author.username?.toLowerCase();
@@ -1397,6 +1805,11 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
           }
         } catch (noteErr) {
           console.error('🔮 Discord memory note generation failed:', noteErr.message || noteErr);
+          if (noteErr.status === 404 || noteErr.status === 400 || (noteErr.message && noteErr.message.toLowerCase().includes('model'))) {
+            alertAdmin('discord-note-model', '⚠️ Discord Note Model Failure',
+              `Note generation failed: ${noteErr.message || noteErr}\n\nCurrent NOTE_MODEL: \`${NOTE_MODEL}\`\n\nUpdate via Render → Environment → NOTE_MODEL`,
+              'error');
+          }
         }
       })();
     }
@@ -1652,6 +2065,71 @@ client.once('ready', () => {
       console.error('[Pulse] Check error:', err.message);
     }
   }, 4 * 60 * 60 * 1000); // Check every 4 hours
+
+  // ============================================================
+  // DAILY BRIEFING — DM Ross every morning at configured hour ET
+  // ============================================================
+
+  let lastBriefingDate = null;
+
+  setInterval(async () => {
+    try {
+      const etHour = getETHour();
+      if (etHour !== BRIEFING_HOUR_ET) return;
+
+      const today = getTodayET();
+      if (lastBriefingDate === today) return;
+      lastBriefingDate = today;
+
+      console.log('[Briefing] Daily briefing trigger firing...');
+
+      const admin = await findAdminMember();
+      if (!admin) { console.log('[Briefing] Admin not found'); return; }
+
+      const embed = await buildDailyBriefing();
+      await admin.send({ embeds: [embed] });
+      console.log('[Briefing] Daily briefing sent');
+    } catch (err) {
+      console.error('[Briefing] Error:', err.message);
+    }
+  }, 60 * 60 * 1000); // Check every hour
+
+  // ============================================================
+  // HEALTH MONITOR — Check note generation every 4 hours
+  // Alerts if Oracle conversations are happening but notes aren't saving
+  // ============================================================
+
+  setInterval(async () => {
+    try {
+      const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
+      const today = getTodayET();
+
+      // Any notes in last 12h?
+      const usersWithRecentNotes = await User.countDocuments({
+        oracleNotes: { $elemMatch: { date: { $gt: twelveHoursAgo } } }
+      });
+
+      // Any conversations today?
+      const discordUsage = await OracleUsage.find({ date: today });
+      const appUsage = await User.countDocuments({
+        'aiUsage.date': today, 'aiUsage.count': { $gt: 0 }
+      });
+      const hasConversations = discordUsage.length > 0 || appUsage > 0;
+
+      if (hasConversations && usersWithRecentNotes === 0) {
+        alertAdmin('notes-dead',
+          '⚠️ Notes Not Generating',
+          'Oracle conversations are happening but no memory notes have been saved in 12+ hours.\n\n' +
+          `Current NOTE_MODEL: \`${NOTE_MODEL}\`\n\n` +
+          'Run `!models` to test, or update NOTE_MODEL in Render.',
+          'error'
+        );
+      }
+    } catch (err) {
+      console.error('[Health] Note check error:', err.message);
+    }
+  }, 4 * 60 * 60 * 1000); // Every 4 hours
+
 });
 
 // ============================================================
@@ -1686,5 +2164,5 @@ if (!ANTHROPIC_API_KEY) {
 
 client.login(DISCORD_TOKEN);
 
-// Export client for cross-module access (e.g., milestone DMs from app.js)
-module.exports = { client };
+// Export client and alertAdmin for cross-module access (e.g., model failure alerts from app.js)
+module.exports = { client, alertAdmin };
