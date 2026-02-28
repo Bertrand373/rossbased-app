@@ -68,17 +68,24 @@
   overscroll-behavior: contain;
 }
 
-/* Week view: scroll at container level so header can stick */
+/* Week view: container stays non-scrolling — only the grid section scrolls.
+   Header + legend are siblings above the scroll area, so they stay in place. */
 .calendar-container:has(.week-view-grid) {
-  overflow-y: auto !important;
+  overflow: hidden;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* The grid section becomes the scroll container in week view */
+.calendar-container:has(.week-view-grid) .calendar-main-section {
+  overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  padding-top: 0;
   padding-bottom: 160px;
 }
 
-.calendar-container:has(.week-view-grid)::-webkit-scrollbar {
+.calendar-container:has(.week-view-grid) .calendar-main-section::-webkit-scrollbar {
   display: none;
 }
 
@@ -1352,8 +1359,12 @@ body:has(.calendar-display) {
     padding-bottom: 45px;
   }
 
-  /* Week view: moon bar visible, needs clearance for last cell */
+  /* Week view: padding on the scroll section, not container */
   .calendar-container:has(.week-view-grid) {
+    padding-bottom: 0;
+  }
+
+  .calendar-container:has(.week-view-grid) .calendar-main-section {
     padding-bottom: 160px;
   }
 
@@ -1369,8 +1380,12 @@ body:has(.calendar-display) {
     padding-bottom: 103px;
   }
 
-  /* Week view: moon bar visible, needs clearance for last cell + safe area */
+  /* Week view: padding on the scroll section, not container */
   .calendar-container:has(.week-view-grid) {
+    padding-bottom: 0;
+  }
+
+  .calendar-container:has(.week-view-grid) .calendar-main-section {
     padding-bottom: 160px;
   }
 
@@ -1385,6 +1400,10 @@ body:has(.calendar-display) {
   }
 
   .calendar-container:has(.week-view-grid) {
+    padding-bottom: 0;
+  }
+
+  .calendar-container:has(.week-view-grid) .calendar-main-section {
     padding-bottom: 160px;
   }
 }
