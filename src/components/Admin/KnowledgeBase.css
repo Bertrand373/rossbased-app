@@ -393,6 +393,99 @@
   color: rgba(255, 255, 255, 0.15);
 }
 
+/* ============================================================
+   FILTERS — Type, Category, Status pills
+   ============================================================ */
+
+.kb-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.kb-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kb-filter-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.25);
+  min-width: 56px;
+  flex-shrink: 0;
+}
+
+.kb-filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.kb-filter-pills-scroll {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.kb-filter-pills-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.kb-pill {
+  padding: 4px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.02);
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.kb-pill:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.kb-pill.active {
+  background: rgba(212, 168, 67, 0.1);
+  border-color: rgba(212, 168, 67, 0.25);
+  color: rgba(212, 168, 67, 0.85);
+  font-weight: 600;
+}
+
+.kb-clear-filters {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(239, 68, 68, 0.06);
+  color: rgba(239, 68, 68, 0.5);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  align-self: flex-start;
+}
+
+.kb-clear-filters:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: rgba(239, 68, 68, 0.7);
+}
+
 /* Document list */
 .kb-doc-list {
   display: flex;
@@ -678,6 +771,35 @@
 /* Empty state */
 [data-theme="light"] .kb-empty { color: rgba(0,0,0,0.3); }
 [data-theme="light"] .kb-empty-hint { color: rgba(0,0,0,0.2) !important; }
+
+/* Filters */
+[data-theme="light"] .kb-filters {
+  background: rgba(0,0,0,0.015);
+  border-color: rgba(0,0,0,0.06);
+}
+[data-theme="light"] .kb-filter-label { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .kb-pill {
+  background: rgba(0,0,0,0.02);
+  border-color: rgba(0,0,0,0.06);
+  color: rgba(0,0,0,0.35);
+}
+[data-theme="light"] .kb-pill:hover {
+  background: rgba(0,0,0,0.04);
+  color: rgba(0,0,0,0.5);
+}
+[data-theme="light"] .kb-pill.active {
+  background: rgba(170,130,40,0.08);
+  border-color: rgba(170,130,40,0.2);
+  color: rgba(170,130,40,0.8);
+}
+[data-theme="light"] .kb-clear-filters {
+  background: rgba(220,50,50,0.04);
+  color: rgba(220,50,50,0.4);
+}
+[data-theme="light"] .kb-clear-filters:hover {
+  background: rgba(220,50,50,0.08);
+  color: rgba(220,50,50,0.6);
+}
 
 /* Document list */
 [data-theme="light"] .kb-doc {

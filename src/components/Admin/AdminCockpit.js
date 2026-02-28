@@ -139,8 +139,10 @@ const AdminCockpit = () => {
   const [checkins, setCheckins] = useState(null);
 
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [authError, setAuthError] = useState(null);
   const [lastRefresh, setLastRefresh] = useState(null);
+  const [oracleStatus, setOracleStatus] = useState({ status: 'checking', latency: null });
 
   const fetchData = useCallback(async (endpoint, setter) => {
     try {
@@ -170,6 +172,32 @@ const AdminCockpit = () => {
     const interval = setInterval(() => loadAll(), 60000);
     return () => clearInterval(interval);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Oracle health check — pings backend when Oracle tab is active
+  useEffect(() => {
+    if (tab !== 'oracle') return;
+    const checkOracle = async () => {
+      setOracleStatus({ status: 'checking', latency: null });
+      try {
+        const token = localStorage.getItem('token');
+        const start = Date.now();
+        const res = await fetch(`${API}/api/analytics/overview`, {
+          headers: { Authorization: `Bearer ${token}` },
+          signal: AbortSignal.timeout(8000),
+        });
+        const latency = Date.now() - start;
+        if (res.ok) {
+          if (latency > 4000) setOracleStatus({ status: 'slow', latency });
+          else setOracleStatus({ status: 'operational', latency });
+        } else {
+          setOracleStatus({ status: 'down', latency: null });
+        }
+      } catch {
+        setOracleStatus({ status: 'down', latency: null });
+      }
+    };
+    checkOracle();
+  }, [tab]);
 
   // Computed
   const stickiness = overview?.dau > 0 && overview?.mau > 0 ? Math.round((overview.dau / overview.mau) * 100) : 0;
@@ -277,7 +305,7 @@ const AdminCockpit = () => {
             {lastRefresh && (
               <span className="ac-header-time">{lastRefresh.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             )}
-            <button className="ac-refresh" onClick={() => loadAll()} title="Refresh all data">
+            <button className={`ac-refresh ${refreshing ? 'spinning' : ''}`} onClick={async () => { setRefreshing(true); await loadAll(); setRefreshing(false); }} title="Refresh all data">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
             </button>
           </div>
@@ -843,9 +871,12 @@ const AdminCockpit = () => {
               <span className="ac-section-brand-title">The Oracle</span>
               <span className="ac-section-brand-sub">AI system health & knowledge base</span>
             </div>
-            <span className="ac-oracle-status">
+            <span className={`ac-oracle-status ac-oracle-status-${oracleStatus.status}`}>
               <span className="ac-oracle-status-dot" />
-              Operational
+              {oracleStatus.status === 'checking' ? 'Checking...' :
+               oracleStatus.status === 'operational' ? `Operational${oracleStatus.latency ? ` · ${oracleStatus.latency}ms` : ''}` :
+               oracleStatus.status === 'slow' ? `Slow · ${oracleStatus.latency}ms` :
+               'Down'}
             </span>
           </div>
           <div className="ac-oracle-wrap">
