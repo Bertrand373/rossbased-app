@@ -81,12 +81,18 @@
 }
 
 /* Direct flex children need explicit width to break out (negative margins alone don't resize flex items).
-   Scoped to mobile/tablet only — desktop keeps its max-width constraint. */
-@media (max-width: 1024px) {
+   Grandchildren like milestone-grid break out naturally in block flow. These must match. */
+.stats-page > .stat-supporting,
+.stats-page > .share-card-section {
+  max-width: none;
+  width: calc(100% + 2 * var(--grid-breakout));
+}
+
+/* Desktop: re-cap to match grandchild breakout width (700px + 2 × breakout) */
+@media (min-width: 1025px) {
   .stats-page > .stat-supporting,
   .stats-page > .share-card-section {
-    max-width: none;
-    width: calc(100% + 2 * var(--grid-breakout));
+    max-width: calc(700px + 2 * var(--grid-breakout));
   }
 }
 

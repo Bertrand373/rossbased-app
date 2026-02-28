@@ -1307,12 +1307,12 @@ body:has(.calendar-display) {
   }
   
   .day-workout-glyph svg {
-    width: 7px;
+    width: 10px;
     height: auto;
   }
   
   .week-workout-glyph svg {
-    width: 8px;
+    width: 11px;
     height: auto;
   }
 }
@@ -1324,12 +1324,12 @@ body:has(.calendar-display) {
   }
   
   .day-workout-glyph svg {
-    width: 11px;
+    width: 13px;
     height: auto;
   }
   
   .week-workout-glyph svg {
-    width: 12px;
+    width: 14px;
     height: auto;
   }
 }
@@ -1359,7 +1359,7 @@ body:has(.calendar-display) {
 /* PWA standalone: restore spacing (safe-area present, moon bar higher) */
 @media (display-mode: standalone) {
   .calendar-container {
-    padding-bottom: 95px;
+    padding-bottom: 100px;
   }
 
   /* Week view: no moon bar, wrapper already clears nav — minimal padding */
@@ -1374,7 +1374,7 @@ body:has(.calendar-display) {
 
 @media (display-mode: standalone) and (max-width: 480px) {
   .calendar-container {
-    padding-bottom: 95px;
+    padding-bottom: 100px;
   }
 
   .calendar-container:has(.week-view-grid) {
