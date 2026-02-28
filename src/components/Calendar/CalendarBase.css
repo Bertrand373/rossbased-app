@@ -1304,9 +1304,9 @@
     padding-bottom: 55px;
   }
 
-  /* Week view: no moon bar, just clear the nav */
+  /* Week view: no moon bar, wrapper already clears nav — minimal padding */
   .calendar-container:has(.week-view-grid) {
-    padding-bottom: 16px;
+    padding-bottom: 8px;
   }
 
   /* Week view: just clear the nav bar (no moon bar to dodge) */
@@ -1321,9 +1321,9 @@
     padding-bottom: 110px;
   }
 
-  /* Week view: no moon bar, just clear the nav */
+  /* Week view: no moon bar, wrapper already clears nav — minimal padding */
   .calendar-container:has(.week-view-grid) {
-    padding-bottom: 20px;
+    padding-bottom: 8px;
   }
 
   .week-view-grid {
@@ -1337,7 +1337,7 @@
   }
 
   .calendar-container:has(.week-view-grid) {
-    padding-bottom: 20px;
+    padding-bottom: 8px;
   }
 }
 
