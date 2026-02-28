@@ -134,23 +134,29 @@
   padding-top: 0;
   overflow: hidden !important;
   overscroll-behavior: none;
+  touch-action: manipulation;
 }
 
 /* Lock ancestors when month view is active */
 .app-content:has(.calendar-display) {
   overflow: hidden !important;
   overscroll-behavior: none;
+  touch-action: manipulation;
 }
 
 .main-content-wrapper:has(.calendar-display) {
   overflow: hidden !important;
   overscroll-behavior: none;
+  touch-action: manipulation;
 }
 
 html:has(.calendar-display),
 body:has(.calendar-display) {
   overflow: hidden !important;
   overscroll-behavior: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 
 /* Period Display - Typography focused like landing stats */
@@ -1359,7 +1365,7 @@ body:has(.calendar-display) {
 /* PWA standalone: restore spacing (safe-area present, moon bar higher) */
 @media (display-mode: standalone) {
   .calendar-container {
-    padding-bottom: 100px;
+    padding-bottom: 103px;
   }
 
   /* Week view: no moon bar, wrapper already clears nav — minimal padding */
@@ -1374,7 +1380,7 @@ body:has(.calendar-display) {
 
 @media (display-mode: standalone) and (max-width: 480px) {
   .calendar-container {
-    padding-bottom: 100px;
+    padding-bottom: 103px;
   }
 
   .calendar-container:has(.week-view-grid) {
