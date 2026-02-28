@@ -13,6 +13,8 @@
   padding: 48px 24px 120px;
   background-color: var(--background);
   width: 100%;
+  --grid-breakout: 16px;
+  overflow-x: hidden;
 }
 
 @media (min-width: 1025px) {
@@ -22,13 +24,44 @@
   }
   
   .urge-toolkit > * {
-    max-width: 560px;
+    max-width: 700px;
   }
 }
 
 .urge-toolkit > * {
   width: 100%;
-  max-width: 400px;
+  max-width: 480px;
+}
+
+/* =============================================================================
+   GRID BREAKOUT — containers extend beyond page padding to match Stats/Calendar
+   ============================================================================= */
+
+/* Grandchildren inside ut-content — negative margins work in block flow */
+.ut-intensity,
+.ut-protocols,
+.ut-breathing-info-card,
+.ut-protocol-steps,
+.ut-interactive-tools,
+.ut-quick-actions,
+.ut-triggers {
+  margin-left: calc(-1 * var(--grid-breakout));
+  margin-right: calc(-1 * var(--grid-breakout));
+}
+
+/* Direct flex children — need explicit width calc (negative margins alone don't resize flex items) */
+.urge-toolkit > .mp-section,
+.urge-toolkit > .ut-peak-recording {
+  max-width: none;
+  width: calc(100% + 2 * var(--grid-breakout));
+}
+
+/* Desktop: re-cap direct children to match grandchild breakout width */
+@media (min-width: 1025px) {
+  .urge-toolkit > .mp-section,
+  .urge-toolkit > .ut-peak-recording {
+    max-width: calc(700px + 2 * var(--grid-breakout));
+  }
 }
 
 /* =============================================================================
@@ -156,7 +189,7 @@
   margin-bottom: 48px;
   background: var(--surface-overlay);
   border: 1px solid var(--border-subtle);
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 24px 20px 20px;
 }
 
@@ -237,7 +270,7 @@
   margin-bottom: 32px;
   background: var(--surface-overlay);
   border: 1px solid var(--border-subtle);
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 4px 20px;
 }
 
@@ -323,7 +356,7 @@
   padding: 24px;
   background: var(--surface-overlay);
   border: 1px solid var(--border-subtle);
-  border-radius: 16px;
+  border-radius: 12px;
   text-align: center;
 }
 
@@ -375,7 +408,7 @@
   margin-bottom: 40px;
   background: var(--surface-overlay);
   border: 1px solid var(--border-subtle);
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 20px;
 }
 
@@ -428,7 +461,7 @@
   margin-bottom: 32px;
   background: var(--surface-overlay);
   border: 1px solid var(--border-subtle);
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 4px 20px;
 }
 
@@ -495,7 +528,7 @@
   padding: 20px;
   background: var(--surface-overlay);
   border: 1px solid var(--border-subtle);
-  border-radius: 16px;
+  border-radius: 12px;
 }
 
 .ut-quick-list {
@@ -530,7 +563,7 @@
   margin-bottom: 32px;
   background: var(--surface-overlay);
   border: 1px solid var(--border-subtle);
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 20px;
 }
 
@@ -949,8 +982,12 @@
    RESPONSIVE
    ============================================================================= */
 
+@media (max-width: 768px) {
+  .urge-toolkit { padding: 48px 20px 120px; --grid-breakout: 12px; }
+}
+
 @media (max-width: 480px) {
-  .urge-toolkit { padding: 32px 20px 120px; }
+  .urge-toolkit { padding: 32px 16px 120px; --grid-breakout: 10px; }
   .ut-phase { padding-bottom: 24px; margin-bottom: 32px; }
   .ut-steps { margin-bottom: 36px; }
   .ut-step { padding: 8px 12px; font-size: 0.8125rem; }
@@ -960,6 +997,10 @@
   .ut-modal-title { font-size: 1.25rem; }
   .ut-breathing-circle { width: 160px; height: 160px; }
   .ut-breathing-orb { width: 44px; height: 44px; }
+}
+
+@media (max-width: 360px) {
+  .urge-toolkit { padding: 28px 12px 100px; --grid-breakout: 6px; }
 }
 
 @media (min-width: 1024px) {
@@ -978,7 +1019,7 @@
   margin-bottom: 32px;
   background: var(--surface-overlay);
   border: 1px solid var(--border-subtle);
-  border-radius: 16px;
+  border-radius: 12px;
   text-align: center;
   animation: fadeInUp 500ms ease forwards;
   opacity: 0;
