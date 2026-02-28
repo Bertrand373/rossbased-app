@@ -32,7 +32,7 @@
   /* No min-height - parent .app-content handles layout */
   flex: 1;
   background-color: var(--background);
-  padding: 12px 6px 108px;
+  padding: 12px 6px 148px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -230,8 +230,8 @@
   flex-direction: column;
   position: relative;
   z-index: 1;
-  /* Ensure grid fills viewport regardless of parent flex chain */
-  min-height: calc(100dvh - 220px);
+  /* Ensure grid fills viewport — accounts for app header, padding, calendar header */
+  min-height: calc(100dvh - 310px);
 }
 
 /* =============================================================================
@@ -351,7 +351,6 @@
   background: var(--cal-cell-bg);
   border: none;
   border-radius: 6px;
-  overflow: hidden;
   transition: background 120ms ease, box-shadow 120ms ease;
 }
 
@@ -860,11 +859,11 @@
 
 @media (max-width: 480px) {
   .calendar-container {
-    padding: 8px 4px 108px;
+    padding: 8px 4px 148px;
   }
 
   .calendar-main-section {
-    min-height: calc(100dvh - 250px);
+    min-height: calc(100dvh - 300px);
   }
   
   /* Minimal header adjustments — stays horizontal */
