@@ -24,16 +24,42 @@
   --cal-today-ring: rgba(0,0,0,0.1);
 }
 
+/* =============================================================================
+   PARENT WRAPPER CONSTRAINT — prevents scroll, same pattern as Tracker
+   ============================================================================= */
+
+.main-content-wrapper:has(.calendar-container) {
+  padding: 0;
+  overflow: hidden;
+  height: calc(100dvh - var(--header-height-mobile) - var(--nav-height-mobile));
+  max-height: calc(100dvh - var(--header-height-mobile) - var(--nav-height-mobile));
+}
+
+.app-content:has(.calendar-container) {
+  overflow: hidden;
+  padding-bottom: 0 !important;
+}
+
+@media (min-width: 1025px) {
+  .main-content-wrapper:has(.calendar-container) {
+    height: calc(100dvh - var(--header-height));
+    max-height: calc(100dvh - var(--header-height));
+  }
+}
+
+/* =============================================================================
+   CALENDAR CONTAINER
+   ============================================================================= */
+
 .calendar-container {
-  /* No min-height - parent .app-content handles layout */
   flex: 1;
   background-color: var(--background);
-  padding: 12px 6px 148px;
+  padding: 12px 6px 50px;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* Content wrapper - wider on desktop */
@@ -226,8 +252,7 @@
   flex-direction: column;
   position: relative;
   z-index: 1;
-  /* Fill viewport — 310px accounts for: app header (~91+safe-area), padding (160), calendar chrome (~58) */
-  min-height: calc(100dvh - 310px);
+  min-height: 0;
 }
 
 /* =============================================================================
@@ -808,11 +833,7 @@
 
 @media (max-width: 480px) {
   .calendar-container {
-    padding: 8px 4px 148px;
-  }
-
-  .calendar-main-section {
-    min-height: calc(100dvh - 300px);
+    padding: 8px 4px 50px;
   }
   
   /* Minimal header adjustments — stays horizontal */
