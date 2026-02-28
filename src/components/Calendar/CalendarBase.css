@@ -129,10 +129,22 @@
   border-bottom: 1px solid var(--border-subtle);
 }
 
-/* Month view: no container top gap, prevent scroll */
+/* Month view: no container top gap, prevent scroll at all levels */
 .calendar-container:has(.calendar-display) {
   padding-top: 0;
-  overflow: hidden;
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+/* Lock ancestors when month view is active */
+.app-content:has(.calendar-display) {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+.main-content-wrapper:has(.calendar-display) {
+  overflow: hidden !important;
+  overscroll-behavior: none;
 }
 
 /* Period Display - Typography focused like landing stats */
@@ -1338,10 +1350,10 @@
   }
 }
 
-/* PWA standalone: restore original spacing (safe-area present) */
+/* PWA standalone: restore spacing (safe-area present, moon bar higher) */
 @media (display-mode: standalone) {
   .calendar-container {
-    padding-bottom: 110px;
+    padding-bottom: 85px;
   }
 
   /* Week view: no moon bar, wrapper already clears nav — minimal padding */
@@ -1356,7 +1368,7 @@
 
 @media (display-mode: standalone) and (max-width: 480px) {
   .calendar-container {
-    padding-bottom: 110px;
+    padding-bottom: 85px;
   }
 
   .calendar-container:has(.week-view-grid) {

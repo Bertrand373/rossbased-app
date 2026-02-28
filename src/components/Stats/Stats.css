@@ -80,12 +80,14 @@
   margin-right: calc(-1 * var(--grid-breakout));
 }
 
-/* Direct children of stats-page are flex items — negative margins alone don't widen them.
-   Must explicitly calc width to break out, then negative margins position correctly. */
-.stats-page > .stat-supporting,
-.stats-page > .share-card-section {
-  max-width: none;
-  width: calc(100% + 2 * var(--grid-breakout));
+/* Direct flex children need explicit width to break out (negative margins alone don't resize flex items).
+   Scoped to mobile/tablet only — desktop keeps its max-width constraint. */
+@media (max-width: 1024px) {
+  .stats-page > .stat-supporting,
+  .stats-page > .share-card-section {
+    max-width: none;
+    width: calc(100% + 2 * var(--grid-breakout));
+  }
 }
 
 /* =============================================================================
