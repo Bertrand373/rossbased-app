@@ -1289,24 +1289,35 @@
 }
 
 /* =============================================================================
-   MOBILE BROWSER — No safe area, browser chrome offsets viewport
-   Month view: reduce bottom padding (less gap above moon bar)
-   Week view: increase grid padding (last cell clears moon bar blur)
+   MOBILE BROWSER — browser chrome eats viewport, adjust grid clearance
+   PWA standalone is fine — these overrides only hit in-browser
    ============================================================================= */
 
-@media not (display-mode: standalone) {
+@media (max-width: 1024px) {
+  /* Browser default: tighter bottom padding (no safe-area in browser) */
   .calendar-container {
-    padding-bottom: 90px;
+    padding-bottom: 70px;
   }
 
   .week-view-grid {
-    padding-bottom: 40px;
+    padding-bottom: 52px;
   }
 }
 
-@media not (display-mode: standalone) and (max-width: 480px) {
+/* PWA standalone: restore original spacing (safe-area present) */
+@media (display-mode: standalone) {
   .calendar-container {
-    padding-bottom: 90px;
+    padding-bottom: 110px;
+  }
+
+  .week-view-grid {
+    padding-bottom: 12px;
+  }
+}
+
+@media (display-mode: standalone) and (max-width: 480px) {
+  .calendar-container {
+    padding-bottom: 110px;
   }
 }
 
