@@ -636,16 +636,18 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           </div>
         </div>
 
-        {/* 6-column metric grid (mirrors Calendar day headers) */}
-        <div className="metric-grid-row">
-          {['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'].map((metric) => (
-            <button
-              key={metric}
-              className={`metric-cell ${selectedMetric === metric ? 'active' : ''}`}
-              onClick={() => setSelectedMetric(metric)}
-            >
-              {metric.charAt(0).toUpperCase() + metric.slice(1)}
-            </button>
+        {/* Metric toggles — pipe-divider style matching app toggle DNA */}
+        <div className="toggle-row benefits-row">
+          {['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'].map((metric, index) => (
+            <React.Fragment key={metric}>
+              <button
+                className={`toggle-btn ${selectedMetric === metric ? 'active' : ''}`}
+                onClick={() => setSelectedMetric(metric)}
+              >
+                {metric.charAt(0).toUpperCase() + metric.slice(1)}
+              </button>
+              {index < 5 && <div className="toggle-divider" />}
+            </React.Fragment>
           ))}
         </div>
 

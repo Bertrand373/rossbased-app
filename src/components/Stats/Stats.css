@@ -67,9 +67,8 @@
 .stat-supporting,
 .milestone-grid,
 .benefit-header,
-.metric-grid-row,
 .chart-box,
-.analytics-stack {
+.numbers-container {
   margin-left: calc(-1 * var(--grid-breakout));
   margin-right: calc(-1 * var(--grid-breakout));
 }
@@ -477,46 +476,7 @@
   flex-shrink: 0;
 }
 
-/* 6-column metric grid — mirrors Calendar SUN-SAT day headers */
-.metric-grid-row {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 0;
-}
-
-.metric-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 0;
-  font-size: 0.75rem;
-  font-weight: 500;
-  font-family: inherit;
-  color: var(--text-tertiary);
-  background: transparent;
-  border: none;
-  border-right: 1px solid var(--border-subtle);
-  cursor: pointer;
-  transition: color 150ms ease, background 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-  text-transform: capitalize;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
-}
-
-.metric-cell:last-child { border-right: none; }
-.metric-cell:hover:not(.active) { color: var(--text-secondary); }
-
-.metric-cell.active {
-  color: var(--text);
-  font-weight: 600;
-  background: var(--surface-overlay);
-}
-
-/* Legacy toggle-row — kept for compatibility */
+/* Toggle-row — pipe-divider style for metric selection */
 .stats-page .toggle-row {
   display: flex;
   justify-content: center;
@@ -1068,6 +1028,21 @@
   .stats-page .modal h2 { font-size: 1.375rem; }
 }
 
+@media (max-width: 520px) {
+  .stats-page .toggle-row.benefits-row {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 12px;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .stats-page .toggle-row.benefits-row .toggle-divider:nth-of-type(4) {
+    display: none;
+  }
+}
+
 @media (max-width: 480px) {
   .stats-page { padding: 32px 16px 100px; --grid-breakout: 10px; }
   .stat-hero-num { font-size: 4rem; }
@@ -1076,7 +1051,8 @@
   .milestone-card { padding: 18px 6px; }
   .milestone-num { font-size: 1.25rem; }
   .milestone-label { font-size: 0.5rem; }
-  .metric-cell { font-size: 0.6875rem; padding: 10px 0; }
+  .stats-page .toggle-btn { font-size: 0.8125rem; padding: 8px 12px; }
+  .stats-page .toggle-divider { height: 14px; }
   .time-toggle-compact .tt-btn { font-size: 0.75rem; padding: 4px 8px; }
   .average-num { font-size: 4rem; }
   .average-suffix { font-size: 1rem; }
@@ -1091,7 +1067,7 @@
 }
 
 @media (max-width: 374px) {
-  .metric-cell { font-size: 0.625rem; padding: 9px 0; }
+  .stats-page .toggle-btn { font-size: 0.75rem; padding: 8px 10px; }
   .time-toggle-compact .tt-btn { font-size: 0.6875rem; padding: 4px 6px; }
 }
 
@@ -1132,7 +1108,7 @@
     opacity: 1;
   }
   
-  .stats-page .toggle-btn, .milestone-card, .stat-hero-num, .stat-supporting-card, .reset-btn, .metric-cell, .tt-btn {
+  .stats-page .toggle-btn, .milestone-card, .stat-hero-num, .stat-supporting-card, .reset-btn, .tt-btn {
     transition: none;
   }
 }
