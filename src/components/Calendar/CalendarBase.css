@@ -256,6 +256,26 @@ body:has(.calendar-display) {
   background-color: var(--border-prominent);
 }
 
+/* Gear icon - week view metric picker */
+.week-metrics-gear {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 8px;
+  margin-left: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.week-metrics-gear:active {
+  color: var(--text);
+}
+
 /* =============================================================================
    LEGEND - Minimal, barely visible
    ============================================================================= */

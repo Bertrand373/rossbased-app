@@ -9,7 +9,7 @@ import './CalendarBase.css';
 import './CalendarModals.css';
 import '../../styles/BottomSheet.css';
 
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaCog } from 'react-icons/fa';
 
 // NEW: Import InterventionService for ML feedback loop
 import interventionService from '../../services/InterventionService';
@@ -163,6 +163,57 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [showSuggestions, setShowSuggestions] = useState(null); // index of active suggestion dropdown
   const [swipedExerciseId, setSwipedExerciseId] = useState(null); // exercise showing delete
   const exerciseTouchStartX = useRef(0);
+
+  // Week view metric selection
+  const METRIC_OPTIONS = [
+    { key: 'energy', label: 'Energy' },
+    { key: 'focus', label: 'Focus' },
+    { key: 'confidence', label: 'Confidence' },
+    { key: 'aura', label: 'Aura' },
+    { key: 'sleep', label: 'Sleep' },
+    { key: 'workout', label: 'Workout' }
+  ];
+  const [weekMetrics, setWeekMetrics] = useState(() => {
+    try {
+      const saved = localStorage.getItem('tt_weekMetrics');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length === 3) return parsed;
+      }
+    } catch {}
+    return ['energy', 'focus', 'confidence'];
+  });
+  const [metricsSheetOpen, setMetricsSheetOpen] = useState(false);
+  const [metricsSheetReady, setMetricsSheetReady] = useState(false);
+
+  const toggleWeekMetric = (key) => {
+    setWeekMetrics(prev => {
+      let next;
+      if (prev.includes(key)) {
+        if (prev.length <= 3) return prev; // don't go below 3
+        next = prev.filter(k => k !== key);
+      } else {
+        if (prev.length >= 3) {
+          // Replace oldest (first) selection
+          next = [...prev.slice(1), key];
+        } else {
+          next = [...prev, key];
+        }
+      }
+      localStorage.setItem('tt_weekMetrics', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  // Metrics sheet open/close
+  const openMetricsSheet = () => {
+    setMetricsSheetOpen(true);
+    requestAnimationFrame(() => setMetricsSheetReady(true));
+  };
+  const closeMetricsSheet = () => {
+    setMetricsSheetReady(false);
+    setTimeout(() => setMetricsSheetOpen(false), 300);
+  };
 
   // Mark initial entrance animation as complete
   useEffect(() => {
@@ -1407,17 +1458,22 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           
           {/* Benefit bars - white progress bars matching modal style */}
           <div className="week-benefits-prominent">
-            {dayBenefits && ['energy', 'focus', 'confidence'].map(metric => (
+            {dayBenefits && weekMetrics.map(metric => {
+              const val = metric === 'sleep' ? (dayBenefits.sleep || dayBenefits.attraction || 5)
+                : metric === 'workout' ? (dayBenefits.workout || dayBenefits.gymPerformance || 5)
+                : (dayBenefits[metric] || 5);
+              return (
               <div key={metric} className="week-benefit-item">
                 <span className="week-benefit-label-top">{metric}</span>
                 <div className="week-benefit-bar">
                   <div 
                     className="week-benefit-fill" 
-                    style={{ width: `${(dayBenefits[metric] || 5) * 10}%` }} 
+                    style={{ width: `${val * 10}%` }} 
                   />
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
           
           {/* Bottom indicators - tracked data only */}
@@ -1473,6 +1529,11 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           >
             Week
           </button>
+          {viewMode === 'week' && (
+            <button className="week-metrics-gear" onClick={openMetricsSheet} aria-label="Choose week metrics">
+              <FaCog />
+            </button>
+          )}
         </div>
       </div>
 
@@ -1866,6 +1927,39 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                 </>
               );
             })()}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================================================================
+          WEEK METRICS SELECTION SHEET
+          ================================================================ */}
+      {metricsSheetOpen && (
+        <div className={`sheet-backdrop${metricsSheetReady ? ' open' : ''}`} onClick={closeMetricsSheet}>
+          <div className={`sheet-panel metrics-sheet${metricsSheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" />
+            <div className="metrics-sheet-body">
+              <h3 className="metrics-sheet-title">Week View Metrics</h3>
+              <p className="metrics-sheet-subtitle">Choose 3 to display</p>
+              <div className="metrics-sheet-options">
+                {METRIC_OPTIONS.map(({ key, label }) => {
+                  const isActive = weekMetrics.includes(key);
+                  return (
+                    <button
+                      key={key}
+                      className={`metrics-sheet-option${isActive ? ' active' : ''}`}
+                      onClick={() => toggleWeekMetric(key)}
+                    >
+                      <span className="metrics-option-label">{label}</span>
+                      <span className={`metrics-option-check${isActive ? ' active' : ''}`}>
+                        {isActive ? '✓' : ''}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              <button className="calendar-btn-ghost" onClick={closeMetricsSheet} style={{ marginTop: '16px', width: '100%' }}>Done</button>
             </div>
           </div>
         </div>

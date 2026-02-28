@@ -1667,3 +1667,79 @@
     font-size: 0.875rem;
   }
 }
+
+/* =============================================================================
+   WEEK METRICS SELECTION SHEET
+   ============================================================================= */
+
+.metrics-sheet {
+  max-height: 50dvh;
+}
+
+.metrics-sheet-body {
+  padding: 0 20px 24px;
+}
+
+.metrics-sheet-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 2px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.metrics-sheet-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin: 0 0 16px;
+  text-align: center;
+}
+
+.metrics-sheet-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.metrics-sheet-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.metrics-sheet-option.active {
+  border-color: var(--text);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.metrics-option-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+.metrics-sheet-option.active .metrics-option-label {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.metrics-option-check {
+  font-size: 0.875rem;
+  color: transparent;
+  width: 20px;
+  text-align: center;
+}
+
+.metrics-option-check.active {
+  color: var(--text);
+}
