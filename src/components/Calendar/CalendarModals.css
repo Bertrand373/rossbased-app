@@ -1159,6 +1159,8 @@
 .cal-sheet {
   max-height: 85dvh;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Override calendar-modal when inside sheet panel */
@@ -1167,13 +1169,16 @@
   max-height: none;
   width: 100%;
   max-width: none;
+  flex-shrink: 1;
 }
 
 /* Day Info flexes to fill panel, internal content scrolls */
 .cal-sheet .calendar-day-info {
-  flex: 1;
+  flex: 1 1 0%;
   min-height: 0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Footer inside sheet needs no extra bottom padding (panel handles safe area) */
@@ -1198,7 +1203,7 @@
 
 /* Wrapper that allows sheet to smoothly resize when content changes */
 .cal-sheet-body {
-  flex: 1;
+  flex: 1 1 0%;
   display: flex;
   flex-direction: column;
   min-height: 0;

@@ -76,6 +76,7 @@
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding-top: 0;
+  padding-bottom: 160px;
 }
 
 .calendar-container:has(.week-view-grid)::-webkit-scrollbar {
@@ -1103,6 +1104,12 @@ body:has(.calendar-display) {
   animation: fadeInUp 500ms ease forwards;
 }
 
+/* Week view: kill header animation so position:sticky works in Safari PWA */
+.calendar-container:has(.week-view-grid) .calendar-header-minimal {
+  animation: none;
+  opacity: 1;
+}
+
 .calendar-legend-minimal {
   animation: fadeInUp 500ms ease 50ms forwards;
   opacity: 0;
@@ -1346,12 +1353,12 @@ body:has(.calendar-display) {
     padding-bottom: 45px;
   }
 
-  /* Week view: no moon bar, wrapper already clears nav — minimal padding */
+  /* Week view: moon bar visible, needs clearance for last cell */
   .calendar-container:has(.week-view-grid) {
-    padding-bottom: 8px;
+    padding-bottom: 160px;
   }
 
-  /* Week view: just clear the nav bar (no moon bar to dodge) */
+  /* Week view: inner grid breathing room */
   .week-view-grid {
     padding-bottom: 16px;
   }
@@ -1363,9 +1370,9 @@ body:has(.calendar-display) {
     padding-bottom: 103px;
   }
 
-  /* Week view: no moon bar, wrapper already clears nav — minimal padding */
+  /* Week view: moon bar visible, needs clearance for last cell + safe area */
   .calendar-container:has(.week-view-grid) {
-    padding-bottom: 8px;
+    padding-bottom: 160px;
   }
 
   .week-view-grid {
@@ -1379,7 +1386,7 @@ body:has(.calendar-display) {
   }
 
   .calendar-container:has(.week-view-grid) {
-    padding-bottom: 8px;
+    padding-bottom: 160px;
   }
 }
 
