@@ -73,11 +73,17 @@
 
 .stat-supporting,
 .milestone-grid,
-.benefit-header,
 .chart-box,
-.numbers-container {
+.numbers-container,
+.share-card-section {
   margin-left: calc(-1 * var(--grid-breakout));
   margin-right: calc(-1 * var(--grid-breakout));
+}
+
+/* Direct children of stats-page are capped at 480px — breakout elements need to escape */
+.stats-page > .stat-supporting,
+.stats-page > .share-card-section {
+  max-width: none;
 }
 
 /* =============================================================================
