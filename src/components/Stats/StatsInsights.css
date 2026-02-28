@@ -1,6 +1,6 @@
 /* src/components/Stats/StatsInsights.css */
 /* Pure data analytics styling - matches Landing page minimal aesthetic */
-/* UPDATED: Added streak-phase block styling */
+/* UPDATED: Grid container design matching Calendar/Stats cohesion */
 
 /* ============================================================
    INSIGHT CARDS - Floating sections with dividers
@@ -99,13 +99,19 @@
 }
 
 /* ============================================================
-   YOUR NUMBERS - 3x2 Grid layout
+   YOUR NUMBERS - Rounded grid container with cell borders
    ============================================================ */
+
+/* Container wrapping numbers + extremes as one connected block */
+.numbers-container {
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  overflow: hidden;
+}
 
 .numbers-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px 16px;
 }
 
 .number-item {
@@ -113,7 +119,17 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 4px;
+  gap: 5px;
+  padding: 20px 8px;
+  border-bottom: 1px solid var(--border-subtle);
+  border-right: 1px solid var(--border-subtle);
+}
+
+.number-item:nth-child(3n) { border-right: none; }
+
+/* Last row — remove bottom border only if no extremes follow */
+.numbers-container:not(.has-extremes) .number-item:nth-last-child(-n+3) {
+  border-bottom: none;
 }
 
 .number-label {
@@ -150,14 +166,10 @@
   color: var(--text-tertiary);
 }
 
-/* Strongest & Growth Area Row */
+/* Strongest & Growth Area — attached to bottom of numbers container */
 .extremes-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 24px;
-  margin-top: 24px;
-  padding-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   border-top: 1px solid var(--border-subtle);
 }
 
@@ -166,6 +178,11 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  padding: 16px 0;
+}
+
+.extreme-item:first-child {
+  border-right: 1px solid var(--border-subtle);
 }
 
 .extreme-label {
@@ -183,10 +200,9 @@
   text-transform: capitalize;
 }
 
+/* Legacy divider — no longer needed */
 .extreme-divider {
-  width: 1px;
-  height: 28px;
-  background: var(--border);
+  display: none;
 }
 
 /* Tracking prompt */
@@ -478,9 +494,8 @@
    ============================================================ */
 
 @media (max-width: 480px) {
-  .numbers-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px 24px;
+  .number-item {
+    padding: 16px 6px;
   }
   
   .number-value {
@@ -489,10 +504,6 @@
   
   .number-label {
     font-size: 0.625rem;
-  }
-  
-  .extremes-row {
-    gap: 20px;
   }
   
   .extreme-value {
@@ -548,21 +559,12 @@
 }
 
 @media (max-width: 360px) {
-  .numbers-grid {
-    gap: 16px 20px;
+  .number-item {
+    padding: 14px 4px;
   }
   
   .number-value {
     font-size: 1.25rem;
-  }
-  
-  .extremes-row {
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .extreme-divider {
-    display: none;
   }
   
   .streak-phase-item .phase-value {
@@ -572,8 +574,21 @@
 
 /* Desktop enhancements */
 @media (min-width: 768px) {
+  /* 6 numbers in one row on desktop */
   .numbers-grid {
-    gap: 24px 20px;
+    grid-template-columns: repeat(6, 1fr);
+  }
+  
+  .number-item {
+    border-bottom: none;
+  }
+  
+  .number-item:nth-child(3n) {
+    border-right: 1px solid var(--border-subtle);
+  }
+  
+  .number-item:nth-child(6n) {
+    border-right: none;
   }
   
   .number-value {

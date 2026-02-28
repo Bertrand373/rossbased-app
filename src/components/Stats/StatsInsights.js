@@ -61,30 +61,31 @@ export const YourNumbers = ({
           </div>
         ) : (
           <>
-            <div className="numbers-grid">
-              {metrics.map(metric => (
-                <div key={metric} className="number-item">
-                  <span className="number-label">{metric}</span>
-                  <span className="number-value">{getValue(metric)}</span>
-                  {daysTracked >= 14 && renderDelta(metric)}
-                </div>
-              ))}
-            </div>
-            
-            {/* Strongest & Growth Area - only show if meaningful */}
-            {metricExtremes?.strongest && metricExtremes?.growthArea && (
-              <div className="extremes-row">
-                <div className="extreme-item">
-                  <span className="extreme-label">Strongest</span>
-                  <span className="extreme-value">{metricExtremes.strongest.metric}</span>
-                </div>
-                <div className="extreme-divider" />
-                <div className="extreme-item">
-                  <span className="extreme-label">Growth area</span>
-                  <span className="extreme-value">{metricExtremes.growthArea.metric}</span>
-                </div>
+            <div className={`numbers-container${metricExtremes?.strongest && metricExtremes?.growthArea ? ' has-extremes' : ''}`}>
+              <div className="numbers-grid">
+                {metrics.map(metric => (
+                  <div key={metric} className="number-item">
+                    <span className="number-label">{metric}</span>
+                    <span className="number-value">{getValue(metric)}</span>
+                    {daysTracked >= 14 && renderDelta(metric)}
+                  </div>
+                ))}
               </div>
-            )}
+              
+              {/* Strongest & Growth Area — attached to numbers container */}
+              {metricExtremes?.strongest && metricExtremes?.growthArea && (
+                <div className="extremes-row">
+                  <div className="extreme-item">
+                    <span className="extreme-label">Strongest</span>
+                    <span className="extreme-value">{metricExtremes.strongest.metric}</span>
+                  </div>
+                  <div className="extreme-item">
+                    <span className="extreme-label">Growth area</span>
+                    <span className="extreme-value">{metricExtremes.growthArea.metric}</span>
+                  </div>
+                </div>
+              )}
+            </div>
             
             {/* Show tracking prompt if not enough data for trends */}
             {daysTracked < 14 && (

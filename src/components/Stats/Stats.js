@@ -615,36 +615,37 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       {isPremium && <ShareCard userData={safeUserData} isVisible={true} />}
 
       {/* Benefit Tracker */}
-      <section className="stats-section">
+      <section className="stats-section benefit-section">
         <h2>Benefits</h2>
         
-        {/* Metric toggles - Single row, wraps on mobile */}
-        <div className="toggle-row benefits-row">
-          {['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'].map((metric, index) => (
-            <React.Fragment key={metric}>
-              <button
-                className={`toggle-btn ${selectedMetric === metric ? 'active' : ''}`}
-                onClick={() => setSelectedMetric(metric)}
-              >
-                {metric.charAt(0).toUpperCase() + metric.slice(1)}
-              </button>
-              {index < 5 && <div className="toggle-divider" />}
-            </React.Fragment>
-          ))}
+        {/* Header: label left, time range right (mirrors Calendar) */}
+        <div className="benefit-header">
+          <h2>Benefits</h2>
+          <div className="time-toggle-compact">
+            {timeRanges.map((r, index) => (
+              <React.Fragment key={r.key}>
+                <button
+                  className={`tt-btn ${timeRange === r.key ? 'active' : ''}`}
+                  onClick={() => setTimeRange(r.key)}
+                >
+                  {r.label}
+                </button>
+                {index < timeRanges.length - 1 && <div className="tt-div" />}
+              </React.Fragment>
+            ))}
+          </div>
         </div>
 
-        {/* Time range toggles */}
-        <div className="toggle-row time-range">
-          {timeRanges.map((r, index) => (
-            <React.Fragment key={r.key}>
-              <button
-                className={`toggle-btn ${timeRange === r.key ? 'active' : ''}`}
-                onClick={() => setTimeRange(r.key)}
-              >
-                {r.label}
-              </button>
-              {index < timeRanges.length - 1 && <div className="toggle-divider" />}
-            </React.Fragment>
+        {/* 6-column metric grid (mirrors Calendar day headers) */}
+        <div className="metric-grid-row">
+          {['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'].map((metric) => (
+            <button
+              key={metric}
+              className={`metric-cell ${selectedMetric === metric ? 'active' : ''}`}
+              onClick={() => setSelectedMetric(metric)}
+            >
+              {metric.charAt(0).toUpperCase() + metric.slice(1)}
+            </button>
           ))}
         </div>
 
