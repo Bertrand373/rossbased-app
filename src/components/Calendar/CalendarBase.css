@@ -266,7 +266,7 @@
 
 .calendar-moon-bar {
   position: fixed;
-  bottom: calc(52px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(64px + env(safe-area-inset-bottom, 0px));
   left: 0;
   right: 0;
   display: flex;
