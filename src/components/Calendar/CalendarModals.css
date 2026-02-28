@@ -1738,22 +1738,22 @@
 .metrics-sheet button.cancel {
   display: block;
   width: 100%;
-  padding: 16px 20px;
+  padding: 14px 20px;
   background: transparent;
-  border: none;
+  border: 1px solid var(--border-subtle);
   border-radius: 9999px;
   color: var(--text-secondary);
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 0.9375rem;
+  font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   text-align: center;
-  transition: background-color 100ms ease;
+  transition: border-color 150ms ease, color 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .metrics-sheet button.cancel:hover {
-  background-color: var(--surface-overlay);
+  border-color: var(--border);
   color: var(--text);
 }
 
