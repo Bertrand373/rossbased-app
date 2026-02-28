@@ -80,10 +80,12 @@
   margin-right: calc(-1 * var(--grid-breakout));
 }
 
-/* Direct children of stats-page are capped at 480px — breakout elements need to escape */
+/* Direct children of stats-page are flex items — negative margins alone don't widen them.
+   Must explicitly calc width to break out, then negative margins position correctly. */
 .stats-page > .stat-supporting,
 .stats-page > .share-card-section {
   max-width: none;
+  width: calc(100% + 2 * var(--grid-breakout));
 }
 
 /* =============================================================================

@@ -120,21 +120,19 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 4px;
-  padding: 0 8px;
-  position: relative;
-  z-index: 10;
-  background: var(--background);
-}
-
-/* Week view: pin header while scrolling */
-.calendar-container:has(.week-view-grid) .calendar-header-minimal {
+  margin-bottom: 0;
+  padding: 10px 8px;
   position: sticky;
   top: 0;
-  margin-bottom: 0;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  z-index: 10;
+  background: var(--background);
   border-bottom: 1px solid var(--border-subtle);
+}
+
+/* Month view: no container top gap, prevent scroll */
+.calendar-container:has(.calendar-display) {
+  padding-top: 0;
+  overflow: hidden;
 }
 
 /* Period Display - Typography focused like landing stats */
@@ -1324,9 +1322,9 @@
    ============================================================================= */
 
 @media (max-width: 1024px) {
-  /* Browser default: month bottom padding clears moon bar blur zone */
+  /* Browser default: month bottom padding — grid should sit just above moon bar */
   .calendar-container {
-    padding-bottom: 65px;
+    padding-bottom: 45px;
   }
 
   /* Week view: no moon bar, wrapper already clears nav — minimal padding */
