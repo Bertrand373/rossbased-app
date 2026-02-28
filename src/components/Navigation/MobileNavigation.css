@@ -10,8 +10,8 @@
   z-index: 90;
   
   /* Tighter vertical rhythm — precision over comfort */
-  padding: 14px 24px;
-  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0));
+  padding: 10px 24px;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0));
   
   background-color: var(--nav-bg);
   backdrop-filter: blur(40px);
@@ -46,7 +46,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 10px 14px;
+  padding: 8px 14px;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
 }
@@ -155,12 +155,12 @@
 /* Larger phones — more room to breathe */
 @media (min-width: 390px) {
   .mobile-nav {
-    padding: 14px 28px;
-    padding-bottom: calc(14px + env(safe-area-inset-bottom, 0));
+    padding: 10px 28px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0));
   }
   
   .mobile-nav-item {
-    padding: 10px 16px;
+    padding: 8px 16px;
   }
   
   .mobile-nav-label {
