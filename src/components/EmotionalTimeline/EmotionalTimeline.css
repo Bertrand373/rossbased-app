@@ -15,6 +15,15 @@
   padding: 48px 24px 120px;
   background-color: var(--background);
   width: 100%;
+  --grid-breakout: 16px;
+}
+
+/* Grid breakout — content extends beyond page padding to match Calendar width */
+.et-current,
+.et-phases,
+.et-trajectory {
+  margin-left: calc(-1 * var(--grid-breakout));
+  margin-right: calc(-1 * var(--grid-breakout));
 }
 
 @media (min-width: 1025px) {
@@ -37,10 +46,11 @@
   cursor: pointer;
   transition: opacity 150ms ease;
   -webkit-tap-highlight-color: transparent;
-  background: var(--surface-overlay);
-  border: 1px solid var(--border-subtle);
-  border-radius: 16px;
-  margin-bottom: 16px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 0;
   animation: fadeInUp 500ms ease forwards;
   opacity: 0;
 }
@@ -708,7 +718,7 @@
    ============================================================================= */
 
 @media (max-width: 480px) {
-  .et-container { padding: 32px 16px 100px; }
+  .et-container { padding: 32px 16px 100px; --grid-breakout: 10px; }
   .et-current-header { gap: 10px; margin-bottom: 28px; }
   .et-current-num { font-size: 1.375rem; }
   .et-current-name { font-size: 0.875rem; }
@@ -729,7 +739,7 @@
 }
 
 @media (max-width: 360px) {
-  .et-container { padding: 28px 12px 90px; }
+  .et-container { padding: 28px 12px 90px; --grid-breakout: 6px; }
   .trajectory-values { gap: 6px; }
   .trajectory-label { min-width: 70px; font-size: 0.8125rem; }
   .trajectory-early, .trajectory-now { font-size: 0.8125rem; min-width: 24px; }
