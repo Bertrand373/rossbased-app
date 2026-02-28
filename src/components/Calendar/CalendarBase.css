@@ -344,10 +344,7 @@ body:has(.calendar-display) {
   opacity: 0.6;
 }
 
-/* Week view — hide moon bar, lunar data visible on individual day cells */
-.calendar-container:has(.week-view-grid) .calendar-moon-bar {
-  display: none;
-}
+/* Week view — moon bar stays visible for consistent nav height */
 
 .moon-bar-emoji {
   line-height: 1;
