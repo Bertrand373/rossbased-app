@@ -12,8 +12,6 @@
   --cal-tint-relapse: rgba(248,113,113,0.08);
   --cal-tint-wetdream: rgba(251,191,36,0.07);
   --cal-today-ring: rgba(255,255,255,0.12);
-  --cal-tracked-tint: rgba(255,255,255,0.018);
-  --cal-journal-dot: rgba(255,255,255,0.2);
 }
 
 [data-theme="light"] {
@@ -24,8 +22,6 @@
   --cal-tint-relapse: rgba(220,38,38,0.07);
   --cal-tint-wetdream: rgba(217,119,6,0.065);
   --cal-today-ring: rgba(0,0,0,0.1);
-  --cal-tracked-tint: rgba(0,0,0,0.02);
-  --cal-journal-dot: rgba(0,0,0,0.16);
 }
 
 .calendar-container {
@@ -230,7 +226,7 @@
   flex-direction: column;
   position: relative;
   z-index: 1;
-  /* Ensure grid fills viewport — accounts for app header, padding, calendar header */
+  /* Fill viewport — 310px accounts for: app header (~91+safe-area), padding (160), calendar chrome (~58) */
   min-height: calc(100dvh - 310px);
 }
 
@@ -378,9 +374,21 @@
   color: var(--text-secondary);
 }
 
-/* Tracked data — barely-there tint when no status */
-.day-cell.tracked {
-  background: var(--cal-tracked-tint);
+/* =============================================================================
+   DATA DASH — unified indicator for benefits or journal (top-right)
+   Same dash language as toast icons and sheet handles
+   ============================================================================= */
+
+.day-data-dash {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 6px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--text);
+  opacity: 0.14;
+  pointer-events: none;
 }
 
 /* Future days — muted numbers */
@@ -466,25 +474,6 @@
 }
 
 /* =============================================================================
-   JOURNAL DOT — small circle below day number
-   ============================================================================= */
-
-.day-journal-dot {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: var(--cal-journal-dot);
-  margin-top: 4px;
-  margin-left: 1px;
-  flex-shrink: 0;
-}
-
-/* Center dot under today's circle */
-.day-cell.today .day-journal-dot {
-  margin-left: calc((24px - 3px) / 2);
-}
-
-/* =============================================================================
    MOON PHASE INDICATORS - Premium lunar tracking
    ============================================================================= */
 
@@ -566,96 +555,72 @@
 }
 
 /* =============================================================================
-   WEEK VIEW - Premium Cards
+   WEEK VIEW - V7 Tinted Cards
+   Same design language as month: status tints, today ring, gap-based, no borders
    ============================================================================= */
 
 .week-view-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .week-day-cell {
-  background: var(--surface-overlay);
-  border: 1px solid var(--border-subtle);
-  border-radius: 14px;
-  padding: 16px 12px;
+  background: var(--cal-cell-bg);
+  border: none;
+  border-radius: 10px;
+  padding: 12px 14px;
   cursor: pointer;
-  transition: all 200ms ease;
+  transition: background 120ms ease, box-shadow 120ms ease;
   display: flex;
   flex-direction: column;
-  min-height: 180px;
-}
-
-.week-day-cell:hover {
-  background: var(--surface-raised);
-  border-color: var(--border);
+  flex: 1;
+  min-height: 0;
 }
 
 .week-day-cell:active {
   transform: scale(0.98);
 }
 
-/* Status styling for week cells - horizontal dash at top (matches month view) */
-.week-day-cell.current-streak,
-.week-day-cell.former-streak,
-.week-day-cell.relapse,
+/* Status — tinted card backgrounds (matches month cells) */
+.week-day-cell.current-streak {
+  background: var(--cal-tint-current);
+}
+
+.week-day-cell.former-streak {
+  background: var(--cal-tint-former);
+}
+
+.week-day-cell.relapse {
+  background: var(--cal-tint-relapse);
+}
+
 .week-day-cell.wet-dream {
-  position: relative;
+  background: var(--cal-tint-wetdream);
 }
 
-.week-day-cell.current-streak::after {
-  content: '';
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 30px;
-  height: 3px;
-  background: var(--status-current);
-  border-radius: 2px;
-}
-
-.week-day-cell.former-streak::after {
-  content: '';
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 30px;
-  height: 3px;
-  background: var(--status-former);
-  border-radius: 2px;
-}
-
-.week-day-cell.relapse::after {
-  content: '';
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 30px;
-  height: 3px;
-  background: var(--status-relapse);
-  border-radius: 2px;
-}
-
-.week-day-cell.wet-dream::after {
-  content: '';
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 30px;
-  height: 3px;
-  background: var(--status-wetdream);
-  border-radius: 2px;
-}
-
-/* Today card highlight */
+/* Today card — inset ring matching month */
 .week-day-cell.today-card {
-  background: var(--surface-raised);
-  border-color: var(--border-prominent);
+  box-shadow: inset 0 0 0 1.5px var(--cal-today-ring);
+}
+
+/* Today + status */
+.week-day-cell.today-card.current-streak {
+  background: var(--cal-tint-current);
+  box-shadow: inset 0 0 0 1.5px var(--cal-today-ring);
+}
+.week-day-cell.today-card.former-streak {
+  background: var(--cal-tint-former);
+  box-shadow: inset 0 0 0 1.5px var(--cal-today-ring);
+}
+.week-day-cell.today-card.relapse {
+  background: var(--cal-tint-relapse);
+  box-shadow: inset 0 0 0 1.5px var(--cal-today-ring);
+}
+.week-day-cell.today-card.wet-dream {
+  background: var(--cal-tint-wetdream);
+  box-shadow: inset 0 0 0 1.5px var(--cal-today-ring);
 }
 
 /* Week day header */
@@ -744,14 +709,13 @@
   transition: width 300ms ease;
 }
 
-/* Week day indicators */
+/* Week day indicators — no separator border in V7 */
 .week-day-indicators {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border-subtle);
+  margin-top: 8px;
+  padding-top: 0;
 }
 
 /* Week data indicator - single dash for tracked data */
@@ -774,34 +738,20 @@
 
 @media (max-width: 768px) {
   .week-view-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 6px;
   }
   
   .week-day-cell {
     flex-direction: row;
     align-items: center;
-    min-height: auto;
-    padding: 16px;
-    gap: 16px;
+    padding: 12px 14px;
+    gap: 14px;
   }
   
   .week-day-header {
     margin-bottom: 0;
-    min-width: 56px;
+    min-width: 52px;
     flex-shrink: 0;
-  }
-  
-  .week-day-cell.current-streak::after,
-  .week-day-cell.former-streak::after,
-  .week-day-cell.relapse::after,
-  .week-day-cell.wet-dream::after {
-    top: 50%;
-    transform: translateY(-50%);
-    right: 16px;
-    left: auto;
-    width: 3px;
-    height: 24px;
   }
   
   .week-day-name {
@@ -814,7 +764,7 @@
   
   .week-benefits-prominent {
     flex: 1;
-    gap: 10px;
+    gap: 8px;
   }
   
   .week-benefit-item {
@@ -824,13 +774,13 @@
   }
   
   .week-benefit-label-top {
-    min-width: 70px;
-    font-size: 0.625rem;
+    min-width: 65px;
+    font-size: 0.5625rem;
   }
   
   .week-benefit-bar {
     flex: 1;
-    height: 3px;
+    height: 2px;
   }
   
   .week-day-indicators {
@@ -838,10 +788,9 @@
     gap: 6px;
     margin-top: 0;
     padding-top: 0;
-    padding-left: 16px;
-    border-top: none;
-    border-left: 1px solid var(--border-subtle);
-    min-width: 44px;
+    padding-left: 12px;
+    border-left: 1px solid var(--cal-grid-bg);
+    min-width: 32px;
     align-items: center;
   }
   
@@ -924,13 +873,11 @@
     font-size: 0.6875rem;
   }
   
-  /* Journal dot adjusts for smaller today circle */
-  .day-cell.today .day-journal-dot {
-    margin-left: calc((22px - 3px) / 2);
-  }
-  
-  .day-journal-dot {
-    margin-top: 3px;
+  /* Data dash mobile — tighter position */
+  .day-data-dash {
+    top: 4px;
+    right: 4px;
+    width: 5px;
   }
   
   /* Moon indicator mobile adjustments */
@@ -953,41 +900,29 @@
     box-shadow: inset 0 0 8px rgba(60, 60, 80, 0.08);
   }
   
-  /* Week view very small */
+  /* Week view mobile */
   .week-day-cell {
-    padding: 14px 16px;
-    gap: 16px;
-    border-radius: 12px;
-  }
-  
-  .week-day-cell.current-streak::after,
-  .week-day-cell.former-streak::after,
-  .week-day-cell.relapse::after,
-  .week-day-cell.wet-dream::after {
-    top: 50%;
-    transform: translateY(-50%);
-    right: 14px;
-    left: auto;
-    width: 2px;
-    height: 20px;
+    padding: 10px 12px;
+    gap: 12px;
+    border-radius: 8px;
   }
   
   .week-day-header {
-    min-width: 48px;
+    min-width: 46px;
   }
   
   .week-day-name {
-    font-size: 0.5625rem;
+    font-size: 0.5rem;
   }
   
   .week-day-number {
-    font-size: 1.5rem;
+    font-size: 1.375rem;
   }
   
   .week-day-number.today {
-    width: 38px;
-    height: 38px;
-    font-size: 0.9375rem;
+    width: 34px;
+    height: 34px;
+    font-size: 0.875rem;
   }
   
   .week-benefit-label-top {
@@ -1166,13 +1101,11 @@
     font-size: 0.875rem;
   }
   
-  .day-cell.today .day-journal-dot {
-    margin-left: calc((30px - 3px) / 2);
-  }
-  
-  .day-journal-dot {
-    width: 3.5px;
-    height: 3.5px;
+  .day-data-dash {
+    top: 7px;
+    right: 7px;
+    width: 7px;
+    height: 2px;
   }
   
   /* Moon indicator desktop */
@@ -1195,26 +1128,17 @@
     box-shadow: inset 0 0 16px rgba(60, 60, 80, 0.12);
   }
   
-  /* Week view - better spacing on desktop */
+  /* Week view - desktop uses vertical columns */
   .week-view-grid {
-    gap: 12px;
+    flex-direction: row;
+    gap: 8px;
   }
   
   .week-day-cell {
+    flex-direction: column;
     min-height: 220px;
     padding: 20px 16px;
-    border-radius: 18px;
-  }
-  
-  .week-day-cell.current-streak::after,
-  .week-day-cell.former-streak::after,
-  .week-day-cell.relapse::after,
-  .week-day-cell.wet-dream::after {
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 32px;
-    height: 3px;
+    border-radius: 12px;
   }
   
   .week-day-header {
@@ -1248,8 +1172,11 @@
   }
   
   .week-day-indicators {
-    margin-top: 18px;
-    padding-top: 14px;
+    flex-direction: row;
+    margin-top: 14px;
+    padding-top: 0;
+    padding-left: 0;
+    border-left: none;
   }
   
   .week-data-dash {
