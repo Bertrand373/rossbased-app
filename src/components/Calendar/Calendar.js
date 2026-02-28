@@ -1441,7 +1441,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   };
 
   return (
-    <div className="calendar-container">
+    <div className={`calendar-container${initialAnimDone ? ' anim-done' : ''}`}>
       {/* Minimal Header - Landing page style - ORIGINAL STRUCTURE */}
       <div className="calendar-header-minimal">
         {/* Period Display - Typography focused */}
