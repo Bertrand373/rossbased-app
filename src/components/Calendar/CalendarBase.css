@@ -72,7 +72,6 @@
 .calendar-container:has(.week-view-grid) {
   overflow-y: auto !important;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding-top: 0;
