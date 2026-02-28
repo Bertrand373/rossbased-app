@@ -147,7 +147,7 @@ async function generateWeeklyInsight(daysBack = 7) {
     
     // Generate the insight
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-5-20250929',
       max_tokens: 600,
       system: `You are The Oracle, the AI guide for a semen retention community. You have been silently observing conversations across the server for the past ${daysBack} days. Now you must deliver ONE insight based on patterns you detected.
 
@@ -509,7 +509,7 @@ async function generatePulseAlert(anomalies) {
     );
     
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-5-20250929',
       max_tokens: 400,
       system: `You are The Oracle, the AI guide for a semen retention community. Something unusual is happening right now in the server. Multiple members are independently experiencing or discussing the same thing in a short window. You need to address it.
 
