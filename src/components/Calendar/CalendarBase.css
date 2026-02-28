@@ -230,7 +230,8 @@
   flex-direction: column;
   position: relative;
   z-index: 1;
-  min-height: 0;
+  /* Ensure grid fills viewport regardless of parent flex chain */
+  min-height: calc(100dvh - 220px);
 }
 
 /* =============================================================================
@@ -860,6 +861,10 @@
 @media (max-width: 480px) {
   .calendar-container {
     padding: 8px 4px 108px;
+  }
+
+  .calendar-main-section {
+    min-height: calc(100dvh - 250px);
   }
   
   /* Minimal header adjustments — stays horizontal */
