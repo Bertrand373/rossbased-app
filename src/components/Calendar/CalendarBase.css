@@ -46,6 +46,7 @@
   .main-content-wrapper:has(.calendar-container) {
     display: flex;
     flex-direction: column;
+    max-width: none;
     height: calc(100dvh - var(--header-height));
     max-height: calc(100dvh - var(--header-height));
   }
@@ -71,7 +72,7 @@
 .calendar-container > .calendar-legend-minimal,
 .calendar-container > .calendar-main-section {
   width: 100%;
-  max-width: 900px;
+  max-width: 1200px;
 }
 
 /* Modals should NOT be constrained - they're fixed position overlays */
@@ -1071,13 +1072,13 @@
 
 @media (min-width: 1024px) {
   .calendar-container {
-    padding: 24px 48px 128px;
+    padding: 16px 32px 56px;
   }
   
   .calendar-container > .calendar-header-minimal,
   .calendar-container > .calendar-legend-minimal,
   .calendar-container > .calendar-main-section {
-    max-width: 1000px;
+    max-width: 1400px;
   }
   
   /* Minimal header - desktop */
