@@ -1939,27 +1939,27 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         <div className={`sheet-backdrop${metricsSheetReady ? ' open' : ''}`} onClick={closeMetricsSheet}>
           <div className={`sheet-panel metrics-sheet${metricsSheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div className="sheet-header" />
-            <div className="metrics-sheet-body">
-              <h3 className="metrics-sheet-title">Week View Metrics</h3>
+            <div className="sheet">
+              <h3 className="sheet-title">Week View Metrics</h3>
               <p className="metrics-sheet-subtitle">Choose 3 to display</p>
-              <div className="metrics-sheet-options">
-                {METRIC_OPTIONS.map(({ key, label }) => {
+              <div className="sheet-content">
+                {METRIC_OPTIONS.map(({ key, label }, idx) => {
                   const isActive = weekMetrics.includes(key);
                   return (
-                    <button
-                      key={key}
-                      className={`metrics-sheet-option${isActive ? ' active' : ''}`}
-                      onClick={() => toggleWeekMetric(key)}
-                    >
-                      <span className="metrics-option-label">{label}</span>
-                      <span className={`metrics-option-check${isActive ? ' active' : ''}`}>
-                        {isActive ? '✓' : ''}
-                      </span>
-                    </button>
+                    <React.Fragment key={key}>
+                      {idx > 0 && <div className="sheet-divider" />}
+                      <button
+                        className={isActive ? 'active' : ''}
+                        onClick={() => toggleWeekMetric(key)}
+                      >
+                        <span>{label}</span>
+                        {isActive && <span className="metrics-check">✓</span>}
+                      </button>
+                    </React.Fragment>
                   );
                 })}
               </div>
-              <button className="calendar-btn-ghost" onClick={closeMetricsSheet} style={{ marginTop: '16px', width: '100%' }}>Done</button>
+              <button className="cancel" onClick={closeMetricsSheet}>Done</button>
             </div>
           </div>
         </div>
