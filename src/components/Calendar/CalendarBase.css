@@ -416,7 +416,7 @@
   width: 10px;
   height: 2px;
   border-radius: 1px;
-  background: #fff;
+  background: var(--text);
   opacity: 0.18;
   pointer-events: none;
 }
@@ -757,7 +757,7 @@
 .week-data-dash {
   width: 10px;
   height: 2px;
-  background: #fff;
+  background: var(--text);
   border-radius: 1px;
   opacity: 0.22;
 }
@@ -1247,6 +1247,12 @@
   margin-left: 6px;
 }
 
+/* Light mode — dark dumbbells for visibility on light cells */
+[data-theme="light"] .day-workout-glyph,
+[data-theme="light"] .week-workout-glyph {
+  color: var(--text-muted);
+}
+
 /* Responsive adjustments for workout glyph */
 @media (max-width: 480px) {
   .day-workout-glyph {
@@ -1279,6 +1285,28 @@
   .week-workout-glyph svg {
     width: 12px;
     height: auto;
+  }
+}
+
+/* =============================================================================
+   MOBILE BROWSER — No safe area, browser chrome offsets viewport
+   Month view: reduce bottom padding (less gap above moon bar)
+   Week view: increase grid padding (last cell clears moon bar blur)
+   ============================================================================= */
+
+@media not (display-mode: standalone) {
+  .calendar-container {
+    padding-bottom: 90px;
+  }
+
+  .week-view-grid {
+    padding-bottom: 40px;
+  }
+}
+
+@media not (display-mode: standalone) and (max-width: 480px) {
+  .calendar-container {
+    padding-bottom: 90px;
   }
 }
 

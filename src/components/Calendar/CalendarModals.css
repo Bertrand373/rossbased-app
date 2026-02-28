@@ -134,6 +134,10 @@
   color: var(--accent-gold-text);
 }
 
+[data-theme="light"] .calendar-workout-icon.has-workout {
+  color: var(--text-secondary);
+}
+
 .calendar-modal-header h3 {
   margin: 0;
   font-size: 0.6875rem;
