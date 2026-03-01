@@ -15,7 +15,6 @@ import './MindProgram.css';
 // Option B: Serve from Render backend → `${process.env.REACT_APP_API_URL}/audio/based30.mp3`
 const AUDIO_SRC = '/audio/based30.mp3';
 
-const EXPLAINER_KEY = 'titantrack_mp_explained';
 const TOTAL_NIGHTS = 30;
 const LEGACY_STORAGE_KEY = 'titantrack_mindprogram';
 
@@ -65,7 +64,6 @@ const MindProgram = ({ isPremium, userData, updateUserData, openPlanModal }) => 
   const [progress, setProgress] = useState(getInitialProgress);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showWhatItDoes, setShowWhatItDoes] = useState(false);
-  const [showExplainer, setShowExplainer] = useState(false);
 
   // Audio state
   const [isPlaying, setIsPlaying] = useState(false);
@@ -138,14 +136,6 @@ const MindProgram = ({ isPremium, userData, updateUserData, openPlanModal }) => 
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      // First-play gate: show explainer if user hasn't seen it
-      try {
-        if (!localStorage.getItem(EXPLAINER_KEY)) {
-          setShowExplainer(true);
-          return;
-        }
-      } catch (e) {}
-
       audioRef.current.loop = loopEnabled;
 
       // Attempt play — if iOS killed the session, reload and retry
@@ -172,23 +162,6 @@ const MindProgram = ({ isPremium, userData, updateUserData, openPlanModal }) => 
         });
     }
   }, [isPlaying, loopEnabled, audioError, setupMediaSession]);
-
-  // Dismiss explainer and start playback
-  const handleExplainerDismiss = useCallback(() => {
-    try { localStorage.setItem(EXPLAINER_KEY, 'true'); } catch (e) {}
-    setShowExplainer(false);
-
-    // Start playback after dismissing
-    if (audioRef.current && !audioError) {
-      audioRef.current.loop = loopEnabled;
-      audioRef.current.play()
-        .then(() => {
-          setIsPlaying(true);
-          setupMediaSession();
-        })
-        .catch(() => {});
-    }
-  }, [loopEnabled, audioError, setupMediaSession]);
 
   const handleTimeUpdate = useCallback(() => {
     if (audioRef.current) {
@@ -325,50 +298,6 @@ const MindProgram = ({ isPremium, userData, updateUserData, openPlanModal }) => 
         </div>
       ) : (
         <>
-          {/* First-play explainer — shows once, never again */}
-          {showExplainer && (
-            <div className="mp-explainer-overlay">
-              <div className="mp-explainer" onClick={e => e.stopPropagation()}>
-                <h3 className="mp-explainer-title">Before You Listen</h3>
-                
-                <div className="mp-explainer-items">
-                  <div className="mp-explainer-item">
-                    <span className="mp-explainer-num">01</span>
-                    <div className="mp-explainer-content">
-                      <span className="mp-explainer-heading">What this is</span>
-                      <span className="mp-explainer-text">
-                        A subliminal audio program that rewires your subconscious beliefs around sexual energy, pornography, and self-control.
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="mp-explainer-item">
-                    <span className="mp-explainer-num">02</span>
-                    <div className="mp-explainer-content">
-                      <span className="mp-explainer-heading">What to expect</span>
-                      <span className="mp-explainer-text">
-                        The audio sounds fast and unclear. That's intentional — it bypasses your conscious mind. Your subconscious is like a supercomputer. It hears, understands, and processes it easily.
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="mp-explainer-item">
-                    <span className="mp-explainer-num">03</span>
-                    <div className="mp-explainer-content">
-                      <span className="mp-explainer-heading">How to use</span>
-                      <span className="mp-explainer-text">
-                        Loop on repeat while you sleep. Low to medium volume. Use a sleep headband or comfortable headphones. 30 nights minimum — continue to 60+ for deeper rewiring.
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                
-                <button className="mp-explainer-btn" onClick={handleExplainerDismiss}>
-                  Got it
-                </button>
-              </div>
-            </div>
-          )}
           {/* Audio Player */}
           <div className="mp-player">
             <div className="mp-player-main">
@@ -510,6 +439,12 @@ const MindProgram = ({ isPremium, userData, updateUserData, openPlanModal }) => 
             <span className="mp-instr-num">03</span>
             <span className="mp-instr-text">
               After 30 consecutive nights, your belief system around sexual energy shifts. Retention becomes the default rather than the struggle.
+            </span>
+          </div>
+          <div className="mp-instr-item">
+            <span className="mp-instr-num">04</span>
+            <span className="mp-instr-text">
+              The audio sounds fast and unclear — that's intentional. Your subconscious processes it easily while your conscious mind can't interfere.
             </span>
           </div>
         </div>
