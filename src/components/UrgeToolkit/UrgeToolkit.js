@@ -952,13 +952,13 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
                   resetSession();
                 }}
               >
-                Complete Session
+                Complete
               </button>
               <button 
                 className="ut-btn-ghost"
                 onClick={resetSession}
               >
-                Start New Session
+                New Session
               </button>
             </div>
           </>

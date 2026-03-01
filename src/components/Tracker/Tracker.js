@@ -1379,7 +1379,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                   onClick={savePeakRecording}
                   disabled={!peakMessage.trim()}
                 >
-                  Save Transmission
+                  Save
                 </button>
                 <button className="btn-ghost" onClick={() => closePeakSheet(() => { setShowPeakPrompt(false); setPeakMessage(''); })}>
                   Skip

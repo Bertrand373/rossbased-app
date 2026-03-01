@@ -19,6 +19,10 @@
   
   /* Whisper-thin separator - confident restraint */
   border-top: 1px solid var(--border-subtle);
+  
+  /* Force own compositing layer — fixes Safari position:fixed breaks */
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 
 .mobile-nav-inner {

@@ -59,7 +59,7 @@
 .calendar-container {
   flex: 1;
   background-color: var(--background);
-  padding: 12px 6px 110px;
+  padding: 12px 6px 72px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -910,7 +910,7 @@ body:has(.calendar-display) {
 
 @media (max-width: 480px) {
   .calendar-container {
-    padding: 8px 4px 110px;
+    padding: 8px 4px 72px;
   }
   
   /* Minimal header adjustments — stays horizontal */
