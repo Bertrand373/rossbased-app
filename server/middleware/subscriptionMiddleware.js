@@ -201,6 +201,92 @@ const expireStaleCanceled = async () => {
   return result.modifiedCount;
 };
 
+// ============================================
+// STRIPE SYNC — DAILY SAFETY NET
+// ============================================
+// Catches drift between Stripe and MongoDB.
+// If a webhook fails or gets lost, this corrects it within 24 hours.
+const syncStripeSubscriptions = async () => {
+  const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+  if (!stripe) {
+    console.log('⚠️ Stripe not configured, skipping sync');
+    return { checked: 0, fixed: 0 };
+  }
+
+  try {
+    // Find all users our DB thinks are 'active' with a Stripe subscription ID
+    const activeUsers = await User.find({
+      'subscription.status': 'active',
+      'subscription.stripeSubscriptionId': { $exists: true, $ne: null, $ne: '' }
+    }).select('username subscription isPremium');
+
+    let checked = 0;
+    let fixed = 0;
+
+    for (const user of activeUsers) {
+      checked++;
+      try {
+        const stripeSub = await stripe.subscriptions.retrieve(
+          user.subscription.stripeSubscriptionId
+        );
+
+        // Stripe says canceled/expired but our DB says active
+        if (['canceled', 'incomplete_expired', 'unpaid'].includes(stripeSub.status)) {
+          await User.updateOne(
+            { _id: user._id },
+            { $set: { 'subscription.status': 'expired', 'isPremium': false } }
+          );
+          fixed++;
+          console.log(`🔄 Stripe sync: ${user.username} → expired (Stripe: ${stripeSub.status})`);
+        }
+        // Stripe says trialing but our DB says active
+        else if (stripeSub.status === 'trialing') {
+          const trialEnd = new Date(stripeSub.trial_end * 1000);
+          if (trialEnd < new Date()) {
+            await User.updateOne(
+              { _id: user._id },
+              { $set: { 'subscription.status': 'expired', 'isPremium': false } }
+            );
+            fixed++;
+            console.log(`🔄 Stripe sync: ${user.username} → expired (trial ended)`);
+          } else {
+            await User.updateOne(
+              { _id: user._id },
+              { $set: { 'subscription.status': 'trial' } }
+            );
+            fixed++;
+            console.log(`🔄 Stripe sync: ${user.username} → trial (still trialing)`);
+          }
+        }
+        // Stripe says active — all good, no action needed
+      } catch (err) {
+        // Subscription not found in Stripe — revoke access
+        if (err.code === 'resource_missing') {
+          await User.updateOne(
+            { _id: user._id },
+            { $set: { 'subscription.status': 'expired', 'isPremium': false } }
+          );
+          fixed++;
+          console.log(`🔄 Stripe sync: ${user.username} → expired (sub not found in Stripe)`);
+        } else {
+          console.error(`⚠️ Stripe sync error for ${user.username}:`, err.message);
+        }
+      }
+    }
+
+    if (fixed > 0) {
+      console.log(`🔄 Stripe sync complete: checked ${checked}, fixed ${fixed}`);
+    } else if (checked > 0) {
+      console.log(`✅ Stripe sync: all ${checked} active subscriptions verified`);
+    }
+
+    return { checked, fixed };
+  } catch (error) {
+    console.error('❌ Stripe sync failed:', error.message);
+    return { checked: 0, fixed: 0 };
+  }
+};
+
 module.exports = {
   isPaywallEnabled,
   getTestUsers,
@@ -209,5 +295,6 @@ module.exports = {
   grantGrandfatherAccess,
   checkAndApplyGrandfather,
   expireStaleTrials,
-  expireStaleCanceled
+  expireStaleCanceled,
+  syncStripeSubscriptions
 };

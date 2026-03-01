@@ -34,7 +34,7 @@ const OracleUsage = require('./models/OracleUsage');
 const stripeRoutes = require('./routes/stripeRoutes');
 const discordLinkRoutes = require('./routes/discordLink');
 const timelineRoutes = require('./routes/timelineRoutes');
-const { expireStaleTrials, expireStaleCanceled, checkPremiumAccess } = require('./middleware/subscriptionMiddleware');
+const { expireStaleTrials, expireStaleCanceled, checkPremiumAccess, syncStripeSubscriptions } = require('./middleware/subscriptionMiddleware');
 const { checkAndSendOnboardingNotification } = require('./services/notificationService');
 
 // Import leaderboard service
@@ -113,6 +113,20 @@ mongoose.connect(mongoUri, {
           console.error('Subscription cleanup error:', e);
         }
       }, 60 * 60 * 1000); // Every hour
+
+      // ============================================
+      // STRIPE SUBSCRIPTION SYNC (runs every 24 hours)
+      // Safety net: verifies active subs against Stripe API
+      // Catches any webhook failures within 24 hours
+      // ============================================
+      syncStripeSubscriptions(); // Run once on startup
+      setInterval(async () => {
+        try {
+          await syncStripeSubscriptions();
+        } catch (e) {
+          console.error('Stripe sync error:', e);
+        }
+      }, 24 * 60 * 60 * 1000); // Every 24 hours
 
       // ============================================
       // ORACLE OUTCOME MEASUREMENT (runs every 4 hours)
