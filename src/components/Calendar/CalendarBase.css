@@ -403,6 +403,8 @@ body:has(.calendar-display) {
 
 .calendar-display {
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -1373,7 +1375,7 @@ body:has(.calendar-display) {
    ============================================================================= */
 
 @media (max-width: 1024px) {
-  /* Moon bar is a flex child now — no padding hack needed */
+  /* Moon bar is a flex child — no padding hack needed */
   .calendar-container {
     padding-bottom: 0;
   }
