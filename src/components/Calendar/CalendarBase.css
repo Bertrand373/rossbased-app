@@ -133,6 +133,7 @@
   gap: 12px;
   margin-bottom: 0;
   padding: 10px 8px;
+  flex-shrink: 0;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -669,7 +670,9 @@ body:has(.calendar-display) {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding-bottom: 12px;
+  flex: 1;
+  min-height: 0;
+  padding-bottom: 4px;
 }
 
 .week-day-cell {
@@ -681,7 +684,9 @@ body:has(.calendar-display) {
   transition: background 120ms ease, box-shadow 120ms ease;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .week-day-cell:active {
@@ -733,7 +738,7 @@ body:has(.calendar-display) {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .week-day-name {
@@ -783,7 +788,8 @@ body:has(.calendar-display) {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
+  min-height: 0;
 }
 
 .week-benefit-item {
@@ -819,7 +825,7 @@ body:has(.calendar-display) {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 4px;
   padding-top: 0;
 }
 
@@ -843,13 +849,13 @@ body:has(.calendar-display) {
 
 @media (max-width: 768px) {
   .week-view-grid {
-    gap: 6px;
+    gap: 4px;
   }
   
   .week-day-cell {
     flex-direction: row;
     align-items: center;
-    padding: 12px 14px;
+    padding: 10px 14px;
     gap: 14px;
   }
   
@@ -869,7 +875,7 @@ body:has(.calendar-display) {
   
   .week-benefits-prominent {
     flex: 1;
-    gap: 8px;
+    gap: 6px;
   }
   
   .week-benefit-item {
@@ -1002,9 +1008,13 @@ body:has(.calendar-display) {
   }
   
   /* Week view mobile */
+  .week-view-grid {
+    gap: 3px;
+  }
+
   .week-day-cell {
-    padding: 10px 12px;
-    gap: 12px;
+    padding: 8px 12px;
+    gap: 10px;
     border-radius: 8px;
   }
   
