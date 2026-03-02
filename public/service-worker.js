@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-globals */
 
-const CACHE_NAME = 'titantrack-v6';
+const CACHE_NAME = 'titantrack-v7';
 
 // Only precache files with STABLE names (not hashed by CRA)
 const SHELL_URLS = [
@@ -31,19 +31,20 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Activate event - clean up old caches
+// Activate event - NUCLEAR: delete ALL caches and start fresh
 self.addEventListener('activate', (event) => {
-  console.log('[Service Worker] Activating...');
+  console.log('[Service Worker] Activating - purging all caches...');
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames
-          .filter((name) => name !== CACHE_NAME)
-          .map((name) => {
-            console.log('[Service Worker] Deleting old cache:', name);
-            return caches.delete(name);
-          })
+        cacheNames.map((name) => {
+          console.log('[Service Worker] Deleting cache:', name);
+          return caches.delete(name);
+        })
       );
+    }).then(() => {
+      console.log('[Service Worker] All caches deleted, re-caching shell...');
+      return caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL_URLS));
     })
   );
   self.clients.claim();
