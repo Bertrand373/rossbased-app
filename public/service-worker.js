@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-globals */
 
-const CACHE_NAME = 'titantrack-v5';
+const CACHE_NAME = 'titantrack-v6';
 
 // Only precache files with STABLE names (not hashed by CRA)
 const SHELL_URLS = [
