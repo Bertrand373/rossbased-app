@@ -326,12 +326,12 @@ body:has(.calendar-display) {
 
 .calendar-main-section {
   flex: 1;
+  height: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   position: relative;
   z-index: 1;
-  min-height: 0;
-  overflow: hidden;
 }
 
 /* =============================================================================
@@ -404,7 +404,7 @@ body:has(.calendar-display) {
 
 .calendar-display {
   flex: 1;
-  min-height: 0;
+  height: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
