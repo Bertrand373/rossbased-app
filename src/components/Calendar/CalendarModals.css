@@ -1740,21 +1740,20 @@
   width: 100%;
   padding: 14px 20px;
   background: transparent;
-  border: 1px solid var(--border-subtle);
+  border: none;
   border-radius: 9999px;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   font-size: 0.9375rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   text-align: center;
-  transition: border-color 150ms ease, color 150ms ease;
+  transition: color 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .metrics-sheet button.cancel:hover {
-  border-color: var(--border);
-  color: var(--text);
+  color: var(--text-secondary);
 }
 
 .metrics-check {

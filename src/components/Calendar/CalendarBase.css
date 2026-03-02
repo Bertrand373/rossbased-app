@@ -59,7 +59,7 @@
 .calendar-container {
   flex: 1;
   background-color: var(--background);
-  padding: 12px 6px 72px;
+  padding: 12px 6px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -82,7 +82,7 @@
   overflow-x: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  padding-bottom: 160px;
+  padding-bottom: 16px;
 }
 
 .calendar-container:has(.week-view-grid) .calendar-main-section::-webkit-scrollbar {
@@ -92,7 +92,8 @@
 /* Content wrapper - wider on desktop */
 .calendar-container > .calendar-header-minimal,
 .calendar-container > .calendar-legend-minimal,
-.calendar-container > .calendar-main-section {
+.calendar-container > .calendar-main-section,
+.calendar-container > .calendar-moon-bar {
   width: 100%;
   max-width: 1200px;
 }
@@ -337,10 +338,7 @@ body:has(.calendar-display) {
    ============================================================================= */
 
 .calendar-moon-bar {
-  position: fixed;
-  bottom: calc(62px + env(safe-area-inset-bottom, 0px));
-  left: 0;
-  right: 0;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -350,11 +348,11 @@ body:has(.calendar-display) {
   background: color-mix(in srgb, var(--background) 88%, transparent);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--border-subtle);
   box-shadow: 0 -4px 16px color-mix(in srgb, var(--background) 40%, transparent);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  z-index: 100;
+  z-index: 2;
   animation: moonBarIn 400ms cubic-bezier(0.16, 1, 0.3, 1) 200ms forwards;
   opacity: 0;
   transform: translateY(8px);
@@ -910,7 +908,7 @@ body:has(.calendar-display) {
 
 @media (max-width: 480px) {
   .calendar-container {
-    padding: 8px 4px 72px;
+    padding: 8px 4px 0;
   }
   
   /* Minimal header adjustments — stays horizontal */
@@ -1153,12 +1151,13 @@ body:has(.calendar-display) {
 
 @media (min-width: 1024px) {
   .calendar-container {
-    padding: 16px 32px 56px;
+    padding: 16px 32px 0;
   }
   
   .calendar-container > .calendar-header-minimal,
   .calendar-container > .calendar-legend-minimal,
-  .calendar-container > .calendar-main-section {
+  .calendar-container > .calendar-main-section,
+  .calendar-container > .calendar-moon-bar {
     max-width: 1400px;
   }
   
@@ -1296,9 +1295,8 @@ body:has(.calendar-display) {
     height: 16px;
   }
   
-  /* Moon bar - no mobile nav offset on desktop */
+  /* Moon bar - desktop padding */
   .calendar-moon-bar {
-    bottom: 0;
     padding: 12px 24px;
   }
 }
@@ -1375,9 +1373,9 @@ body:has(.calendar-display) {
    ============================================================================= */
 
 @media (max-width: 1024px) {
-  /* Browser default: month bottom padding — grid should sit just above moon bar */
+  /* Moon bar is a flex child now — no padding hack needed */
   .calendar-container {
-    padding-bottom: 45px;
+    padding-bottom: 0;
   }
 
   /* Week view: padding on the scroll section, not container */
@@ -1386,7 +1384,7 @@ body:has(.calendar-display) {
   }
 
   .calendar-container:has(.week-view-grid) .calendar-main-section {
-    padding-bottom: 160px;
+    padding-bottom: 16px;
   }
 
   /* Week view: inner grid breathing room */
@@ -1395,10 +1393,10 @@ body:has(.calendar-display) {
   }
 }
 
-/* PWA standalone: restore spacing (safe-area present, moon bar higher) */
+/* PWA standalone: moon bar is flex child — no padding hack needed */
 @media (display-mode: standalone) {
   .calendar-container {
-    padding-bottom: 103px;
+    padding-bottom: 0;
   }
 
   /* Week view: padding on the scroll section, not container */
@@ -1407,7 +1405,7 @@ body:has(.calendar-display) {
   }
 
   .calendar-container:has(.week-view-grid) .calendar-main-section {
-    padding-bottom: 160px;
+    padding-bottom: 16px;
   }
 
   .week-view-grid {
@@ -1417,7 +1415,7 @@ body:has(.calendar-display) {
 
 @media (display-mode: standalone) and (max-width: 480px) {
   .calendar-container {
-    padding-bottom: 103px;
+    padding-bottom: 0;
   }
 
   .calendar-container:has(.week-view-grid) {
@@ -1425,7 +1423,7 @@ body:has(.calendar-display) {
   }
 
   .calendar-container:has(.week-view-grid) .calendar-main-section {
-    padding-bottom: 160px;
+    padding-bottom: 16px;
   }
 }
 
