@@ -68,27 +68,11 @@
   overscroll-behavior: contain;
 }
 
-/* Week view: container stays non-scrolling — only the grid section scrolls.
-   Header + legend are siblings above the scroll area, so they stay in place. */
+/* Week view: container stays non-scrolling — grid fills via flex like month view */
 .calendar-container:has(.week-view-grid) {
   overflow: hidden;
   padding-top: 0;
   padding-bottom: 0;
-}
-
-/* The grid section becomes the scroll container in week view */
-.calendar-container:has(.week-view-grid) .calendar-main-section {
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  padding-bottom: 16px;
-}
-
-.calendar-container:has(.week-view-grid) .calendar-main-section::-webkit-scrollbar {
-  display: none;
 }
 
 /* Content wrapper - wider on desktop */
@@ -672,7 +656,6 @@ body:has(.calendar-display) {
   gap: 6px;
   flex: 1;
   min-height: 0;
-  padding-bottom: 4px;
 }
 
 .week-day-cell {
@@ -1393,18 +1376,8 @@ body:has(.calendar-display) {
     padding-bottom: 0;
   }
 
-  /* Week view: padding on the scroll section, not container */
   .calendar-container:has(.week-view-grid) {
     padding-bottom: 0;
-  }
-
-  .calendar-container:has(.week-view-grid) .calendar-main-section {
-    padding-bottom: 16px;
-  }
-
-  /* Week view: inner grid breathing room */
-  .week-view-grid {
-    padding-bottom: 16px;
   }
 }
 
@@ -1414,17 +1387,8 @@ body:has(.calendar-display) {
     padding-bottom: 0;
   }
 
-  /* Week view: padding on the scroll section, not container */
   .calendar-container:has(.week-view-grid) {
     padding-bottom: 0;
-  }
-
-  .calendar-container:has(.week-view-grid) .calendar-main-section {
-    padding-bottom: 16px;
-  }
-
-  .week-view-grid {
-    padding-bottom: 12px;
   }
 }
 
@@ -1435,10 +1399,6 @@ body:has(.calendar-display) {
 
   .calendar-container:has(.week-view-grid) {
     padding-bottom: 0;
-  }
-
-  .calendar-container:has(.week-view-grid) .calendar-main-section {
-    padding-bottom: 16px;
   }
 }
 
