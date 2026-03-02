@@ -70,7 +70,9 @@
 
 /* Week view: container stays non-scrolling — grid fills via flex like month view */
 .calendar-container:has(.week-view-grid) {
-  overflow: hidden;
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  touch-action: manipulation;
   padding-top: 0;
   padding-bottom: 0;
 }
@@ -148,6 +150,25 @@
 
 html:has(.calendar-display),
 body:has(.calendar-display) {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+/* Lock ancestors when week view is active — same as month view */
+.app-content:has(.week-view-grid) {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+.main-content-wrapper:has(.week-view-grid) {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+html:has(.week-view-grid),
+body:has(.week-view-grid) {
   overflow: hidden !important;
   overscroll-behavior: none;
 }
