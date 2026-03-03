@@ -58,8 +58,8 @@ const OnboardingGuide = ({ onComplete }) => {
       title: 'Track daily benefits',
       message: 'Log how you feel each day. This powers your AI insights.',
       position: 'top',
-      padding: 6,
-      radius: '14px'
+      padding: 8,
+      radius: '9999px'
     },
     {
       target: isMobile 
@@ -72,12 +72,12 @@ const OnboardingGuide = ({ onComplete }) => {
       radius: '12px'
     },
     {
-      target: isMobile ? '.mobile-nav-inner' : '.nav-container',
+      target: isMobile ? '.mobile-nav' : '.header-nav',
       title: 'Explore when ready',
       message: 'Calendar, stats, and emotional timeline await.',
       position: isMobile ? 'top' : 'bottom',
-      padding: 10,
-      radius: '16px'
+      padding: 4,
+      radius: '0px'
     }
   ];
 
