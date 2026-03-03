@@ -618,18 +618,30 @@ body.static-view .app-content { overflow: hidden; }
 
 /* ============================================================
    TRACKER VIEW
+   Same parent-constraint pattern as Calendar — exact viewport,
+   safe-area aware, fully scroll-locked (no rubberbanding)
    ============================================================ */
 
 .main-content-wrapper:has(.tracker) {
   padding: 0;
   overflow: hidden;
-  height: calc(100dvh - var(--header-height-mobile) - var(--nav-height-mobile));
-  max-height: calc(100dvh - var(--header-height-mobile) - var(--nav-height-mobile));
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--header-height-mobile) - var(--nav-height-mobile) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - var(--header-height-mobile) - var(--nav-height-mobile) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
 }
 
 .app-content:has(.tracker) {
-  overflow: hidden;
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  touch-action: manipulation;
   padding-bottom: 0 !important;
+}
+
+html:has(.tracker),
+body:has(.tracker) {
+  overflow: hidden !important;
+  overscroll-behavior: none;
 }
 
 @media (min-width: 1025px) {

@@ -9,7 +9,6 @@
   align-items: center;
   justify-content: center;
   padding: 0 24px;
-  padding-bottom: 80px;
   background-color: var(--background);
 }
 
@@ -843,22 +842,12 @@
    ============================================================ */
 
 @media (min-width: 768px) {
-  .tracker {
-    padding-top: 48px;
-    padding-bottom: 80px;
-  }
-  
   .streak-num { font-size: 10rem; }
   .date { margin-bottom: 16px; }
   .milestone { margin-top: 16px; }
 }
 
 @media (max-width: 480px) {
-  .tracker {
-    padding-top: 44px;
-    padding-bottom: 60px;
-  }
-  
   .streak-num { font-size: 7rem; }
   .date { margin-bottom: 10px; font-size: 0.75rem; }
   .milestone { margin-top: 10px; font-size: 0.75rem; }
@@ -883,11 +872,6 @@
 }
 
 @media (max-height: 700px) {
-  .tracker {
-    padding-top: 32px;
-    padding-bottom: 75px;
-  }
-  
   .streak-num { font-size: 6rem; }
   .date { margin-bottom: 8px; }
   .milestone { margin-top: 8px; }
@@ -896,11 +880,6 @@
 }
 
 @media (max-height: 600px) {
-  .tracker {
-    padding-top: 24px;
-    padding-bottom: 70px;
-  }
-  
   .streak-num { font-size: 5rem; }
   .date { font-size: 0.6875rem; margin-bottom: 6px; }
   .milestone { margin-top: 6px; font-size: 0.6875rem; }
@@ -918,8 +897,6 @@
     flex-direction: row;
     justify-content: center;
     gap: 32px;
-    padding-top: 16px;
-    padding-bottom: 24px;
   }
   
   .tracker-main { flex: none; }

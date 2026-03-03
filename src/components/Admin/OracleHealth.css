@@ -529,6 +529,104 @@
   color: rgba(255,255,255,0.15);
 }
 
+/* Per-user breakdown rows */
+.oh-user-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.oh-user-row:last-child {
+  border-bottom: none;
+}
+
+.oh-user-rank {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.15);
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.oh-user-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.55);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oh-user-tier {
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.oh-user-tier.gf {
+  color: rgba(114,137,218,0.8);
+  background: rgba(114,137,218,0.1);
+}
+
+.oh-user-tier.pro {
+  color: rgba(34,197,94,0.8);
+  background: rgba(34,197,94,0.08);
+}
+
+.oh-user-tier.free {
+  color: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.04);
+}
+
+.oh-user-tier.dc {
+  color: rgba(114,137,218,0.5);
+  background: rgba(114,137,218,0.06);
+}
+
+.oh-user-counts {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.oh-user-count {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.oh-user-count.app {
+  color: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.04);
+}
+
+.oh-user-count.discord {
+  color: rgba(114,137,218,0.7);
+  background: rgba(114,137,218,0.08);
+}
+
+.oh-user-total {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  width: 28px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.oh-user-total.heavy {
+  color: rgba(239,68,68,0.7);
+}
+
 /* Loading / Error */
 .oh-loading {
   display: flex;
@@ -681,3 +779,12 @@
 [data-theme="light"] .oh-pool-fill.app { background: rgba(0,0,0,0.15); }
 [data-theme="light"] .oh-pool-count { color: rgba(0,0,0,0.4); }
 [data-theme="light"] .oh-pool-empty { color: rgba(0,0,0,0.2); }
+
+/* Light theme: User rows */
+[data-theme="light"] .oh-user-row { border-bottom-color: rgba(0,0,0,0.04); }
+[data-theme="light"] .oh-user-rank { color: rgba(0,0,0,0.2); }
+[data-theme="light"] .oh-user-name { color: rgba(0,0,0,0.55); }
+[data-theme="light"] .oh-user-tier.free { color: rgba(0,0,0,0.3); background: rgba(0,0,0,0.04); }
+[data-theme="light"] .oh-user-count.app { color: rgba(0,0,0,0.35); background: rgba(0,0,0,0.04); }
+[data-theme="light"] .oh-user-total { color: rgba(0,0,0,0.5); }
+[data-theme="light"] .oh-user-total.heavy { color: rgba(220,38,38,0.7); }

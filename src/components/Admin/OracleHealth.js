@@ -165,7 +165,7 @@ const OracleHealth = () => {
         <div className="oh-card">
           <div className="oh-card-head oh-clickable" onClick={() => setShowUsage(!showUsage)}>
             <h3>Oracle Usage Today</h3>
-            <span className="oh-card-count">{oracleUsage.totalToday} messages</span>
+            <span className="oh-card-count">{oracleUsage.totalToday} messages <span className="oh-toggle-arrow">{showUsage ? '▾' : '▸'}</span></span>
           </div>
           <div className="oh-usage-row">
             <div className="oh-usage-stat">
@@ -178,30 +178,31 @@ const OracleHealth = () => {
             </div>
           </div>
 
-          {/* Grandfathered shared pool */}
-          {showUsage && oracleUsage.grandfathered && oracleUsage.grandfathered.length > 0 && (
+          {/* Per-user breakdown */}
+          {showUsage && oracleUsage.topUsers && oracleUsage.topUsers.length > 0 && (
             <div className="oh-pool-section">
-              <span className="oh-pool-title">Shared Pool (Grandfathered)</span>
-              {oracleUsage.grandfathered.map((gf, i) => (
-                <div key={i} className="oh-pool-row">
-                  <span className="oh-pool-user">{gf.username}</span>
-                  <div className="oh-pool-bar-wrap">
-                    <div className="oh-pool-bar">
-                      <div className="oh-pool-fill app" style={{ width: `${(gf.app / gf.limit) * 100}%` }} />
-                      <div className="oh-pool-fill discord" style={{ width: `${(gf.discord / gf.limit) * 100}%` }} />
+              <span className="oh-pool-title">All Users Today</span>
+              {oracleUsage.topUsers.map((u, i) => {
+                const tierLabel = u.tier === 'grandfathered' ? 'GF' : u.tier === 'active' ? 'PRO' : u.tier === 'trialing' ? 'TRIAL' : u.tier === 'discord-only' ? 'DC' : 'FREE';
+                const tierClass = u.tier === 'grandfathered' ? 'gf' : u.tier === 'active' ? 'pro' : u.tier === 'trialing' ? 'pro' : u.tier === 'discord-only' ? 'dc' : 'free';
+                return (
+                  <div key={i} className="oh-user-row">
+                    <span className="oh-user-rank">#{i + 1}</span>
+                    <span className="oh-user-name">{u.username}</span>
+                    <span className={`oh-user-tier ${tierClass}`}>{tierLabel}</span>
+                    <div className="oh-user-counts">
+                      {u.app > 0 && <span className="oh-user-count app">{u.app}a</span>}
+                      {u.discord > 0 && <span className="oh-user-count discord">{u.discord}d</span>}
                     </div>
-                    <span className="oh-pool-count">{gf.combined}/{gf.limit}</span>
+                    <span className={`oh-user-total ${u.total >= 10 ? 'heavy' : ''}`}>{u.total}</span>
                   </div>
-                </div>
-              ))}
-              {oracleUsage.grandfathered.length === 0 && (
-                <span className="oh-pool-empty">No grandfathered usage today</span>
-              )}
+                );
+              })}
             </div>
           )}
-          {showUsage && (!oracleUsage.grandfathered || oracleUsage.grandfathered.length === 0) && (
+          {showUsage && (!oracleUsage.topUsers || oracleUsage.topUsers.length === 0) && (
             <div className="oh-pool-section">
-              <span className="oh-pool-empty">No grandfathered usage today</span>
+              <span className="oh-pool-empty">No usage today</span>
             </div>
           )}
         </div>
