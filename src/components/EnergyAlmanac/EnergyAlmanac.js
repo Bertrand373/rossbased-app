@@ -8,7 +8,7 @@ import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import './EnergyAlmanac.css';
 import '../../styles/BottomSheet.css';
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
-import { getMoonPhase } from '../../utils/lunarData';
+import { getLunarData } from '../../utils/lunarData';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
@@ -41,7 +41,47 @@ const getChineseYear = (date) => {
 // CALCULATION ENGINES
 // ============================================================
 
-// getMoonPhase is now imported from '../../utils/lunarData'
+/**
+ * Calculate moon phase (0-29.53 day cycle)
+ */
+const getMoonPhase = (date = new Date()) => {
+  const knownNewMoon = new Date('2025-01-29T12:36:00Z');
+  const lunarCycle = 29.53058867;
+  
+  const daysSinceKnown = (date - knownNewMoon) / (1000 * 60 * 60 * 24);
+  const currentCycleDay = ((daysSinceKnown % lunarCycle) + lunarCycle) % lunarCycle;
+  
+  const illumination = Math.round((1 - Math.cos(2 * Math.PI * currentCycleDay / lunarCycle)) / 2 * 100);
+  
+  let phase, emoji, energy;
+  if (currentCycleDay < 1.5 || currentCycleDay >= 28.5) {
+    phase = 'New Moon'; emoji = '🌑';
+    energy = 'New beginnings, intention setting, introspection';
+  } else if (currentCycleDay < 7.38) {
+    phase = 'Waxing Crescent'; emoji = '🌒';
+    energy = 'Building momentum, taking action on intentions';
+  } else if (currentCycleDay < 9.23) {
+    phase = 'First Quarter'; emoji = '🌓';
+    energy = 'Challenges arise, decision points, commitment';
+  } else if (currentCycleDay < 13.0) {
+    phase = 'Waxing Gibbous'; emoji = '🌔';
+    energy = 'Refinement, adjustment, patience before fruition';
+  } else if (currentCycleDay < 16.5) {
+    phase = 'Full Moon'; emoji = '🌕';
+    energy = 'Peak energy, culmination, heightened emotions';
+  } else if (currentCycleDay < 21.15) {
+    phase = 'Waning Gibbous'; emoji = '🌖';
+    energy = 'Gratitude, sharing wisdom, integration';
+  } else if (currentCycleDay < 23.0) {
+    phase = 'Last Quarter'; emoji = '🌗';
+    energy = 'Release, forgiveness, letting go';
+  } else {
+    phase = 'Waning Crescent'; emoji = '🌘';
+    energy = 'Rest, reflection, preparation for renewal';
+  }
+  
+  return { phase, emoji, illumination, energy, cycleDay: Math.floor(currentCycleDay) };
+};
 
 /**
  * Calculate spermatogenesis cycle position (72-day cycle)
@@ -214,6 +254,22 @@ const generateForecast = (moonData, spermaData, personalDay, zodiac, streakDays)
 // COMPONENT
 // ============================================================
 
+// Moon tint — matches Calendar.js for visual congruence
+const getMoonTintStyle = (eventType) => {
+  switch (eventType) {
+    case 'total-lunar-eclipse':
+      return { filter: 'brightness(0.6) sepia(1) hue-rotate(-45deg) saturate(3.5) contrast(1.15) drop-shadow(0 0 4px rgba(180,50,20,0.6))' };
+    case 'partial-lunar-eclipse':
+      return { filter: 'brightness(0.75) sepia(0.6) hue-rotate(-25deg) saturate(2) contrast(1.05) drop-shadow(0 0 3px rgba(160,60,30,0.3))' };
+    case 'supermoon':
+      return { filter: 'grayscale(1) brightness(1.8) drop-shadow(0 0 5px rgba(255,255,255,0.45))' };
+    case 'penumbral-lunar-eclipse':
+      return { filter: 'grayscale(0.8) brightness(0.85) drop-shadow(0 0 2px rgba(100,100,120,0.3))' };
+    default:
+      return { filter: 'grayscale(1) brightness(1.5) drop-shadow(0 0 3px rgba(200,210,220,0.35))' };
+  }
+};
+
 const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [aiSynthesis, setAiSynthesis] = useState(null);
@@ -289,6 +345,8 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
     const birthDate = userData?.birthDate;
     
     const moon = getMoonPhase(today);
+    const lunarInfo = getLunarData(today);
+    moon.eventType = lunarInfo.specialEvent?.type || null;
     const sperma = getSpermatogenesisPhase(streakDays);
     const personalDay = getPersonalDay(birthDate, today);
     const zodiac = getChineseZodiac(birthDate, today);
@@ -408,7 +466,7 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
                 <div className="almanac-row">
                   <span className="almanac-row-label">Lunar Phase</span>
                   <div className="almanac-row-header">
-                    <span className="almanac-row-title">{moon.emoji} {moon.phase}</span>
+                    <span className="almanac-row-title"><span style={{ ...getMoonTintStyle(moon.eventType), display: 'inline-block' }}>{moon.emoji}</span> {moon.phase}</span>
                     <span className="almanac-row-value">{moon.illumination}% illuminated</span>
                   </div>
                   <span className="almanac-row-desc">{moon.energy}</span>

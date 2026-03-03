@@ -234,10 +234,6 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
   // FIXED: Handle onboarding complete - show date picker if needed
   const handleOnboardingComplete = () => {
-    // Set date picker BEFORE hiding onboarding to prevent flash
-    if (!userData.startDate) {
-      setShowDatePicker(true);
-    }
     setShowOnboarding(false);
     // Defer API call so it doesn't break React's state batching
     setTimeout(() => updateUserData({ hasSeenOnboarding: true }), 0);
@@ -1213,21 +1209,6 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     });
   };
 
-  // Show date picker overlay if no start date set (initial setup only)
-  if (showDatePicker && !userData.startDate) {
-    return (
-      <div className="tracker">
-        <div className="overlay">
-          <DatePicker
-            onSubmit={handleDateSubmit}
-            onCancel={userData.startDate ? () => setShowDatePicker(false) : null}
-            initialDate={userData.startDate ? new Date(userData.startDate) : new Date()}
-            title={userData.startDate ? "Edit start date" : "When did you start?"}
-          />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="tracker">
@@ -1478,9 +1459,9 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         </div>
       )}
 
-      {/* Date Picker — Bottom Sheet (edit mode) */}
-      {showDatePicker && userData.startDate && (
-        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowDatePicker(false))}>
+      {/* Date Picker — Bottom Sheet (first-time setup + edit mode) */}
+      {showDatePicker && (
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={userData.startDate ? () => closeSheet(() => setShowDatePicker(false)) : undefined}>
           <div ref={sheetPanelRef} className={`sheet-panel tracker-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div 
               className="sheet-header"
@@ -1490,9 +1471,9 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
             />
             <DatePicker
               onSubmit={(date) => closeSheet(() => handleDateSubmit(date))}
-              onCancel={() => closeSheet(() => setShowDatePicker(false))}
-              initialDate={new Date(userData.startDate)}
-              title="Edit start date"
+              onCancel={userData.startDate ? () => closeSheet(() => setShowDatePicker(false)) : null}
+              initialDate={userData.startDate ? new Date(userData.startDate) : new Date()}
+              title={userData.startDate ? "Edit start date" : "When did you start?"}
             />
           </div>
         </div>
