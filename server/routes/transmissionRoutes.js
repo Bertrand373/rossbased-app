@@ -17,6 +17,7 @@ const {
 } = require('../data/transmissionWisdom');
 
 // Initialize Anthropic client
+const { getLunarData } = require('../utils/lunarData');
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
@@ -405,10 +406,18 @@ router.post('/synthesis', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const { streakDays, sperma, moon, personalDay, zodiac } = req.body;
+    const { streakDays, sperma, personalDay, zodiac } = req.body;
+
+    // Compute lunar data server-side — never trust client
+    const timezone = req.body.timezone || 'America/New_York';
+    const serverLunar = getLunarData(new Date(), timezone);
+    const moon = {
+      phase: serverLunar.label,
+      illumination: serverLunar.illumination,
+      energy: serverLunar.energy
+    };
 
     // Check cache — only regenerate once per day per user
-    const timezone = req.body.timezone || 'America/New_York';
     const now = new Date();
     const userNow = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
     
@@ -465,6 +474,15 @@ Energy: ${zodiac.yearEnergy}`;
     userData += `
 
 Generate the synthesis now.`;
+
+    // Append special lunar event if active today
+    if (serverLunar.specialEvent) {
+      userData = userData.replace('Generate the synthesis now.', 
+        `SPECIAL LUNAR EVENT: ${serverLunar.specialEvent.name}
+Significance: ${serverLunar.specialEvent.significance}
+
+Generate the synthesis now.`);
+    }
 
     console.log(`🔮 Generating synthesis for ${user.username} (Day ${streakDays})`);
 

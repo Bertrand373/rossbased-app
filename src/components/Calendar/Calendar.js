@@ -16,58 +16,29 @@ import interventionService from '../../services/InterventionService';
 
 // UNIFIED TRIGGER SYSTEM
 import { getAllTriggers, getTriggerLabel } from '../../constants/triggerConstants';
+import { getLunarData } from '../../utils/lunarData';
 
-// =============================================================================
-// LUNAR PHASE SYSTEM - Premium moon tracking with emoji icons
-// Uses recent verified new moon reference for accuracy
-// =============================================================================
 
-const getLunarData = (date) => {
-  const synodicMonth = 29.53058867;
-  // Recent verified new moon - minimizes accumulated error
-  // Jan 29, 2025 at 12:36 UTC (source: timeanddate.com, USNO)
-  const knownNewMoon = new Date('2025-01-29T12:36:00Z');
-  const daysSinceNew = (date.getTime() - knownNewMoon.getTime()) / (1000 * 60 * 60 * 24);
-  const lunarAge = ((daysSinceNew % synodicMonth) + synodicMonth) % synodicMonth;
-  const illumination = (1 - Math.cos((lunarAge / synodicMonth) * 2 * Math.PI)) / 2;
-  
-  // Phase thresholds adjusted:
-  // - New/Full moon get ~1.5 day windows to catch the day even when checking at midnight
-  // - This ensures the actual full moon day shows as "Full Moon" not the day after
-  let phase, isSignificant, label, emoji;
-  if (lunarAge < 1.5 || lunarAge >= 28.5) {
-    // New Moon window: last 1 day of cycle + first 1.5 days
-    phase = 'new'; isSignificant = true; label = 'New Moon'; emoji = '🌑';
-  } else if (lunarAge < 7.38) {
-    phase = 'waxing-crescent'; isSignificant = false; label = 'Waxing Crescent'; emoji = '🌒';
-  } else if (lunarAge < 9.23) {
-    phase = 'first-quarter'; isSignificant = false; label = 'First Quarter'; emoji = '🌓';
-  } else if (lunarAge < 13.0) {
-    // Waxing Gibbous ends earlier to give Full Moon more buffer
-    phase = 'waxing-gibbous'; isSignificant = false; label = 'Waxing Gibbous'; emoji = '🌔';
-  } else if (lunarAge < 16.5) {
-    // Full Moon window: ~3.5 days centered around day 14.77
-    phase = 'full'; isSignificant = true; label = 'Full Moon'; emoji = '🌕';
-  } else if (lunarAge < 21.15) {
-    phase = 'waning-gibbous'; isSignificant = false; label = 'Waning Gibbous'; emoji = '🌖';
-  } else if (lunarAge < 23.0) {
-    phase = 'last-quarter'; isSignificant = false; label = 'Last Quarter'; emoji = '🌗';
-  } else {
-    phase = 'waning-crescent'; isSignificant = false; label = 'Waning Crescent'; emoji = '🌘';
+
+// Moon event tint styles - premium visual treatment for special lunar events
+const getMoonTintStyle = (eventType) => {
+  if (!eventType) return {};
+  switch (eventType) {
+    case 'total-lunar-eclipse':
+      return { filter: 'brightness(0.9) sepia(1) hue-rotate(-30deg) saturate(4)' };
+    case 'partial-lunar-eclipse':
+      return { filter: 'brightness(0.85) sepia(0.5) hue-rotate(-20deg) saturate(2.5)' };
+    case 'supermoon':
+      return { filter: 'brightness(1.3) contrast(1.05)' };
+    case 'penumbral-lunar-eclipse':
+      return { filter: 'brightness(0.75) saturate(0.6)' };
+    default:
+      return {};
   }
-  
-  return {
-    phase,
-    isSignificant,
-    label,
-    emoji,
-    illumination: Math.round(illumination * 100),
-    lunarAge: Math.round(lunarAge * 10) / 10
-  };
 };
 
 // Moon emoji renderer - consistent across app
-const MoonIcon = ({ phase, size = 11, emoji }) => {
+const MoonIcon = ({ phase, size = 11, emoji, eventType }) => {
   const moonEmoji = emoji || {
     'new': '🌑',
     'waxing-crescent': '🌒',
@@ -82,7 +53,7 @@ const MoonIcon = ({ phase, size = 11, emoji }) => {
   return (
     <span 
       className="moon-emoji" 
-      style={{ fontSize: `${size}px`, lineHeight: 1 }}
+      style={{ fontSize: `${size}px`, lineHeight: 1, ...getMoonTintStyle(eventType) }}
       role="img" 
       aria-label={phase}
     >
@@ -886,7 +857,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     return (
       <div className="calendar-moon-info">
         <div className="calendar-moon-row">
-          <MoonIcon phase={lunar.phase} size={16} />
+          <MoonIcon phase={lunar.phase} size={16} eventType={lunar.specialEvent?.type} />
           <span className="calendar-moon-label">{lunar.label}</span>
           <span className="calendar-moon-illumination">{lunar.illumination}%</span>
         </div>
@@ -1401,7 +1372,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                 className="day-moon-indicator"
                 onClick={(e) => openMoonDetail(currentDay, e)}
               >
-                <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={9} />
+                <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={9} eventType={lunar.specialEvent?.type} />
               </span>
             )}
           </div>
@@ -1451,7 +1422,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                 className="week-moon-indicator"
                 onClick={(e) => openMoonDetail(day, e)}
               >
-                <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={14} />
+                <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={14} eventType={lunar.specialEvent?.type} />
               </span>
             )}
           </div>
@@ -1573,21 +1544,17 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       {/* Moon Phase - Sticky bar above nav, both views */}
       {(() => {
         const lunar = getLunarData(new Date());
-        const synodicMonth = 29.53058867;
-        const cycleDayRaw = lunar.lunarAge;
-        const cycleDay = Math.ceil(cycleDayRaw) || 1;
-        const cycleTotal = Math.round(synodicMonth);
         return (
           <div 
             className="calendar-moon-bar"
             onClick={(e) => openMoonDetail(new Date(), e)}
           >
             <span className="moon-bar-emoji">
-              <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={24} />
+              <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={24} eventType={lunar.specialEvent?.type} />
             </span>
-            <span className="moon-bar-label">{lunar.label}</span>
+            <span className="moon-bar-label">{lunar.specialEvent ? `${lunar.label} · ${lunar.specialEvent.name}` : lunar.label}</span>
             <span className="moon-bar-separator">·</span>
-            <span className="moon-bar-meta">Day {cycleDay}/{cycleTotal}</span>
+            <span className="moon-bar-meta">Day {lunar.cycleDay}/{lunar.cycleTotal}</span>
             <span className="moon-bar-separator">·</span>
             <span className="moon-bar-meta">{lunar.illumination}%</span>
           </div>
@@ -1893,7 +1860,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                 <>
                   <div className="moon-detail-visual">
                     <div className={`moon-detail-glow moon-${lunar.phase}`}>
-                      <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={72} />
+                      <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={72} eventType={lunar.specialEvent?.type} />
                     </div>
                   </div>
                   
@@ -1906,10 +1873,42 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                   <div className="moon-detail-illumination">
                     {lunar.illumination}% illumination
                   </div>
+
+                  {/* Moonrise/Moonset times */}
+                  {(lunar.moonrise || lunar.moonset) && (
+                    <div style={{ 
+                      display: 'flex', justifyContent: 'center', gap: '24px',
+                      marginBottom: '16px', fontSize: '0.8125rem', color: 'var(--text-muted)' 
+                    }}>
+                      {lunar.moonrise && <span>Moonrise {lunar.moonrise}</span>}
+                      {lunar.moonset && <span>Moonset {lunar.moonset}</span>}
+                    </div>
+                  )}
+
+                  {/* Special event banner */}
+                  {lunar.specialEvent && (
+                    <div style={{
+                      background: 'var(--surface-overlay)', borderRadius: '12px',
+                      padding: '12px 16px', marginBottom: '16px', textAlign: 'center'
+                    }}>
+                      <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)', marginBottom: '4px' }}>
+                        {lunar.specialEvent.name}
+                      </div>
+                      {lunar.specialEvent.peakTimeUTC && (
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                          Peak: {(() => {
+                            const [h, m] = lunar.specialEvent.peakTimeUTC.split(':');
+                            const peak = new Date(); peak.setUTCHours(parseInt(h), parseInt(m), 0, 0);
+                            return peak.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                          })()} (local) &middot; {lunar.specialEvent.visibility}
+                        </div>
+                      )}
+                    </div>
+                  )}
                   
                   <div className="moon-detail-insight">
                     <p>
-                      {({
+                      {lunar.specialEvent ? lunar.specialEvent.significance : ({
                         'new': "The new moon is a time of new beginnings. Set intentions, recommit to your practice, and plant the seeds for what you want to grow this cycle.",
                         'waxing-crescent': "The waxing crescent fuels motivation and desire. Your intentions are taking root — channel rising energy into disciplined action.",
                         'first-quarter': "The first quarter tests your resolve. Obstacles surface now to strengthen you. Push forward with discipline — don't waver.",
@@ -1918,7 +1917,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                         'waning-gibbous': "Time to turn inward. Reflect on your progress, practice gratitude, and observe what this cycle has revealed about your patterns.",
                         'last-quarter': "Release what no longer serves you. Let go of habits, thoughts, and triggers that hold you back. This is a phase of conscious shedding.",
                         'waning-crescent': "Rest and surrender. Recuperate before the next cycle begins. It's okay to feel low energy — you're preparing for renewal."
-                      })[lunar.phase] || "Track your journey through each lunar cycle. The moon's rhythm mirrors your own internal patterns."}
+                      })[lunar.phase] || "Track your journey through each lunar cycle. The moon's rhythm mirrors your own internal patterns.")}
                     </p>
                   </div>
                   <div className="moon-detail-footer">

@@ -26,6 +26,7 @@ const knowledgeRoutes = require('./routes/knowledgeRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const adminRevenueRoutes = require('./routes/adminRevenue');
 const { initializeSchedulers } = require('./services/notificationScheduler');
+const { buildLunarContext } = require('./utils/lunarData');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 const { getCommunityPulse } = require('./services/communityPulse');
 const { getOutcomePatterns } = require('./services/outcomeAggregation');
@@ -1354,7 +1355,8 @@ NUMEROLOGY:
 - 2026 is a 10/1 Universal Year (2+0+2+6=10, 1+0=1). New beginnings, leadership, fresh cycles.
 
 Use this awareness naturally. Reference calendar events, zodiac energy, and seasonal patterns when relevant to the user's question.\n`;
-    const systemWithKnowledge = systemPrompt + dateContext + communityContext + outcomeContext + ragContext;
+    const lunarContext = buildLunarContext(userTimezone || 'America/New_York');
+    const systemWithKnowledge = systemPrompt + dateContext + lunarContext + communityContext + outcomeContext + ragContext;
 
     // Set up SSE headers
     res.setHeader('Content-Type', 'text/event-stream');

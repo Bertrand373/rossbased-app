@@ -8,6 +8,7 @@ import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import './EnergyAlmanac.css';
 import '../../styles/BottomSheet.css';
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
+import { getMoonPhase } from '../../utils/lunarData';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
@@ -40,47 +41,7 @@ const getChineseYear = (date) => {
 // CALCULATION ENGINES
 // ============================================================
 
-/**
- * Calculate moon phase (0-29.53 day cycle)
- */
-const getMoonPhase = (date = new Date()) => {
-  const knownNewMoon = new Date('2025-01-29T12:36:00Z');
-  const lunarCycle = 29.53058867;
-  
-  const daysSinceKnown = (date - knownNewMoon) / (1000 * 60 * 60 * 24);
-  const currentCycleDay = ((daysSinceKnown % lunarCycle) + lunarCycle) % lunarCycle;
-  
-  const illumination = Math.round((1 - Math.cos(2 * Math.PI * currentCycleDay / lunarCycle)) / 2 * 100);
-  
-  let phase, emoji, energy;
-  if (currentCycleDay < 1.5 || currentCycleDay >= 28.5) {
-    phase = 'New Moon'; emoji = '🌑';
-    energy = 'New beginnings, intention setting, introspection';
-  } else if (currentCycleDay < 7.38) {
-    phase = 'Waxing Crescent'; emoji = '🌒';
-    energy = 'Building momentum, taking action on intentions';
-  } else if (currentCycleDay < 9.23) {
-    phase = 'First Quarter'; emoji = '🌓';
-    energy = 'Challenges arise, decision points, commitment';
-  } else if (currentCycleDay < 13.0) {
-    phase = 'Waxing Gibbous'; emoji = '🌔';
-    energy = 'Refinement, adjustment, patience before fruition';
-  } else if (currentCycleDay < 16.5) {
-    phase = 'Full Moon'; emoji = '🌕';
-    energy = 'Peak energy, culmination, heightened emotions';
-  } else if (currentCycleDay < 21.15) {
-    phase = 'Waning Gibbous'; emoji = '🌖';
-    energy = 'Gratitude, sharing wisdom, integration';
-  } else if (currentCycleDay < 23.0) {
-    phase = 'Last Quarter'; emoji = '🌗';
-    energy = 'Release, forgiveness, letting go';
-  } else {
-    phase = 'Waning Crescent'; emoji = '🌘';
-    energy = 'Rest, reflection, preparation for renewal';
-  }
-  
-  return { phase, emoji, illumination, energy, cycleDay: Math.floor(currentCycleDay) };
-};
+// getMoonPhase is now imported from '../../utils/lunarData'
 
 /**
  * Calculate spermatogenesis cycle position (72-day cycle)
