@@ -20,21 +20,19 @@ import { getLunarData } from '../../utils/lunarData';
 
 
 
-// Moon tint system — silver baseline, event overrides
-// Blood moon: deep copper-red + atmospheric glow (matches NASA reference imagery)
-// Supermoon: bright silver + white glow (perceived size/brightness increase)
+// Moon event tint styles - premium visual treatment for special lunar events
 const getMoonTintStyle = (eventType) => {
   switch (eventType) {
     case 'total-lunar-eclipse':
-      return { filter: 'brightness(0.6) sepia(1) hue-rotate(-45deg) saturate(3.5) contrast(1.15) drop-shadow(0 0 4px rgba(180,50,20,0.6))' };
+      return { filter: 'sepia(1) hue-rotate(-30deg) saturate(3) brightness(0.85)' };
     case 'partial-lunar-eclipse':
-      return { filter: 'brightness(0.75) sepia(0.6) hue-rotate(-25deg) saturate(2) contrast(1.05) drop-shadow(0 0 3px rgba(160,60,30,0.3))' };
+      return { filter: 'grayscale(0.4) sepia(0.4) hue-rotate(-20deg) saturate(2) brightness(1.1)' };
     case 'supermoon':
-      return { filter: 'grayscale(1) brightness(1.8) drop-shadow(0 0 5px rgba(255,255,255,0.45))' };
+      return { filter: 'grayscale(1) brightness(1.8)' };
     case 'penumbral-lunar-eclipse':
-      return { filter: 'grayscale(0.8) brightness(0.85) drop-shadow(0 0 2px rgba(100,100,120,0.3))' };
+      return { filter: 'grayscale(1) brightness(1.0)' };
     default:
-      return { filter: 'grayscale(1) brightness(1.5) drop-shadow(0 0 3px rgba(200,210,220,0.35))' };
+      return { filter: 'grayscale(1) brightness(1.5)' };
   }
 };
 
@@ -1572,7 +1570,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
             <span className="moon-bar-emoji">
               <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={24} eventType={lunar.specialEvent?.type} />
             </span>
-            <span className="moon-bar-label">{lunar.specialEvent ? lunar.specialEvent.name : lunar.label}</span>
+            <span className="moon-bar-label" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '200px' }}>{lunar.specialEvent ? lunar.specialEvent.name : lunar.label}</span>
             <span className="moon-bar-separator">·</span>
             <span className="moon-bar-meta">Day {lunar.cycleDay}/{lunar.cycleTotal}</span>
             <span className="moon-bar-separator">·</span>
