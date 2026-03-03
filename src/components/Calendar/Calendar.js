@@ -22,18 +22,17 @@ import { getLunarData } from '../../utils/lunarData';
 
 // Moon event tint styles - premium visual treatment for special lunar events
 const getMoonTintStyle = (eventType) => {
-  if (!eventType) return {};
   switch (eventType) {
     case 'total-lunar-eclipse':
-      return { filter: 'brightness(0.9) sepia(1) hue-rotate(-30deg) saturate(4)' };
+      return { filter: 'sepia(1) hue-rotate(-30deg) saturate(3) brightness(0.85)' };
     case 'partial-lunar-eclipse':
-      return { filter: 'brightness(0.85) sepia(0.5) hue-rotate(-20deg) saturate(2.5)' };
+      return { filter: 'grayscale(0.4) sepia(0.4) hue-rotate(-20deg) saturate(2) brightness(1.1)' };
     case 'supermoon':
-      return { filter: 'brightness(1.3) contrast(1.05)' };
+      return { filter: 'grayscale(1) brightness(1.8)' };
     case 'penumbral-lunar-eclipse':
-      return { filter: 'brightness(0.75) saturate(0.6)' };
+      return { filter: 'grayscale(1) brightness(1.0)' };
     default:
-      return {};
+      return { filter: 'grayscale(1) brightness(1.5)' };
   }
 };
 
@@ -1413,18 +1412,20 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         <div key={i} className={cellClasses} onClick={() => openDayInfo(day)}>
           <div className="week-day-header">
             <span className="week-day-name">{format(day, 'EEE')}</span>
-            <span className={`week-day-number ${isToday ? 'today' : ''} ${dayStatus?.type || ''} ${wetDream && !dayStatus ? 'wet-dream' : ''}`}>
-              {format(day, 'd')}
-            </span>
-            {/* Moon indicator in week view header */}
-            {isMoonDay && (
-              <span 
-                className="week-moon-indicator"
-                onClick={(e) => openMoonDetail(day, e)}
-              >
-                <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={14} eventType={lunar.specialEvent?.type} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span className={`week-day-number ${isToday ? 'today' : ''} ${dayStatus?.type || ''} ${wetDream && !dayStatus ? 'wet-dream' : ''}`}>
+                {format(day, 'd')}
               </span>
-            )}
+              {/* Moon indicator beside day number */}
+              {isMoonDay && (
+                <span 
+                  className="week-moon-indicator"
+                  onClick={(e) => openMoonDetail(day, e)}
+                >
+                  <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={14} eventType={lunar.specialEvent?.type} />
+                </span>
+              )}
+            </div>
           </div>
           
           {/* Benefit bars - white progress bars matching modal style */}
@@ -1911,13 +1912,13 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                       {lunar.specialEvent ? lunar.specialEvent.significance : (({
                         'new': "The new moon is a time of new beginnings. Set intentions, recommit to your practice, and plant the seeds for what you want to grow this cycle.",
                         'waxing-crescent': "The waxing crescent fuels motivation and desire. Your intentions are taking root — channel rising energy into disciplined action.",
-                        'first-quarter': "The first quarter tests your resolve. Obstacles surface now to strengthen you. Push forward with discipline — don't waver.",
+                        'first-quarter': "The first quarter tests your resolve. Obstacles surface now to strengthen you. Push forward with discipline — do not waver.",
                         'waxing-gibbous': "Energy is accumulating rapidly. Refine your habits and stay locked in. Momentum is building toward a peak — maintain focus.",
                         'full': "The full moon amplifies everything — vitality, magnetism, and urges. Many practitioners report peak energy. Stay vigilant. This is where discipline matters most.",
                         'waning-gibbous': "Time to turn inward. Reflect on your progress, practice gratitude, and observe what this cycle has revealed about your patterns.",
                         'last-quarter': "Release what no longer serves you. Let go of habits, thoughts, and triggers that hold you back. This is a phase of conscious shedding.",
-                        'waning-crescent': "Rest and surrender. Recuperate before the next cycle begins. It's okay to feel low energy — you're preparing for renewal."
-                      })[lunar.phase] || "Track your journey through each lunar cycle. The moon's rhythm mirrors your own internal patterns."))}
+                        'waning-crescent': "Rest and surrender. Recuperate before the next cycle begins. Low energy is natural. You are preparing for renewal."
+                      })[lunar.phase] || "Track your journey through each lunar cycle. The lunar rhythm mirrors your own internal patterns."))}
                     </p>
                   </div>
                   <div className="moon-detail-footer">
