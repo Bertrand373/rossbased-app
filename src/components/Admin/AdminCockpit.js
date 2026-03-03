@@ -295,11 +295,8 @@ const AdminCockpit = () => {
       <div className="ac-header">
         <div className="ac-header-top">
           <div className="ac-brand">
-            <img src="/tt-icon-white.png" alt="TitanTrack" className="ac-brand-mark-img" />
-            <div className="ac-brand-text">
-              <span className="ac-brand-name">TitanTrack</span>
-              <span className="ac-brand-chip">ADMIN</span>
-            </div>
+            <img src={require('../../assets/trackerapplogo.png')} alt="TitanTrack" className="ac-brand-wordmark" />
+            <span className="ac-brand-chip">ADMIN</span>
           </div>
           <div className="ac-header-right">
             {lastRefresh && (
@@ -889,12 +886,6 @@ const AdminCockpit = () => {
         </div>
       )}
 
-      {/* ===== FOOTER ===== */}
-      <div className="ac-footer">
-        <span className="ac-footer-brand">TitanTrack</span>
-        <span className="ac-footer-sep">·</span>
-        <span className="ac-footer-oracle">Powered by The Oracle</span>
-      </div>
     </div>
   );
 };

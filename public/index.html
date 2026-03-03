@@ -158,14 +158,17 @@
           var ldr = document.getElementById('initial-loader');
           if (ldr) ldr.style.backgroundColor = '#ffffff';
         }
-        requestAnimationFrame(function() {
-          requestAnimationFrame(function() {
+        // PWA FIX: In standalone mode with viewport-fit=cover, WebKit
+        // finalizes viewport height ~50-120ms after first paint. Flexbox
+        // centering shifts when this happens. 200ms guarantees the viewport
+        // is settled on all devices while remaining imperceptible after
+        // the iOS splash screen (which itself lasts 1-2 seconds).
+        setTimeout(function() {
             if (loaderIcon) {
               loaderIcon.style.opacity = '1';
               loaderIcon.style.animation = 'pulse 2s ease-in-out infinite';
             }
-          });
-        });
+        }, 200);
       })();
     </script>
     

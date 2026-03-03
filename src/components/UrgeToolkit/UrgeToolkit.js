@@ -643,7 +643,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
   const steps = [
     { id: 'assessment', label: 'Assess' },
     { id: 'protocol', label: 'Protocol' },
-    { id: 'tools', label: 'Tools' },
+    { id: 'tools', label: 'Reinforce' },
     { id: 'summary', label: 'Complete' }
   ];
 
@@ -851,13 +851,13 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
         {currentStep === 'tools' && (
           <>
             <div className="ut-section-header">
-              <h2 className="ut-section-title">Additional Tools</h2>
-              <p className="ut-section-desc">Interactive techniques to reinforce your progress</p>
+              <h2 className="ut-section-title">Reinforce</h2>
+              <p className="ut-section-desc">Protocol complete. Lock in your state.</p>
             </div>
             
             {/* Interactive Tools */}
             <div className="ut-interactive-tools">
-              <div className="ut-tools-label">Guided Practices</div>
+              <div className="ut-tools-label">Practices</div>
               {getInteractiveTools().map((tool, index, arr) => (
                 <React.Fragment key={tool.id}>
                   <button className="ut-interactive-tool" onClick={tool.action}>
@@ -874,11 +874,11 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
             
             {/* Quick Actions */}
             <div className="ut-quick-actions">
-              <div className="ut-tools-label">Quick Actions</div>
+              <div className="ut-tools-label">Redirects</div>
               <div className="ut-quick-list">
                 {getQuickActions().map((action, index) => (
                   <div key={index} className="ut-quick-item">
-                    <span className="ut-quick-bullet">•</span>
+                    <span className="ut-quick-num">{String(index + 1).padStart(2, '0')}</span>
                     <span className="ut-quick-text">{action}</span>
                   </div>
                 ))}
@@ -893,7 +893,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
                   setCurrentStep('summary');
                 }}
               >
-                Continue to Summary
+                Log Session
               </button>
             </div>
           </>

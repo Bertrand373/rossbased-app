@@ -850,7 +850,7 @@ const splitResponse = (text) => {
 // Every DM includes a persistent command footer — no memorization needed.
 // ============================================================
 
-const ADMIN_DM_FOOTER = '!status · !revenue · !users · !pool · !models · !brief';
+const ADMIN_DM_FOOTER = '!status · !revenue · !users · !pool · !models · !brief · !pulse-stats';
 const ORACLE_ICON = 'https://titantrack.app/The_Oracle.png';
 const BRIEFING_HOUR_ET = parseInt(process.env.BRIEFING_HOUR || '9'); // 9am ET default
 
@@ -1041,6 +1041,7 @@ async function handleAdminDM(message) {
       case '!pool': return await dmPool(message);
       case '!models': return await dmModels(message);
       case '!brief': return await dmBriefing(message);
+      case '!pulse-stats': return await dmPulseStats(message);
       default:
         const embed = new EmbedBuilder()
           .setColor(ORACLE_COLOR)
@@ -1052,6 +1053,25 @@ async function handleAdminDM(message) {
     console.error('[Admin DM] Error:', err.message);
     await message.reply(`Command failed: ${err.message}`).catch(() => {});
   }
+}
+
+async function dmPulseStats(message) {
+  const stats = await getPulseStats();
+  const topicsStr = stats.topTopics.length > 0
+    ? stats.topTopics.map(([topic, count]) => `  ${topic}: ${count}`).join('\n')
+    : '  No observations yet';
+  const embed = new EmbedBuilder()
+    .setColor(ORACLE_COLOR)
+    .setTitle('🔮 Pulse Stats')
+    .setDescription(
+      `**This week:** ${stats.thisWeek} observations (${stats.unprocessed} unprocessed)\n` +
+      `**Unique members:** ${stats.uniqueAuthors}\n` +
+      `**Total all-time:** ${stats.total}\n\n` +
+      `**Top patterns this week:**\n${topicsStr}`
+    )
+    .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
+    .setTimestamp();
+  await message.reply({ embeds: [embed] });
 }
 
 async function dmStatus(message) {
@@ -1380,7 +1400,7 @@ client.on('messageCreate', async (message) => {
       // Find the insight channel
       const guild = message.guild;
       const targetChannel = guild.channels.cache.find(
-        ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
+        ch => ch.name.toLowerCase() === INSIGHT_CHANNEL && (ch.type === 0 || ch.type === 5)
       );
       
       if (!targetChannel) {
@@ -1983,7 +2003,7 @@ client.once('ready', () => {
       if (!guild) return;
       
       const targetChannel = guild.channels.cache.find(
-        ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
+        ch => ch.name.toLowerCase() === INSIGHT_CHANNEL && (ch.type === 0 || ch.type === 5)
       );
       
       if (!targetChannel) {
@@ -2063,7 +2083,7 @@ client.once('ready', () => {
       if (!guild) return;
       
       const targetChannel = guild.channels.cache.find(
-        ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
+        ch => ch.name.toLowerCase() === INSIGHT_CHANNEL && (ch.type === 0 || ch.type === 5)
       );
       
       if (!targetChannel) return;

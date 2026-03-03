@@ -543,10 +543,13 @@
   gap: 12px;
 }
 
-.ut-quick-bullet {
-  color: var(--text-tertiary);
+.ut-quick-num {
   font-size: 0.75rem;
-  line-height: 1.6;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  font-feature-settings: 'tnum' 1;
+  flex-shrink: 0;
+  width: 20px;
 }
 
 .ut-quick-text {

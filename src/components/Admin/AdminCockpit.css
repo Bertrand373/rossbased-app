@@ -50,6 +50,13 @@
   flex-shrink: 0;
 }
 
+
+.ac-brand-wordmark {
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 .ac-loading-brand-img {
   width: 48px;
   height: 48px;
@@ -1334,6 +1341,7 @@
   color: rgba(170,130,40,0.85);
 }
 [data-theme="light"] .ac-brand-mark-img { filter: invert(1); }
+[data-theme="light"] .ac-brand-wordmark { filter: none; }
 [data-theme="light"] .ac-loading-brand-img { filter: invert(1); }
 [data-theme="light"] .ac-section-brand-logo { filter: invert(1); }
 [data-theme="light"] .ac-brand-chip {
