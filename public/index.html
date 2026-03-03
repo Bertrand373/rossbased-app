@@ -99,6 +99,7 @@
         align-items: center;
         z-index: 9999;
         transition: background-color 0.2s ease;
+        background-color: #000000;
       }
       
       /* Dark theme loader */
@@ -114,7 +115,6 @@
       .loader-icon {
         width: 64px;
         height: 64px;
-        /* Start invisible — JS reveals after viewport settles (prevents PWA position jump) */
         opacity: 0;
         transform: translateZ(0);
         -webkit-transform: translateZ(0);
@@ -139,7 +139,7 @@
       }
     </style>
   </head>
-  <body>
+  <body style="background-color:#000000">
     <noscript>You need to enable JavaScript to run this app.</noscript>
     
     <!-- Minimal loader - icon only, theme-aware -->
@@ -154,19 +154,17 @@
         var loaderIcon = document.getElementById('loader-icon');
         if (loaderIcon && theme === 'light') {
           loaderIcon.src = '%PUBLIC_URL%/icon-192-black.png';
+          document.body.style.backgroundColor = '#ffffff';
+          var ldr = document.getElementById('initial-loader');
+          if (ldr) ldr.style.backgroundColor = '#ffffff';
         }
-        // PWA FIX: Icon starts invisible (opacity:0 in CSS).
-        // Wait for viewport to fully settle before revealing.
-        // In PWA standalone mode, viewport-fit=cover causes the viewport
-        // dimensions to finalize AFTER first paint, which shifts flexbox
-        // centering. By waiting, the icon appears in its final position.
         requestAnimationFrame(function() {
-          setTimeout(function() {
+          requestAnimationFrame(function() {
             if (loaderIcon) {
               loaderIcon.style.opacity = '1';
               loaderIcon.style.animation = 'pulse 2s ease-in-out infinite';
             }
-          }, 50);
+          });
         });
       })();
     </script>
