@@ -61,6 +61,23 @@ const MoonIcon = ({ phase, size = 11, emoji, eventType }) => {
   );
 };
 
+// Moon insight text for detail modal — extracted to avoid JSX parsing issues
+const MOON_INSIGHTS = {
+  'new': "The new moon is a time of new beginnings. Set intentions, recommit to your practice, and plant the seeds for what you want to grow this cycle.",
+  'waxing-crescent': "The waxing crescent fuels motivation and desire. Your intentions are taking root \u2014 channel rising energy into disciplined action.",
+  'first-quarter': "The first quarter tests your resolve. Obstacles surface now to strengthen you. Push forward with discipline \u2014 do not waver.",
+  'waxing-gibbous': "Energy is accumulating rapidly. Refine your habits and stay locked in. Momentum is building toward a peak \u2014 maintain focus.",
+  'full': "The full moon amplifies everything \u2014 vitality, magnetism, and urges. Many practitioners report peak energy. Stay vigilant. This is where discipline matters most.",
+  'waning-gibbous': "Time to turn inward. Reflect on your progress, practice gratitude, and observe what this cycle has revealed about your patterns.",
+  'last-quarter': "Release what no longer serves you. Let go of habits, thoughts, and triggers that hold you back. This is a phase of conscious shedding.",
+  'waning-crescent': "Rest and surrender. Recuperate before the next cycle begins. Low energy is natural. You are preparing for renewal."
+};
+
+const getMoonInsight = (lunar) => {
+  if (lunar.specialEvent) return lunar.specialEvent.significance;
+  return MOON_INSIGHTS[lunar.phase] || "Track your journey through each lunar cycle. The lunar rhythm mirrors your own internal patterns.";
+};
+
 // Tiny dumbbell SVG for calendar day cells — two-plate clean
 const DumbbellGlyph = ({ size = 10 }) => (
   <svg width={size} height={Math.round(size * 0.56)} viewBox="0 0 32 18" fill="currentColor" style={{ display: 'block' }}>
@@ -1909,16 +1926,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                   
                   <div className="moon-detail-insight">
                     <p>
-                      {lunar.specialEvent ? lunar.specialEvent.significance : (({
-                        'new': "The new moon is a time of new beginnings. Set intentions, recommit to your practice, and plant the seeds for what you want to grow this cycle.",
-                        'waxing-crescent': "The waxing crescent fuels motivation and desire. Your intentions are taking root — channel rising energy into disciplined action.",
-                        'first-quarter': "The first quarter tests your resolve. Obstacles surface now to strengthen you. Push forward with discipline — do not waver.",
-                        'waxing-gibbous': "Energy is accumulating rapidly. Refine your habits and stay locked in. Momentum is building toward a peak — maintain focus.",
-                        'full': "The full moon amplifies everything — vitality, magnetism, and urges. Many practitioners report peak energy. Stay vigilant. This is where discipline matters most.",
-                        'waning-gibbous': "Time to turn inward. Reflect on your progress, practice gratitude, and observe what this cycle has revealed about your patterns.",
-                        'last-quarter': "Release what no longer serves you. Let go of habits, thoughts, and triggers that hold you back. This is a phase of conscious shedding.",
-                        'waning-crescent': "Rest and surrender. Recuperate before the next cycle begins. Low energy is natural. You are preparing for renewal."
-                      })[lunar.phase] || "Track your journey through each lunar cycle. The lunar rhythm mirrors your own internal patterns."))}
+                      {getMoonInsight(lunar)}
                     </p>
                   </div>
                   <div className="moon-detail-footer">
