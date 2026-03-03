@@ -114,13 +114,10 @@
       .loader-icon {
         width: 64px;
         height: 64px;
-        opacity: 1;
-        /* Pre-establish GPU compositing layer — prevents reflow when animation runs */
-        transform: translateZ(0) scale(1);
-        -webkit-transform: translateZ(0) scale(1);
-        will-change: transform, opacity;
-        /* No delay — starts immediately so no compositing layer promotion mid-render */
-        animation: pulse 2s ease-in-out infinite;
+        /* Start invisible — JS reveals after viewport settles (prevents PWA position jump) */
+        opacity: 0;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
       }
       
       @keyframes pulse {
@@ -150,7 +147,7 @@
       <img class="loader-icon" id="loader-icon" src="%PUBLIC_URL%/icon-192.png" alt="" width="64" height="64" />
     </div>
     
-    <!-- Theme-aware loader icon script -->
+    <!-- Theme-aware loader icon + viewport-settle reveal -->
     <script>
       (function() {
         var theme = document.documentElement.getAttribute('data-theme') || 'dark';
@@ -158,6 +155,19 @@
         if (loaderIcon && theme === 'light') {
           loaderIcon.src = '%PUBLIC_URL%/icon-192-black.png';
         }
+        // PWA FIX: Icon starts invisible (opacity:0 in CSS).
+        // Wait for viewport to fully settle before revealing.
+        // In PWA standalone mode, viewport-fit=cover causes the viewport
+        // dimensions to finalize AFTER first paint, which shifts flexbox
+        // centering. By waiting, the icon appears in its final position.
+        requestAnimationFrame(function() {
+          setTimeout(function() {
+            if (loaderIcon) {
+              loaderIcon.style.opacity = '1';
+              loaderIcon.style.animation = 'pulse 2s ease-in-out infinite';
+            }
+          }, 50);
+        });
       })();
     </script>
     
