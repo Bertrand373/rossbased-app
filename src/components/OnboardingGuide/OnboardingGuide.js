@@ -1,17 +1,30 @@
 // OnboardingGuide.js - TITANTRACK
-// Premium onboarding with architectural line+dot connector
-// UPDATED: 4 steps - now includes Crisis Toolkit as highlighted step
+// Premium onboarding — spotlight + floating tooltip
+// 4 steps: streak counter → log button → crisis toolkit → explore nav
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './OnboardingGuide.css';
 
-const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
+const OnboardingGuide = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [targetRect, setTargetRect] = useState(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  // Key increments on each step change to force CSS animation re-trigger
+  const [animKey, setAnimKey] = useState(0);
+  const retryRef = useRef(null);
+
+  // Lock body scroll while onboarding is active
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    };
+  }, []);
 
   // Check for mobile on resize
   useEffect(() => {
@@ -20,46 +33,62 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Define the 4 onboarding steps - Crisis toolkit now highlighted
+  // Escape key to skip
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === 'Escape') handleComplete();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Define the 4 onboarding steps
   const steps = [
     {
-      // Step 1: Target ONLY the streak number itself
       target: '.streak-num',
       title: 'Set your start date',
       message: 'Tap the counter to set when your journey began.',
       position: 'bottom',
-      padding: 12
+      padding: 12,
+      radius: '20px'
     },
     {
-      // Step 2: Target the log button
       target: '.benefits-trigger',
       title: 'Track daily benefits',
       message: 'Log how you feel each day. This powers your AI insights.',
       position: 'top',
-      padding: 6
+      padding: 6,
+      radius: '14px'
     },
     {
-      // Step 3: NEW - Target the Urges/Crisis nav item specifically
       target: isMobile 
         ? '.mobile-nav-item[href="/urge-toolkit"]' 
         : '.nav-link[href="/urge-toolkit"]',
       title: 'Crisis toolkit ready',
       message: 'When urges hit, breathing exercises and emergency protocols are one tap away.',
       position: isMobile ? 'top' : 'bottom',
-      padding: 8
+      padding: 8,
+      radius: '12px'
     },
     {
-      // Step 4: Target just the nav links container (not full bar)
       target: isMobile ? '.mobile-nav-inner' : '.nav-container',
       title: 'Explore when ready',
       message: 'Calendar, stats, and emotional timeline await.',
       position: isMobile ? 'top' : 'bottom',
-      padding: 10
+      padding: 10,
+      radius: '16px'
     }
   ];
 
-  // Find and measure the target element
+  // Find and measure the target element — with retry logic
   const updateTargetPosition = useCallback(() => {
+    // Clear any pending retry
+    if (retryRef.current) {
+      clearTimeout(retryRef.current);
+      retryRef.current = null;
+    }
+
     const step = steps[currentStep];
     if (!step) return;
 
@@ -78,21 +107,45 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
         centerY: rect.top + rect.height / 2
       });
     } else {
+      // Element not found — retry up to 5 times at increasing intervals
+      // This handles race conditions where DOM isn't painted yet
       setTargetRect(null);
+      let attempts = 0;
+      const retry = () => {
+        attempts++;
+        const el = document.querySelector(step.target);
+        if (el) {
+          const r = el.getBoundingClientRect();
+          setTargetRect({
+            top: r.top,
+            left: r.left,
+            width: r.width,
+            height: r.height,
+            bottom: r.bottom,
+            right: r.right,
+            centerX: r.left + r.width / 2,
+            centerY: r.top + r.height / 2
+          });
+        } else if (attempts < 5) {
+          retryRef.current = setTimeout(retry, attempts * 150);
+        }
+        // After 5 attempts, tooltip will center on screen (graceful fallback)
+      };
+      retryRef.current = setTimeout(retry, 100);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep, isMobile]);
 
-  // Update position on mount and step change
+  // Update position on mount, step change, resize, scroll
   useEffect(() => {
-    const timer = setTimeout(() => {
-      updateTargetPosition();
-    }, 50);
+    const timer = setTimeout(updateTargetPosition, 50);
     
     window.addEventListener('resize', updateTargetPosition);
     window.addEventListener('scroll', updateTargetPosition);
     
     return () => {
       clearTimeout(timer);
+      if (retryRef.current) clearTimeout(retryRef.current);
       window.removeEventListener('resize', updateTargetPosition);
       window.removeEventListener('scroll', updateTargetPosition);
     };
@@ -105,6 +158,7 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
     
     setTimeout(() => {
       setCurrentStep(nextStep);
+      setAnimKey(k => k + 1); // Force animation re-trigger
     }, 200);
     
     setTimeout(() => {
@@ -139,7 +193,7 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
   const isLastStep = currentStep === steps.length - 1;
   const padding = step.padding || 8;
 
-  // Calculate tooltip position - follows target with screen constraints
+  // Tooltip position — follows target, stays on screen
   const getTooltipStyle = () => {
     if (!targetRect) {
       return {
@@ -149,12 +203,11 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
       };
     }
 
-    // Space between spotlight and tooltip
     const tooltipOffset = 16;
     const tooltipWidth = 300;
     const screenPadding = 20;
     
-    // Calculate horizontal position - follow target but stay on screen
+    // Horizontal: follow target center, clamped to screen
     let leftPos = targetRect.centerX;
     const minLeft = screenPadding + (tooltipWidth / 2);
     const maxLeft = window.innerWidth - screenPadding - (tooltipWidth / 2);
@@ -166,70 +219,34 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
         left: `${leftPos}px`,
         transform: 'translateX(-50%)'
       };
-    } else if (step.position === 'top') {
+    } else {
       return {
         bottom: `${window.innerHeight - targetRect.top + padding + tooltipOffset}px`,
         left: `${leftPos}px`,
         transform: 'translateX(-50%)'
       };
     }
-
-    return {};
   };
 
-  // Get spotlight style - TIGHT, element-specific
+  // Spotlight style — unified, uses step.radius for shape
   const getSpotlightStyle = () => {
     if (!targetRect) return { opacity: 0 };
     
-    // For full nav (step 4) - rounded corners
-    if (currentStep === 3) {
-      return {
-        top: `${targetRect.top - padding}px`,
-        left: `${targetRect.left - padding}px`,
-        width: `${targetRect.width + (padding * 2)}px`,
-        height: `${targetRect.height + (padding * 2)}px`,
-        borderRadius: '16px'
-      };
-    }
-    
-    // For crisis/urges nav item (step 3) - tighter focus
-    if (currentStep === 2) {
-      return {
-        top: `${targetRect.top - padding}px`,
-        left: `${targetRect.left - padding}px`,
-        width: `${targetRect.width + (padding * 2)}px`,
-        height: `${targetRect.height + (padding * 2)}px`,
-        borderRadius: '12px'
-      };
-    }
-    
-    // For counter (step 1) - tight around just the button
-    if (currentStep === 0) {
-      return {
-        top: `${targetRect.top - padding}px`,
-        left: `${targetRect.left - padding}px`,
-        width: `${targetRect.width + (padding * 2)}px`,
-        height: `${targetRect.height + (padding * 2)}px`,
-        borderRadius: '20px'
-      };
-    }
-    
-    // For benefits button (step 2)
     return {
       top: `${targetRect.top - padding}px`,
       left: `${targetRect.left - padding}px`,
       width: `${targetRect.width + (padding * 2)}px`,
       height: `${targetRect.height + (padding * 2)}px`,
-      borderRadius: '14px'
+      borderRadius: step.radius
     };
   };
 
   return (
     <div className="onboarding-overlay">
-      {/* Full-screen click blocker - prevents ALL interaction with app */}
+      {/* Full-screen click blocker */}
       <div className="onboarding-blocker" />
       
-      {/* Spotlight - tight focus on element */}
+      {/* Spotlight */}
       {targetRect && (
         <div 
           className="onboarding-spotlight"
@@ -237,8 +254,9 @@ const OnboardingGuide = ({ onComplete, onTriggerDatePicker }) => {
         />
       )}
 
-      {/* Tooltip */}
+      {/* Tooltip — animKey forces re-mount for fresh CSS animation */}
       <div 
+        key={animKey}
         className={`onboarding-tooltip ${step.position} ${tooltipVisible ? 'visible' : 'hidden'}`}
         style={getTooltipStyle()}
       >
