@@ -1908,7 +1908,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                   
                   <div className="moon-detail-insight">
                     <p>
-                      {lunar.specialEvent ? lunar.specialEvent.significance : ({
+                      {lunar.specialEvent ? lunar.specialEvent.significance : (({
                         'new': "The new moon is a time of new beginnings. Set intentions, recommit to your practice, and plant the seeds for what you want to grow this cycle.",
                         'waxing-crescent': "The waxing crescent fuels motivation and desire. Your intentions are taking root — channel rising energy into disciplined action.",
                         'first-quarter': "The first quarter tests your resolve. Obstacles surface now to strengthen you. Push forward with discipline — don't waver.",
@@ -1917,7 +1917,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                         'waning-gibbous': "Time to turn inward. Reflect on your progress, practice gratitude, and observe what this cycle has revealed about your patterns.",
                         'last-quarter': "Release what no longer serves you. Let go of habits, thoughts, and triggers that hold you back. This is a phase of conscious shedding.",
                         'waning-crescent': "Rest and surrender. Recuperate before the next cycle begins. It's okay to feel low energy — you're preparing for renewal."
-                      })[lunar.phase] || "Track your journey through each lunar cycle. The moon's rhythm mirrors your own internal patterns.")}
+                      })[lunar.phase] || "Track your journey through each lunar cycle. The moon's rhythm mirrors your own internal patterns."))}
                     </p>
                   </div>
                   <div className="moon-detail-footer">
