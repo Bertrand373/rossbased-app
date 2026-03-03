@@ -282,7 +282,7 @@ const AdminCockpit = () => {
   if (loading) return (
     <div className="ac-wrap">
       <div className="ac-loading">
-        <div className="ac-loading-brand">TT</div>
+        <img src="/tt-icon-white.png" alt="TitanTrack" className="ac-loading-brand-img" />
         <div className="ac-loader" />
         <span>Loading admin...</span>
       </div>
@@ -295,7 +295,7 @@ const AdminCockpit = () => {
       <div className="ac-header">
         <div className="ac-header-top">
           <div className="ac-brand">
-            <span className="ac-brand-mark">TT</span>
+            <img src="/tt-icon-white.png" alt="TitanTrack" className="ac-brand-mark-img" />
             <div className="ac-brand-text">
               <span className="ac-brand-name">TitanTrack</span>
               <span className="ac-brand-chip">ADMIN</span>
@@ -365,7 +365,6 @@ const AdminCockpit = () => {
           { id: 'oracle', label: 'Oracle' },
         ].map(t => (
           <button key={t.id} className={`ac-nav-btn ${tab === t.id ? 'active' : ''}`} onClick={() => setTab(t.id)}>
-            <NavIcon id={t.id} />
             <span className="ac-nav-label">{t.label}</span>
           </button>
         ))}
@@ -869,7 +868,7 @@ const AdminCockpit = () => {
         <div className="ac-section">
           <div className="ac-section-brand">
             <div className="ac-section-brand-icon ac-section-brand-oracle">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <img src="/The_Oracle.png" alt="Oracle" className="ac-section-brand-logo" />
             </div>
             <div className="ac-section-brand-text">
               <span className="ac-section-brand-title">The Oracle</span>

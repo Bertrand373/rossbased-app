@@ -557,6 +557,7 @@
   padding: 12px 14px;
   gap: 12px;
   transition: opacity 0.2s;
+  overflow: hidden;
 }
 
 .kb-doc-disabled {

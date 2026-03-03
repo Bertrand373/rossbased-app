@@ -297,6 +297,8 @@
   color: rgba(255,255,255,0.25);
   line-height: 1.5;
   margin: 6px 0 0;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Recent notes */

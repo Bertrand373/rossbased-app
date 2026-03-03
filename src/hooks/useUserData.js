@@ -379,8 +379,8 @@ export const useUserData = () => {
         (Date.now() - new Date(processed.createdAt).getTime()) < 2 * 60 * 1000;
       
       if (isNewSignup) {
-        sessionStorage.setItem('login_toast', 'Welcome to TitanTrack. 7 days full access.');
-        sessionStorage.setItem('login_toast_duration', '4000');
+        sessionStorage.setItem('login_toast', 'Welcome to TitanTrack.');
+        sessionStorage.setItem('login_toast_duration', '3000');
       } else {
         sessionStorage.setItem('login_toast', `Welcome, ${processed.username}!`);
       }

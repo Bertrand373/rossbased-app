@@ -7,6 +7,8 @@ const { Client, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.j
 const Anthropic = require('@anthropic-ai/sdk');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 const { logIfRelevant, generateWeeklyInsight, generateObservations, detectAnomaly, generatePulseAlert, getPulseStats } = require('./services/oracleInsight');
+const { getCommunityPulse } = require('./services/communityPulse');
+const { getOutcomePatterns } = require('./services/outcomeAggregation');
 const { classifyInteraction } = require('./services/interactionClassifier');
 const KnowledgeChunk = require('./models/KnowledgeChunk');
 const OracleUsage = require('./models/OracleUsage');
@@ -1378,7 +1380,7 @@ client.on('messageCreate', async (message) => {
       // Find the insight channel
       const guild = message.guild;
       const targetChannel = guild.channels.cache.find(
-        ch => ch.name.toLowerCase() === INSIGHT_CHANNEL && (ch.type === 0 || ch.type === 5)
+        ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
       );
       
       if (!targetChannel) {
@@ -1704,7 +1706,17 @@ NUMEROLOGY:
 - 2026 is a 10/1 Universal Year (2+0+2+6=10, 1+0=1). New beginnings, leadership, fresh cycles.
 
 Use this awareness naturally. Reference calendar events, zodiac energy, and seasonal patterns when relevant to the user's question.\n`;
-    const systemWithKnowledge = SYSTEM_PROMPT + dateContext + personalContext + ragContext;
+    // Inject community pulse so Discord Oracle has situational awareness
+    const communityPulse = await getCommunityPulse();
+    const communityContext = communityPulse
+      ? `\n\nCOMMUNITY PULSE (what the community is collectively experiencing right now):\n${communityPulse}\nUse this awareness naturally. You can reference community patterns when relevant ("you're not alone in this — several practitioners are hitting the same wall right now"). Never name specific members.\n`
+      : '';
+    // Inject outcome patterns (real success rates from measured conversations)
+    const outcomePatterns = await getOutcomePatterns();
+    const outcomeContext = outcomePatterns
+      ? `\n\n${outcomePatterns}\nReference these patterns naturally when relevant. Say things like "based on what I've seen with practitioners at your phase" or "most men in your situation who..." Never cite exact percentages unless it strengthens the point.\n`
+      : '';
+    const systemWithKnowledge = SYSTEM_PROMPT + dateContext + personalContext + communityContext + outcomeContext + ragContext;
     
     // Call Claude (with silent retry on overload)
     const response = await callClaude({
@@ -1971,7 +1983,7 @@ client.once('ready', () => {
       if (!guild) return;
       
       const targetChannel = guild.channels.cache.find(
-        ch => ch.name.toLowerCase() === INSIGHT_CHANNEL && (ch.type === 0 || ch.type === 5)
+        ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
       );
       
       if (!targetChannel) {
@@ -2051,7 +2063,7 @@ client.once('ready', () => {
       if (!guild) return;
       
       const targetChannel = guild.channels.cache.find(
-        ch => ch.name.toLowerCase() === INSIGHT_CHANNEL && (ch.type === 0 || ch.type === 5)
+        ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
       );
       
       if (!targetChannel) return;

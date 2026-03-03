@@ -40,12 +40,12 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   // Onboarding starts hidden — only shows after user clears the paywall
   const [showOnboarding, setShowOnboarding] = useState(false);
   
-  // Only trigger onboarding AFTER user has cleared the paywall
+  // Show onboarding for ALL new users — teaching app basics isn't a premium feature
   useEffect(() => {
-    if (!userData.hasSeenOnboarding && isPremium) {
+    if (!userData.hasSeenOnboarding) {
       setShowOnboarding(true);
     }
-  }, [isPremium, userData.hasSeenOnboarding]);
+  }, [userData.hasSeenOnboarding]);
   
   // Deferred login toast — fires after route swap has settled
   // (OAuth redirects cause full page reload → route tree swap eats toasts fired during login)
@@ -243,12 +243,6 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     setTimeout(() => updateUserData({ hasSeenOnboarding: true }), 0);
   };
 
-  // Handle onboarding trigger for date picker
-  const handleOnboardingDateTrigger = () => {
-    setShowOnboarding(false);
-    setShowDatePicker(true);
-    updateUserData({ hasSeenOnboarding: true });
-  };
 
   // Date submit - no toast, modal closing is confirmation
   const handleDateSubmit = (date) => {
@@ -1239,10 +1233,9 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     <div className="tracker">
       
       {/* Onboarding Guide - First time only */}
-      {showOnboarding && isPremium && (
+      {showOnboarding && (
         <OnboardingGuide 
           onComplete={handleOnboardingComplete}
-          onTriggerDatePicker={handleOnboardingDateTrigger}
         />
       )}
       

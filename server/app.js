@@ -28,6 +28,7 @@ const adminRevenueRoutes = require('./routes/adminRevenue');
 const { initializeSchedulers } = require('./services/notificationScheduler');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 const { getCommunityPulse } = require('./services/communityPulse');
+const { getOutcomePatterns } = require('./services/outcomeAggregation');
 const { classifyInteraction, backfillRelapseFlag } = require('./services/interactionClassifier');
 const OracleInteraction = require('./models/OracleInteraction');
 const OracleUsage = require('./models/OracleUsage');
@@ -558,7 +559,29 @@ app.delete('/api/user/:username', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
     
-    console.log('✅ Account deleted:', req.params.username);
+    // Clean up all related data from other collections
+    const NotificationSubscription = require('./models/NotificationSubscription');
+    const cleanup = await Promise.allSettled([
+      PageView.deleteMany({ userId: req.params.username }),
+      NotificationSubscription.deleteMany({ username: req.params.username }),
+      OracleInteraction.deleteMany({ username: req.params.username }),
+      OracleUsage.deleteMany({ discordUserId: user.discordId || 'none' })
+    ]);
+    
+    const cleaned = cleanup.filter(r => r.status === 'fulfilled').length;
+    console.log(`✅ Account deleted: ${req.params.username} (${cleaned}/4 collections cleaned)`);
+    
+    // Cancel Stripe subscription if one exists (non-blocking)
+    if (user.subscription?.stripeSubscriptionId) {
+      try {
+        const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+        await stripe.subscriptions.cancel(user.subscription.stripeSubscriptionId);
+        console.log(`💳 Stripe subscription canceled for ${req.params.username}`);
+      } catch (stripeErr) {
+        console.warn(`⚠️ Stripe cancel failed (non-blocking): ${stripeErr.message}`);
+      }
+    }
+    
     res.json({ success: true, message: 'Account successfully deleted' });
   } catch (err) {
     console.error('Error deleting user:', err);
@@ -971,10 +994,9 @@ function buildOracleContext(user, timezone) {
     }
   }
 
-  // --- OUTCOME PATTERNS (injected once sufficient data exists) ---
-  // TODO: Aggregate measured OracleOutcome documents to inject patterns like:
-  // "Users at your streak phase who dealt with urges via cold exposure: 82% maintained streak"
-  // Requires ~100+ measured outcomes to be statistically meaningful
+  // --- OUTCOME PATTERNS ---
+  // Aggregated outcome data is injected async at the streaming endpoint level
+  // via getOutcomePatterns() — see /api/ai/chat/stream
 
   // --- ML RISK PREDICTION ---
   if (user.mlRiskSnapshot && user.mlRiskSnapshot.updatedAt) {
@@ -1178,6 +1200,9 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     // Inject community pulse (async, cached — adds ~0ms after first fetch)
     const communityPulse = await getCommunityPulse();
 
+    // Inject outcome patterns (async, cached 6h — real success rates from measured outcomes)
+    const outcomePatterns = await getOutcomePatterns();
+
     const systemPrompt = `You are The Oracle, the AI guide within TitanTrack.
 
 You are an extraordinarily perceptive spiritual teacher with an almost supernatural understanding of human transformation. You see what others miss. You read between lines. You sense what someone is really asking even when they don't say it. You detect hidden fears, ego patterns, self-deception. You anticipate someone's next phase before they mention it. You connect current struggles to larger transformation patterns.
@@ -1308,6 +1333,10 @@ When in doubt, shorter. Say what needs to be said. Stop.
     const communityContext = communityPulse 
       ? `\n\nCOMMUNITY PULSE (what the broader TitanTrack community is experiencing right now):\n${communityPulse}\nUse this awareness naturally. You can reference community patterns when relevant ("you're not alone in this — several practitioners are hitting the same wall right now"). Never name specific members.\n`
       : '';
+    // Inject outcome patterns (real success rates from measured conversations)
+    const outcomeContext = outcomePatterns
+      ? `\n\n${outcomePatterns}\nReference these patterns naturally when relevant. Say things like "based on what I've seen with practitioners at your phase" or "most men in your situation who..." Never cite exact percentages unless it strengthens the point.\n`
+      : '';
     // Inject current date and calendar awareness so Oracle has temporal context
     const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: userTimezone || 'America/New_York' });
     const dateContext = `\n\n## CURRENT DATE & CALENDAR AWARENESS
@@ -1325,7 +1354,7 @@ NUMEROLOGY:
 - 2026 is a 10/1 Universal Year (2+0+2+6=10, 1+0=1). New beginnings, leadership, fresh cycles.
 
 Use this awareness naturally. Reference calendar events, zodiac energy, and seasonal patterns when relevant to the user's question.\n`;
-    const systemWithKnowledge = systemPrompt + dateContext + communityContext + ragContext;
+    const systemWithKnowledge = systemPrompt + dateContext + communityContext + outcomeContext + ragContext;
 
     // Set up SSE headers
     res.setHeader('Content-Type', 'text/event-stream');
