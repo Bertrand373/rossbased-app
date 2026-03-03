@@ -53,11 +53,11 @@ const DiscordCallback = ({ onLogin }) => {
         trackLogin('discord');
       }
 
-      // Call onLogin
+      // Call onLogin — handleLogin in App.js sets shouldNavigateToTracker(true)
+      // which triggers PostLoginNavigator to route to /
+      // No hard reload needed — React Router handles the transition smoothly
+      // (same flow as Google auth)
       await onLogin(data.username, null, true);
-      
-      // Full reload to ensure clean state after OAuth
-      window.location.href = '/';
     } catch (err) {
       console.error('Discord auth error:', err);
       setError(err.message || 'Discord sign-in failed');

@@ -48,10 +48,10 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   }, [userData.hasSeenOnboarding]);
   
   // Deferred login toast — fires after route swap has settled
-  // (OAuth redirects cause full page reload → route tree swap eats toasts fired during login)
+  // If onboarding will show, leave toast in sessionStorage for handleOnboardingComplete
   useEffect(() => {
     const msg = sessionStorage.getItem('login_toast');
-    if (msg) {
+    if (msg && userData.hasSeenOnboarding) {
       const duration = parseInt(sessionStorage.getItem('login_toast_duration') || '2500', 10);
       sessionStorage.removeItem('login_toast');
       sessionStorage.removeItem('login_toast_duration');
@@ -237,6 +237,15 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     setShowOnboarding(false);
     // Defer API call so it doesn't break React's state batching
     setTimeout(() => updateUserData({ hasSeenOnboarding: true }), 0);
+    
+    // Fire deferred login toast now that onboarding overlay is gone
+    const msg = sessionStorage.getItem('login_toast');
+    if (msg) {
+      const duration = parseInt(sessionStorage.getItem('login_toast_duration') || '2500', 10);
+      sessionStorage.removeItem('login_toast');
+      sessionStorage.removeItem('login_toast_duration');
+      setTimeout(() => toast.success(msg, { duration }), 600);
+    }
   };
 
 

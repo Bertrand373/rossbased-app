@@ -27,6 +27,7 @@ import MobileNavigation from './components/Navigation/MobileNavigation';
 import InstallPrompt from './components/InstallPrompt/InstallPrompt';
 import AIChat from './components/AIChat/AIChat';
 import AdminCockpit from './components/Admin/AdminCockpit';
+import ScrollIndicator from './components/Shared/ScrollIndicator';
 
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
@@ -664,6 +665,8 @@ function AppContent({
                 <ProfileButton userData={userData} />
               </div>
             </header>
+            
+            {isMobile && <ScrollIndicator />}
             
             {isMobile && (
               <MobileNavigation 

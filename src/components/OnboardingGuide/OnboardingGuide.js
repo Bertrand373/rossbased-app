@@ -63,18 +63,18 @@ const OnboardingGuide = ({ onComplete }) => {
     },
     {
       target: isMobile 
-        ? '.mobile-nav-item[href="/urge-toolkit"]' 
-        : '.nav-link[href="/urge-toolkit"]',
-      title: 'Crisis toolkit ready',
-      message: 'When urges hit, breathing exercises and emergency protocols are one tap away.',
+        ? '.mobile-nav-oracle' 
+        : '.nav-link-oracle',
+      title: 'Meet The Oracle',
+      message: 'Your AI guide. Trained on retention science and built to know your patterns.',
       position: isMobile ? 'top' : 'bottom',
-      padding: 8,
-      radius: '12px'
+      padding: 10,
+      radius: '50%'
     },
     {
       target: isMobile ? '.mobile-nav' : '.header-nav',
       title: 'Explore when ready',
-      message: 'Calendar, stats, and emotional timeline await.',
+      message: 'Calendar, stats, and crisis tools — all one tap away.',
       position: isMobile ? 'top' : 'bottom',
       padding: 4,
       radius: '0px'
@@ -228,14 +228,28 @@ const OnboardingGuide = ({ onComplete }) => {
     }
   };
 
-  // Spotlight style — unified, uses step.radius for shape
+  // Spotlight style — unified, clamped to viewport
   const getSpotlightStyle = () => {
     if (!targetRect) return { opacity: 0 };
     
+    let left = targetRect.left - padding;
+    let width = targetRect.width + (padding * 2);
+    const vw = window.innerWidth;
+    
+    // Shift left if overflowing right edge (keeps full padding)
+    if (left + width > vw) {
+      left = vw - width;
+    }
+    // If that pushed past left edge, pin to 0 and fit to screen
+    if (left < 0) {
+      left = 0;
+      width = Math.min(width, vw);
+    }
+    
     return {
       top: `${targetRect.top - padding}px`,
-      left: `${targetRect.left - padding}px`,
-      width: `${targetRect.width + (padding * 2)}px`,
+      left: `${left}px`,
+      width: `${width}px`,
       height: `${targetRect.height + (padding * 2)}px`,
       borderRadius: step.radius
     };
