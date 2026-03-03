@@ -99,6 +99,10 @@
         align-items: center;
         z-index: 9999;
         transition: background-color 0.2s ease;
+        /* Match iOS splash screen centering — center within safe area, not full viewport */
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        box-sizing: border-box;
       }
       
       /* Dark theme loader */
@@ -114,9 +118,12 @@
       .loader-icon {
         width: 64px;
         height: 64px;
+        opacity: 1;
+        /* Pre-establish GPU layer — prevents jump when animation kicks in */
+        transform: scale(1);
+        will-change: transform, opacity;
         animation: pulse 2s ease-in-out infinite;
         animation-delay: 0.4s;
-        opacity: 1;
       }
       
       @keyframes pulse {
@@ -143,7 +150,7 @@
     
     <!-- Minimal loader - icon only, theme-aware -->
     <div id="initial-loader">
-      <img class="loader-icon" id="loader-icon" src="%PUBLIC_URL%/icon-192.png" alt="" />
+      <img class="loader-icon" id="loader-icon" src="%PUBLIC_URL%/icon-192.png" alt="" width="64" height="64" />
     </div>
     
     <!-- Theme-aware loader icon script -->
