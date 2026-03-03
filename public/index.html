@@ -99,10 +99,6 @@
         align-items: center;
         z-index: 9999;
         transition: background-color 0.2s ease;
-        /* Match iOS splash screen centering — center within safe area, not full viewport */
-        padding-top: env(safe-area-inset-top, 0px);
-        padding-bottom: env(safe-area-inset-bottom, 0px);
-        box-sizing: border-box;
       }
       
       /* Dark theme loader */
@@ -119,21 +115,22 @@
         width: 64px;
         height: 64px;
         opacity: 1;
-        /* Pre-establish GPU layer — prevents jump when animation kicks in */
-        transform: scale(1);
+        /* Pre-establish GPU compositing layer — prevents reflow when animation runs */
+        transform: translateZ(0) scale(1);
+        -webkit-transform: translateZ(0) scale(1);
         will-change: transform, opacity;
+        /* No delay — starts immediately so no compositing layer promotion mid-render */
         animation: pulse 2s ease-in-out infinite;
-        animation-delay: 0.4s;
       }
       
       @keyframes pulse {
         0%, 100% { 
           opacity: 1; 
-          transform: scale(1);
+          transform: translateZ(0) scale(1);
         }
         50% { 
           opacity: 0.4; 
-          transform: scale(0.95);
+          transform: translateZ(0) scale(0.95);
         }
       }
       
