@@ -1156,7 +1156,7 @@ async function dmAnnounce(message) {
     if (!guild) return await message.reply('No guild found.');
 
     const channel = guild.channels.cache.find(
-      ch => ch.name.toLowerCase() === INSIGHT_CHANNEL && (ch.type === 0 || ch.type === 5)
+      ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
     );
     if (!channel) return await message.reply(`Could not find #${INSIGHT_CHANNEL}. Set INSIGHT_CHANNEL env var.`);
 
@@ -1211,7 +1211,7 @@ async function dmResetChannel(message) {
     if (!guild) return await message.reply('No guild found.');
 
     const target = guild.channels.cache.find(
-      ch => ch.name.toLowerCase() === channelArg && (ch.type === 0 || ch.type === 5)
+      ch => ch.name.toLowerCase().startsWith(channelArg) && (ch.type === 0 || ch.type === 5)
     );
     if (!target) return await message.reply(`Could not find channel #${channelArg}.`);
 
@@ -1568,7 +1568,7 @@ client.on('messageCreate', async (message) => {
       // Find the insight channel
       const guild = message.guild;
       const targetChannel = guild.channels.cache.find(
-        ch => ch.name.toLowerCase() === INSIGHT_CHANNEL && (ch.type === 0 || ch.type === 5)
+        ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
       );
       
       if (!targetChannel) {
@@ -2224,7 +2224,7 @@ client.once('ready', () => {
       if (!guild) return;
       
       const targetChannel = guild.channels.cache.find(
-        ch => ch.name.toLowerCase() === INSIGHT_CHANNEL && (ch.type === 0 || ch.type === 5)
+        ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
       );
       
       if (!targetChannel) {
@@ -2304,7 +2304,7 @@ client.once('ready', () => {
       if (!guild) return;
       
       const targetChannel = guild.channels.cache.find(
-        ch => ch.name.toLowerCase() === INSIGHT_CHANNEL && (ch.type === 0 || ch.type === 5)
+        ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
       );
       
       if (!targetChannel) return;
