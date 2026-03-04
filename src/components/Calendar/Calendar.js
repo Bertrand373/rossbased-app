@@ -266,14 +266,15 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
     const onMove = (e) => {
       delta = e.touches[0].clientY - startY;
-      if (delta <= 0) { dragging = false; return; }
-      if (scrollableEl && scrollableEl.scrollTop > 0) { dragging = false; return; }
-      if (delta > 8) {
-        dragging = true;
-        e.preventDefault();
-        panel.style.transition = 'none';
-        panel.style.transform = `translateY(${delta}px)`;
-      }
+      if (delta <= 0) return;
+      // If touch started inside scrollable content that isn't scrolled to top, let it scroll
+      if (scrollableEl && scrollableEl.scrollTop > 2) return;
+      // Call preventDefault immediately — iOS claims the gesture within ~10px,
+      // so we must cancel before that threshold, not after
+      e.preventDefault();
+      dragging = true;
+      panel.style.transition = 'none';
+      panel.style.transform = `translateY(${delta}px)`;
     };
 
     const onEnd = () => {
@@ -335,13 +336,11 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
     const onMove = (e) => {
       delta = e.touches[0].clientY - startY;
-      if (delta <= 0) { dragging = false; return; }
-      if (delta > 8) {
-        dragging = true;
-        e.preventDefault();
-        panel.style.transition = 'none';
-        panel.style.transform = `translateY(${delta}px)`;
-      }
+      if (delta <= 0) return;
+      e.preventDefault();
+      dragging = true;
+      panel.style.transition = 'none';
+      panel.style.transform = `translateY(${delta}px)`;
     };
 
     const onEnd = () => {
