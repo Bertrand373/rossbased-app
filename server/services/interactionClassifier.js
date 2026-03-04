@@ -39,7 +39,7 @@ async function classifyInteraction(userMessage, opts = {}) {
 
     // --- Haiku classification call ---
     const classifyResponse = await anthropic.messages.create({
-      model: 'claude-3-5-haiku-20241022',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 120,
       system: `Classify this semen retention practitioner's message. Respond ONLY with valid JSON, no preamble, no markdown.
 

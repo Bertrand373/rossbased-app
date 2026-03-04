@@ -84,7 +84,7 @@ async function getCommunityPulse() {
       : '';
 
     const response = await anthropic.messages.create({
-      model: 'claude-3-5-haiku-20241022',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 250,
       system: `You generate a community pulse briefing for an AI guide called "The Oracle" that serves a semen retention community. This briefing will be injected into the Oracle's context so it knows what the community is collectively experiencing RIGHT NOW.
 
