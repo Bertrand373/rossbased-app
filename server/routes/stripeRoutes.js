@@ -276,7 +276,7 @@ router.post('/webhook', async (req, res) => {
             break;
           case 'past_due':
           case 'unpaid':
-            status = 'active'; // Give grace period
+            status = 'expired'; // Payment failed — revoke access
             break;
           case 'canceled':
           case 'incomplete_expired':
@@ -350,10 +350,11 @@ router.post('/webhook', async (req, res) => {
         const customerId = invoice.customer;
         
         const user = await User.findOne({ 'subscription.stripeCustomerId': customerId });
-        if (user) {
-          console.log(`⚠️ Payment failed for ${user.username}`);
-          // Don't immediately revoke - Stripe will retry
-          // After all retries fail, subscription.deleted will fire
+        if (user && user.subscription?.status !== 'grandfathered') {
+          user.subscription.status = 'expired';
+          user.isPremium = false;
+          await user.save({ validateModifiedOnly: true });
+          console.log(`❌ Payment failed, access revoked for ${user.username}`);
         }
         break;
       }

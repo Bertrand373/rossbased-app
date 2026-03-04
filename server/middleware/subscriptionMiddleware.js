@@ -230,8 +230,8 @@ const syncStripeSubscriptions = async () => {
           user.subscription.stripeSubscriptionId
         );
 
-        // Stripe says canceled/expired but our DB says active
-        if (['canceled', 'incomplete_expired', 'unpaid'].includes(stripeSub.status)) {
+        // Stripe says canceled/expired/past_due but our DB says active
+        if (['canceled', 'incomplete_expired', 'unpaid', 'past_due'].includes(stripeSub.status)) {
           await User.updateOne(
             { _id: user._id },
             { $set: { 'subscription.status': 'expired', 'isPremium': false } }
