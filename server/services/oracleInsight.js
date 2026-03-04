@@ -11,35 +11,70 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-// Topics that indicate a message is relevant to retention/spiritual practice
-const RELEVANT_TOPICS = [
-  'energy', 'urge', 'relapse', 'streak', 'day', 'week', 'month',
-  'sleep', 'dream', 'wet dream', 'nocturnal', 'insomnia', 'vivid',
-  'flatline', 'dead', 'numb', 'nothing', 'empty', 'low',
-  'confidence', 'aura', 'magnetic', 'attraction', 'women', 'eye contact',
-  'focus', 'clarity', 'brain fog', 'sharp', 'productive',
-  'transmut', 'meditat', 'breath', 'cold shower', 'exercise', 'workout',
-  'kundalini', 'chakra', 'spine', 'tingling', 'pressure', 'vibrat',
-  'chrism', 'pineal', 'third eye', 'spiritual', 'awaken',
-  'anger', 'rage', 'emotion', 'crying', 'mood', 'depress', 'anxiet',
-  'withdraw', 'lonely', 'isolat',
-  'semen', 'retain', 'celiba', 'nofap', 'porn', 'lust',
-  'synchron', 'angel number', '1111', '111', '222', '333', '444',
-  'manifest', 'attract', 'frequenc', 'dimension', 'astral',
-  'benefit', 'superpower', 'transform', 'change', 'notice',
-  'scared', 'afraid', 'struggle', 'hard', 'difficult', 'tempt',
-  'strong', 'powerful', 'alive', 'unstoppable',
-  'diet', 'fast', 'semen', 'zinc', 'supplement',
-  'god', 'pray', 'faith', 'purpose', 'meaning', 'why'
+// TIER 1: Exact word topics — matched with word boundaries (\b)
+// Prevents 'day' matching 'today', 'fast' matching 'breakfast', 'low' matching 'below'
+const EXACT_WORD_TOPICS = [
+  // Core retention
+  'urge', 'relapse', 'streak', 'flatline', 'retention', 'nofap', 'celibacy',
+  // Physical
+  'energy', 'sleep', 'dream', 'insomnia', 'workout', 'exercise', 'fasting',
+  'spine', 'tingling', 'zinc', 'supplement',
+  // Mental/emotional
+  'confidence', 'aura', 'focus', 'clarity', 'mood', 'anger', 'rage',
+  'depression', 'anxiety', 'withdrawal', 'isolation', 'struggle', 'temptation',
+  'emotion', 'crying', 'lust', 'porn',
+  // Spiritual/esoteric
+  'kundalini', 'chakra', 'chrism', 'pineal', 'awakening', 'transmutation',
+  'meditation', 'breathwork', 'manifestation', 'vibration', 'frequency',
+  'synchronicity', 'astral', 'spiritual', 'faith', 'purpose',
+  // Benefits
+  'benefit', 'superpower', 'productive', 'magnetic',
+  // Social
+  'god', 'pray'
 ];
 
+// TIER 2: Substring/phrase topics — multi-word or stems that won't false-match
+// Safe to use includes() because these don't appear inside unrelated words
+const SUBSTRING_TOPICS = [
+  'wet dream', 'nocturnal', 'brain fog', 'eye contact', 'cold shower',
+  'third eye', 'angel number', 'attract', 'tempt', 'awaken',
+  'semen', 'retain', 'celiba', 'depress', 'anxiet', 'withdraw', 'isolat',
+  'transmut', 'meditat', 'vibrat', 'frequenc', 'synchron', 'kundalin',
+  'difficult', 'afraid', 'scared', 'powerful', 'unstoppable'
+];
+
+// Escape special regex characters in topic strings
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Precompile exact-word regexes once at startup (performance)
+const EXACT_WORD_REGEXES = EXACT_WORD_TOPICS.map(topic => ({
+  topic,
+  regex: new RegExp(`\\b${escapeRegex(topic)}\\b`, 'i')
+}));
+
 /**
- * Detect topics in a message
- * Returns array of matched topics
+ * Detect topics in a message using two-tier matching
+ * Returns array of matched topic strings (clean, meaningful labels)
  */
 function detectTopics(text) {
   const lower = text.toLowerCase();
-  return RELEVANT_TOPICS.filter(topic => lower.includes(topic));
+  const matched = [];
+
+  // Tier 1: exact word boundaries — no false substring matches
+  for (const { topic, regex } of EXACT_WORD_REGEXES) {
+    if (regex.test(text)) matched.push(topic);
+  }
+
+  // Tier 2: substring/phrase — safe because these are specific enough
+  for (const topic of SUBSTRING_TOPICS) {
+    if (lower.includes(topic) && !matched.includes(topic)) {
+      matched.push(topic);
+    }
+  }
+
+  return matched;
 }
 
 /**
@@ -57,8 +92,7 @@ function isRelevantMessage(text) {
   ];
   if (skipPatterns.some(p => p.test(text.trim()))) return false;
   
-  const topics = detectTopics(text);
-  return topics.length > 0;
+  return detectTopics(text).length > 0;
 }
 
 /**
@@ -225,9 +259,19 @@ async function getPulseStats() {
       topicCounts[topic] = (topicCounts[topic] || 0) + 1;
     }
   }
+
+  // Defense-in-depth: filter out any legacy noise topics that may still exist in DB
+  const NOISE_TOPICS = new Set([
+    'day', 'week', 'month', 'low', 'why', 'fast', 'hard', 'nothing',
+    'empty', 'dead', 'women', 'change', 'notice', 'strong', 'alive',
+    'numb', 'meaning', 'pressure', 'dimension', 'vivid', 'sharp',
+    '111', '222', '333', '444', '1111', 'breath', 'diet'
+  ]);
+
   const topTopics = Object.entries(topicCounts)
+    .filter(([topic]) => !NOISE_TOPICS.has(topic) && topic.length > 3)
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
+    .slice(0, 8); // Show top 8 instead of 5 — now that topics are clean, more is useful
   
   const uniqueAuthors = new Set(recentObs.map(o => o.author)).size;
   
