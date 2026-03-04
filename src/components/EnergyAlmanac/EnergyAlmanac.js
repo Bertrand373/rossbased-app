@@ -311,7 +311,7 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
   const handleClose = useCallback(() => closeSheet(() => setIsExpanded(false)), [closeSheet]);
 
   // Swipe-to-dismiss — non-passive native listeners so iOS respects preventDefault
-  useSheetSwipe(sheetPanelRef, isExpanded, () => setIsExpanded(false));
+  useSheetSwipe(sheetPanelRef, isExpanded, () => closeSheet(() => setIsExpanded(false)));
   
   const calculations = useMemo(() => {
     const today = new Date();

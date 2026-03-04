@@ -79,7 +79,7 @@ const PlanModal = ({
   const handleClose = useCallback(() => closeSheet(onClose), [closeSheet, onClose]);
 
   // Swipe-to-dismiss — non-passive native listeners so iOS respects preventDefault
-  useSheetSwipe(sheetPanelRef, showContent, onClose);
+  useSheetSwipe(sheetPanelRef, showContent, () => closeSheet(onClose));
 
   if (!showContent) return null;
 

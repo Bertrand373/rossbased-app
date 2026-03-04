@@ -62,6 +62,9 @@ const useSheetSwipe = (panelRef, isOpen, onDismiss, threshold = 100) => {
     const onEnd = () => {
       if (startY === -1 || !dragging) return;
       if (delta > threshold) {
+        // Call onDismiss immediately — lets component set sheetReady(false) now
+        // so the backdrop CSS transition fades in sync with the panel sliding down
+        onDismiss();
         panel.style.transition = 'transform 250ms ease-out';
         panel.style.transform = 'translateY(100%)';
         setTimeout(() => {
@@ -69,7 +72,6 @@ const useSheetSwipe = (panelRef, isOpen, onDismiss, threshold = 100) => {
             panel.style.transition = '';
             panel.style.transform = '';
           }
-          onDismiss();
         }, 250);
       } else {
         panel.style.transition = 'transform 250ms ease-out';

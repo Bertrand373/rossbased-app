@@ -129,7 +129,7 @@ const Profile = ({
     setShowPrivacyModal(false);
     setDeleteConfirmText('');
   }, []);
-  useSheetSwipe(sheetPanelRef, sheetVisible, handleSwipeDismiss);
+  useSheetSwipe(sheetPanelRef, sheetVisible, () => closeSheet(handleSwipeDismiss));
 
   const tabs = [
     { id: 'account', label: 'Account' },

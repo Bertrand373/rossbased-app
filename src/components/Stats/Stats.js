@@ -108,7 +108,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setShowResetAllModal(false);
     setSelectedMilestone(null);
   }, []);
-  useSheetSwipe(sheetPanelRef, sheetVisible, handleSwipeDismiss);
+  useSheetSwipe(sheetPanelRef, sheetVisible, () => closeSheet(handleSwipeDismiss));
   useBodyScrollLock(sheetVisible);
   
   // Detect theme changes for chart colors

@@ -145,10 +145,10 @@ const InstallPrompt = ({
   }, []);
 
   // Swipe-to-dismiss — non-passive native listeners so iOS respects preventDefault
-  useSheetSwipe(panelRef, isVisible, () => {
+  useSheetSwipe(panelRef, isVisible, () => closeSheet(() => {
     setIsVisible(false);
     onClose?.();
-  });
+  }));
   
   // Initialize
   useEffect(() => {

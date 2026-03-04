@@ -325,7 +325,14 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     }
     setShowPatternAlert(false);
   }, []);
-  useSheetSwipe(sheetPanelRef, trackerSheetVisible, handleSwipeDismiss);
+  useSheetSwipe(sheetPanelRef, trackerSheetVisible, () => {
+    // Clear all ready states immediately — backdrop CSS transition fades in sync with panel
+    setSheetReady(false);
+    setBenefitsReady(false);
+    setPeakSheetReady(false);
+    setPatternSheetReady(false);
+    setTimeout(handleSwipeDismiss, 300);
+  });
 
   // Reset streak (relapse) - keep toast, this is significant
   const handleReset = () => {
