@@ -15,6 +15,9 @@
   max-height: 90dvh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  /* panel has touch-action:none from BottomSheet.css; re-enable pan-y on the
+     content area so the sheet can scroll on short screens */
+  touch-action: pan-y;
 }
 
 /* =============================================================================

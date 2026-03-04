@@ -59,7 +59,9 @@ body:has(.sheet-backdrop.open) {
   transform: translateY(100%);
   transition: transform 300ms ease;
   pointer-events: none;
-  touch-action: pan-y;
+  /* none = let JS hook handle all gestures; preventDefault() now fires everywhere on the panel.
+     pan-y would tell iOS to handle vertical gestures natively, bypassing our preventDefault(). */
+  touch-action: none;
   /* Hide scrollbars globally for all sheets */
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -68,6 +70,13 @@ body:has(.sheet-backdrop.open) {
 .sheet-panel::-webkit-scrollbar { display: none; }
 .sheet-panel *::-webkit-scrollbar { display: none; }
 .sheet-panel * { scrollbar-width: none; }
+
+/* Restore native scroll for any element explicitly opted out of swipe interception.
+   touch-action: none on the panel blocks all native gestures — re-enable pan-y here
+   so inner scrollable zones (benefit sliders, long content) still scroll natively. */
+.sheet-panel [data-no-swipe] {
+  touch-action: pan-y;
+}
 
 .sheet-panel::before {
   content: '';
