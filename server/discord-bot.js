@@ -1156,9 +1156,9 @@ async function dmAnnounce(message) {
     if (!guild) return await message.reply('No guild found.');
 
     const channel = guild.channels.cache.find(
-      ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
+      ch => ch.name.toLowerCase().startsWith('oracle') && (ch.type === 0 || ch.type === 5)
     );
-    if (!channel) return await message.reply(`Could not find #${INSIGHT_CHANNEL}. Set INSIGHT_CHANNEL env var.`);
+    if (!channel) return await message.reply(`Could not find oracle channel.`);
 
     const announcementText = [
       'Oracle access now requires a linked TitanTrack account.',
@@ -1181,8 +1181,8 @@ async function dmAnnounce(message) {
       .setFooter({ text: 'Oracle · titantrack.app', iconURL: ORACLE_ICON });
 
     await channel.send({ content: '@everyone', embeds: [embed] });
-    await message.reply(`✓ Announcement posted to #${INSIGHT_CHANNEL}`);
-    console.log(`🔮 Oracle access announcement posted to #${INSIGHT_CHANNEL}`);
+    await message.reply(`✓ Announcement posted to #${channel.name}`);
+    console.log(`🔮 Oracle access announcement posted to #${channel.name}`);
   } catch (err) {
     console.error('[Announce] Error:', err.message);
     await message.reply(`Failed: ${err.message}`);
