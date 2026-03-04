@@ -1083,7 +1083,7 @@ function buildOracleContext(user, timezone) {
 // SHARED ORACLE POOL (Grandfathered users)
 // OG lifetime users share a single daily pool across Discord + App
 // ============================================
-const GRANDFATHERED_DAILY_LIMIT = 15;
+const GRANDFATHERED_DAILY_LIMIT = 1;
 
 // Get today's date in Eastern Time (matches Discord bot's reset boundary)
 function getTodayET() {
@@ -1128,7 +1128,7 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     
     const BETA_DAILY_LIMIT = 5;
     const FREE_WEEKLY_LIMIT = 3;
-    const PREMIUM_DAILY_LIMIT = 25;
+    const PREMIUM_DAILY_LIMIT = 3;
 
     // Weekly limit tracking for free users (timezone-aware)
     const getWeekStartLocal = () => {
@@ -1147,6 +1147,7 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     // Check limits
     // --- SHARED POOL: Grandfathered users have a combined Discord+App daily limit ---
     const isGrandfathered = user.subscription?.status === 'grandfathered';
+    const { hasPremium: userHasPremium } = checkPremiumAccess(user); // Always use subscription-aware check — never raw isPremium field (can be stale from beta)
     const discordUsageToday = isGrandfathered ? await getDiscordUsageForUser(user) : 0;
     const combinedCount = currentCount + discordUsageToday;
     
@@ -1160,17 +1161,34 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
         error: 'Daily limit reached',
         message: `You've used all ${GRANDFATHERED_DAILY_LIMIT} daily messages. Resets at midnight.`
       });
-    } else if (!isBetaPeriod && user.isPremium && !isGrandfathered && currentCount >= PREMIUM_DAILY_LIMIT) {
+    } else if (!isBetaPeriod && userHasPremium && !isGrandfathered && currentCount >= PREMIUM_DAILY_LIMIT) {
       return res.status(429).json({ 
         error: 'Daily limit reached',
         message: `You've used all ${PREMIUM_DAILY_LIMIT} daily messages. Resets at midnight.`
       });
-    } else if (!isBetaPeriod && !user.isPremium && currentWeeklyCount >= FREE_WEEKLY_LIMIT) {
+    } else if (!isBetaPeriod && !userHasPremium && currentWeeklyCount >= FREE_WEEKLY_LIMIT) {
       return res.status(429).json({ 
         error: 'Weekly limit reached',
         message: `You've used your ${FREE_WEEKLY_LIMIT} weekly messages. Resets Monday. Upgrade for unlimited.`
       });
     }
+
+    // Calculate remaining BEFORE stream — needed to inject tier-aware nudge into system prompt
+    let preStreamRemaining, userTier;
+    if (isBetaPeriod) {
+      preStreamRemaining = BETA_DAILY_LIMIT - currentCount - 1;
+      userTier = 'beta';
+    } else if (isGrandfathered) {
+      preStreamRemaining = GRANDFATHERED_DAILY_LIMIT - combinedCount - 1;
+      userTier = 'grandfathered';
+    } else if (userHasPremium) {
+      preStreamRemaining = PREMIUM_DAILY_LIMIT - currentCount - 1;
+      userTier = 'premium';
+    } else {
+      preStreamRemaining = FREE_WEEKLY_LIMIT - currentWeeklyCount - 1;
+      userTier = 'free';
+    }
+    preStreamRemaining = Math.max(0, preStreamRemaining);
 
     // Build deep user context from their data
     const userContext = buildOracleContext(user, userTimezone);
@@ -1297,7 +1315,8 @@ When in doubt, shorter. Say what needs to be said. Stop.
 8. Use their name rarely. Maybe 1 in 8 responses.
 9. No emojis unless they use them first
 10. Never mention documentation, guides, sources, or materials
-11. ALWAYS respond in the same language the user writes in.`;
+11. ALWAYS respond in the same language the user writes in.
+12. If someone sends a vague or low-effort question (single word, "is this normal", "how long", "what should I do") — answer it, but briefly remind them once that Oracle has access to their streak, benefit logs, emotional patterns, and past observations. A more specific question gets a much deeper answer. Say it naturally, not as a disclaimer. Never repeat this more than once per conversation.`;
 
     // Build messages array
     const messages = [
@@ -1332,7 +1351,19 @@ NUMEROLOGY:
 - 2026 is a 10/1 Universal Year (2+0+2+6=10, 1+0=1). New beginnings, leadership, fresh cycles.
 
 Use this awareness naturally. Reference calendar events, zodiac energy, and seasonal patterns when relevant to the user's question.\n`;
-    const systemWithKnowledge = systemPrompt + dateContext + communityContext + outcomeContext + ragContext;
+    // Tier-aware last-message nudge — injected when user is on their final message
+    let limitNudgeContext = '';
+    if (preStreamRemaining === 0) {
+      if (userTier === 'grandfathered') {
+        limitNudgeContext = `\n\n## MESSAGE LIMIT NOTICE\nThis is the user's only Oracle message today. At the END of your response — after fully answering — add exactly one line break and then this line verbatim: "This is your only Oracle message today. Make it count tomorrow."\nDo not modify the wording. Do not add it mid-response. Only at the very end.\n`;
+      } else if (userTier === 'premium') {
+        limitNudgeContext = `\n\n## MESSAGE LIMIT NOTICE\nThis is the user's last Oracle message today. At the END of your response — after fully answering — add exactly one line break and then this line verbatim: "This is your last Oracle message today. Resets at midnight."\nDo not modify the wording. Do not add it mid-response. Only at the very end.\n`;
+      } else if (userTier === 'free') {
+        limitNudgeContext = `\n\n## MESSAGE LIMIT NOTICE\nThis is the user's last Oracle message for the week. At the END of your response — after fully answering — add exactly one line break and then this line verbatim: "This is your last Oracle message for the week. Resets Monday."\nDo not modify the wording. Do not add it mid-response. Only at the very end.\n`;
+      }
+    }
+
+    const systemWithKnowledge = systemPrompt + dateContext + communityContext + outcomeContext + ragContext + limitNudgeContext;
 
     // Set up SSE headers
     res.setHeader('Content-Type', 'text/event-stream');
@@ -1342,7 +1373,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
     // Stream from Claude with natural pacing
     const stream = await anthropic.messages.stream({
       model: ORACLE_MODEL,
-      max_tokens: 500,
+      max_tokens: 1000,
       system: systemWithKnowledge,
       messages: messages
     });
@@ -1562,7 +1593,7 @@ Examples:
       effectiveUsed = combinedCount + 1; // app + discord combined
       effectiveLimit = GRANDFATHERED_DAILY_LIMIT;
       messagesRemaining = GRANDFATHERED_DAILY_LIMIT - effectiveUsed;
-    } else if (user.isPremium) {
+    } else if (userHasPremium) {
       effectiveUsed = currentCount + 1;
       effectiveLimit = PREMIUM_DAILY_LIMIT;
       messagesRemaining = PREMIUM_DAILY_LIMIT - effectiveUsed;
@@ -1579,7 +1610,7 @@ Examples:
       messagesLimit: effectiveLimit,
       messagesRemaining: Math.max(0, messagesRemaining),
       isBetaPeriod,
-      isPremium: user.isPremium || false
+      isPremium: userHasPremium
     })}\n\n`);
     res.write('data: [DONE]\n\n');
     res.end();
@@ -1625,7 +1656,7 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
     
     const BETA_DAILY_LIMIT = 5;
     const FREE_WEEKLY_LIMIT = 3;
-    const PREMIUM_DAILY_LIMIT = 25;
+    const PREMIUM_DAILY_LIMIT = 3;
 
     // Weekly tracking for free users (timezone-aware)
     const getWeekStartLocal = () => {
@@ -1643,6 +1674,7 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
 
     let messagesUsed, messagesLimit, messagesRemaining, resetsAt;
     const isGrandfathered = user.subscription?.status === 'grandfathered';
+    const { hasPremium: userHasPremium } = checkPremiumAccess(user); // Always use subscription-aware check — never raw isPremium field (can be stale from beta)
     const discordUsageToday = isGrandfathered ? await getDiscordUsageForUser(user) : 0;
 
     if (isBetaPeriod) {
@@ -1655,7 +1687,7 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
       messagesLimit = GRANDFATHERED_DAILY_LIMIT;
       messagesRemaining = GRANDFATHERED_DAILY_LIMIT - messagesUsed;
       resetsAt = 'midnight';
-    } else if (user.isPremium) {
+    } else if (userHasPremium) {
       messagesUsed = currentCount;
       messagesLimit = PREMIUM_DAILY_LIMIT;
       messagesRemaining = PREMIUM_DAILY_LIMIT - currentCount;
@@ -1672,7 +1704,7 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
       messagesLimit,
       messagesRemaining: Math.max(0, messagesRemaining),
       isBetaPeriod,
-      isPremium: user.isPremium || false,
+      isPremium: userHasPremium,
       resetsAt
     });
   } catch (err) {
@@ -1703,7 +1735,7 @@ app.get('/api/ai-usage/:username', authenticate, async (req, res) => {
     
     const BETA_DAILY_LIMIT = 5;
     const FREE_WEEKLY_LIMIT = 3;
-    const PREMIUM_DAILY_LIMIT = 25;
+    const PREMIUM_DAILY_LIMIT = 3;
 
     // Weekly tracking for free users (timezone-aware)
     const getWeekStartLocal = () => {
@@ -1721,6 +1753,7 @@ app.get('/api/ai-usage/:username', authenticate, async (req, res) => {
 
     let messagesUsed, messagesLimit, messagesRemaining, resetsAt;
     const isGrandfathered = user.subscription?.status === 'grandfathered';
+    const { hasPremium: userHasPremium } = checkPremiumAccess(user); // Always use subscription-aware check — never raw isPremium field (can be stale from beta)
     const discordUsageToday = isGrandfathered ? await getDiscordUsageForUser(user) : 0;
 
     if (isBetaPeriod) {
@@ -1733,7 +1766,7 @@ app.get('/api/ai-usage/:username', authenticate, async (req, res) => {
       messagesLimit = GRANDFATHERED_DAILY_LIMIT;
       messagesRemaining = GRANDFATHERED_DAILY_LIMIT - messagesUsed;
       resetsAt = 'midnight';
-    } else if (user.isPremium) {
+    } else if (userHasPremium) {
       messagesUsed = currentCount;
       messagesLimit = PREMIUM_DAILY_LIMIT;
       messagesRemaining = PREMIUM_DAILY_LIMIT - currentCount;
@@ -1750,7 +1783,7 @@ app.get('/api/ai-usage/:username', authenticate, async (req, res) => {
       messagesLimit,
       messagesRemaining: Math.max(0, messagesRemaining),
       isBetaPeriod,
-      isPremium: user.isPremium || false,
+      isPremium: userHasPremium,
       resetsAt,
       lastUsed: user.aiUsage?.lastUsed || null
     });

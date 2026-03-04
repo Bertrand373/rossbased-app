@@ -15,6 +15,7 @@ const KnowledgeChunk = require('./models/KnowledgeChunk');
 const OracleUsage = require('./models/OracleUsage');
 const DiscordMemory = require('./models/DiscordMemory');
 const User = require('./models/User');
+const { checkPremiumAccess } = require('./middleware/subscriptionMiddleware');
 const { randomUUID } = require('crypto');
 
 // ============================================================
@@ -46,8 +47,9 @@ const ALLOWED_CHANNELS = ['retention-ai-chat', 'oracle', 'ai-chat', 'ask-oracle'
 // Rate limiting per user
 const USER_COOLDOWNS = new Map();
 const COOLDOWN_MS = 10000; // 10 seconds between messages per user
-const MAX_DAILY_PER_USER = 10;
-const GRANDFATHERED_DAILY_POOL = 15; // Shared pool across Discord + App for OG lifetime users
+const GRANDFATHERED_DAILY_POOL = 1;  // Shared pool across Discord + App for OG lifetime users
+const PREMIUM_DAILY_LIMIT = 3;       // Paid subscribers: 3/day shared across Discord + App
+const FREE_WEEKLY_LIMIT = 3;         // Free linked users: 3/week shared across Discord + App
 const DAILY_USAGE = new Map();
 const PULSE_COOLDOWN_DAYS = 3;
 
@@ -228,7 +230,7 @@ Premium retention tracking app. 6-metric benefit tracking, AI insights, spermato
 Redirect smoothly. Never say "I can't help with that." Never reference documentation. Just steer it back naturally.
 
 ## YOUR SYSTEM (answer accurately when asked)
-Each person gets 10 messages per day with Oracle. There is a 10-second cooldown between messages. When someone is running low, a small "X remaining today" note appears at the bottom of your response. This is a real limit built into the system. The limit resets at midnight Eastern Time every night. If someone asks about it, be straightforward. Don't deny it exists or pretend you don't know about it. The limit exists by design to encourage quality over quantity. It is not a Discord feature. It is part of how Oracle operates.
+Access to Oracle on Discord requires a linked TitanTrack account. Link at titantrack.app. Message limits depend on your plan: OG lifetime members get 1 message per day, Premium subscribers get 3 per day, free members get 3 per week. These limits are shared across Discord and the app — they are one combined pool, not separate. There is a 10-second cooldown between messages. The limit resets at midnight Eastern Time (daily limits) or Monday midnight (weekly limits). If someone asks about it, be straightforward. The limit exists by design to encourage quality over quantity.
 
 ## LOW-EFFORT MESSAGES
 If someone sends a vague or surface-level message (single words, "hey", "what's up", "is this normal", "how long", questions they could answer themselves), still answer, but gently nudge them toward getting more out of their messages. You're not punishing them. You're helping them use their time with you wisely.
@@ -285,7 +287,7 @@ Your domain is semen retention, masculine transformation, esoteric knowledge, sp
 Oracle currently lives in this Discord server and inside the TitanTrack app. If someone asks about adding you to their own server, tell them Oracle is exclusive to TitanTrack for now, but this may expand in the future. Point them to titantrack.app if they want to learn more.
 
 **Cost and access:**
-Oracle comes with TitanTrack. TitanTrack is $8/month. Inside the app, Oracle is available on the Premium tier. In this Discord, everyone gets 10 messages per day with Oracle for free.
+Oracle comes with TitanTrack. TitanTrack is $8/month. Inside the app, Oracle is available on all tiers (free users get 3 messages/week, Premium gets 3/day). In this Discord, Oracle requires a linked TitanTrack account — link at titantrack.app. Limits are shared across Discord and the app as one combined pool.
 
 **Comparisons to other AI:**
 If someone asks if you're better than ChatGPT or how you compare to other AI, don't trash other tools. Don't hype yourself either. The difference is specificity. General AI knows a little about everything. You know this domain deeply. You also have access to this community's real patterns, real data, and a knowledge base built from practitioners. That's the difference. Say it once and move on.
@@ -310,12 +312,12 @@ When users ask about app features, the community, or how things work, guide them
 - Mind Program (Based30) is a 30-night subliminal audio protocol. Premium feature. Users play the audio while sleeping, confirm each morning. 30 consecutive nights reprograms subconscious beliefs. Audio is intentionally sped up for subconscious processing.
 - Energy Almanac (Daily Transmission) shows spermatogenesis cycle position (74-day cycle), lunar phase, personal day numerology, Chinese zodiac alignment, and an AI-generated synthesis combining all data points.
 - Stats & Analytics show benefit trends over time, streak history, and AI-powered relapse prediction using TensorFlow neural networks that run entirely on-device (privacy-first).
-- Oracle (you) is accessed via the eye icon in navigation. Message limits: Premium gets 25/day, free users get 3/week. You exist both in-app and on Discord (10/day in Discord).
+- Oracle (you) is accessed via the eye icon in navigation. Message limits: OG lifetime members get 1/day, Premium gets 3/day, free users get 3/week. All limits are shared across Discord and the app as one combined pool. You exist both in-app and on Discord (Discord requires a linked account).
 - Profile has settings for Discord account linking, leaderboard opt-in, notification preferences, and subscription management.
 - The app is a PWA (Progressive Web App). Users install it by tapping "Add to Home Screen" in their browser. Works on iOS and Android without app stores.
 
 **Subscription:**
-- $8/month or $62/year (save ~35%). Unlocks Premium Oracle (25 messages/day), Mind Program, and all future premium features.
+- $8/month or $62/year (save ~35%). Unlocks Premium Oracle (3 messages/day), Mind Program, and all future premium features.
 - Discord community members who joined before Feb 17, 2025 have grandfathered lifetime access.
 - Free tier: streak tracking, calendar, benefit logging, emotional timeline, urge toolkit, 3 Oracle messages/week.
 
@@ -634,42 +636,78 @@ const isRateLimited = async (userId, username) => {
   if (username && ADMIN_DISCORD_USERS.includes(username.toLowerCase())) {
     return { limited: false };
   }
-  
+
   const now = Date.now();
-  
+
   // Cooldown check (in-memory is fine for seconds-level cooldown)
   const lastMessage = USER_COOLDOWNS.get(userId);
   if (lastMessage && (now - lastMessage) < COOLDOWN_MS) {
     return { limited: true, reason: 'cooldown', remaining: Math.ceil((COOLDOWN_MS - (now - lastMessage)) / 1000) };
   }
-  
-  // Daily limit check (persisted to MongoDB — survives server restarts)
+
+  // --- LINK REQUIRED: Discord Oracle requires a linked TitanTrack account ---
+  let linkedUser;
+  try {
+    linkedUser = await User.findOne({ discordId: userId });
+  } catch (err) {
+    console.error('Rate limit DB check failed, allowing through:', err);
+    return { limited: false };
+  }
+  if (!linkedUser) {
+    return { limited: true, reason: 'unlinked' };
+  }
+
   const today = getTodayET();
+
   try {
     const usage = await OracleUsage.findOne({ discordUserId: userId, date: today });
-    const discordCount = usage?.count || 0;
-    
-    // --- SHARED POOL: Cross-check app usage for grandfathered linked users ---
-    // OG lifetime users share a single pool across Discord + App to prevent gaming
-    const linkedUser = await User.findOne({ discordId: userId });
-    if (linkedUser && linkedUser.subscription?.status === 'grandfathered') {
-      // Read app usage — aiUsage.date is in user's local TZ, but close enough for daily pooling
-      const appCount = (linkedUser.aiUsage?.date === today) ? (linkedUser.aiUsage?.count || 0) : 0;
-      const combinedCount = discordCount + appCount;
-      if (combinedCount >= GRANDFATHERED_DAILY_POOL) {
+    const discordCountToday = usage?.count || 0;
+    const appCountToday = (linkedUser.aiUsage?.date === today) ? (linkedUser.aiUsage?.count || 0) : 0;
+    const combinedToday = discordCountToday + appCountToday;
+
+    const isGrandfathered = linkedUser.subscription?.status === 'grandfathered';
+    const { hasPremium: userHasPremium } = checkPremiumAccess(linkedUser);
+
+    if (isGrandfathered) {
+      // GF: 1/day shared pool across Discord + App
+      if (combinedToday >= GRANDFATHERED_DAILY_POOL) {
         return { limited: true, reason: 'daily' };
       }
-      return { limited: false };
+      return { limited: false, tier: 'grandfathered', remaining: GRANDFATHERED_DAILY_POOL - combinedToday };
     }
-    
-    // Non-grandfathered: standard Discord-only limit
-    if (discordCount >= MAX_DAILY_PER_USER) {
-      return { limited: true, reason: 'daily' };
+
+    if (userHasPremium) {
+      // Paid: 3/day shared pool across Discord + App
+      if (combinedToday >= PREMIUM_DAILY_LIMIT) {
+        return { limited: true, reason: 'daily' };
+      }
+      return { limited: false, tier: 'premium', remaining: PREMIUM_DAILY_LIMIT - combinedToday };
     }
+
+    // Free linked: 3/week shared pool across Discord + App
+    // App's aiUsage.weeklyCount is the source of truth — Discord usage also increments it
+    const getWeekStartET = () => {
+      const etNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+      const day = etNow.getDay();
+      const diff = day === 0 ? 6 : day - 1;
+      const monday = new Date(etNow);
+      monday.setDate(etNow.getDate() - diff);
+      return monday.toISOString().split('T')[0];
+    };
+    const currentWeekStart = getWeekStartET();
+    const storedWeekStart = linkedUser.aiUsage?.weekStart || '';
+    const isNewWeek = storedWeekStart !== currentWeekStart;
+    const weeklyCount = isNewWeek ? 0 : (linkedUser.aiUsage?.weeklyCount || 0);
+
+    if (weeklyCount >= FREE_WEEKLY_LIMIT) {
+      return { limited: true, reason: 'weekly' };
+    }
+    return { limited: false, tier: 'free', remaining: FREE_WEEKLY_LIMIT - weeklyCount, weekStart: currentWeekStart, isNewWeek };
+
   } catch (err) {
     console.error('Rate limit DB check failed, allowing through:', err);
   }
-  
+
   return { limited: false };
 };
 
@@ -884,7 +922,7 @@ const splitResponse = (text) => {
 // Every DM includes a persistent command footer — no memorization needed.
 // ============================================================
 
-const ADMIN_DM_FOOTER = '!status · !revenue · !users · !pool · !models · !brief · !pulse-stats';
+const ADMIN_DM_FOOTER = '!status · !revenue · !users · !pool · !models · !brief · !pulse-stats · !announce · !reset-channel #name confirm';
 const ORACLE_ICON = 'https://titantrack.app/The_Oracle.png';
 const BRIEFING_HOUR_ET = parseInt(process.env.BRIEFING_HOUR || '9'); // 9am ET default
 
@@ -1018,7 +1056,7 @@ async function gatherHealthData() {
   for (const gf of grandfathered) {
     const ac = gf.aiUsage?.date === today ? (gf.aiUsage?.count || 0) : 0;
     const dr = discordUsageRecords.find(d => d.discordUserId === gf.discordId);
-    poolUsage.push({ username: gf.username, app: ac, discord: dr?.count || 0, combined: ac + (dr?.count || 0), limit: 15 });
+    poolUsage.push({ username: gf.username, app: ac, discord: dr?.count || 0, combined: ac + (dr?.count || 0), limit: GRANDFATHERED_DAILY_POOL });
   }
 
   // Streaks
@@ -1076,6 +1114,8 @@ async function handleAdminDM(message) {
       case '!models': return await dmModels(message);
       case '!brief': return await dmBriefing(message);
       case '!pulse-stats': return await dmPulseStats(message);
+      case '!announce': return await dmAnnounce(message);
+      case '!reset-channel': return await dmResetChannel(message);
       default:
         const embed = new EmbedBuilder()
           .setColor(ORACLE_COLOR)
@@ -1106,6 +1146,100 @@ async function dmPulseStats(message) {
     .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
     .setTimestamp();
   await message.reply({ embeds: [embed] });
+}
+
+async function dmAnnounce(message) {
+  // Posts the Oracle access announcement to the insight channel
+  // Triggered manually via !announce admin DM command
+  try {
+    const guild = client.guilds.cache.first();
+    if (!guild) return await message.reply('No guild found.');
+
+    const channel = guild.channels.cache.find(
+      ch => ch.name.toLowerCase() === INSIGHT_CHANNEL && (ch.type === 0 || ch.type === 5)
+    );
+    if (!channel) return await message.reply(`Could not find #${INSIGHT_CHANNEL}. Set INSIGHT_CHANNEL env var.`);
+
+    const announcementText = [
+      'Oracle access now requires a linked TitanTrack account.',
+      '',
+      'To use Oracle here, connect your account at **titantrack.app** — it takes 30 seconds.',
+      '',
+      'Once linked, your limits are:',
+      '— **OG members** (Discord before Feb 17, 2026): 1 message per day',
+      '— **Premium subscribers**: 3 messages per day',
+      '— **Free members**: 3 messages per week',
+      '',
+      'These limits are shared across Discord and the app as one combined pool.',
+      '',
+      'This is by design. Oracle has access to your streak, benefit logs, emotional patterns, and past observations. It knows more about you than you realize. Use it accordingly.'
+    ].join('\n');
+
+    const embed = new EmbedBuilder()
+      .setColor(ORACLE_COLOR)
+      .setDescription(announcementText)
+      .setFooter({ text: 'Oracle · titantrack.app', iconURL: ORACLE_ICON });
+
+    await channel.send({ embeds: [embed] });
+    await message.reply(`✓ Announcement posted to #${INSIGHT_CHANNEL}`);
+    console.log(`🔮 Oracle access announcement posted to #${INSIGHT_CHANNEL}`);
+  } catch (err) {
+    console.error('[Announce] Error:', err.message);
+    await message.reply(`Failed: ${err.message}`);
+  }
+}
+
+async function dmResetChannel(message) {
+  // Usage: !reset-channel #channel-name confirm
+  // Clones the channel (preserving all settings/permissions) then deletes the original.
+  // Requires "confirm" to prevent accidental execution.
+  const parts = message.content.trim().split(/\s+/);
+  // parts[0] = !reset-channel, parts[1] = #channel-name, parts[2] = confirm
+  const channelArg = (parts[1] || '').replace(/^#/, '').toLowerCase();
+  const confirmed = (parts[2] || '').toLowerCase() === 'confirm';
+
+  if (!channelArg) {
+    return await message.reply(
+      '**Usage:** `!reset-channel #channel-name confirm`\n' +
+      'Clones the channel (keeps all settings & permissions) then deletes the original. All messages are gone permanently.\n' +
+      'Omit `confirm` to preview without executing.'
+    );
+  }
+
+  try {
+    const guild = client.guilds.cache.first();
+    if (!guild) return await message.reply('No guild found.');
+
+    const target = guild.channels.cache.find(
+      ch => ch.name.toLowerCase() === channelArg && (ch.type === 0 || ch.type === 5)
+    );
+    if (!target) return await message.reply(`Could not find channel #${channelArg}.`);
+
+    if (!confirmed) {
+      return await message.reply(
+        `⚠️ This will clone **#${target.name}** and permanently delete the original — all messages gone.\n` +
+        `Run \`!reset-channel #${target.name} confirm\` to execute.`
+      );
+    }
+
+    // Clone the channel — preserves name, topic, position, permissions, slowmode, nsfw flag
+    const cloned = await target.clone({
+      reason: `Channel reset by admin via Oracle !reset-channel`
+    });
+
+    // Reposition clone to match original
+    await cloned.setPosition(target.position).catch(() => {});
+
+    // Delete the original
+    await target.delete(`Channel reset by admin via Oracle !reset-channel`);
+
+    await message.reply(`✓ **#${cloned.name}** has been reset. Fresh channel, all settings preserved.`);
+    console.log(`🔮 Channel reset: #${cloned.name} cloned and original deleted by admin`);
+
+  } catch (err) {
+    console.error('[ResetChannel] Error:', err.message);
+    await message.reply(`Failed: ${err.message}\nMake sure Oracle has Manage Channels permission.`);
+  }
 }
 
 async function dmStatus(message) {
@@ -1634,23 +1768,31 @@ client.on('messageCreate', async (message) => {
       // Silent ignore for cooldown
       return;
     }
+    if (rateLimited.reason === 'unlinked') {
+      // Not linked — direct them to the app. No long explanation.
+      await message.reply({ embeds: [buildOracleEmbed('Oracle is available to linked TitanTrack members. Connect your account at titantrack.app to access it here.')] });
+      return;
+    }
     if (rateLimited.reason === 'daily') {
       const dailyLimitMessages = [
         'You\'ve drawn enough from the well today. Let what you\'ve received settle. Return tomorrow.',
         'Oracle has spoken enough for one day. Sit with what you\'ve been given.',
-        'Ten exchanges is the boundary. Integration matters more than accumulation. Tomorrow.',
+        'One exchange is the boundary. Integration matters more than accumulation. Tomorrow.',
         'Enough for today. Real growth happens between the conversations, not during them.',
         'The well refills at midnight. Until then, apply what you already know.',
         'Silence is part of the teaching. Sit with today\'s words.',
         'You have what you need for now. Come back when the sun does.',
         'Oracle rests. Not every answer comes from asking.',
         'Today\'s thread is complete. Tomorrow brings a new one.',
-        'Ten is the number. Reflect on what was given before seeking more.',
         'Some answers only surface after you stop asking. Tomorrow.',
         'The signal fades when drawn from too often. Let it rebuild overnight.',
       ];
       const limitMsg = dailyLimitMessages[Math.floor(Math.random() * dailyLimitMessages.length)];
       await message.reply({ embeds: [buildOracleEmbed(limitMsg)] });
+      return;
+    }
+    if (rateLimited.reason === 'weekly') {
+      await message.reply({ embeds: [buildOracleEmbed('You\'ve used your 3 Oracle messages for the week. The limit resets Monday. Upgrade to Premium at titantrack.app for daily access.')] });
       return;
     }
   }
@@ -1784,36 +1926,80 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
     const reply = response.content[0].text;
     const chunks = splitResponse(reply);
     
-    // Record usage first so we can show remaining
+    // Record Discord usage
     await recordUsage(message.author.id);
-    
-    // Get remaining count for footer
+
+    // For free linked users: also increment app weekly count (shared pool source of truth)
+    if (linkedUser) {
+      const { hasPremium: userHasPremium } = checkPremiumAccess(linkedUser);
+      const isGrandfathered = linkedUser.subscription?.status === 'grandfathered';
+      if (!isGrandfathered && !userHasPremium) {
+        try {
+          const getWeekStartET = () => {
+            const etNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+            const day = etNow.getDay();
+            const diff = day === 0 ? 6 : day - 1;
+            const monday = new Date(etNow);
+            monday.setDate(etNow.getDate() - diff);
+            return monday.toISOString().split('T')[0];
+          };
+          const currentWeekStart = getWeekStartET();
+          const storedWeekStart = linkedUser.aiUsage?.weekStart || '';
+          const isNewWeek = storedWeekStart !== currentWeekStart;
+          await User.findOneAndUpdate(
+            { discordId: message.author.id },
+            {
+              $set: { 'aiUsage.weekStart': currentWeekStart },
+              $set: { 'aiUsage.weeklyCount': isNewWeek ? 1 : (linkedUser.aiUsage?.weeklyCount || 0) + 1 }
+            }
+          );
+        } catch (err) { /* silent — non-blocking */ }
+      }
+    }
+
+    // Get remaining count for footer (tier-aware)
     const todayStr = getTodayET();
-    let used = 0;
-    let poolLimit = MAX_DAILY_PER_USER;
+    let remaining = 0;
+    let discordUserTier = 'free';
     try {
       const usage = await OracleUsage.findOne({ discordUserId: message.author.id, date: todayStr });
-      if (usage) used = usage.count;
-      
-      // Shared pool: include app usage for grandfathered linked users
-      if (linkedUser && linkedUser.subscription?.status === 'grandfathered') {
-        poolLimit = GRANDFATHERED_DAILY_POOL;
-        const appCount = (linkedUser.aiUsage?.date === todayStr) ? (linkedUser.aiUsage?.count || 0) : 0;
-        used = used + appCount;
+      const discordUsedNow = usage?.count || 0;
+      if (linkedUser) {
+        const { hasPremium: userHasPremium } = checkPremiumAccess(linkedUser);
+        const isGrandfathered = linkedUser.subscription?.status === 'grandfathered';
+        const appCountNow = (linkedUser.aiUsage?.date === todayStr) ? (linkedUser.aiUsage?.count || 0) : 0;
+        if (isGrandfathered) {
+          discordUserTier = 'grandfathered';
+          remaining = GRANDFATHERED_DAILY_POOL - (discordUsedNow + appCountNow);
+        } else if (userHasPremium) {
+          discordUserTier = 'premium';
+          remaining = PREMIUM_DAILY_LIMIT - (discordUsedNow + appCountNow);
+        } else {
+          discordUserTier = 'free';
+          const weeklyUsed = linkedUser.aiUsage?.weeklyCount || 0;
+          remaining = FREE_WEEKLY_LIMIT - weeklyUsed;
+        }
       }
     } catch (err) { /* silent */ }
-    const remaining = poolLimit - used;
-    
+    remaining = Math.max(0, remaining);
+
+    // Tier-aware last-message footer — only shown when this was their final message (0 remaining)
+    const getTierFooter = (tier) => {
+      if (tier === 'grandfathered') return 'This is your only Oracle message today. Make it count tomorrow.';
+      if (tier === 'premium') return 'This is your last Oracle message today. Resets at midnight.';
+      return 'This is your last Oracle message for the week. Resets Monday.';
+    };
+
     // Send first chunk as reply, rest as follow-ups
     for (let i = 0; i < chunks.length; i++) {
       const embed = buildOracleEmbed(chunks[i]);
-      
-      // Only add remaining footer to the LAST chunk (skip for admins)
+
+      // Only add footer to the LAST chunk on final message (skip for admins)
       const isAdmin = ADMIN_DISCORD_USERS.includes(authorUsername);
-      if (i === chunks.length - 1 && remaining <= 5 && remaining > 0 && !isAdmin) {
-        embed.setFooter({ text: `Oracle · titantrack.app · ${remaining} remaining today`, iconURL: 'https://titantrack.app/The_Oracle.png' });
+      if (i === chunks.length - 1 && remaining === 0 && !isAdmin) {
+        embed.setFooter({ text: `Oracle · ${getTierFooter(discordUserTier)}`, iconURL: 'https://titantrack.app/The_Oracle.png' });
       }
-      
+
       if (i === 0) {
         await message.reply({ embeds: [embed] });
       } else {
