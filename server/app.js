@@ -1610,7 +1610,8 @@ Examples:
       messagesLimit: effectiveLimit,
       messagesRemaining: Math.max(0, messagesRemaining),
       isBetaPeriod,
-      isPremium: userHasPremium
+      isPremium: userHasPremium,
+      isGrandfathered
     })}\n\n`);
     res.write('data: [DONE]\n\n');
     res.end();
@@ -1705,6 +1706,7 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
       messagesRemaining: Math.max(0, messagesRemaining),
       isBetaPeriod,
       isPremium: userHasPremium,
+      isGrandfathered,
       resetsAt
     });
   } catch (err) {
@@ -1784,6 +1786,7 @@ app.get('/api/ai-usage/:username', authenticate, async (req, res) => {
       messagesRemaining: Math.max(0, messagesRemaining),
       isBetaPeriod,
       isPremium: userHasPremium,
+      isGrandfathered,
       resetsAt,
       lastUsed: user.aiUsage?.lastUsed || null
     });

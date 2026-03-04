@@ -55,7 +55,8 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     messagesLimit: 5,
     messagesRemaining: 5,
     isBetaPeriod: true,
-    isPremium: false
+    isPremium: false,
+    isGrandfathered: false
   });
   const [error, setError] = useState(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -329,7 +330,8 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                   messagesLimit: parsed.messagesLimit,
                   messagesRemaining: parsed.messagesRemaining,
                   isBetaPeriod: parsed.isBetaPeriod,
-                  isPremium: parsed.isPremium || false
+                  isPremium: parsed.isPremium || false,
+                  isGrandfathered: parsed.isGrandfathered || false
                 });
               } else if (parsed.type === 'error') {
                 throw new Error(parsed.message);
@@ -411,7 +413,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
             <div className="ai-chat-header-content">
               <img src="/oracle-wordmark.png" alt="Oracle" className="ai-chat-header-wordmark" />
               <span className="ai-chat-subtitle">
-                {usage.messagesRemaining} remaining · {usage.isBetaPeriod ? 'Beta' : usage.isPremium ? 'Premium' : `Free · ${usage.messagesLimit}/week`}
+                {usage.messagesRemaining} remaining · {usage.isBetaPeriod ? 'Beta' : usage.isGrandfathered ? 'Lifetime' : usage.isPremium ? 'Premium' : `Free · ${usage.messagesLimit}/week`}
               </span>
             </div>
             <button 
@@ -584,12 +586,14 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
             ) : (
               <div className="ai-chat-limit-reached">
                 <span className="ai-chat-limit-text">
-                  {usage.isPremium 
+                  {usage.isGrandfathered
+                    ? 'Daily limit reached · Resets at midnight'
+                    : usage.isPremium 
                     ? 'Daily limit reached · Resets at midnight'
                     : 'Weekly limit reached · Resets Monday'
                   }
                 </span>
-                {!usage.isPremium && openPlanModal && (
+                {!usage.isPremium && !usage.isGrandfathered && openPlanModal && (
                   <button className="ai-chat-upgrade-btn" onClick={() => { onClose(); openPlanModal(); }}>
                     Upgrade to Premium
                   </button>
