@@ -113,15 +113,10 @@ const getSpermatogenesisPhase = (streakDays) => {
 /**
  * Calculate Personal Day number (numerology)
  */
-const getPersonalDay = (birthDate, currentDate = new Date()) => {
-  if (!birthDate) return null;
-  
-  const birth = new Date(birthDate);
-  const birthMonth = birth.getMonth() + 1;
-  const birthDay = birth.getDate();
-  const currentMonth = currentDate.getMonth() + 1;
-  const currentDay = currentDate.getDate();
-  const currentYear = currentDate.getFullYear();
+const getDayNumerology = (currentDate = new Date()) => {
+  const month = currentDate.getMonth() + 1;
+  const day = currentDate.getDate();
+  const year = currentDate.getFullYear();
   
   const reduceToDigit = (num) => {
     while (num > 9 && num !== 11 && num !== 22 && num !== 33) {
@@ -130,30 +125,40 @@ const getPersonalDay = (birthDate, currentDate = new Date()) => {
     return num;
   };
   
-  const birthSum = reduceToDigit(birthMonth + birthDay);
-  const yearSum = reduceToDigit(
-    String(currentYear).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0)
-  );
-  const dateSum = reduceToDigit(currentMonth + currentDay);
+  // DAY ENERGY — surface vibration, immediate and overt
+  // Simply the calendar date reduced (3rd = 3, 14th = 5, 23rd = 5)
+  const dayEnergy = reduceToDigit(day);
   
-  const personalDay = reduceToDigit(birthSum + yearSum + dateSum);
+  // UNIVERSAL ENERGY — deep current, what the day builds toward
+  // Full date life path: sum all digits, reduce to single digit
+  const allDigits = `${month}${day}${year}`.split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+  const universalEnergy = reduceToDigit(allDigits);
   
   const meanings = {
-    1: { theme: 'Initiative', guidance: 'Start new projects. Take leadership. Assert yourself.' },
-    2: { theme: 'Cooperation', guidance: 'Partnership favored. Patience required. Diplomacy wins.' },
-    3: { theme: 'Expression', guidance: 'Creative energy high. Communicate freely. Social connections.' },
-    4: { theme: 'Foundation', guidance: 'Build structure. Practical work. Discipline rewarded.' },
-    5: { theme: 'Change', guidance: 'Expect the unexpected. Adapt quickly. Freedom calls.' },
-    6: { theme: 'Responsibility', guidance: 'Family matters. Service to others. Harmony at home.' },
-    7: { theme: 'Reflection', guidance: 'Introspection day. Study and analyze. Trust intuition.' },
-    8: { theme: 'Power', guidance: 'Business and finance favored. Authority recognized. Manifest.' },
-    9: { theme: 'Completion', guidance: 'Release what no longer serves. Endings bring beginnings.' },
-    11: { theme: 'Illumination', guidance: 'Master number day. Heightened intuition. Spiritual downloads.' },
-    22: { theme: 'Master Builder', guidance: 'Master number day. Large visions. Practical idealism.' },
-    33: { theme: 'Master Teacher', guidance: 'Master number day. Selfless service. Healing presence.' }
+    1: { theme: 'Initiative', dayGuidance: 'Leadership and independence in the air. Self-starting energy.', universalGuidance: 'The day builds toward new beginnings. Decisive action rewarded.' },
+    2: { theme: 'Cooperation', dayGuidance: 'Sensitivity heightened. Diplomacy and patience on the surface.', universalGuidance: 'The day builds toward partnership and balance. Yield to win.' },
+    3: { theme: 'Expression', dayGuidance: 'Creative and social energy front and center. Communication flows.', universalGuidance: 'The day builds toward self-expression. Ideas gain traction.' },
+    4: { theme: 'Foundation', dayGuidance: 'Discipline and structure dominate. Practical energy prevails.', universalGuidance: 'The day builds toward grounded power. Hard work compounds.' },
+    5: { theme: 'Change', dayGuidance: 'Restless energy. Expect the unexpected. Impulse is strong.', universalGuidance: 'The day builds toward transformation. Adaptability is the lesson.' },
+    6: { theme: 'Responsibility', dayGuidance: 'Duty and care feel immediate. Others need your attention.', universalGuidance: 'The day builds toward harmony. Service to others is the path.' },
+    7: { theme: 'Reflection', dayGuidance: 'Introspective pull. Solitude feels natural. Inner work calls.', universalGuidance: 'The day builds toward spiritual insight. Trust what surfaces.' },
+    8: { theme: 'Power', dayGuidance: 'Authority and ambition on display. Material energy is strong.', universalGuidance: 'The day builds toward manifestation. Execute with confidence.' },
+    9: { theme: 'Completion', dayGuidance: 'Release energy. Endings feel close. Letting go is the move.', universalGuidance: 'The day builds toward closure. What you release makes space.' },
+    11: { theme: 'Illumination', dayGuidance: 'Master energy. Intuition is electric. Pay attention to signs.', universalGuidance: 'The day builds toward spiritual awakening. Downloads incoming.' },
+    22: { theme: 'Master Builder', dayGuidance: 'Master energy. Vision meets execution. Think large scale.', universalGuidance: 'The day builds toward something lasting. Practical idealism.' },
+    33: { theme: 'Master Teacher', dayGuidance: 'Master energy. Compassion radiates. Healing presence felt.', universalGuidance: 'The day builds toward selfless service. Lead by example.' }
   };
   
-  return { number: personalDay, ...meanings[personalDay] };
+  return {
+    dayEnergy,
+    dayTheme: meanings[dayEnergy]?.theme || '',
+    dayGuidance: meanings[dayEnergy]?.dayGuidance || '',
+    universalEnergy,
+    universalTheme: meanings[universalEnergy]?.theme || '',
+    universalGuidance: meanings[universalEnergy]?.universalGuidance || '',
+    // Keep .number for backward compat with forecast function
+    number: universalEnergy
+  };
 };
 
 /**
@@ -347,8 +352,9 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
     const moon = getMoonPhase(today);
     const lunarInfo = getLunarData(today);
     moon.eventType = lunarInfo.specialEvent?.type || null;
+    moon.illumination = lunarInfo.illumination;
     const sperma = getSpermatogenesisPhase(streakDays);
-    const personalDay = getPersonalDay(birthDate, today);
+    const personalDay = getDayNumerology(today);
     const zodiac = getChineseZodiac(birthDate, today);
     const forecast = generateForecast(moon, sperma, personalDay, zodiac, streakDays);
     
@@ -384,7 +390,7 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
             streakDays,
             sperma: { position: sperma.position, cycleLength: sperma.cycleLength, cycleNumber: sperma.cycleNumber, phase: sperma.phase, description: sperma.description },
             moon: { phase: moon.phase, illumination: moon.illumination, energy: moon.energy },
-            personalDay: personalDay ? { number: personalDay.number, theme: personalDay.theme, guidance: personalDay.guidance } : null,
+            personalDay: personalDay ? { dayEnergy: personalDay.dayEnergy, dayTheme: personalDay.dayTheme, universalEnergy: personalDay.universalEnergy, universalTheme: personalDay.universalTheme } : null,
             zodiac: zodiac ? { animal: zodiac.animal, element: zodiac.element, yinYang: zodiac.yinYang, currentAnimal: zodiac.currentAnimal, yearType: zodiac.yearType, yearEnergy: zodiac.yearEnergy } : null,
             timezone: detectedTimezone
           })
@@ -472,14 +478,25 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
                   <span className="almanac-row-desc">{moon.energy}</span>
                 </div>
                 
-                {/* Personal Day */}
+                {/* Day Energy — surface vibration */}
                 {personalDay && (
                   <div className="almanac-row">
-                    <span className="almanac-row-label">Personal Day</span>
+                    <span className="almanac-row-label">Day Energy</span>
                     <div className="almanac-row-header">
-                      <span className="almanac-row-title">{personalDay.number} · {personalDay.theme}</span>
+                      <span className="almanac-row-title">{personalDay.dayEnergy} · {personalDay.dayTheme}</span>
                     </div>
-                    <span className="almanac-row-desc">{personalDay.guidance}</span>
+                    <span className="almanac-row-desc">{personalDay.dayGuidance}</span>
+                  </div>
+                )}
+                
+                {/* Universal Energy — deep current */}
+                {personalDay && (
+                  <div className="almanac-row">
+                    <span className="almanac-row-label">Universal Energy</span>
+                    <div className="almanac-row-header">
+                      <span className="almanac-row-title">{personalDay.universalEnergy} · {personalDay.universalTheme}</span>
+                    </div>
+                    <span className="almanac-row-desc">{personalDay.universalGuidance}</span>
                   </div>
                 )}
                 
