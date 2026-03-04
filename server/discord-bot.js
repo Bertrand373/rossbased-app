@@ -1180,7 +1180,7 @@ async function dmAnnounce(message) {
       .setDescription(announcementText)
       .setFooter({ text: 'Oracle · titantrack.app', iconURL: ORACLE_ICON });
 
-    await channel.send({ embeds: [embed] });
+    await channel.send({ content: '@everyone', embeds: [embed] });
     await message.reply(`✓ Announcement posted to #${INSIGHT_CHANNEL}`);
     console.log(`🔮 Oracle access announcement posted to #${INSIGHT_CHANNEL}`);
   } catch (err) {
