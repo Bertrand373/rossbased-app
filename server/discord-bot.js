@@ -1953,8 +1953,10 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
           await User.findOneAndUpdate(
             { discordId: message.author.id },
             {
-              $set: { 'aiUsage.weekStart': currentWeekStart },
-              $set: { 'aiUsage.weeklyCount': isNewWeek ? 1 : (linkedUser.aiUsage?.weeklyCount || 0) + 1 }
+              $set: { 
+                'aiUsage.weekStart': currentWeekStart,
+                'aiUsage.weeklyCount': isNewWeek ? 1 : (linkedUser.aiUsage?.weeklyCount || 0) + 1
+              }
             }
           );
         } catch (err) { /* silent — non-blocking */ }
