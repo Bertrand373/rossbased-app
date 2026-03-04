@@ -4,9 +4,8 @@
 
 .scroll-indicator {
   position: fixed;
-  bottom: calc(var(--nav-height-mobile, 62px) + env(safe-area-inset-bottom, 0px) + 8px);
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: calc(var(--nav-height-mobile, 62px) + env(safe-area-inset-bottom, 0px) + 12px);
+  right: 24px;
   z-index: 89; /* Just below mobile-nav (90) */
   
   display: flex;
@@ -22,11 +21,11 @@
 @keyframes scrollIndicatorIn {
   from {
     opacity: 0;
-    transform: translateX(-50%) translateY(-4px);
+    transform: translateY(-4px);
   }
   to {
-    opacity: 0.6;
-    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -52,7 +51,7 @@
 @media (prefers-reduced-motion: reduce) {
   .scroll-indicator {
     animation: none;
-    opacity: 0.5;
+    opacity: 0.8;
   }
   
   .scroll-indicator svg {
