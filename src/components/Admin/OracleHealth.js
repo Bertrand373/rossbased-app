@@ -194,7 +194,7 @@ const OracleHealth = () => {
                       {u.app > 0 && <span className="oh-user-count app">{u.app}a</span>}
                       {u.discord > 0 && <span className="oh-user-count discord">{u.discord}d</span>}
                     </div>
-                    <span className={`oh-user-total ${u.total >= 10 ? 'heavy' : ''}`}>{u.total}</span>
+                    <span className={`oh-user-total ${u.total >= 3 ? 'heavy' : ''}`}>{u.total}</span>
                   </div>
                 );
               })}

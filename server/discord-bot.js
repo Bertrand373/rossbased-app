@@ -53,6 +53,10 @@ const FREE_WEEKLY_LIMIT = 3;         // Free linked users: 3/week shared across 
 const DAILY_USAGE = new Map();
 const PULSE_COOLDOWN_DAYS = 3;
 
+// Track user message → Oracle reply for auto-cleanup on user message delete
+// Map<userMessageId, oracleReplyMessage>
+const REPLY_MAP = new Map();
+
 // Get today's date string in Eastern Time (resets at midnight ET, not UTC)
 function getTodayET() {
   return new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); // 'en-CA' gives YYYY-MM-DD
@@ -2001,7 +2005,14 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       }
 
       if (i === 0) {
-        await message.reply({ embeds: [embed] });
+        const sentReply = await message.reply({ embeds: [embed] });
+        // Track so we can delete Oracle's reply if user deletes their message
+        REPLY_MAP.set(message.id, sentReply);
+        // Cap map size to avoid memory leak (keep last 500 exchanges)
+        if (REPLY_MAP.size > 500) {
+          const firstKey = REPLY_MAP.keys().next().value;
+          REPLY_MAP.delete(firstKey);
+        }
       } else {
         await message.channel.send({ embeds: [embed] });
       }
@@ -2177,6 +2188,21 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
   } catch (err) {
     console.error('Reaction ingestion error:', err.message);
+  }
+});
+
+// ============================================================
+// MESSAGE DELETE — auto-remove Oracle reply when user deletes their message
+// ============================================================
+
+client.on('messageDelete', async (deleted) => {
+  const oracleReply = REPLY_MAP.get(deleted.id);
+  if (!oracleReply) return;
+  REPLY_MAP.delete(deleted.id);
+  try {
+    await oracleReply.delete();
+  } catch {
+    // Message may already be deleted or inaccessible — silent fail
   }
 });
 

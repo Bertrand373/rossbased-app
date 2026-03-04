@@ -295,7 +295,7 @@ const AdminCockpit = () => {
       <div className="ac-header">
         <div className="ac-header-top">
           <div className="ac-brand">
-            <img src={require('../../assets/trackerapplogo.png')} alt="TitanTrack" className="ac-brand-wordmark" />
+            <img src={require('../../assets/trackerapplogo.png')} alt="TitanTrack" className="ac-brand-icon" />
             <span className="ac-brand-chip">ADMIN</span>
           </div>
           <div className="ac-header-right">
