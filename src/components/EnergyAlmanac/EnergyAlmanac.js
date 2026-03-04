@@ -8,6 +8,7 @@ import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import './EnergyAlmanac.css';
 import '../../styles/BottomSheet.css';
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
+import useSheetSwipe from '../../hooks/useSheetSwipe';
 import { getLunarData } from '../../utils/lunarData';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
@@ -283,9 +284,6 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
   const [showContent, setShowContent] = useState(false);
   const [sheetReady, setSheetReady] = useState(false);
   const sheetPanelRef = useRef(null);
-  const touchStartY = useRef(0);
-  const touchDeltaY = useRef(0);
-  const isDragging = useRef(false);
 
   // Lock body scroll when sheet is open
   useBodyScrollLock(showContent);
@@ -312,37 +310,8 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
 
   const handleClose = useCallback(() => closeSheet(() => setIsExpanded(false)), [closeSheet]);
 
-  // Swipe-to-dismiss
-  const onTouchStart = useCallback((e) => {
-    touchStartY.current = e.touches[0].clientY;
-    touchDeltaY.current = 0;
-    isDragging.current = false;
-  }, []);
-
-  const onTouchMove = useCallback((e) => {
-    const delta = e.touches[0].clientY - touchStartY.current;
-    if (delta < 0) return;
-    if (delta > 10) {
-      isDragging.current = true;
-      touchDeltaY.current = delta;
-      if (sheetPanelRef.current) {
-        sheetPanelRef.current.style.transform = `translateY(${delta}px)`;
-        sheetPanelRef.current.style.transition = 'none';
-      }
-    }
-  }, []);
-
-  const onTouchEnd = useCallback(() => {
-    if (!isDragging.current) return;
-    if (sheetPanelRef.current) {
-      sheetPanelRef.current.style.transition = '';
-      sheetPanelRef.current.style.transform = '';
-    }
-    if (touchDeltaY.current > 80) {
-      handleClose();
-    }
-    isDragging.current = false;
-  }, [handleClose]);
+  // Swipe-to-dismiss — non-passive native listeners so iOS respects preventDefault
+  useSheetSwipe(sheetPanelRef, isExpanded, () => setIsExpanded(false));
   
   const calculations = useMemo(() => {
     const today = new Date();
@@ -437,9 +406,6 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
           >
             <div 
               className="sheet-header"
-              onTouchStart={onTouchStart}
-              onTouchMove={onTouchMove}
-              onTouchEnd={onTouchEnd}
             />
 
             {/* Header */}

@@ -5,6 +5,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './InstallPrompt.css';
 import '../../styles/BottomSheet.css';
+import useSheetSwipe from '../../hooks/useSheetSwipe';
 
 // =============================================================================
 // PLATFORM DETECTION
@@ -128,9 +129,6 @@ const InstallPrompt = ({
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [sheetReady, setSheetReady] = useState(false);
   const panelRef = useRef(null);
-  const touchStartY = useRef(0);
-  const touchDeltaY = useRef(0);
-  const isDragging = useRef(false);
 
   // Sheet open animation
   useEffect(() => {
@@ -146,50 +144,11 @@ const InstallPrompt = ({
     setTimeout(() => cb && cb(), 300);
   }, []);
 
-  // Swipe-to-dismiss
-  const onTouchStart = useCallback((e) => {
-    touchStartY.current = e.touches[0].clientY;
-    touchDeltaY.current = 0;
-    isDragging.current = false;
-  }, []);
-
-  const onTouchMove = useCallback((e) => {
-    const d = e.touches[0].clientY - touchStartY.current;
-    if (d < 0) return;
-    if (d > 10) {
-      isDragging.current = true;
-      touchDeltaY.current = d;
-      if (panelRef.current) {
-        panelRef.current.style.transition = 'none';
-        panelRef.current.style.transform = `translateY(${d}px)`;
-      }
-    }
-  }, []);
-
-  const onTouchEnd = useCallback(() => {
-    if (!isDragging.current) return;
-    if (touchDeltaY.current > 100 && panelRef.current) {
-      panelRef.current.style.transition = 'transform 250ms ease-out';
-      panelRef.current.style.transform = 'translateY(100%)';
-      setSheetReady(false);
-      setTimeout(() => {
-        if (panelRef.current) {
-          panelRef.current.style.transition = '';
-          panelRef.current.style.transform = '';
-        }
-        setIsVisible(false);
-        onClose?.();
-      }, 250);
-    } else if (panelRef.current) {
-      panelRef.current.style.transition = 'transform 250ms ease-out';
-      panelRef.current.style.transform = '';
-      setTimeout(() => {
-        if (panelRef.current) panelRef.current.style.transition = '';
-      }, 250);
-    }
-    isDragging.current = false;
-    touchDeltaY.current = 0;
-  }, [onClose]);
+  // Swipe-to-dismiss — non-passive native listeners so iOS respects preventDefault
+  useSheetSwipe(panelRef, isVisible, () => {
+    setIsVisible(false);
+    onClose?.();
+  });
   
   // Initialize
   useEffect(() => {
@@ -284,17 +243,14 @@ const InstallPrompt = ({
   const platformLabel = platformInfo.platform === 'ios' ? 'Safari' : 
                         platformInfo.platform === 'android' ? 'Chrome' : 'Browser';
   
-  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-  const appIcon = currentTheme === 'light' ? '/icon-192-black.png' : '/icon-192.png';
-  
   return (
     <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={handleClose} style={{ zIndex: 10000 }}>
       <div ref={panelRef} className={`sheet-panel install-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
-        <div className="sheet-header" onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd} />
+        <div className="sheet-header" />
         
         {/* Header */}
         <div className="install-header">
-          <img src={appIcon} alt="" className="install-app-icon" />
+          <img src="/tt-icon-white.png" alt="" className="install-app-icon" />
           <h2>Install TitanTrack</h2>
           <p>Add to your home screen for the full experience</p>
         </div>

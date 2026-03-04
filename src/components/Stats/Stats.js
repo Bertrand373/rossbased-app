@@ -7,6 +7,7 @@ import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import './Stats.css';
 import '../../styles/BottomSheet.css';
+import useSheetSwipe from '../../hooks/useSheetSwipe';
 import toast from 'react-hot-toast';
 
 // Import extracted components
@@ -83,9 +84,6 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   // Bottom sheet state
   const [sheetReady, setSheetReady] = useState(false);
   const sheetPanelRef = useRef(null);
-  const sheetStartY = useRef(0);
-  const sheetDeltaY = useRef(0);
-  const sheetDragging = useRef(false);
 
   // Sheet open animation
   const sheetVisible = showMilestoneModal || showResetStreakModal || showResetAllModal;
@@ -102,52 +100,14 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setTimeout(cb, 300);
   }, []);
 
-  // Swipe-to-close handlers
-  const onSheetTouchStart = useCallback((e) => {
-    sheetStartY.current = e.touches[0].clientY;
-    sheetDeltaY.current = 0;
-    sheetDragging.current = false;
+  // Swipe-to-dismiss — non-passive native listeners so iOS respects preventDefault
+  const handleSwipeDismiss = useCallback(() => {
+    setShowMilestoneModal(false);
+    setShowResetStreakModal(false);
+    setShowResetAllModal(false);
+    setSelectedMilestone(null);
   }, []);
-
-  const onSheetTouchMove = useCallback((e) => {
-    const delta = e.touches[0].clientY - sheetStartY.current;
-    if (delta < 0) return;
-    if (delta > 10) {
-      sheetDragging.current = true;
-      sheetDeltaY.current = delta;
-      if (sheetPanelRef.current) {
-        sheetPanelRef.current.style.transition = 'none';
-        sheetPanelRef.current.style.transform = `translateY(${delta}px)`;
-      }
-    }
-  }, []);
-
-  const onSheetTouchEnd = useCallback(() => {
-    if (!sheetDragging.current) return;
-    if (sheetDeltaY.current > 100 && sheetPanelRef.current) {
-      sheetPanelRef.current.style.transition = 'transform 250ms ease-out';
-      sheetPanelRef.current.style.transform = 'translateY(100%)';
-      setSheetReady(false);
-      setTimeout(() => {
-        if (sheetPanelRef.current) {
-          sheetPanelRef.current.style.transition = '';
-          sheetPanelRef.current.style.transform = '';
-        }
-        setShowMilestoneModal(false);
-        setShowResetStreakModal(false);
-        setShowResetAllModal(false);
-        setSelectedMilestone(null);
-      }, 250);
-    } else if (sheetPanelRef.current) {
-      sheetPanelRef.current.style.transition = 'transform 250ms ease-out';
-      sheetPanelRef.current.style.transform = '';
-      setTimeout(() => {
-        if (sheetPanelRef.current) sheetPanelRef.current.style.transition = '';
-      }, 250);
-    }
-    sheetDragging.current = false;
-    sheetDeltaY.current = 0;
-  }, []);
+  useSheetSwipe(sheetPanelRef, sheetVisible, handleSwipeDismiss);
   
   // Detect theme changes for chart colors
   useEffect(() => {
@@ -761,7 +721,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       {showMilestoneModal && selectedMilestone && (
         <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => { setShowMilestoneModal(false); setSelectedMilestone(null); })}>
           <div ref={sheetPanelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
-            <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd} />
+            <div className="sheet-header" />
             <div className="modal" style={{ animation: 'none' }}>
               <span className="modal-num">{selectedMilestone.days}</span>
               <h2>{selectedMilestone.label}</h2>
@@ -799,7 +759,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       {showResetStreakModal && (
         <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowResetStreakModal(false))}>
           <div ref={sheetPanelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
-            <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd} />
+            <div className="sheet-header" />
             <div className="modal" style={{ animation: 'none' }}>
               <h2>Reset Streak?</h2>
               <p className="modal-text">This will reset your current streak to 0. Your history and benefits data will be kept.</p>
@@ -816,7 +776,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       {showResetAllModal && (
         <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => { setShowResetAllModal(false); setResetConfirmText(''); })}>
           <div ref={sheetPanelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
-            <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd} />
+            <div className="sheet-header" />
             <div className="modal" style={{ animation: 'none' }}>
               <h2>Reset All Data?</h2>
               <p className="modal-text">This will permanently delete all progress data including streaks, benefits, and milestones. This cannot be undone.</p>

@@ -3,6 +3,7 @@
 // Now controlled by header button instead of floating FAB
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './AIChat.css';
+import useSheetSwipe from '../../hooks/useSheetSwipe';
 
 // Mixpanel tracking
 import { trackAIChatOpened, trackAIMessageSent, trackAIChatCleared, trackAILimitReached } from '../../utils/mixpanel';
@@ -66,11 +67,6 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   const chatBodyRef = useRef(null);
   const panelRef = useRef(null);
   const hasTrackedOpen = useRef(false);
-  
-  // Swipe-to-close refs
-  const touchStartY = useRef(0);
-  const touchDeltaY = useRef(0);
-  const isDragging = useRef(false);
 
   // Track chat opened (once per open)
   useEffect(() => {
@@ -138,54 +134,8 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     }
   }, [usage.messagesRemaining, usage.messagesLimit]);
 
-  // Swipe-to-close (mobile drawer)
-  const handleTouchStart = useCallback((e) => {
-    touchStartY.current = e.touches[0].clientY;
-    touchDeltaY.current = 0;
-    isDragging.current = false;
-  }, []);
-
-  const handleTouchMove = useCallback((e) => {
-    const delta = e.touches[0].clientY - touchStartY.current;
-    if (delta < 0) return; // Only allow downward swipe
-    if (delta > 10) {
-      isDragging.current = true;
-      touchDeltaY.current = delta;
-      if (panelRef.current) {
-        panelRef.current.style.transition = 'none';
-        panelRef.current.style.transform = `translateY(${delta}px)`;
-      }
-    }
-  }, []);
-
-  const handleTouchEnd = useCallback(() => {
-    if (!isDragging.current) return;
-    
-    if (touchDeltaY.current > 100 && panelRef.current) {
-      // Threshold met — animate out and close
-      panelRef.current.style.transition = 'transform 250ms ease-out';
-      panelRef.current.style.transform = 'translateY(100%)';
-      onClose();
-      setTimeout(() => {
-        if (panelRef.current) {
-          panelRef.current.style.transition = '';
-          panelRef.current.style.transform = '';
-        }
-      }, 250);
-    } else if (panelRef.current) {
-      // Below threshold — snap back
-      panelRef.current.style.transition = 'transform 250ms ease-out';
-      panelRef.current.style.transform = '';
-      setTimeout(() => {
-        if (panelRef.current) {
-          panelRef.current.style.transition = '';
-        }
-      }, 250);
-    }
-    
-    isDragging.current = false;
-    touchDeltaY.current = 0;
-  }, [onClose]);
+  // Swipe-to-close (mobile drawer) — non-passive so iOS respects preventDefault
+  useSheetSwipe(panelRef, isOpen, onClose);
 
   // Fetch usage stats
   const fetchUsage = async () => {
@@ -406,9 +356,6 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
           {/* Header */}
           <header 
             className="ai-chat-header"
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
           >
             <div className="ai-chat-header-content">
               <img src="/oracle-wordmark.png" alt="Oracle" className="ai-chat-header-wordmark" />

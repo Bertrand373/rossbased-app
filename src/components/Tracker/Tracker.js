@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 
 import './Tracker.css';
 import '../../styles/BottomSheet.css';
+import useSheetSwipe from '../../hooks/useSheetSwipe';
 import '../PredictionDisplay/PredictionDisplay.css';
 import DatePicker from '../Shared/DatePicker';
 import PatternInsightCard from '../PatternInsight/PatternInsightCard';
@@ -84,9 +85,6 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   const [benefitsReady, setBenefitsReady] = useState(false);
   const [peakSheetReady, setPeakSheetReady] = useState(false);
   const sheetPanelRef = useRef(null);
-  const sheetTouchStartY = useRef(0);
-  const sheetTouchDeltaY = useRef(0);
-  const sheetIsDragging = useRef(false);
   
   // Live clock state - updates every minute
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -309,68 +307,25 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     }, 300);
   }, []);
 
-  // Swipe-to-close (mobile) - matches Oracle pattern
-  const handleSheetTouchStart = useCallback((e) => {
-    sheetTouchStartY.current = e.touches[0].clientY;
-    sheetTouchDeltaY.current = 0;
-    sheetIsDragging.current = false;
-  }, []);
-
-  const handleSheetTouchMove = useCallback((e) => {
-    const delta = e.touches[0].clientY - sheetTouchStartY.current;
-    if (delta < 0) return;
-    if (delta > 10) {
-      sheetIsDragging.current = true;
-      sheetTouchDeltaY.current = delta;
-      if (sheetPanelRef.current) {
-        sheetPanelRef.current.style.transition = 'none';
-        sheetPanelRef.current.style.transform = `translateY(${delta}px)`;
-      }
+  // Swipe-to-dismiss — non-passive native listeners so iOS respects preventDefault
+  const trackerSheetVisible = showStreakOptions || showResetConfirm || showLogLock || showBenefits || showPeakPrompt || showPatternAlert;
+  const handleSwipeDismiss = useCallback(() => {
+    setShowStreakOptions(false);
+    setShowResetConfirm(false);
+    setShowLogLock(false);
+    setShowBenefits(false);
+    setShowPeakPrompt(false);
+    setPeakMessage('');
+    if (patternInterventionIdRef.current) {
+      interventionService.recordResponse(patternInterventionIdRef.current, 'dismissed');
+      patternInterventionIdRef.current = null;
+      sessionStorage.setItem('pattern_insight_dismissed', 'true');
+      sessionStorage.removeItem('pattern_alert_active');
+      setIsPatternAlertShowing(false);
     }
+    setShowPatternAlert(false);
   }, []);
-
-  const handleSheetTouchEnd = useCallback(() => {
-    if (!sheetIsDragging.current) return;
-    if (sheetTouchDeltaY.current > 100 && sheetPanelRef.current) {
-      sheetPanelRef.current.style.transition = 'transform 250ms ease-out';
-      sheetPanelRef.current.style.transform = 'translateY(100%)';
-      setSheetReady(false);
-      setBenefitsReady(false);
-      setPatternSheetReady(false);
-      setPeakSheetReady(false);
-      setTimeout(() => {
-        if (sheetPanelRef.current) {
-          sheetPanelRef.current.style.transition = '';
-          sheetPanelRef.current.style.transform = '';
-        }
-        setShowStreakOptions(false);
-        setShowResetConfirm(false);
-        setShowLogLock(false);
-        setShowBenefits(false);
-        setShowPeakPrompt(false);
-        setPeakMessage('');
-        // Pattern alert cleanup (only if it was the active sheet)
-        if (patternInterventionIdRef.current) {
-          interventionService.recordResponse(patternInterventionIdRef.current, 'dismissed');
-          patternInterventionIdRef.current = null;
-          sessionStorage.setItem('pattern_insight_dismissed', 'true');
-          sessionStorage.removeItem('pattern_alert_active');
-          setIsPatternAlertShowing(false);
-        }
-        setShowPatternAlert(false);
-      }, 250);
-    } else if (sheetPanelRef.current) {
-      sheetPanelRef.current.style.transition = 'transform 250ms ease-out';
-      sheetPanelRef.current.style.transform = '';
-      setTimeout(() => {
-        if (sheetPanelRef.current) {
-          sheetPanelRef.current.style.transition = '';
-        }
-      }, 250);
-    }
-    sheetIsDragging.current = false;
-    sheetTouchDeltaY.current = 0;
-  }, []);
+  useSheetSwipe(sheetPanelRef, trackerSheetVisible, handleSwipeDismiss);
 
   // Reset streak (relapse) - keep toast, this is significant
   const handleReset = () => {
@@ -1235,9 +1190,6 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
           <div ref={sheetPanelRef} className={`sheet-panel benefits-sheet${benefitsReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div 
               className="sheet-header"
-              onTouchStart={handleSheetTouchStart}
-              onTouchMove={handleSheetTouchMove}
-              onTouchEnd={handleSheetTouchEnd}
             />
             <div className="benefits-modal">
               <h2 className={postLogInsight ? 'fading' : ''}>Log Benefits</h2>
@@ -1330,9 +1282,6 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
           <div ref={sheetPanelRef} className={`sheet-panel peak-sheet${peakSheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div 
               className="sheet-header"
-              onTouchStart={handleSheetTouchStart}
-              onTouchMove={handleSheetTouchMove}
-              onTouchEnd={handleSheetTouchEnd}
             />
             <div className="peak-prompt">
               <div className="peak-prompt-header">
@@ -1379,9 +1328,6 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
           <div ref={sheetPanelRef} className={`sheet-panel tracker-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div 
               className="sheet-header"
-              onTouchStart={handleSheetTouchStart}
-              onTouchMove={handleSheetTouchMove}
-              onTouchEnd={handleSheetTouchEnd}
             />
             <div className="sheet">
               <h3 className="sheet-title">Streak Options</h3>
@@ -1417,9 +1363,6 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
           <div ref={sheetPanelRef} className={`sheet-panel tracker-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div 
               className="sheet-header"
-              onTouchStart={handleSheetTouchStart}
-              onTouchMove={handleSheetTouchMove}
-              onTouchEnd={handleSheetTouchEnd}
             />
             <div className="confirm-modal">
               <h2>{resetType === 'wetdream' ? 'Log wet dream?' : 'Reset streak?'}</h2>
@@ -1449,9 +1392,6 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
           <div ref={sheetPanelRef} className={`sheet-panel tracker-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div 
               className="sheet-header"
-              onTouchStart={handleSheetTouchStart}
-              onTouchMove={handleSheetTouchMove}
-              onTouchEnd={handleSheetTouchEnd}
             />
             <div className="confirm-modal">
               <h2>Free Logs Used</h2>
@@ -1474,9 +1414,6 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
           <div ref={sheetPanelRef} className={`sheet-panel tracker-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div 
               className="sheet-header"
-              onTouchStart={handleSheetTouchStart}
-              onTouchMove={handleSheetTouchMove}
-              onTouchEnd={handleSheetTouchEnd}
             />
             <DatePicker
               onSubmit={(date) => closeSheet(() => handleDateSubmit(date))}
@@ -1509,9 +1446,6 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
             <div ref={sheetPanelRef} className={`sheet-panel prediction-sheet${patternSheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
               <div 
                 className="sheet-header"
-                onTouchStart={handleSheetTouchStart}
-                onTouchMove={handleSheetTouchMove}
-                onTouchEnd={handleSheetTouchEnd}
               />
 
               {/* Score */}

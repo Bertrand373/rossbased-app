@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import './Profile.css';
 import '../../styles/BottomSheet.css';
+import useSheetSwipe from '../../hooks/useSheetSwipe';
 import { useNotifications } from '../../hooks/useNotifications';
 // Theme context
 import { useTheme } from '../../App';
@@ -104,12 +105,6 @@ const Profile = ({
   // Bottom sheet state (all modals)
   const [sheetReady, setSheetReady] = useState(false);
   const sheetPanelRef = useRef(null);
-  const sheetStartY = useRef(0);
-  const sheetDeltaY = useRef(0);
-  const sheetDragging = useRef(false);
-
-  // Scroll lock — no longer needed (all modals are sheets now)
-  // useBodyScrollLock kept for future use
 
   // Sheet animation
   const sheetVisible = showExportModal || showDeleteConfirm || showFeedbackModal || showPrivacyModal;
@@ -126,53 +121,15 @@ const Profile = ({
     setTimeout(cb, 300);
   }, []);
 
-  // Swipe-to-close
-  const onSheetTouchStart = useCallback((e) => {
-    sheetStartY.current = e.touches[0].clientY;
-    sheetDeltaY.current = 0;
-    sheetDragging.current = false;
+  // Swipe-to-dismiss — non-passive native listeners so iOS respects preventDefault
+  const handleSwipeDismiss = useCallback(() => {
+    setShowExportModal(false);
+    setShowDeleteConfirm(false);
+    setShowFeedbackModal(false);
+    setShowPrivacyModal(false);
+    setDeleteConfirmText('');
   }, []);
-
-  const onSheetTouchMove = useCallback((e) => {
-    const delta = e.touches[0].clientY - sheetStartY.current;
-    if (delta < 0) return;
-    if (delta > 10) {
-      sheetDragging.current = true;
-      sheetDeltaY.current = delta;
-      if (sheetPanelRef.current) {
-        sheetPanelRef.current.style.transition = 'none';
-        sheetPanelRef.current.style.transform = `translateY(${delta}px)`;
-      }
-    }
-  }, []);
-
-  const onSheetTouchEnd = useCallback(() => {
-    if (!sheetDragging.current) return;
-    if (sheetDeltaY.current > 100 && sheetPanelRef.current) {
-      sheetPanelRef.current.style.transition = 'transform 250ms ease-out';
-      sheetPanelRef.current.style.transform = 'translateY(100%)';
-      setSheetReady(false);
-      setTimeout(() => {
-        if (sheetPanelRef.current) {
-          sheetPanelRef.current.style.transition = '';
-          sheetPanelRef.current.style.transform = '';
-        }
-        setShowExportModal(false);
-        setShowDeleteConfirm(false);
-        setShowFeedbackModal(false);
-        setShowPrivacyModal(false);
-        setDeleteConfirmText('');
-      }, 250);
-    } else if (sheetPanelRef.current) {
-      sheetPanelRef.current.style.transition = 'transform 250ms ease-out';
-      sheetPanelRef.current.style.transform = '';
-      setTimeout(() => {
-        if (sheetPanelRef.current) sheetPanelRef.current.style.transition = '';
-      }, 250);
-    }
-    sheetDragging.current = false;
-    sheetDeltaY.current = 0;
-  }, []);
+  useSheetSwipe(sheetPanelRef, sheetVisible, handleSwipeDismiss);
 
   const tabs = [
     { id: 'account', label: 'Account' },
@@ -1156,7 +1113,7 @@ const Profile = ({
       {showFeedbackModal && (
         <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowFeedbackModal(false))}>
           <div ref={sheetPanelRef} className={`sheet-panel profile-sheet feedback-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
-            <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd} />
+            <div className="sheet-header" />
             
             <h2 className="feedback-sheet-title">Send Feedback</h2>
             
@@ -1194,7 +1151,7 @@ const Profile = ({
       {showExportModal && (
         <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowExportModal(false))}>
           <div ref={sheetPanelRef} className={`sheet-panel profile-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
-            <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd} />
+            <div className="sheet-header" />
             <div className="confirm-modal" style={{ animation: 'none' }}>
               <h2>Export Data</h2>
               <p>Download all your tracking data including streak history, journal entries, and settings.</p>
@@ -1211,7 +1168,7 @@ const Profile = ({
       {showDeleteConfirm && (
         <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); })}>
           <div ref={sheetPanelRef} className={`sheet-panel profile-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
-            <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd} />
+            <div className="sheet-header" />
             <div className="confirm-modal delete-confirm-modal" style={{ animation: 'none' }}>
               <h2>Delete Account?</h2>
               <p>This will permanently delete all your data. This cannot be undone.</p>
@@ -1255,7 +1212,7 @@ const Profile = ({
       {showPrivacyModal && (
         <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowPrivacyModal(false))}>
           <div ref={sheetPanelRef} className={`sheet-panel profile-sheet privacy-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
-            <div className="sheet-header" onTouchStart={onSheetTouchStart} onTouchMove={onSheetTouchMove} onTouchEnd={onSheetTouchEnd} />
+            <div className="sheet-header" />
             
             <div className="privacy-sheet-header">
               <h2>Privacy Policy</h2>
