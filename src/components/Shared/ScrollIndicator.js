@@ -1,50 +1,43 @@
 // ScrollIndicator.js - TITANTRACK
-// Subtle scroll chevron — appears when content extends below the fold.
-// Fades out after user scrolls ~150px. Re-evaluates on every route change. Mobile only.
+// Scroll chevron — visible whenever there is more content below the viewport.
+// Hides only when user reaches the bottom. Re-evaluates on route change. Mobile only.
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import './ScrollIndicator.css';
 
 const ScrollIndicator = () => {
   const [visible, setVisible] = useState(false);
-  const dismissed = useRef(false);
   const location = useLocation();
 
-  // Check if page has scrollable overflow below the viewport
-  const checkOverflow = useCallback(() => {
-    if (dismissed.current) return;
-    const scrollable = document.documentElement.scrollHeight > window.innerHeight + 80;
-    const nearTop = window.scrollY < 150;
-    setVisible(scrollable && nearTop);
+  // Check if there is still content below the current scroll position
+  const checkCanScroll = useCallback(() => {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const viewportHeight = window.innerHeight;
+    const totalHeight = document.documentElement.scrollHeight;
+    // 100px buffer so it hides slightly before the absolute bottom
+    const hasMoreBelow = totalHeight - scrollTop - viewportHeight > 100;
+    setVisible(hasMoreBelow);
   }, []);
 
-  // Reset on every route change
+  // Reset and re-check on every route change
   useEffect(() => {
-    dismissed.current = false;
     setVisible(false);
     // Wait for new page content to render before checking
-    const timer = setTimeout(checkOverflow, 400);
+    const timer = setTimeout(checkCanScroll, 400);
     return () => clearTimeout(timer);
-  }, [location.pathname, checkOverflow]);
+  }, [location.pathname, checkCanScroll]);
 
-  // Scroll listener — dismiss after 150px
+  // Continuously check on scroll and resize
   useEffect(() => {
-    const onScroll = () => {
-      if (window.scrollY > 150) {
-        setVisible(false);
-        dismissed.current = true;
-      }
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', checkOverflow, { passive: true });
+    window.addEventListener('scroll', checkCanScroll, { passive: true });
+    window.addEventListener('resize', checkCanScroll, { passive: true });
 
     return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', checkOverflow);
+      window.removeEventListener('scroll', checkCanScroll);
+      window.removeEventListener('resize', checkCanScroll);
     };
-  }, [checkOverflow]);
+  }, [checkCanScroll]);
 
   if (!visible) return null;
 

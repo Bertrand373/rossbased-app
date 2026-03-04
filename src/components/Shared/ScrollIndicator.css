@@ -1,5 +1,5 @@
 /* ScrollIndicator.css - TITANTRACK
-   Minimal chevron above bottom nav — signals scrollable content below.
+   Chevron above bottom nav — visible whenever more content exists below.
    Theme-aware via CSS variables. Mobile only. */
 
 .scroll-indicator {
@@ -13,31 +13,8 @@
   justify-content: center;
   
   color: var(--text-tertiary);
-  opacity: 0;
-  animation: scrollIndicatorIn 600ms ease 200ms forwards;
+  opacity: 1;
   pointer-events: none;
-}
-
-@keyframes scrollIndicatorIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Single subtle pulse then hold — not a loop */
-.scroll-indicator svg {
-  animation: scrollChevronPulse 1.8s ease 800ms 1 forwards;
-}
-
-@keyframes scrollChevronPulse {
-  0%   { opacity: 1; }
-  50%  { opacity: 0.4; }
-  100% { opacity: 1; }
 }
 
 /* Desktop — hidden (scroll is obvious with visible scrollbar) */
@@ -50,11 +27,6 @@
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .scroll-indicator {
-    animation: none;
     opacity: 0.8;
-  }
-  
-  .scroll-indicator svg {
-    animation: none;
   }
 }
