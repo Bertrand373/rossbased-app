@@ -155,7 +155,7 @@ const PlanModal = ({
             <div className="plan-feature">AI pattern recognition that learns you</div>
             <div className="plan-feature">Full benefit analytics and trend charts</div>
             <div className="plan-feature">Personalized relapse prediction</div>
-            <div className="plan-feature">25 daily Oracle messages</div>
+            <div className="plan-feature">3 daily Oracle messages</div>
             <div className="plan-feature">Subliminal mind program</div>
           </div>
 

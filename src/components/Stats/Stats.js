@@ -8,6 +8,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 import './Stats.css';
 import '../../styles/BottomSheet.css';
 import useSheetSwipe from '../../hooks/useSheetSwipe';
+import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 import toast from 'react-hot-toast';
 
 // Import extracted components
@@ -108,6 +109,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setSelectedMilestone(null);
   }, []);
   useSheetSwipe(sheetPanelRef, sheetVisible, handleSwipeDismiss);
+  useBodyScrollLock(sheetVisible);
   
   // Detect theme changes for chart colors
   useEffect(() => {
