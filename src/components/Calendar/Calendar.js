@@ -132,9 +132,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   // Overlay animation state
   const [calSheetReady, setCalSheetReady] = useState(false);
   const calSheetPanelRef = useRef(null);
-  const calSheetTouchStartY = useRef(0);
-  const calSheetTouchDeltaY = useRef(0);
-  const calSheetIsDragging = useRef(false);
+  const metricsSheetPanelRef = useRef(null);
 
   // Journal states
   const [isEditingNote, setIsEditingNote] = useState(false);
@@ -238,63 +236,147 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     }, 300);
   }, []);
 
-  // Swipe-to-close for sheets (mobile)
-  const handleCalSheetTouchStart = useCallback((e) => {
-    calSheetTouchStartY.current = e.touches[0].clientY;
-    calSheetTouchDeltaY.current = 0;
-    calSheetIsDragging.current = false;
-  }, []);
+  // Swipe-to-close for cal sheets — full panel, smart scroll disambiguation
+  // Attaches non-passive touchmove so we can preventDefault when dragging sheet down
+  useEffect(() => {
+    const panel = calSheetPanelRef.current;
+    if (!panel || (!dayInfoModal && !moonDetailModal)) return;
 
-  const handleCalSheetTouchMove = useCallback((e) => {
-    const delta = e.touches[0].clientY - calSheetTouchStartY.current;
-    if (delta < 0) return;
-    if (delta > 10) {
-      calSheetIsDragging.current = true;
-      calSheetTouchDeltaY.current = delta;
-      if (calSheetPanelRef.current) {
-        calSheetPanelRef.current.style.transition = 'none';
-        calSheetPanelRef.current.style.transform = `translateY(${delta}px)`;
+    let startY = 0;
+    let delta = 0;
+    let dragging = false;
+    let scrollableEl = null;
+
+    const findScrollable = (target) => {
+      let el = target;
+      while (el && el !== panel) {
+        const oy = window.getComputedStyle(el).overflowY;
+        if ((oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight + 1) return el;
+        el = el.parentElement;
       }
-    }
-  }, []);
+      return null;
+    };
 
-  const handleCalSheetTouchEnd = useCallback(() => {
-    if (!calSheetIsDragging.current) return;
-    if (calSheetTouchDeltaY.current > 100 && calSheetPanelRef.current) {
-      calSheetPanelRef.current.style.transition = 'transform 250ms ease-out';
-      calSheetPanelRef.current.style.transform = 'translateY(100%)';
-      setCalSheetReady(false);
-      setTimeout(() => {
-        if (calSheetPanelRef.current) {
-          calSheetPanelRef.current.style.transition = '';
-          calSheetPanelRef.current.style.transform = '';
-        }
-        setDayInfoModal(false);
-        setMoonDetailModal(false);
-        setSelectedDate(null);
-        setSelectedMoonDate(null);
-        setIsEditingNote(false);
-        setNoteText('');
-        setSheetView('info');
-        setShowTriggerSelection(false);
-        setEditingExistingTrigger(false);
-        setSelectedTrigger('');
-        setWorkoutExercises([]);
-        setShowSuggestions(null);
-        setSwipedExerciseId(null);
-      }, 250);
-    } else if (calSheetPanelRef.current) {
-      calSheetPanelRef.current.style.transition = 'transform 250ms ease-out';
-      calSheetPanelRef.current.style.transform = '';
-      setTimeout(() => {
-        if (calSheetPanelRef.current) {
-          calSheetPanelRef.current.style.transition = '';
-        }
-      }, 250);
-    }
-    calSheetIsDragging.current = false;
-    calSheetTouchDeltaY.current = 0;
-  }, []);
+    const onStart = (e) => {
+      startY = e.touches[0].clientY;
+      delta = 0;
+      dragging = false;
+      scrollableEl = findScrollable(e.target);
+    };
+
+    const onMove = (e) => {
+      delta = e.touches[0].clientY - startY;
+      if (delta <= 0) { dragging = false; return; }
+      if (scrollableEl && scrollableEl.scrollTop > 0) { dragging = false; return; }
+      if (delta > 8) {
+        dragging = true;
+        e.preventDefault();
+        panel.style.transition = 'none';
+        panel.style.transform = `translateY(${delta}px)`;
+      }
+    };
+
+    const onEnd = () => {
+      if (!dragging) return;
+      if (delta > 100) {
+        panel.style.transition = 'transform 250ms ease-out';
+        panel.style.transform = 'translateY(100%)';
+        setCalSheetReady(false);
+        setTimeout(() => {
+          if (calSheetPanelRef.current) {
+            calSheetPanelRef.current.style.transition = '';
+            calSheetPanelRef.current.style.transform = '';
+          }
+          setDayInfoModal(false);
+          setMoonDetailModal(false);
+          setSelectedDate(null);
+          setSelectedMoonDate(null);
+          setIsEditingNote(false);
+          setNoteText('');
+          setSheetView('info');
+          setShowTriggerSelection(false);
+          setEditingExistingTrigger(false);
+          setSelectedTrigger('');
+          setWorkoutExercises([]);
+          setShowSuggestions(null);
+          setSwipedExerciseId(null);
+        }, 250);
+      } else {
+        panel.style.transition = 'transform 250ms ease-out';
+        panel.style.transform = '';
+        setTimeout(() => {
+          if (calSheetPanelRef.current) calSheetPanelRef.current.style.transition = '';
+        }, 250);
+      }
+      dragging = false;
+      delta = 0;
+    };
+
+    panel.addEventListener('touchstart', onStart, { passive: true });
+    panel.addEventListener('touchmove', onMove, { passive: false });
+    panel.addEventListener('touchend', onEnd, { passive: true });
+    return () => {
+      panel.removeEventListener('touchstart', onStart);
+      panel.removeEventListener('touchmove', onMove);
+      panel.removeEventListener('touchend', onEnd);
+    };
+  }, [dayInfoModal, moonDetailModal]);
+
+  // Swipe-to-close for metrics sheet — full panel, no scrollable content to worry about
+  useEffect(() => {
+    const panel = metricsSheetPanelRef.current;
+    if (!panel || !metricsSheetOpen) return;
+
+    let startY = 0;
+    let delta = 0;
+    let dragging = false;
+
+    const onStart = (e) => { startY = e.touches[0].clientY; delta = 0; dragging = false; };
+
+    const onMove = (e) => {
+      delta = e.touches[0].clientY - startY;
+      if (delta <= 0) { dragging = false; return; }
+      if (delta > 8) {
+        dragging = true;
+        e.preventDefault();
+        panel.style.transition = 'none';
+        panel.style.transform = `translateY(${delta}px)`;
+      }
+    };
+
+    const onEnd = () => {
+      if (!dragging) return;
+      if (delta > 80) {
+        panel.style.transition = 'transform 250ms ease-out';
+        panel.style.transform = 'translateY(100%)';
+        setMetricsSheetReady(false);
+        setTimeout(() => {
+          if (metricsSheetPanelRef.current) {
+            metricsSheetPanelRef.current.style.transition = '';
+            metricsSheetPanelRef.current.style.transform = '';
+          }
+          setMetricsSheetOpen(false);
+        }, 250);
+      } else {
+        panel.style.transition = 'transform 250ms ease-out';
+        panel.style.transform = '';
+        setTimeout(() => {
+          if (metricsSheetPanelRef.current) metricsSheetPanelRef.current.style.transition = '';
+        }, 250);
+      }
+      dragging = false;
+      delta = 0;
+    };
+
+    panel.addEventListener('touchstart', onStart, { passive: true });
+    panel.addEventListener('touchmove', onMove, { passive: false });
+    panel.addEventListener('touchend', onEnd, { passive: true });
+    return () => {
+      panel.removeEventListener('touchstart', onStart);
+      panel.removeEventListener('touchmove', onMove);
+      panel.removeEventListener('touchend', onEnd);
+    };
+  }, [metricsSheetOpen]);
 
 
   // Get trigger options from unified constants (Calendar shows ALL triggers)
@@ -1588,12 +1670,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       {dayInfoModal && selectedDate && (
         <div className={`sheet-backdrop${calSheetReady ? ' open' : ''}`} onClick={() => closeCalSheet(closeDayInfo)}>
           <div ref={calSheetPanelRef} className={`sheet-panel cal-sheet${calSheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
-            <div 
-              className="sheet-header"
-              onTouchStart={handleCalSheetTouchStart}
-              onTouchMove={handleCalSheetTouchMove}
-              onTouchEnd={handleCalSheetTouchEnd}
-            />
+            <div className="sheet-header" />
             <div className="cal-sheet-body" style={{ transition: 'height 300ms cubic-bezier(0.16, 1, 0.3, 1)' }}>
 
               {/* ---- INFO VIEW ---- */}
@@ -1731,6 +1808,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                             onTouchStart={(e) => handleExerciseTouchStart(e, exercise.id)}
                             onTouchEnd={(e) => handleExerciseTouchEnd(e, exercise.id)}
                           >
+                            <div className="workout-exercise-content">
                             <div className="workout-exercise-main">
                               <div className="workout-exercise-name-wrap">
                                 <input
@@ -1824,7 +1902,8 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                                   <span className="workout-field-unit">min</span>
                                 </div>
                               </div>
-                            </div>
+                            </div>{/* workout-exercise-main */}
+                            </div>{/* workout-exercise-content */}
                             {/* Delete button - revealed on swipe left */}
                             <button 
                               className="workout-exercise-delete"
@@ -1867,12 +1946,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       {moonDetailModal && selectedMoonDate && (
         <div className={`sheet-backdrop${calSheetReady ? ' open' : ''}`} onClick={() => closeCalSheet(closeMoonDetail)}>
           <div ref={calSheetPanelRef} className={`sheet-panel cal-sheet${calSheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
-            <div 
-              className="sheet-header"
-              onTouchStart={handleCalSheetTouchStart}
-              onTouchMove={handleCalSheetTouchMove}
-              onTouchEnd={handleCalSheetTouchEnd}
-            />
+            <div className="sheet-header" />
             <div className="calendar-modal moon-detail-modal">
             {(() => {
               const lunar = getLunarData(selectedMoonDate);
@@ -1947,7 +2021,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           ================================================================ */}
       {metricsSheetOpen && (
         <div className={`sheet-backdrop${metricsSheetReady ? ' open' : ''}`} onClick={closeMetricsSheet}>
-          <div className={`sheet-panel metrics-sheet${metricsSheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+          <div ref={metricsSheetPanelRef} className={`sheet-panel metrics-sheet${metricsSheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div className="sheet-header" />
             <div className="sheet">
               <h3 className="sheet-title">Week View Metrics</h3>

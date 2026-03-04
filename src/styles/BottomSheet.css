@@ -25,6 +25,13 @@
   -webkit-backdrop-filter: blur(4px);
 }
 
+/* Lock background scroll whenever any sheet is open */
+html:has(.sheet-backdrop.open),
+body:has(.sheet-backdrop.open) {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
 /* ============================================================
    PANEL
    ============================================================ */

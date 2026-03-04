@@ -499,9 +499,12 @@ body:has(.week-view-grid) {
   width: 10px;
   height: 2px;
   border-radius: 1px;
-  background: var(--text);
-  opacity: 0.18;
+  background: rgba(255, 255, 255, 0.65);
   pointer-events: none;
+}
+
+[data-theme="light"] .day-data-dash {
+  background: rgba(0, 0, 0, 0.5);
 }
 
 /* Future days — muted numbers */
@@ -841,9 +844,12 @@ body:has(.week-view-grid) {
 .week-data-dash {
   width: 10px;
   height: 2px;
-  background: var(--text);
+  background: rgba(255, 255, 255, 0.65);
   border-radius: 1px;
-  opacity: 0.22;
+}
+
+[data-theme="light"] .week-data-dash {
+  background: rgba(0, 0, 0, 0.5);
 }
 
 /* =============================================================================
