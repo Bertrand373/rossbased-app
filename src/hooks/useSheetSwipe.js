@@ -35,6 +35,11 @@ const useSheetSwipe = (panelRef, isOpen, onDismiss, threshold = 100) => {
     };
 
     const onStart = (e) => {
+      // If touch starts inside a no-swipe zone (e.g. sliders), don't intercept
+      if (e.target.closest('[data-no-swipe]')) {
+        startY = -1; // sentinel — onMove will bail immediately
+        return;
+      }
       startY = e.touches[0].clientY;
       delta = 0;
       dragging = false;
@@ -42,6 +47,7 @@ const useSheetSwipe = (panelRef, isOpen, onDismiss, threshold = 100) => {
     };
 
     const onMove = (e) => {
+      if (startY === -1) return; // touch started in no-swipe zone
       delta = e.touches[0].clientY - startY;
       if (delta <= 0) return;
       // If inside a scrollable area that still has content above, let it scroll
@@ -54,7 +60,7 @@ const useSheetSwipe = (panelRef, isOpen, onDismiss, threshold = 100) => {
     };
 
     const onEnd = () => {
-      if (!dragging) return;
+      if (startY === -1 || !dragging) return;
       if (delta > threshold) {
         panel.style.transition = 'transform 250ms ease-out';
         panel.style.transform = 'translateY(100%)';

@@ -1194,7 +1194,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
             <div className="benefits-modal">
               <h2 className={postLogInsight ? 'fading' : ''}>Log Benefits</h2>
               
-              <div className={`benefits-list${postLogInsight ? ' fading' : ''}`}>
+              <div className={`benefits-list${postLogInsight ? ' fading' : ''}`} data-no-swipe="true">
                 {benefitsList.map(({ key, label, desc }) => (
                   <div key={key} className="benefit-row">
                     <div className="benefit-info">
