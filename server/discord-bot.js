@@ -1513,6 +1513,7 @@ client.on('messageCreate', async (message) => {
   
   const channelName = message.channel.name?.toLowerCase();
   const authorUsername = message.author.username?.toLowerCase();
+  const username = message.member?.displayName || message.author.username;
 
   // ============================================================
   // PASSIVE OBSERVATION (runs on every human message)
@@ -1857,7 +1858,7 @@ client.on('messageCreate', async (message) => {
     await message.channel.sendTyping();
     
     // Build conversation with history
-    const username = message.member?.displayName || message.author.username;
+    // username already defined above
     const messages = await buildMessages(message.author.id, content, username);
     
     // Flat token ceiling — let Claude self-regulate length via system prompt
