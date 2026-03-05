@@ -308,7 +308,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   }, []);
 
   // Swipe-to-dismiss — non-passive native listeners so iOS respects preventDefault
-  const trackerSheetVisible = showStreakOptions || showResetConfirm || showLogLock || showBenefits || showPeakPrompt || showPatternAlert;
+  const trackerSheetVisible = showStreakOptions || showResetConfirm || showLogLock || showPeakPrompt || showPatternAlert;
   const handleSwipeDismiss = useCallback(() => {
     setShowStreakOptions(false);
     setShowResetConfirm(false);
