@@ -1133,9 +1133,13 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         ? differenceInDays(new Date(), tomorrow) + 1 
         : 0;
       
+      // Keep startDate in sync — Calendar relapse must match Tracker reset behavior
+      const newStartDate = !isAfter(tomorrow, today) ? tomorrow : new Date();
+      
       updateUserData({
         streakHistory: updatedStreakHistory,
         currentStreak: newCurrentStreak,
+        startDate: newStartDate,
         relapseCount: (userData.relapseCount || 0) + 1,
         lastRelapse: selectedDate,
         lastTrigger: selectedTrigger
@@ -1216,6 +1220,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       streakHistory: updatedStreakHistory,
       currentStreak: newCurrentStreak,
       longestStreak: newLongestStreak,
+      startDate: activeStreak ? new Date(activeStreak.start) : new Date(),
       relapseCount: Math.max((userData.relapseCount || 1) - 1, 0)
     });
     
