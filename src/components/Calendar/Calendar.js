@@ -149,6 +149,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [workoutExercises, setWorkoutExercises] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(null); // index of active suggestion dropdown
   const [swipedExerciseId, setSwipedExerciseId] = useState(null); // exercise showing delete
+  const [removingExerciseId, setRemovingExerciseId] = useState(null);
   const exerciseTouchStartX = useRef(0);
 
   // Week view metric selection
@@ -747,19 +748,25 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   };
 
   const deleteExercise = (id) => {
-    const updated = workoutExercises.filter(e => e.id !== id);
-    setWorkoutExercises(updated);
+    setRemovingExerciseId(id);
     setSwipedExerciseId(null);
-    persistWorkout(updated); // Save immediately — don't rely on Done button
+    setTimeout(() => {
+      const updated = workoutExercises.filter(e => e.id !== id);
+      setWorkoutExercises(updated);
+      setRemovingExerciseId(null);
+      persistWorkout(updated); // Save immediately to MongoDB
+    }, 280);
   };
 
   // Swipe-to-reveal delete on exercise rows
   const handleExerciseTouchStart = (e, id) => {
+    if (e.target.closest('.workout-exercise-delete')) return;
     exerciseTouchStartX.current = e.touches[0].clientX;
     setSwipedExerciseId(null); // Reset any previously swiped
   };
 
   const handleExerciseTouchEnd = (e, id) => {
+    if (e.target.closest('.workout-exercise-delete')) return;
     const deltaX = e.changedTouches[0].clientX - exerciseTouchStartX.current;
     if (deltaX < -60) {
       setSwipedExerciseId(id); // Reveal delete button
@@ -1795,7 +1802,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                         {workoutExercises.map((exercise, index) => (
                           <div 
                             key={exercise.id} 
-                            className={`workout-exercise-row${swipedExerciseId === exercise.id ? ' swiped' : ''}`}
+                            className={`workout-exercise-row${swipedExerciseId === exercise.id ? ' swiped' : ''}${removingExerciseId === exercise.id ? ' removing' : ''}`}
                             onTouchStart={(e) => handleExerciseTouchStart(e, exercise.id)}
                             onTouchEnd={(e) => handleExerciseTouchEnd(e, exercise.id)}
                           >
@@ -1898,6 +1905,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                             {/* Delete button - revealed on swipe left */}
                             <button 
                               className="workout-exercise-delete"
+                              onTouchStart={(e) => e.stopPropagation()}
                               onClick={() => deleteExercise(exercise.id)}
                             >
                               ×
