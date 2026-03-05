@@ -532,7 +532,7 @@
   -webkit-appearance: none !important;
   appearance: none !important;
   -webkit-tap-highlight-color: transparent;
-  touch-action: pan-y;
+  touch-action: none; /* Override [data-no-swipe] pan-y — sliders are fully JS-controlled */
 }
 
 .benefit-slider input[type="range"]::-webkit-slider-runnable-track {

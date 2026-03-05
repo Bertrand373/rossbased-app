@@ -7,6 +7,7 @@ import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { format } from 'date-fns';
 import './ShareCard.css';
 import '../../styles/BottomSheet.css';
+import useSheetSwipe from '../../hooks/useSheetSwipe';
 
 // Share icon (iOS style)
 const ShareIcon = () => (
@@ -34,11 +35,6 @@ const ShareCard = ({ userData, isVisible = true }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const canvasRef = useRef(null);
   const panelRef = useRef(null);
-  
-  // Swipe-to-close refs
-  const touchStartY = useRef(0);
-  const touchDeltaY = useRef(0);
-  const isDragging = useRef(false);
   
   // Theme detection
   const [isDarkTheme, setIsDarkTheme] = useState(() => {
@@ -205,59 +201,10 @@ const ShareCard = ({ userData, isVisible = true }) => {
     setTimeout(() => {
       setShowPreview(false);
       document.body.style.overflow = '';
-    }, 300); // Match CSS transition duration
+    }, 300);
   }, []);
 
-  // Swipe-to-close (mobile drawer) - matches Oracle pattern
-  const handleTouchStart = useCallback((e) => {
-    touchStartY.current = e.touches[0].clientY;
-    touchDeltaY.current = 0;
-    isDragging.current = false;
-  }, []);
-
-  const handleTouchMove = useCallback((e) => {
-    const delta = e.touches[0].clientY - touchStartY.current;
-    if (delta < 0) return; // Only allow downward swipe
-    if (delta > 10) {
-      isDragging.current = true;
-      touchDeltaY.current = delta;
-      if (panelRef.current) {
-        panelRef.current.style.transition = 'none';
-        panelRef.current.style.transform = `translateY(${delta}px)`;
-      }
-    }
-  }, []);
-
-  const handleTouchEnd = useCallback(() => {
-    if (!isDragging.current) return;
-    
-    if (touchDeltaY.current > 100 && panelRef.current) {
-      // Threshold met — animate out and close
-      panelRef.current.style.transition = 'transform 250ms ease-out';
-      panelRef.current.style.transform = 'translateY(100%)';
-      setPreviewOpen(false);
-      setTimeout(() => {
-        if (panelRef.current) {
-          panelRef.current.style.transition = '';
-          panelRef.current.style.transform = '';
-        }
-        setShowPreview(false);
-        document.body.style.overflow = '';
-      }, 250);
-    } else if (panelRef.current) {
-      // Below threshold — snap back
-      panelRef.current.style.transition = 'transform 250ms ease-out';
-      panelRef.current.style.transform = '';
-      setTimeout(() => {
-        if (panelRef.current) {
-          panelRef.current.style.transition = '';
-        }
-      }, 250);
-    }
-    
-    isDragging.current = false;
-    touchDeltaY.current = 0;
-  }, []);
+  useSheetSwipe(panelRef, previewOpen, closePreview);
 
   // Handle share action
   const handleShare = async () => {
@@ -350,13 +297,7 @@ const ShareCard = ({ userData, isVisible = true }) => {
             onClick={e => e.stopPropagation()}
           >
             {/* Header - swipe target */}
-            <div 
-              className="sheet-header"
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-            >
-            </div>
+            <div className="sheet-header" />
 
             <div className="share-modal-card">
               <span className="share-modal-day">{streak}</span>

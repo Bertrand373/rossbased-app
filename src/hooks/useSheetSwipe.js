@@ -35,6 +35,13 @@ const useSheetSwipe = (panelRef, isOpen, onDismiss, threshold = 100) => {
     };
 
     const onStart = (e) => {
+      // If touch starts on a form input (range sliders), don't intercept.
+      // iOS can report the touch target as an internal part of the input element,
+      // bypassing the [data-no-swipe] ancestor check — catch it explicitly here.
+      if (e.target.tagName === 'INPUT') {
+        startY = -1;
+        return;
+      }
       // If touch starts inside a no-swipe zone (e.g. sliders), don't intercept
       if (e.target.closest('[data-no-swipe]')) {
         startY = -1; // sentinel — onMove will bail immediately
