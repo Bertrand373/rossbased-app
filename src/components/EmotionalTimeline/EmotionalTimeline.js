@@ -8,6 +8,7 @@ import { FaCheck, FaExclamationTriangle } from 'react-icons/fa';
 
 // Body scroll lock for modals
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
+import useSheetSwipe from '../../hooks/useSheetSwipe';
 
 const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal }) => {
   const [selectedPhase, setSelectedPhase] = useState(null);
@@ -16,9 +17,6 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
 
   // Swipe-to-dismiss refs
   const sheetPanelRef = useRef(null);
-  const touchStartY = useRef(0);
-  const touchDeltaY = useRef(0);
-  const isDragging = useRef(false);
 
   // Lock body scroll when modal is open
   useBodyScrollLock(showModal);
@@ -368,37 +366,7 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
     }, 300);
   };
 
-  // Swipe-to-dismiss handlers
-  const onTouchStart = useCallback((e) => {
-    touchStartY.current = e.touches[0].clientY;
-    touchDeltaY.current = 0;
-    isDragging.current = false;
-  }, []);
-
-  const onTouchMove = useCallback((e) => {
-    const delta = e.touches[0].clientY - touchStartY.current;
-    if (delta < 0) return;
-    if (delta > 10) {
-      isDragging.current = true;
-      touchDeltaY.current = delta;
-      if (sheetPanelRef.current) {
-        sheetPanelRef.current.style.transform = `translateY(${delta}px)`;
-        sheetPanelRef.current.style.transition = 'none';
-      }
-    }
-  }, []);
-
-  const onTouchEnd = useCallback(() => {
-    if (!isDragging.current) return;
-    if (sheetPanelRef.current) {
-      sheetPanelRef.current.style.transition = '';
-      sheetPanelRef.current.style.transform = '';
-    }
-    if (touchDeltaY.current > 80) {
-      closeModal();
-    }
-    isDragging.current = false;
-  }, []);
+  useSheetSwipe(sheetPanelRef, modalOpen, closeModal);
 
   return (
     <>
@@ -505,12 +473,7 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
       {showModal && selectedPhase && (
         <div className={`sheet-backdrop${modalOpen ? ' open' : ''}`} onClick={closeModal}>
           <div ref={sheetPanelRef} className={`sheet-panel et-sheet${modalOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
-            <div 
-              className="sheet-header"
-              onTouchStart={onTouchStart}
-              onTouchMove={onTouchMove}
-              onTouchEnd={onTouchEnd}
-            />
+            <div className="sheet-header" />
 
             <div className="et-sheet-header">
               <span className="et-sheet-num">
