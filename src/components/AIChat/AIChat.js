@@ -67,6 +67,8 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   const chatBodyRef = useRef(null);
   const panelRef = useRef(null);
   const hasTrackedOpen = useRef(false);
+  const streamingMessageRef = useRef(null);
+  const hasScrolledToStreamStart = useRef(false);
 
   // Track chat opened (once per open)
   useEffect(() => {
@@ -103,12 +105,26 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     }
   }, [messages]);
 
-  // Scroll to bottom on new messages
+  // Scroll to bottom when user sends a message (to reveal loading indicator)
   useEffect(() => {
-    if (messagesEndRef.current && isOpen) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (!isOpen) return;
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg?.role === 'user') {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, streamingText, isOpen]);
+  }, [messages, isOpen]);
+
+  // Scroll to TOP of Oracle response once when streaming begins
+  useEffect(() => {
+    if (!isOpen) return;
+    if (streamingText && !hasScrolledToStreamStart.current) {
+      hasScrolledToStreamStart.current = true;
+      streamingMessageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    if (!streamingText) {
+      hasScrolledToStreamStart.current = false;
+    }
+  }, [streamingText, isOpen]);
 
   // Focus input when chat opens
   useEffect(() => {
@@ -412,7 +428,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
 
             {/* Streaming response */}
             {streamingText && (
-              <div className="ai-chat-message assistant">
+              <div ref={streamingMessageRef} className="ai-chat-message assistant">
                 <div className="ai-chat-message-row">
                   <img src="/The_Oracle.png" alt="" className="ai-chat-avatar" />
                   <div className="ai-chat-message-content streaming">
