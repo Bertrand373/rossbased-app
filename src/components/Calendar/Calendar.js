@@ -1906,6 +1906,8 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                             {/* Delete button - revealed on swipe left */}
                             <button 
                               className="workout-exercise-delete"
+                              onTouchStart={(e) => e.stopPropagation()}
+                              onTouchEnd={(e) => { e.stopPropagation(); deleteExercise(exercise.id); }}
                               onClick={() => deleteExercise(exercise.id)}
                             >
                               ×
