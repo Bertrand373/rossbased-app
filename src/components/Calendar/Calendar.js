@@ -709,9 +709,48 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     ));
   };
 
+  // Core save logic — accepts exercises array directly (state is async, can't rely on it)
+  const persistWorkout = (exercises) => {
+    if (!selectedDate || !updateUserData) return;
+    const validExercises = exercises
+      .filter(e => e.name && e.name.trim())
+      .map(e => ({
+        name: e.name.trim(),
+        weight: Number(e.weight) || 0,
+        sets: Number(e.sets) || 0,
+        reps: Number(e.reps) || 0,
+        restMinutes: Number(e.restMinutes) || 0
+      }));
+    const dayStr = format(selectedDate, 'yyyy-MM-dd');
+    if (validExercises.length === 0) {
+      const updatedLog = (userData.workoutLog || []).filter(w =>
+        format(new Date(w.date), 'yyyy-MM-dd') !== dayStr
+      );
+      updateUserData({ workoutLog: updatedLog });
+    } else {
+      const dayCount = getDayCount(selectedDate);
+      const streakDay = dayCount?.dayNumber || 0;
+      const spermaDay = streakDay > 0 ? ((streakDay - 1) % 72) + 1 : 0;
+      const spermaCycle = streakDay > 0 ? Math.floor((streakDay - 1) / 72) + 1 : 0;
+      const workoutEntry = { date: selectedDate, streakDay, spermaDay, spermaCycle, exercises: validExercises };
+      const existingLog = [...(userData.workoutLog || [])];
+      const existingIdx = existingLog.findIndex(w =>
+        format(new Date(w.date), 'yyyy-MM-dd') === dayStr
+      );
+      if (existingIdx !== -1) {
+        existingLog[existingIdx] = workoutEntry;
+      } else {
+        existingLog.push(workoutEntry);
+      }
+      updateUserData({ workoutLog: existingLog });
+    }
+  };
+
   const deleteExercise = (id) => {
-    setWorkoutExercises(prev => prev.filter(e => e.id !== id));
+    const updated = workoutExercises.filter(e => e.id !== id);
+    setWorkoutExercises(updated);
     setSwipedExerciseId(null);
+    persistWorkout(updated); // Save immediately — don't rely on Done button
   };
 
   // Swipe-to-reveal delete on exercise rows
@@ -730,56 +769,9 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   // Save workout and transition back to day info
   const saveWorkout = () => {
     if (!selectedDate || !updateUserData) return;
-    
-    // Filter out empty rows
-    const validExercises = workoutExercises
-      .filter(e => e.name && e.name.trim())
-      .map(e => ({
-        name: e.name.trim(),
-        weight: Number(e.weight) || 0,
-        sets: Number(e.sets) || 0,
-        reps: Number(e.reps) || 0,
-        restMinutes: Number(e.restMinutes) || 0
-      }));
-    
-    const dayStr = format(selectedDate, 'yyyy-MM-dd');
-    
-    if (validExercises.length === 0) {
-      // Remove workout entry for this day
-      const updatedLog = (userData.workoutLog || []).filter(w => 
-        format(new Date(w.date), 'yyyy-MM-dd') !== dayStr
-      );
-      updateUserData({ workoutLog: updatedLog });
-      toast.success('Workout cleared');
-    } else {
-      // Calculate spermatogenesis cycle data
-      const dayCount = getDayCount(selectedDate);
-      const streakDay = dayCount?.dayNumber || 0;
-      const spermaDay = streakDay > 0 ? ((streakDay - 1) % 72) + 1 : 0;
-      const spermaCycle = streakDay > 0 ? Math.floor((streakDay - 1) / 72) + 1 : 0;
-      
-      const workoutEntry = {
-        date: selectedDate,
-        streakDay,
-        spermaDay,
-        spermaCycle,
-        exercises: validExercises
-      };
-      
-      const existingLog = [...(userData.workoutLog || [])];
-      const existingIdx = existingLog.findIndex(w => 
-        format(new Date(w.date), 'yyyy-MM-dd') === dayStr
-      );
-      
-      if (existingIdx !== -1) {
-        existingLog[existingIdx] = workoutEntry;
-      } else {
-        existingLog.push(workoutEntry);
-      }
-      
-      updateUserData({ workoutLog: existingLog });
-      toast.success('Workout saved');
-    }
+    persistWorkout(workoutExercises);
+    const hasValid = workoutExercises.some(e => e.name && e.name.trim());
+    toast.success(hasValid ? 'Workout saved' : 'Workout cleared');
     
     // Transition back to day info
     setCalSheetReady(false);
@@ -1906,8 +1898,6 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                             {/* Delete button - revealed on swipe left */}
                             <button 
                               className="workout-exercise-delete"
-                              onTouchStart={(e) => e.stopPropagation()}
-                              onTouchEnd={(e) => { e.stopPropagation(); deleteExercise(exercise.id); }}
                               onClick={() => deleteExercise(exercise.id)}
                             >
                               ×
