@@ -136,6 +136,66 @@ function buildPulseEmbed(text) {
 }
 
 // ============================================================
+// GATE RESPONSE GENERATOR
+// Haiku generates graceful access-boundary messages in Oracle's voice.
+// These auto-delete after 60s so the channel stays clean regardless
+// of server restarts or whether the user deletes their message.
+// A distinct footer ("Daily limit reached", etc.) visually separates
+// these from real Oracle responses so users know this is a boundary.
+// ============================================================
+
+const GATE_SYSTEM = `You write very short access-boundary messages for Oracle, the AI guide inside TitanTrack — a semen retention tracking app. Oracle is a powerful, personalized AI. Access is deliberately limited.
+
+The user has hit a boundary (not linked, or hit their daily/weekly limit). Write 1-3 sentences in Oracle's voice — calm, direct, unhurried. You are not answering their question. You are holding the boundary with presence.
+
+Rules:
+- Never hint at or answer their actual question
+- For limit hits: acknowledge the boundary, briefly suggest they return with something more refined and specific — quality over volume
+- Never use em dashes. No bullet points. No flattery. No AI-speak.
+- Under 60 words`;
+
+async function generateGateResponse(reason, userMessage, username) {
+  const prompts = {
+    unlinked: `User "${username}" tried to use Oracle without a linked TitanTrack account. Their message: "${userMessage.substring(0, 120)}"
+
+Write a brief message: Oracle requires a linked TitanTrack account. Connect at titantrack.app. Give them a sense of what they're missing.`,
+
+    daily: `User "${username}" hit their daily Oracle limit. Their message: "${userMessage.substring(0, 120)}"
+
+Write a brief message: the boundary is reached for today. Resets at midnight. Nudge them to return tomorrow with a more focused, specific question — something worth their one daily exchange.`,
+
+    weekly: `User "${username}" is a free member who used all 3 weekly messages. Their message: "${userMessage.substring(0, 120)}"
+
+Write a brief message: weekly limit reached, resets Monday. Mention they can upgrade to Premium at titantrack.app for daily access.`
+  };
+
+  try {
+    const response = await anthropic.messages.create({
+      model: NOTE_MODEL,
+      max_tokens: 100,
+      system: GATE_SYSTEM,
+      messages: [{ role: 'user', content: prompts[reason] || prompts.daily }]
+    });
+    return response.content[0].text.trim();
+  } catch (err) {
+    console.error('generateGateResponse error:', err.message);
+    const fallbacks = {
+      unlinked: 'Oracle is available to linked TitanTrack members. Connect your account at titantrack.app to access it here.',
+      daily: 'The daily limit has been reached. Return tomorrow with something specific. Precision gets a deeper answer.',
+      weekly: 'Three messages for the week. The limit resets Monday. Upgrade to Premium at titantrack.app for daily access.'
+    };
+    return fallbacks[reason] || fallbacks.daily;
+  }
+}
+
+function buildGateEmbed(text, footerLabel) {
+  return new EmbedBuilder()
+    .setColor(ORACLE_COLOR)
+    .setDescription(text)
+    .setFooter({ text: `Oracle · ${footerLabel}`, iconURL: 'https://titantrack.app/The_Oracle.png' });
+}
+
+// ============================================================
 // SYSTEM PROMPT - Oracle Identity
 // ============================================================
 
@@ -1773,30 +1833,21 @@ client.on('messageCreate', async (message) => {
       return;
     }
     if (rateLimited.reason === 'unlinked') {
-      // Not linked — direct them to the app. No long explanation.
-      await message.reply({ embeds: [buildOracleEmbed('Oracle is available to linked TitanTrack members. Connect your account at titantrack.app to access it here.')] });
+      const gateText = await generateGateResponse('unlinked', content, username);
+      const gateMsg = await message.reply({ embeds: [buildGateEmbed(gateText, 'titantrack.app')] });
+      setTimeout(() => gateMsg.delete().catch(() => {}), 60000);
       return;
     }
     if (rateLimited.reason === 'daily') {
-      const dailyLimitMessages = [
-        'You\'ve drawn enough from the well today. Let what you\'ve received settle. Return tomorrow.',
-        'Oracle has spoken enough for one day. Sit with what you\'ve been given.',
-        'One exchange is the boundary. Integration matters more than accumulation. Tomorrow.',
-        'Enough for today. Real growth happens between the conversations, not during them.',
-        'The well refills at midnight. Until then, apply what you already know.',
-        'Silence is part of the teaching. Sit with today\'s words.',
-        'You have what you need for now. Come back when the sun does.',
-        'Oracle rests. Not every answer comes from asking.',
-        'Today\'s thread is complete. Tomorrow brings a new one.',
-        'Some answers only surface after you stop asking. Tomorrow.',
-        'The signal fades when drawn from too often. Let it rebuild overnight.',
-      ];
-      const limitMsg = dailyLimitMessages[Math.floor(Math.random() * dailyLimitMessages.length)];
-      await message.reply({ embeds: [buildOracleEmbed(limitMsg)] });
+      const gateText = await generateGateResponse('daily', content, username);
+      const gateMsg = await message.reply({ embeds: [buildGateEmbed(gateText, 'Daily limit reached · Resets at midnight')] });
+      setTimeout(() => gateMsg.delete().catch(() => {}), 60000);
       return;
     }
     if (rateLimited.reason === 'weekly') {
-      await message.reply({ embeds: [buildOracleEmbed('You\'ve used your 3 Oracle messages for the week. The limit resets Monday. Upgrade to Premium at titantrack.app for daily access.')] });
+      const gateText = await generateGateResponse('weekly', content, username);
+      const gateMsg = await message.reply({ embeds: [buildGateEmbed(gateText, 'Weekly limit reached · Resets Monday · titantrack.app')] });
+      setTimeout(() => gateMsg.delete().catch(() => {}), 60000);
       return;
     }
   }
