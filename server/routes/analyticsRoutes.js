@@ -258,13 +258,21 @@ router.get('/users', adminCheck, async (req, res) => {
     if (sort === 'active') sortObj = { lastSeen: -1 };
 
     const users = await User.find({},
-      'username email currentStreak longestStreak relapseCount isPremium subscription.status subscription.trialEndDate subscription.currentPeriodEnd createdAt updatedAt lastSeen benefitTracking urgeLog aiUsage showOnLeaderboard discordUsername'
+      'username email currentStreak startDate longestStreak relapseCount isPremium subscription.status subscription.trialEndDate subscription.currentPeriodEnd createdAt updatedAt lastSeen benefitTracking urgeLog aiUsage showOnLeaderboard discordUsername'
     ).sort(sortObj).limit(parseInt(limit)).lean();
 
     res.json({
-      users: users.map(u => ({
+      users: users.map(u => {
+        // Compute real-time streak from startDate (same as Oracle)
+        let streak = u.currentStreak || 0;
+        if (u.startDate) {
+          const start = new Date(u.startDate); start.setHours(0, 0, 0, 0);
+          const today = new Date(); today.setHours(0, 0, 0, 0);
+          streak = Math.max(1, Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1);
+        }
+        return {
         username: u.username, email: u.email || '',
-        currentStreak: u.currentStreak || 0, longestStreak: u.longestStreak || 0,
+        currentStreak: streak, longestStreak: Math.max(u.longestStreak || 0, streak),
         relapses: u.relapseCount || 0, 
         isPremium: (() => {
           const s = u.subscription;
@@ -279,7 +287,7 @@ router.get('/users', adminCheck, async (req, res) => {
         aiMessages: u.aiUsage?.lifetimeCount || 0,
         leaderboard: u.showOnLeaderboard || false, discord: u.discordUsername || '',
         joinedAt: u.createdAt, lastActive: u.lastSeen || u.updatedAt
-      })),
+      }; }),
       total: await User.countDocuments()
     });
   } catch (error) {
