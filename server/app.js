@@ -29,6 +29,8 @@ const { initializeSchedulers } = require('./services/notificationScheduler');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 const { getCommunityPulse } = require('./services/communityPulse');
 const { getOutcomePatterns } = require('./services/outcomeAggregation');
+const { runYouTubeFetch, getYouTubeStats } = require('./services/youtubeComments');
+const { runContentPipeline, getLatestReport } = require('./services/youtubeContentPipeline');
 const { classifyInteraction, backfillRelapseFlag } = require('./services/interactionClassifier');
 const OracleInteraction = require('./models/OracleInteraction');
 const OracleUsage = require('./models/OracleUsage');
@@ -268,6 +270,41 @@ mongoose.connect(mongoUri, {
           console.error('Onboarding notification job error:', err.message);
         }
       }, 2 * 60 * 60 * 1000); // Every 2 hours
+
+      // ============================================
+      // YOUTUBE COMMENT FETCH (runs every 6 hours)
+      // Pulls comments from own channel + niche SR videos
+      // Feeds into Community Pulse and Content Pipeline
+      // ============================================
+      if (process.env.YOUTUBE_API_KEY && process.env.YOUTUBE_CHANNEL_ID) {
+        // Delay first run by 2 minutes (let server stabilize)
+        setTimeout(() => {
+          runYouTubeFetch().catch(e => console.error('YouTube initial fetch error:', e.message));
+        }, 2 * 60 * 1000);
+
+        setInterval(async () => {
+          try {
+            await runYouTubeFetch();
+          } catch (e) {
+            console.error('YouTube fetch cron error:', e.message);
+          }
+        }, 6 * 60 * 60 * 1000); // Every 6 hours
+
+        // Content pipeline — runs once daily (offset by 3 hours from fetch)
+        setTimeout(() => {
+          setInterval(async () => {
+            try {
+              await runContentPipeline();
+            } catch (e) {
+              console.error('Content pipeline cron error:', e.message);
+            }
+          }, 24 * 60 * 60 * 1000); // Every 24 hours
+        }, 3 * 60 * 60 * 1000); // First run 3 hours after startup
+
+        console.log('📺 YouTube comment fetch + content pipeline scheduled');
+      } else {
+        console.log('⚠️ YOUTUBE_API_KEY or YOUTUBE_CHANNEL_ID not set — YouTube integration disabled');
+      }
     } catch (error) {
       console.error('Failed to initialize schedulers:', error);
     }
@@ -2341,6 +2378,63 @@ app.get('/api/oracle-insights/trending-topics', authenticate, async (req, res) =
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// ============================================
+// YOUTUBE INTELLIGENCE (admin only)
+// Stats, manual triggers, and content pipeline
+// ============================================
+
+// GET /api/admin/youtube/stats — Overview of YouTube comment data
+app.get('/api/admin/youtube/stats', authenticate, async (req, res) => {
+  if (req.user.username.toLowerCase() !== 'rossbased' && req.user.username.toLowerCase() !== 'ross') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+  try {
+    const stats = await getYouTubeStats();
+    const pipeline = getLatestReport();
+    res.json({ youtube: stats, contentPipeline: pipeline });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/admin/youtube/fetch — Manually trigger a YouTube comment fetch
+app.post('/api/admin/youtube/fetch', authenticate, async (req, res) => {
+  if (req.user.username.toLowerCase() !== 'rossbased' && req.user.username.toLowerCase() !== 'ross') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+  try {
+    const result = await runYouTubeFetch();
+    res.json({ message: 'YouTube fetch complete', result });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/admin/youtube/pipeline — Manually trigger the content pipeline
+app.post('/api/admin/youtube/pipeline', authenticate, async (req, res) => {
+  if (req.user.username.toLowerCase() !== 'rossbased' && req.user.username.toLowerCase() !== 'ross') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+  try {
+    const report = await runContentPipeline();
+    res.json({ message: 'Content pipeline complete', report });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/admin/youtube/pipeline-report — Get latest content pipeline report
+app.get('/api/admin/youtube/pipeline-report', authenticate, async (req, res) => {
+  if (req.user.username.toLowerCase() !== 'rossbased' && req.user.username.toLowerCase() !== 'ross') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+  const data = getLatestReport();
+  if (!data.report) {
+    return res.json({ message: 'No pipeline report generated yet. Trigger one with POST /api/admin/youtube/pipeline', ...data });
+  }
+  res.json(data);
 });
 
 // ============================================
