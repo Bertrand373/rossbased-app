@@ -986,7 +986,7 @@ const splitResponse = (text) => {
 // Every DM includes a persistent command footer — no memorization needed.
 // ============================================================
 
-const ADMIN_DM_FOOTER = '!status · !revenue · !users · !pool · !models · !brief · !pulse-stats · !announce · !reset-channel #name confirm';
+const ADMIN_DM_FOOTER = '!status · !revenue · !users · !pool · !models · !brief · !pulse-stats · !youtube · !content · !announce · !reset-channel #name confirm';
 const ORACLE_ICON = 'https://titantrack.app/The_Oracle.png';
 const BRIEFING_HOUR_ET = parseInt(process.env.BRIEFING_HOUR || '9'); // 9am ET default
 
@@ -1178,6 +1178,8 @@ async function handleAdminDM(message) {
       case '!models': return await dmModels(message);
       case '!brief': return await dmBriefing(message);
       case '!pulse-stats': return await dmPulseStats(message);
+      case '!youtube': return await dmYouTube(message);
+      case '!content': return await dmContent(message);
       case '!announce': return await dmAnnounce(message);
       case '!reset-channel': return await dmResetChannel(message);
       default:
@@ -1210,6 +1212,142 @@ async function dmPulseStats(message) {
     .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
     .setTimestamp();
   await message.reply({ embeds: [embed] });
+}
+
+async function dmYouTube(message) {
+  try {
+    const { getYouTubeStats, runYouTubeFetch } = require('./services/youtubeComments');
+    const args = message.content.trim().toLowerCase().split(/\s+/);
+
+    // !youtube fetch — triggers manual fetch
+    if (args[1] === 'fetch') {
+      await message.reply('Fetching YouTube comments...');
+      const result = await runYouTubeFetch();
+      const embed = new EmbedBuilder()
+        .setColor(ORACLE_COLOR)
+        .setTitle('📺 YouTube Fetch Complete')
+        .setDescription(
+          `**Own channel:** ${result.own.fetched} fetched, ${result.own.new} new\n` +
+          `**Niche:** ${result.niche.fetched} fetched, ${result.niche.new} new\n` +
+          (result.niche.terms ? `**Terms:** ${result.niche.terms.join(', ')}` : '')
+        )
+        .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
+        .setTimestamp();
+      return await message.reply({ embeds: [embed] });
+    }
+
+    // Default: show stats
+    const stats = await getYouTubeStats();
+    const embed = new EmbedBuilder()
+      .setColor(ORACLE_COLOR)
+      .setTitle('📺 YouTube Intelligence')
+      .setDescription(
+        `**Total comments:** ${stats.total.toLocaleString()}\n` +
+        `**Own channel:** ${stats.own.toLocaleString()}\n` +
+        `**Niche-wide:** ${stats.niche.toLocaleString()}\n` +
+        `**Last 24h:** ${stats.last24h.toLocaleString()}\n` +
+        `**Last 7d:** ${stats.last7d.toLocaleString()}\n\n` +
+        `Use \`!youtube fetch\` to trigger a manual pull.`
+      )
+      .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
+      .setTimestamp();
+    await message.reply({ embeds: [embed] });
+  } catch (err) {
+    await message.reply(`YouTube stats failed: ${err.message}`);
+  }
+}
+
+async function dmContent(message) {
+  try {
+    const { getLatestReport, runContentPipeline } = require('./services/youtubeContentPipeline');
+    const args = message.content.trim().toLowerCase().split(/\s+/);
+
+    // !content run — triggers a fresh pipeline analysis
+    if (args[1] === 'run') {
+      await message.reply('Running content pipeline...');
+      const result = await runContentPipeline();
+      if (result.skipped) {
+        return await message.reply(`Not enough unprocessed comments (${result.commentCount}). Need 20+. Run \`!youtube fetch\` first.`);
+      }
+      if (result.error) {
+        return await message.reply(`Pipeline error: ${result.error}`);
+      }
+      // Fall through to display the report
+    }
+
+    const data = getLatestReport();
+    if (!data.report) {
+      return await message.reply('No content report yet. Run `!content run` to generate one.');
+    }
+
+    const report = data.report;
+
+    // Handle parse errors (raw text response)
+    if (report.parseError) {
+      // Still useful — send the raw analysis
+      const chunks = report.raw.match(/[\s\S]{1,1900}/g) || [report.raw];
+      for (const chunk of chunks) {
+        await message.reply(chunk);
+      }
+      return;
+    }
+
+    // Build clean formatted embeds
+    // FAQ Patterns
+    if (report.faq_patterns && report.faq_patterns.length > 0) {
+      const faqLines = report.faq_patterns.map((f, i) =>
+        `**${i + 1}. ${f.question}**\n` +
+        `Seen ~${f.frequency}x · Source: ${f.source}\n` +
+        `→ ${f.video_opportunity}`
+      ).join('\n\n');
+
+      const faqEmbed = new EmbedBuilder()
+        .setColor(ORACLE_COLOR)
+        .setTitle('🎯 FAQ Patterns — Video Opportunities')
+        .setDescription(faqLines.substring(0, 4000))
+        .setFooter({ text: `Oracle · ${data.report.commentsAnalyzed?.total || '?'} comments analyzed`, iconURL: ORACLE_ICON });
+      await message.reply({ embeds: [faqEmbed] });
+    }
+
+    // Trending Struggles
+    if (report.trending_struggles && report.trending_struggles.length > 0) {
+      const struggleLines = report.trending_struggles.map(s =>
+        `**${s.topic}** [${s.severity}]\n${s.description}`
+      ).join('\n\n');
+
+      const struggleEmbed = new EmbedBuilder()
+        .setColor(ORACLE_COLOR)
+        .setTitle('🔥 Trending Struggles')
+        .setDescription(struggleLines.substring(0, 4000));
+      await message.reply({ embeds: [struggleEmbed] });
+    }
+
+    // Content Gaps
+    if (report.content_gaps && report.content_gaps.length > 0) {
+      const gapLines = report.content_gaps.map(g =>
+        `**${g.topic}**\n${g.rationale}`
+      ).join('\n\n');
+
+      const gapEmbed = new EmbedBuilder()
+        .setColor(ORACLE_COLOR)
+        .setTitle('💡 Content Gaps')
+        .setDescription(gapLines.substring(0, 4000));
+      await message.reply({ embeds: [gapEmbed] });
+    }
+
+    // Niche Pulse
+    if (report.niche_pulse) {
+      const pulseEmbed = new EmbedBuilder()
+        .setColor(ORACLE_COLOR)
+        .setTitle('🌐 Niche Pulse')
+        .setDescription(report.niche_pulse)
+        .setFooter({ text: `Generated ${data.age} · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON });
+      await message.reply({ embeds: [pulseEmbed] });
+    }
+
+  } catch (err) {
+    await message.reply(`Content report failed: ${err.message}`);
+  }
 }
 
 async function dmAnnounce(message) {
@@ -1841,13 +1979,13 @@ client.on('messageCreate', async (message) => {
     }
     if (rateLimited.reason === 'daily') {
       const gateText = await generateGateResponse('daily', content, username);
-      const gateMsg = await message.reply({ embeds: [buildGateEmbed(gateText, 'Daily limit reached · Resets at midnight')] });
+      const gateMsg = await message.reply({ embeds: [buildGateEmbed(gateText, 'Daily limit · Resets midnight ')] });
       setTimeout(() => gateMsg.delete().catch(() => {}), 60000);
       return;
     }
     if (rateLimited.reason === 'weekly') {
       const gateText = await generateGateResponse('weekly', content, username);
-      const gateMsg = await message.reply({ embeds: [buildGateEmbed(gateText, 'Weekly limit reached · Resets Monday · titantrack.app')] });
+      const gateMsg = await message.reply({ embeds: [buildGateEmbed(gateText, 'Weekly limit · Resets Monday ')] });
       setTimeout(() => gateMsg.delete().catch(() => {}), 60000);
       return;
     }
@@ -2043,9 +2181,9 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
 
     // Tier-aware last-message footer — only shown when this was their final message (0 remaining)
     const getTierFooter = (tier) => {
-      if (tier === 'grandfathered') return 'This is your only Oracle message today. Make it count tomorrow.';
-      if (tier === 'premium') return 'This is your last Oracle message today. Resets at midnight.';
-      return 'This is your last Oracle message for the week. Resets Monday.';
+      if (tier === 'grandfathered') return 'Last message today · Resets midnight ';
+      if (tier === 'premium') return 'Last message today · Resets midnight ';
+      return 'Last message this week · Resets Monday ';
     };
 
     // Send first chunk as reply, rest as follow-ups
