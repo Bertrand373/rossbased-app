@@ -45,7 +45,7 @@ async function runContentPipeline() {
 
     const response = await anthropic.messages.create({
       model: NOTE_MODEL,
-      max_tokens: 1200,
+      max_tokens: 4000,
       system: `You analyze YouTube comments from a semen retention creator's channel and across the niche to generate actionable content intelligence.
 
 Your output is a weekly content brief for the creator (Ross, @rossbased, 10K subscribers). He makes videos about semen retention, masculine transformation, spiritual development, and self-improvement.
