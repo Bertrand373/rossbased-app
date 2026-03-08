@@ -35,6 +35,7 @@ const { classifyInteraction, backfillRelapseFlag } = require('./services/interac
 const OracleInteraction = require('./models/OracleInteraction');
 const OracleUsage = require('./models/OracleUsage');
 const stripeRoutes = require('./routes/stripeRoutes');
+const protocolRoutes = require('./routes/protocolRoutes');
 const discordLinkRoutes = require('./routes/discordLink');
 const timelineRoutes = require('./routes/timelineRoutes');
 const { expireStaleTrials, expireStaleCanceled, checkPremiumAccess, syncStripeSubscriptions } = require('./middleware/subscriptionMiddleware');
@@ -2620,6 +2621,7 @@ app.use('/api/knowledge', authenticate, knowledgeRoutes);
 app.use('/api/analytics', authenticate, analyticsRoutes);
 app.use('/api/admin', authenticate, adminRevenueRoutes);
 app.use('/api/stripe', stripeRoutes);
+app.use('/api/protocol', protocolRoutes);
 app.use('/api/discord', discordLinkRoutes);
 app.use('/api/timeline', timelineRoutes);
 

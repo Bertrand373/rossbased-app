@@ -12,6 +12,9 @@ const {
   expireStaleCanceled
 } = require('../middleware/subscriptionMiddleware');
 
+// Protocol ebook delivery (one-time purchase handler)
+const { handleProtocolPurchase } = require('./protocolRoutes');
+
 // ============================================
 // STRIPE INITIALIZATION
 // ============================================
@@ -218,6 +221,15 @@ router.post('/webhook', async (req, res) => {
       // ---- Checkout completed (first payment or trial start) ----
       case 'checkout.session.completed': {
         const session = event.data.object;
+
+        // --- PROTOCOL EBOOK (one-time purchase) ---
+        if (session.mode === 'payment') {
+          await handleProtocolPurchase(session);
+          console.log(`📘 Protocol purchase handled for session ${session.id}`);
+          break;
+        }
+
+        // --- TITANTRACK SUBSCRIPTION ---
         const username = session.metadata?.titantrack_username;
         const plan = session.metadata?.plan || 'monthly';
         
