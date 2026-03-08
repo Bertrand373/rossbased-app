@@ -200,6 +200,89 @@ async function handleProtocolPurchase(session) {
 }
 
 // ============================================
+// RESEND DOWNLOAD LINKS PAGE (GET)
+// ============================================
+router.get('/resend', (req, res) => {
+  const message = req.query.msg;
+  let banner = '';
+  if (message === 'sent') {
+    banner = '<p style="color: #4ade80; margin: 0 0 24px 0;">Fresh download links sent. Check your email.</p>';
+  } else if (message === 'notfound') {
+    banner = '<p style="color: #f87171; margin: 0 0 24px 0;">No purchase found for that email. Double-check the address you used at checkout.</p>';
+  }
+
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head><title>Resend PROTOCOL Links</title><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+    <body style="font-family: -apple-system, sans-serif; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
+      <div style="text-align: center; max-width: 400px; padding: 24px; width: 100%;">
+        <h1 style="font-size: 1.25rem; font-weight: 500; margin: 0 0 8px 0;">Resend PROTOCOL Download Links</h1>
+        <p style="color: rgba(255,255,255,0.5); line-height: 1.6; margin: 0 0 24px 0;">
+          Enter the email you used at checkout. We'll send fresh 48-hour download links.
+        </p>
+        ${banner}
+        <form method="POST" action="/api/protocol/resend">
+          <input type="email" name="email" required placeholder="your@email.com" style="width: 100%; padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.9375rem; margin-bottom: 16px; box-sizing: border-box;" />
+          <button type="submit" style="width: 100%; padding: 14px 28px; background: #fff; color: #000; font-size: 0.9375rem; font-weight: 600; border: none; border-radius: 10px; cursor: pointer;">
+            Send Download Links
+          </button>
+        </form>
+      </div>
+    </body>
+    </html>
+  `);
+});
+
+// ============================================
+// RESEND DOWNLOAD LINKS HANDLER (POST)
+// ============================================
+router.post('/resend', express.urlencoded({ extended: false }), async (req, res) => {
+  try {
+    const email = (req.body.email || '').toLowerCase().trim();
+    if (!email) {
+      return res.redirect('/api/protocol/resend?msg=notfound');
+    }
+
+    // Find the most recent purchase for this email
+    const purchase = await ProtocolPurchase.findOne({ email }).sort({ createdAt: -1 });
+    if (!purchase) {
+      return res.redirect('/api/protocol/resend?msg=notfound');
+    }
+
+    // Generate fresh tokens (new 48-hour window)
+    const tokenPDF = crypto.randomBytes(32).toString('hex');
+    const tokenEPUB = crypto.randomBytes(32).toString('hex');
+    const tokenExpiry = new Date(Date.now() + 48 * 60 * 60 * 1000);
+
+    purchase.tokenPDF = tokenPDF;
+    purchase.tokenEPUB = tokenEPUB;
+    purchase.tokenExpiry = tokenExpiry;
+    purchase.downloadedPDF = false;
+    purchase.downloadedEPUB = false;
+    await purchase.save();
+
+    // Build download URLs and send email
+    const baseUrl = process.env.CLIENT_URL || 'https://titantrack.app';
+    const pdfUrl = `${baseUrl}/api/protocol/download/pdf/${tokenPDF}`;
+    const epubUrl = `${baseUrl}/api/protocol/download/epub/${tokenEPUB}`;
+
+    await resend.emails.send({
+      from: 'Ross <noreply@titantrack.app>',
+      to: email,
+      subject: 'Your PROTOCOL download links (refreshed)',
+      html: buildDeliveryEmail(pdfUrl, epubUrl)
+    });
+
+    console.log(`📧 Protocol resend links sent to ${email}`);
+    return res.redirect('/api/protocol/resend?msg=sent');
+  } catch (err) {
+    console.error('Protocol resend error:', err);
+    return res.redirect('/api/protocol/resend?msg=notfound');
+  }
+});
+
+// ============================================
 // DELIVERY EMAIL HTML
 // ============================================
 function buildDeliveryEmail(pdfUrl, epubUrl) {
@@ -238,12 +321,13 @@ function renderExpiredPage() {
   return `
     <!DOCTYPE html>
     <html>
-    <head><title>Link Expired</title></head>
+    <head><title>Link Expired</title><meta name="viewport" content="width=device-width, initial-scale=1"></head>
     <body style="font-family: -apple-system, sans-serif; background: #000; color: #fff; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
       <div style="text-align: center; max-width: 400px; padding: 24px;">
         <h1 style="font-size: 1.25rem; font-weight: 500;">This download link has expired</h1>
         <p style="color: rgba(255,255,255,0.5); line-height: 1.6;">
-          Links are valid for 48 hours after purchase. Email <a href="mailto:contact@rossbased.com" style="color: #fff;">contact@rossbased.com</a> and I'll send you fresh links.
+          Links are valid for 48 hours after purchase.<br><br>
+          <a href="/api/protocol/resend" style="display: inline-block; padding: 12px 24px; background: #fff; color: #000; font-weight: 600; text-decoration: none; border-radius: 10px;">Get Fresh Links</a>
         </p>
       </div>
     </body>
