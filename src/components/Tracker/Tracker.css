@@ -1158,20 +1158,24 @@
 
 /* ============================================================
    PATTERN ALERT SHEET — AI prediction bottom sheet
+   Sticky header + sticky footer, scrollable middle
    Inherits from BottomSheet.css + PredictionDisplay.css
    ============================================================ */
 
 .prediction-sheet {
   max-height: 85dvh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
   text-align: center;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Tighter spacing for sheet context */
+/* Sticky header — score + risk level */
 .prediction-sheet .prediction-header {
-  margin-bottom: 24px;
+  margin-bottom: 0;
   padding-bottom: 20px;
+  border-bottom: none;
+  flex-shrink: 0;
 }
 
 .prediction-sheet .prediction-label {
@@ -1186,6 +1190,17 @@
   font-size: 1.25rem;
 }
 
+/* Scrollable middle content */
+.prediction-scroll-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 4px;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 8px, black calc(100% - 8px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8px, black calc(100% - 8px), transparent 100%);
+}
+
 .prediction-sheet .prediction-insights {
   margin-bottom: 20px;
 }
@@ -1193,30 +1208,58 @@
 .prediction-sheet .insight-section-label {
   margin-bottom: 16px;
   padding-bottom: 10px;
+  border-bottom: none;
 }
 
 .prediction-sheet .prediction-disclaimer {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   font-size: 0.6875rem;
 }
 
-/* Side-by-side actions */
+/* Sticky footer — actions */
 .prediction-sheet .prediction-actions {
   flex-direction: row;
   gap: 12px;
   margin-bottom: 0;
+  flex-shrink: 0;
+  padding-top: 20px;
 }
 
-.prediction-sheet .prediction-actions .btn-primary,
+.prediction-sheet .prediction-actions .btn-primary {
+  flex: 1;
+  padding: 14px 16px;
+  font-size: 0.875rem;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  color: var(--text);
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 150ms ease;
+}
+
+.prediction-sheet .prediction-actions .btn-primary:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
 .prediction-sheet .prediction-actions .btn-ghost {
   flex: 1;
   padding: 14px 16px;
   font-size: 0.875rem;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease;
 }
 
-.prediction-sheet .prediction-actions .btn-ghost {
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
+.prediction-sheet .prediction-actions .btn-ghost:hover {
+  border-color: var(--border);
+  color: var(--text);
 }
 
 @media (max-width: 480px) {

@@ -465,7 +465,7 @@ export const useUserData = () => {
           break;
         case 'aicard':
         case 'aicardtest':
-          mockUserData = aiCardTestUser;
+          mockUserData = { ...aiCardTestUser, hasSeenOnboarding: true };
           break;
           
         default:
@@ -484,7 +484,10 @@ export const useUserData = () => {
       setIsLoading(false);
       
       const scenarioInfo = getScenarioInfo(username);
-      toast.success(`${scenarioInfo} - All features unlocked!`);
+      const lowerUser = username.toLowerCase();
+      if (lowerUser !== 'aicard' && lowerUser !== 'aicardtest') {
+        toast.success(`${scenarioInfo} - All features unlocked!`);
+      }
       
       return true;
     } catch (err) {

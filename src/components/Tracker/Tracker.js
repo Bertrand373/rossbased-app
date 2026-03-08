@@ -1465,74 +1465,77 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                 <p className="prediction-level">{getRiskLevel(riskScore)} Risk</p>
               </div>
 
-              {/* Why this alert */}
-              {hasPatterns && (
-                <div className="prediction-insights">
-                  <p className="insight-section-label">Why this alert</p>
+              {/* Scrollable middle content */}
+              <div className="prediction-scroll-content" data-no-swipe>
+                {/* Why this alert */}
+                {hasPatterns && (
+                  <div className="prediction-insights">
+                    <p className="insight-section-label">Why this alert</p>
 
-                  {patterns?.streak?.isHighRiskDay && (
-                    <div className="insight-block">
-                      <p className="insight-title">Day {patterns.streak.currentDay}</p>
-                      <p className="insight-detail">
-                        You've relapsed {patterns.streak.relapsesInRange} of {patterns.streak.totalRelapses} times between days {patterns.streak.rangeDays[0]}-{patterns.streak.rangeDays[1]}
-                      </p>
-                    </div>
-                  )}
+                    {patterns?.streak?.isHighRiskDay && (
+                      <div className="insight-block">
+                        <p className="insight-title">Day {patterns.streak.currentDay}</p>
+                        <p className="insight-detail">
+                          You've relapsed {patterns.streak.relapsesInRange} of {patterns.streak.totalRelapses} times between days {patterns.streak.rangeDays[0]}-{patterns.streak.rangeDays[1]}
+                        </p>
+                      </div>
+                    )}
 
-                  {patterns?.time?.isHighRiskTime && (
-                    <div className="insight-block">
-                      <p className="insight-title">Evening hours</p>
-                      <p className="insight-detail">
-                        {patterns.time.eveningPercentage}% of your relapses happened after 8pm
-                      </p>
-                    </div>
-                  )}
+                    {patterns?.time?.isHighRiskTime && (
+                      <div className="insight-block">
+                        <p className="insight-title">Evening hours</p>
+                        <p className="insight-detail">
+                          {patterns.time.eveningPercentage}% of your relapses happened after 8pm
+                        </p>
+                      </div>
+                    )}
 
-                  {patterns?.benefits?.hasSignificantDrop && patterns.benefits.drops.map((drop, i) => (
-                    <div className="insight-block" key={i}>
-                      <p className="insight-title">{drop.metric} dropped</p>
-                      <p className="insight-detail">
-                        From {drop.from} → {drop.to} over the last {patterns.benefits.daysCovered} days
-                      </p>
-                    </div>
-                  ))}
+                    {patterns?.benefits?.hasSignificantDrop && patterns.benefits.drops.map((drop, i) => (
+                      <div className="insight-block" key={i}>
+                        <p className="insight-title">{drop.metric} dropped</p>
+                        <p className="insight-detail">
+                          From {drop.from} → {drop.to} over the last {patterns.benefits.daysCovered} days
+                        </p>
+                      </div>
+                    ))}
 
-                  {(patternPrediction?.factors?.inPurgePhase || patternPrediction?.factors?.emotionalProcessingPhase) && !patterns?.streak?.isHighRiskDay && (
-                    <div className="insight-block">
-                      <p className="insight-title">{currentPhaseName} phase</p>
-                      <p className="insight-detail">
-                        {streak <= 45 
-                          ? 'Days 15-45 often bring intense emotional processing as suppressed feelings surface'
-                          : `You're in the ${currentPhaseName} phase of your journey`
-                        }
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
+                    {(patternPrediction?.factors?.inPurgePhase || patternPrediction?.factors?.emotionalProcessingPhase) && !patterns?.streak?.isHighRiskDay && (
+                      <div className="insight-block">
+                        <p className="insight-title">{currentPhaseName} phase</p>
+                        <p className="insight-detail">
+                          {streak <= 45 
+                            ? 'Days 15-45 often bring intense emotional processing as suppressed feelings surface'
+                            : `You're in the ${currentPhaseName} phase of your journey`
+                          }
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
 
-              {/* Historical match */}
-              {patterns?.historical && (
-                <div className="prediction-insights">
-                  <p className="insight-section-label">Historical match</p>
-                  <p className="historical-line">
-                    Similar conditions on Day {patterns.historical.matchDay}
-                  </p>
-                  <p className="historical-outcome">
-                    {patterns.historical.daysUntilRelapse > 0 
-                      ? `Relapsed ${patterns.historical.daysUntilRelapse} days later`
-                      : 'Relapsed same day'
-                    }
-                  </p>
-                </div>
-              )}
+                {/* Historical match */}
+                {patterns?.historical && (
+                  <div className="prediction-insights">
+                    <p className="insight-section-label">Historical match</p>
+                    <p className="historical-line">
+                      Similar conditions on Day {patterns.historical.matchDay}
+                    </p>
+                    <p className="historical-outcome">
+                      {patterns.historical.daysUntilRelapse > 0 
+                        ? `Relapsed ${patterns.historical.daysUntilRelapse} days later`
+                        : 'Relapsed same day'
+                      }
+                    </p>
+                  </div>
+                )}
 
-              {/* Disclaimer */}
-              <p className="prediction-disclaimer">
-                Pattern awareness, not prediction. Dismiss if you're feeling fine.
-              </p>
+                {/* Disclaimer */}
+                <p className="prediction-disclaimer">
+                  Pattern awareness, not prediction. Dismiss if you're feeling fine.
+                </p>
+              </div>
 
-              {/* Actions */}
+              {/* Sticky footer — actions */}
               <div className="prediction-actions">
                 <button className="btn-primary" onClick={handlePatternStruggling}>
                   I'm struggling
