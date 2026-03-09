@@ -202,9 +202,11 @@ const expireStaleCanceled = async () => {
 };
 
 // ============================================
-// STRIPE SYNC — DAILY SAFETY NET
+// STRIPE SYNC — DAILY SAFETY NET (BIDIRECTIONAL)
 // ============================================
-// Catches drift between Stripe and MongoDB.
+// Catches drift between Stripe and MongoDB in BOTH directions:
+//   Direction 1: DB→Stripe — users MongoDB thinks are active, verify with Stripe
+//   Direction 2: Stripe→DB — all active/trialing Stripe subs, ensure MongoDB knows
 // If a webhook fails or gets lost, this corrects it within 24 hours.
 const syncStripeSubscriptions = async () => {
   const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -214,14 +216,17 @@ const syncStripeSubscriptions = async () => {
   }
 
   try {
-    // Find all users our DB thinks are 'active' with a Stripe subscription ID
+    let checked = 0;
+    let fixed = 0;
+
+    // ═══════════════════════════════════════════
+    // DIRECTION 1: DB → Stripe
+    // Users MongoDB thinks are 'active' — verify with Stripe
+    // ═══════════════════════════════════════════
     const activeUsers = await User.find({
       'subscription.status': 'active',
       'subscription.stripeSubscriptionId': { $exists: true, $ne: null, $ne: '' }
     }).select('username subscription isPremium');
-
-    let checked = 0;
-    let fixed = 0;
 
     for (const user of activeUsers) {
       checked++;
@@ -230,7 +235,6 @@ const syncStripeSubscriptions = async () => {
           user.subscription.stripeSubscriptionId
         );
 
-        // Stripe says canceled/expired/past_due but our DB says active
         if (['canceled', 'incomplete_expired', 'unpaid', 'past_due'].includes(stripeSub.status)) {
           await User.updateOne(
             { _id: user._id },
@@ -239,7 +243,6 @@ const syncStripeSubscriptions = async () => {
           fixed++;
           console.log(`🔄 Stripe sync: ${user.username} → expired (Stripe: ${stripeSub.status})`);
         }
-        // Stripe says trialing but our DB says active
         else if (stripeSub.status === 'trialing') {
           const trialEnd = new Date(stripeSub.trial_end * 1000);
           if (trialEnd < new Date()) {
@@ -258,9 +261,7 @@ const syncStripeSubscriptions = async () => {
             console.log(`🔄 Stripe sync: ${user.username} → trial (still trialing)`);
           }
         }
-        // Stripe says active — all good, no action needed
       } catch (err) {
-        // Subscription not found in Stripe — revoke access
         if (err.code === 'resource_missing') {
           await User.updateOne(
             { _id: user._id },
@@ -274,10 +275,83 @@ const syncStripeSubscriptions = async () => {
       }
     }
 
+    // ═══════════════════════════════════════════
+    // DIRECTION 2: Stripe → DB
+    // All active/trialing Stripe subs — ensure MongoDB knows
+    // Catches missed webhooks (checkout.session.completed, etc.)
+    // ═══════════════════════════════════════════
+    const stripeStatuses = ['active', 'trialing'];
+
+    for (const status of stripeStatuses) {
+      let hasMore = true;
+      let startingAfter = null;
+
+      while (hasMore) {
+        const params = { status, limit: 100 };
+        if (startingAfter) params.starting_after = startingAfter;
+        const batch = await stripe.subscriptions.list(params);
+
+        for (const sub of batch.data) {
+          checked++;
+          const username = sub.metadata?.titantrack_username;
+          const customerId = sub.customer;
+
+          // Find user by metadata username first, then by stripeCustomerId
+          let user = null;
+          if (username) {
+            user = await User.findOne({ username });
+          }
+          if (!user) {
+            user = await User.findOne({ 'subscription.stripeCustomerId': customerId });
+          }
+
+          if (!user) {
+            console.log(`⚠️ Stripe sync: orphan sub ${sub.id} (${status}) — no user found (metadata: ${username || 'none'}, customer: ${customerId})`);
+            continue;
+          }
+
+          const dbStatus = user.subscription?.status;
+          const dbSubId = user.subscription?.stripeSubscriptionId;
+          const expectedDbStatus = status === 'trialing' ? 'trial' : 'active';
+
+          // Skip if already correct
+          if (dbStatus === expectedDbStatus && dbSubId === sub.id) continue;
+          // Don't override grandfathered users
+          if (dbStatus === 'grandfathered') continue;
+
+          // DB is out of sync — fix it
+          const updateFields = {
+            'subscription.status': expectedDbStatus,
+            'subscription.stripeSubscriptionId': sub.id,
+            'subscription.stripeCustomerId': customerId,
+            'subscription.currentPeriodStart': new Date(sub.current_period_start * 1000),
+            'subscription.currentPeriodEnd': new Date(sub.current_period_end * 1000),
+            'isPremium': true
+          };
+
+          if (status === 'trialing' && sub.trial_end) {
+            updateFields['subscription.trialEndDate'] = new Date(sub.trial_end * 1000);
+          }
+
+          const priceInterval = sub.items?.data?.[0]?.price?.recurring?.interval;
+          if (priceInterval) {
+            updateFields['subscription.plan'] = priceInterval === 'year' ? 'yearly' : 'monthly';
+          }
+
+          await User.updateOne({ _id: user._id }, { $set: updateFields });
+          fixed++;
+          console.log(`🔄 Stripe sync: ${user.username} → ${expectedDbStatus} (was: ${dbStatus || 'none'}, sub: ${sub.id})`);
+        }
+
+        hasMore = batch.has_more;
+        if (batch.data.length > 0) startingAfter = batch.data[batch.data.length - 1].id;
+      }
+    }
+
     if (fixed > 0) {
       console.log(`🔄 Stripe sync complete: checked ${checked}, fixed ${fixed}`);
     } else if (checked > 0) {
-      console.log(`✅ Stripe sync: all ${checked} active subscriptions verified`);
+      console.log(`✅ Stripe sync: all ${checked} subscriptions verified`);
     }
 
     return { checked, fixed };
