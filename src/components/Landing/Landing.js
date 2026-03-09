@@ -317,7 +317,18 @@ const Landing = ({ onLogin }) => {
           Available in the app and on Discord.
         </p>
         <div className="landing-oracle-demo">
-          <img src="/oracle-demo.png" alt="Oracle AI responding to a retention question" className="landing-oracle-img" />
+          <div className="landing-oracle-video-wrap">
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              className="landing-oracle-video"
+            >
+              <source src="/videos/oracle-demo.mp4" type="video/mp4" />
+            </video>
+          </div>
         </div>
       </section>
 

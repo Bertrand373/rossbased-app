@@ -440,17 +440,23 @@
   justify-content: center;
 }
 
-.landing-oracle-img {
+.landing-oracle-video-wrap {
   width: 100%;
-  max-width: 300px;
+  max-width: 320px;
   border-radius: 20px;
+  overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
     0 24px 80px rgba(0, 0, 0, 0.6),
     0 0 80px rgba(100, 80, 200, 0.03),
     0 0 160px rgba(100, 80, 200, 0.015);
   background: #000;
+}
+
+.landing-oracle-video {
+  width: 100%;
   display: block;
+  border-radius: 20px;
 }
 
 /* ============================================================
