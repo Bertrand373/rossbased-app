@@ -287,30 +287,61 @@ router.post('/resend', express.urlencoded({ extended: false }), async (req, res)
 // ============================================
 function buildDeliveryEmail(pdfUrl, epubUrl) {
   return `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 24px; background-color: #000000; color: #ffffff;">
-      <h2 style="font-size: 1.25rem; font-weight: 500; margin: 0 0 8px 0; color: #ffffff;">PROTOCOL is yours.</h2>
-      <p style="font-size: 0.9375rem; color: rgba(255,255,255,0.6); line-height: 1.6; margin: 0 0 28px 0;">
-        Download both formats below. These links expire in 48 hours.
-      </p>
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"><meta name="color-scheme" content="dark"><meta name="supported-color-schemes" content="dark"></head>
+    <body style="margin: 0; padding: 0; background-color: #000000;">
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" bgcolor="#000000" style="background-color: #000000;">
+    <tr><td align="center" style="padding: 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" width="480" style="max-width: 480px; width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #ffffff;" bgcolor="#000000">
 
-      <a href="${pdfUrl}" style="display: inline-block; padding: 14px 28px; background-color: #ffffff; color: #000000; font-size: 0.9375rem; font-weight: 600; text-decoration: none; border-radius: 10px; margin-right: 12px; margin-bottom: 12px;">
-        Download PDF
-      </a>
-      <a href="${epubUrl}" style="display: inline-block; padding: 14px 28px; background-color: transparent; color: #ffffff; font-size: 0.9375rem; font-weight: 600; text-decoration: none; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3); margin-bottom: 12px;">
-        Download EPUB
-      </a>
+      <tr><td style="padding: 40px 24px 0 24px;" bgcolor="#000000">
+        <h2 style="font-size: 1.25rem; font-weight: 500; margin: 0 0 8px 0; color: #ffffff;">PROTOCOL is yours.</h2>
+        <p style="font-size: 0.9375rem; color: #999999; line-height: 1.6; margin: 0 0 28px 0;">
+          Download both formats below. These links expire in 48 hours.
+        </p>
+      </td></tr>
 
-      <p style="font-size: 0.9375rem; color: rgba(255,255,255,0.6); line-height: 1.6; margin: 28px 0 0 0;">
-        Start with Chapter 7 if you want results fast — that's the wet dream prevention and urge management system.
-      </p>
-      <p style="font-size: 0.9375rem; color: rgba(255,255,255,0.6); line-height: 1.6; margin: 16px 0 0 0;">
-        If your links expire before you download, just reply to this email and I'll send new ones.
-      </p>
+      <tr><td style="padding: 0 24px;" bgcolor="#000000">
+        <table role="presentation" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding-right: 12px; padding-bottom: 12px;">
+              <a href="${pdfUrl}" style="display: inline-block; padding: 14px 28px; background-color: #ffffff; color: #000000; font-size: 0.9375rem; font-weight: 600; text-decoration: none; border-radius: 10px;">
+                Download PDF
+              </a>
+            </td>
+            <td style="padding-bottom: 12px;">
+              <a href="${epubUrl}" style="display: inline-block; padding: 14px 28px; background-color: #000000; color: #ffffff; font-size: 0.9375rem; font-weight: 600; text-decoration: none; border-radius: 10px; border: 1px solid #555555;">
+                Download EPUB
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td></tr>
 
-      <p style="font-size: 0.8125rem; color: rgba(255,255,255,0.3); line-height: 1.5; margin: 32px 0 0 0;">
-        — Ross
-      </p>
-    </div>
+      <tr><td style="padding: 28px 24px 0 24px;" bgcolor="#000000">
+        <p style="font-size: 0.9375rem; color: #999999; line-height: 1.6; margin: 0;">
+          Start with Chapter 7 if you want results fast... that's the wet dream prevention and urge management system.
+        </p>
+      </td></tr>
+
+      <tr><td style="padding: 16px 24px 0 24px;" bgcolor="#000000">
+        <p style="font-size: 0.9375rem; color: #999999; line-height: 1.6; margin: 0;">
+          If your links expire before you download, just reply to this email and I'll send new ones.
+        </p>
+      </td></tr>
+
+      <tr><td style="padding: 32px 24px 40px 24px;" bgcolor="#000000">
+        <p style="font-size: 0.8125rem; color: #555555; line-height: 1.5; margin: 0;">
+          — Ross
+        </p>
+      </td></tr>
+
+    </table>
+    </td></tr>
+    </table>
+    </body>
+    </html>
   `;
 }
 
