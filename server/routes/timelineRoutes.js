@@ -112,12 +112,12 @@ function buildTimelineEmail(streakDay, ageRange, exercise, priority) {
   const daysRemaining = phase.range[1] - day;
 
   const expectHtml = phase.expect.map(e =>
-    `<tr><td style="padding: 6px 0; color: rgba(255,255,255,0.5); font-size: 0.875rem; line-height: 1.5;">— ${e}</td></tr>`
+    `<tr><td style="padding: 6px 0; color: #888888; font-size: 0.875rem; line-height: 1.5;">— ${e}</td></tr>`
   ).join('');
 
   const nextPhaseBlock = nextPhase ? `
-    <p style="font-size: 0.875rem; color: rgba(255,255,255,0.4); line-height: 1.6; margin: 24px 0 0 0;">
-      <strong style="color: rgba(255,255,255,0.7);">Next up:</strong> ${nextPhase.name} (Day ${nextPhase.range[0]}–${nextPhase.range[1]}). ${daysRemaining > 0 ? `You're ${daysRemaining} days away.` : 'You\'re on the edge of transition.'}
+    <p style="font-size: 0.875rem; color: #777777; line-height: 1.6; margin: 24px 0 0 0;">
+      <strong style="color: #aaaaaa;">Next up:</strong> ${nextPhase.name} (Day ${nextPhase.range[0]}–${nextPhase.range[1]}). ${daysRemaining > 0 ? `You're ${daysRemaining} days away.` : 'You\'re on the edge of transition.'}
     </p>
   ` : '';
 
@@ -128,56 +128,73 @@ function buildTimelineEmail(streakDay, ageRange, exercise, priority) {
     'Low physical activity can make urges harder to manage. Even 20 minutes of walking daily makes a measurable difference.';
 
   return `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 520px; margin: 0 auto; padding: 0; background-color: #000000; color: #ffffff;">
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"><meta name="color-scheme" content="dark"><meta name="supported-color-schemes" content="dark"></head>
+    <body style="margin: 0; padding: 0; background-color: #000000;">
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" bgcolor="#000000" style="background-color: #000000;">
+    <tr><td align="center" style="padding: 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" width="520" style="max-width: 520px; width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #ffffff;" bgcolor="#000000">
 
       <!-- TitanTrack header -->
-      <div style="padding: 32px 24px 24px 24px; border-bottom: 1px solid rgba(255,255,255,0.06);">
-        <img src="https://titantrack.app/tt-icon-white.png" alt="TitanTrack" width="28" height="28" style="display: block; margin-bottom: 20px; opacity: 0.7;" />
+      <tr><td style="padding: 32px 24px 24px 24px; border-bottom: 1px solid #1a1a1a;" bgcolor="#000000">
+        <img src="https://titantrack.app/tt-icon-white.png" alt="TitanTrack" width="28" height="28" style="display: block; margin-bottom: 20px;" />
         <h2 style="font-size: 1.25rem; font-weight: 500; margin: 0 0 4px 0; color: #ffffff;">Your Retention Timeline</h2>
-        <p style="font-size: 0.8125rem; color: rgba(255,255,255,0.3); margin: 0;">Day ${day} · ${ageRange || 'Age not specified'} · ${exercise || 'Exercise not specified'}</p>
-      </div>
+        <p style="font-size: 0.8125rem; color: #666666; margin: 0;">Day ${day} · ${ageRange || 'Age not specified'} · ${exercise || 'Exercise not specified'}</p>
+      </td></tr>
 
       <!-- Timeline content -->
-      <div style="padding: 28px 24px;">
-        <div style="padding: 20px; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-bottom: 24px;">
-          <p style="font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.3); margin: 0 0 8px 0;">Current Phase</p>
-          <h3 style="font-size: 1.125rem; font-weight: 500; color: #ffffff; margin: 0 0 12px 0;">${phase.name}</h3>
-          <p style="font-size: 0.875rem; color: rgba(255,255,255,0.5); line-height: 1.6; margin: 0;">${phase.summary}</p>
-        </div>
+      <tr><td style="padding: 28px 24px;" bgcolor="#000000">
+        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #222222; border-radius: 12px; margin-bottom: 24px;">
+          <tr><td style="padding: 20px;" bgcolor="#000000">
+            <p style="font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #555555; margin: 0 0 8px 0;">Current Phase</p>
+            <h3 style="font-size: 1.125rem; font-weight: 500; color: #ffffff; margin: 0 0 12px 0;">${phase.name}</h3>
+            <p style="font-size: 0.875rem; color: #888888; line-height: 1.6; margin: 0;">${phase.summary}</p>
+          </td></tr>
+        </table>
 
-        <p style="font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.3); margin: 0 0 12px 0;">What to expect right now</p>
+        <p style="font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #555555; margin: 0 0 12px 0;">What to expect right now</p>
         <table cellpadding="0" cellspacing="0" style="width: 100%; margin-bottom: 24px;"><tbody>${expectHtml}</tbody></table>
 
-        <div style="padding: 16px 20px; background: rgba(255,255,255,0.03); border-radius: 10px; margin-bottom: 24px;">
-          <p style="font-size: 0.8125rem; color: rgba(255,255,255,0.6); line-height: 1.6; margin: 0;">
-            <strong style="color: rgba(255,255,255,0.8);">Risk:</strong> ${phase.risk}
-          </p>
-        </div>
+        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 24px;">
+          <tr><td style="padding: 16px 20px; border-radius: 10px;" bgcolor="#0a0a0a">
+            <p style="font-size: 0.8125rem; color: #999999; line-height: 1.6; margin: 0;">
+              <strong style="color: #cccccc;">Risk:</strong> ${phase.risk}
+            </p>
+          </td></tr>
+        </table>
 
-        <div style="padding: 16px 20px; background: rgba(255,255,255,0.03); border-radius: 10px; margin-bottom: 24px;">
-          <p style="font-size: 0.8125rem; color: rgba(255,255,255,0.6); line-height: 1.6; margin: 0;">
-            <strong style="color: rgba(255,255,255,0.8);">Insight:</strong> ${phase.insight}
-          </p>
-        </div>
+        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 24px;">
+          <tr><td style="padding: 16px 20px; border-radius: 10px;" bgcolor="#0a0a0a">
+            <p style="font-size: 0.8125rem; color: #999999; line-height: 1.6; margin: 0;">
+              <strong style="color: #cccccc;">Insight:</strong> ${phase.insight}
+            </p>
+          </td></tr>
+        </table>
 
-        <p style="font-size: 0.8125rem; color: rgba(255,255,255,0.5); line-height: 1.6; margin: 0 0 4px 0;">
-          <strong style="color: rgba(255,255,255,0.7);">Your exercise level:</strong> ${exerciseNote}
+        <p style="font-size: 0.8125rem; color: #888888; line-height: 1.6; margin: 0 0 4px 0;">
+          <strong style="color: #aaaaaa;">Your exercise level:</strong> ${exerciseNote}
         </p>
 
         ${nextPhaseBlock}
-      </div>
+      </td></tr>
 
       <!-- CTA footer -->
-      <div style="padding: 28px 24px 36px 24px; border-top: 1px solid rgba(255,255,255,0.06);">
-        <p style="font-size: 0.875rem; color: rgba(255,255,255,0.5); line-height: 1.6; margin: 0 0 20px 0;">
+      <tr><td style="padding: 28px 24px 36px 24px; border-top: 1px solid #1a1a1a;" bgcolor="#000000">
+        <p style="font-size: 0.875rem; color: #888888; line-height: 1.6; margin: 0 0 20px 0;">
           This timeline is based on patterns from the TitanTrack practitioner community. Track how your reality compares to these projections in real time.
         </p>
         <a href="https://titantrack.app" style="display: inline-block; padding: 12px 24px; background-color: #ffffff; color: #000000; font-size: 0.875rem; font-weight: 600; text-decoration: none; border-radius: 10px;">
           Start Tracking Free
         </a>
-        <p style="font-size: 0.6875rem; color: rgba(255,255,255,0.2); margin: 12px 0 0 0;">7-day free trial. $8/month after.</p>
-      </div>
-    </div>
+        <p style="font-size: 0.6875rem; color: #444444; margin: 12px 0 0 0;">7-day free trial. $8/month after.</p>
+      </td></tr>
+
+    </table>
+    </td></tr>
+    </table>
+    </body>
+    </html>
   `;
 }
 
@@ -225,7 +242,7 @@ router.post('/subscribe', async (req, res) => {
     // Send personalized timeline email via Resend
     try {
       await resend.emails.send({
-        from: 'Ross <noreply@titantrack.app>',
+        from: 'TitanTrack <noreply@titantrack.app>',
         to: emailLower,
         subject: `Your retention timeline — Day ${streakDay || 1}`,
         html: buildTimelineEmail(streakDay, ageRange, exercise, priority)
