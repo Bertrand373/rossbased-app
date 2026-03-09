@@ -308,13 +308,15 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   }, []);
 
   // Swipe-to-dismiss — non-passive native listeners so iOS respects preventDefault
-  const trackerSheetVisible = showStreakOptions || showResetConfirm || showLogLock || showPeakPrompt || showPatternAlert;
+  const isEditingDate = showDatePicker && !!userData.startDate;
+  const trackerSheetVisible = showStreakOptions || showResetConfirm || showLogLock || showPeakPrompt || showPatternAlert || isEditingDate;
   const handleSwipeDismiss = useCallback(() => {
     setShowStreakOptions(false);
     setShowResetConfirm(false);
     setShowLogLock(false);
     setShowBenefits(false);
     setShowPeakPrompt(false);
+    setShowDatePicker(false);
     setPeakMessage('');
     if (patternInterventionIdRef.current) {
       interventionService.recordResponse(patternInterventionIdRef.current, 'dismissed');
