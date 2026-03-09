@@ -131,7 +131,7 @@ router.get('/revenue', adminCheck, async (req, res) => {
 // GET /api/admin/revenue/subscribers/:status
 // Drill-down: returns user details for active/trialing/canceled
 // ============================================================
-router.get('/subscribers/:status', adminCheck, async (req, res) => {
+router.get('/revenue/subscribers/:status', adminCheck, async (req, res) => {
   try {
     const { status } = req.params;
     const User = require('../models/User');

@@ -63,6 +63,21 @@
   color: rgba(255,255,255,0.5);
 }
 
+.rv-spinning {
+  pointer-events: none;
+  color: rgba(255,255,255,0.5);
+}
+
+.rv-spinning svg {
+  animation: rv-spin 0.7s linear infinite;
+}
+
+.rv-done {
+  border-color: rgba(34,197,94,0.25);
+  color: rgba(34,197,94,0.7);
+  background: rgba(34,197,94,0.05);
+}
+
 /* Stats grid */
 .rv-stats-grid {
   display: grid;
@@ -479,6 +494,11 @@
 [data-theme="light"] .rv-refresh:hover {
   background: rgba(0,0,0,0.06);
   color: rgba(0,0,0,0.5);
+}
+[data-theme="light"] .rv-done {
+  border-color: rgba(22,163,74,0.25);
+  color: rgba(22,163,74,0.7);
+  background: rgba(22,163,74,0.05);
 }
 
 /* Stats */

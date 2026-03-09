@@ -14,6 +14,8 @@ const RevenueCard = () => {
   const [subDrilldown, setSubDrilldown] = useState(null);
   const [subDetails, setSubDetails] = useState([]);
   const [subDetailsLoading, setSubDetailsLoading] = useState(false);
+  const [rvRefreshing, setRvRefreshing] = useState(false);
+  const [rvDone, setRvDone] = useState(false);
 
   const token = localStorage.getItem('token');
 
@@ -126,7 +128,22 @@ const RevenueCard = () => {
           <h2 className="rv-title">Revenue</h2>
           <span className="rv-badge">STRIPE</span>
         </div>
-        <button className="rv-refresh" onClick={fetchRevenue}>↻</button>
+        <button className={`rv-refresh ${rvRefreshing ? 'rv-spinning' : rvDone ? 'rv-done' : ''}`} onClick={() => {
+          if (rvRefreshing) return;
+          setRvRefreshing(true);
+          setRvDone(false);
+          Promise.all([fetchRevenue(), new Promise(r => setTimeout(r, 600))]).then(() => {
+            setRvRefreshing(false);
+            setRvDone(true);
+            setTimeout(() => setRvDone(false), 1200);
+          });
+        }}>
+          {rvDone ? (
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          ) : (
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          )}
+        </button>
       </div>
 
       {/* Primary stats */}
