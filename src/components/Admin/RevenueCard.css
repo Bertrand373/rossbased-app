@@ -358,6 +358,93 @@
   margin-bottom: 16px;
 }
 
+/* Subscriber drill-down */
+.rv-sub-tap {
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.rv-sub-tap:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+.rv-sub-selected {
+  background: rgba(255,255,255,0.05) !important;
+  border-bottom: 2px solid rgba(255,255,255,0.12);
+}
+
+.rv-drilldown {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.rv-drilldown-loading {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+}
+
+.rv-drilldown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rv-drilldown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 6px;
+}
+
+.rv-drilldown-left {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rv-drilldown-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rv-drilldown-email {
+  font-size: 10px;
+  color: rgba(255,255,255,0.2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rv-drilldown-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  margin-left: 10px;
+}
+
+.rv-drilldown-date {
+  font-size: 10px;
+  color: rgba(255,255,255,0.25);
+  white-space: nowrap;
+}
+
+.rv-drilldown-plan {
+  font-size: 9px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.15);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
 /* Mobile */
 @media (max-width: 640px) {
   .rv-stats-grid {
@@ -455,3 +542,13 @@
   border-color: rgba(220,38,38,0.15);
   color: rgba(220,38,38,0.8);
 }
+
+/* Drill-down light theme */
+[data-theme="light"] .rv-sub-tap:hover { background: rgba(0,0,0,0.04); }
+[data-theme="light"] .rv-sub-selected { background: rgba(0,0,0,0.05) !important; border-bottom-color: rgba(0,0,0,0.12); }
+[data-theme="light"] .rv-drilldown { border-top-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .rv-drilldown-row { background: rgba(0,0,0,0.02); }
+[data-theme="light"] .rv-drilldown-name { color: rgba(0,0,0,0.7); }
+[data-theme="light"] .rv-drilldown-email { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .rv-drilldown-date { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .rv-drilldown-plan { color: rgba(0,0,0,0.2); }

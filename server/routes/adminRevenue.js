@@ -127,4 +127,82 @@ router.get('/revenue', adminCheck, async (req, res) => {
   }
 });
 
+// ============================================================
+// GET /api/admin/revenue/subscribers/:status
+// Drill-down: returns user details for active/trialing/canceled
+// ============================================================
+router.get('/subscribers/:status', adminCheck, async (req, res) => {
+  try {
+    const { status } = req.params;
+    const User = require('../models/User');
+
+    let stripeSubs = [];
+
+    if (status === 'active') {
+      let hasMore = true;
+      let startingAfter = null;
+      while (hasMore) {
+        const params = { status: 'active', limit: 100 };
+        if (startingAfter) params.starting_after = startingAfter;
+        const batch = await stripe.subscriptions.list(params);
+        stripeSubs.push(...batch.data);
+        hasMore = batch.has_more;
+        if (batch.data.length > 0) startingAfter = batch.data[batch.data.length - 1].id;
+      }
+    } else if (status === 'trialing') {
+      const batch = await stripe.subscriptions.list({ status: 'trialing', limit: 100 });
+      stripeSubs = batch.data;
+    } else if (status === 'canceled') {
+      const batch = await stripe.subscriptions.list({
+        status: 'canceled',
+        limit: 100,
+        created: { gte: Math.floor(Date.now() / 1000) - 30 * 24 * 60 * 60 }
+      });
+      stripeSubs = batch.data;
+    } else {
+      return res.status(400).json({ error: 'Invalid status. Use: active, trialing, canceled' });
+    }
+
+    const subscribers = [];
+
+    for (const sub of stripeSubs) {
+      const username = sub.metadata?.titantrack_username || null;
+      const customerId = sub.customer;
+
+      let email = '?';
+      try {
+        const customer = await stripe.customers.retrieve(customerId);
+        email = customer.email || '?';
+      } catch (e) { /* skip */ }
+
+      let dbUser = null;
+      if (username) {
+        dbUser = await User.findOne({ username }).select('username email').lean();
+      }
+      if (!dbUser) {
+        dbUser = await User.findOne({ 'subscription.stripeCustomerId': customerId }).select('username email').lean();
+      }
+
+      const priceInterval = sub.items?.data?.[0]?.price?.recurring?.interval;
+
+      subscribers.push({
+        username: dbUser?.username || username || '—',
+        email: dbUser?.email || email,
+        plan: priceInterval === 'year' ? 'yearly' : priceInterval === 'month' ? 'monthly' : '—',
+        trialEnd: sub.trial_end ? new Date(sub.trial_end * 1000).toISOString() : null,
+        periodEnd: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
+        canceledAt: sub.canceled_at ? new Date(sub.canceled_at * 1000).toISOString() : null,
+        created: new Date(sub.created * 1000).toISOString(),
+        subId: sub.id
+      });
+    }
+
+    res.json({ status, count: subscribers.length, subscribers });
+
+  } catch (err) {
+    console.error('Subscriber detail error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch subscriber details' });
+  }
+});
+
 module.exports = router;

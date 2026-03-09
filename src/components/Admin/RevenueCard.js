@@ -11,6 +11,9 @@ const RevenueCard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCharges, setShowCharges] = useState(false);
+  const [subDrilldown, setSubDrilldown] = useState(null);
+  const [subDetails, setSubDetails] = useState([]);
+  const [subDetailsLoading, setSubDetailsLoading] = useState(false);
 
   const token = localStorage.getItem('token');
 
@@ -70,6 +73,34 @@ const RevenueCard = () => {
     });
   };
 
+  const fmtShortDate = (dateStr) => {
+    if (!dateStr) return '—';
+    return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
+  const fetchSubDetails = async (status) => {
+    if (subDrilldown === status) {
+      setSubDrilldown(null);
+      setSubDetails([]);
+      return;
+    }
+    setSubDrilldown(status);
+    setSubDetailsLoading(true);
+    setSubDetails([]);
+    try {
+      const res = await fetch(`${API}/api/admin/revenue/subscribers/${status}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setSubDetails(json.subscribers || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch subscriber details:', err);
+    }
+    setSubDetailsLoading(false);
+  };
+
   if (loading) {
     return (
       <div className="rv-loading">
@@ -117,25 +148,54 @@ const RevenueCard = () => {
         </div>
       </div>
 
-      {/* Subscriber counts */}
+      {/* Subscriber counts — tap to drill down */}
       <div className="rv-card">
         <div className="rv-card-head">
           <h3>Subscribers</h3>
         </div>
         <div className="rv-sub-grid">
-          <div className="rv-sub-item">
+          <div className={`rv-sub-item rv-sub-tap ${subDrilldown === 'active' ? 'rv-sub-selected' : ''}`} onClick={() => fetchSubDetails('active')}>
             <span className="rv-sub-num active">{subscribers.active}</span>
             <span className="rv-sub-label">Active</span>
           </div>
-          <div className="rv-sub-item">
+          <div className={`rv-sub-item rv-sub-tap ${subDrilldown === 'trialing' ? 'rv-sub-selected' : ''}`} onClick={() => fetchSubDetails('trialing')}>
             <span className="rv-sub-num trial">{subscribers.trialing}</span>
             <span className="rv-sub-label">Trialing</span>
           </div>
-          <div className="rv-sub-item">
+          <div className={`rv-sub-item rv-sub-tap ${subDrilldown === 'canceled' ? 'rv-sub-selected' : ''}`} onClick={() => fetchSubDetails('canceled')}>
             <span className="rv-sub-num canceled">{subscribers.canceledLast30d}</span>
             <span className="rv-sub-label">Canceled (30d)</span>
           </div>
         </div>
+
+        {subDrilldown && (
+          <div className="rv-drilldown">
+            {subDetailsLoading ? (
+              <div className="rv-drilldown-loading">
+                <div className="rv-loading-spinner" />
+              </div>
+            ) : subDetails.length === 0 ? (
+              <p className="rv-empty">No {subDrilldown} subscribers</p>
+            ) : (
+              <div className="rv-drilldown-list">
+                {subDetails.map((s, i) => (
+                  <div key={i} className="rv-drilldown-row">
+                    <div className="rv-drilldown-left">
+                      <span className="rv-drilldown-name">{s.username || '—'}</span>
+                      <span className="rv-drilldown-email">{s.email}</span>
+                    </div>
+                    <div className="rv-drilldown-right">
+                      {s.trialEnd && <span className="rv-drilldown-date">trial ends {fmtShortDate(s.trialEnd)}</span>}
+                      {s.periodEnd && !s.trialEnd && <span className="rv-drilldown-date">ends {fmtShortDate(s.periodEnd)}</span>}
+                      {s.canceledAt && <span className="rv-drilldown-date">canceled {fmtShortDate(s.canceledAt)}</span>}
+                      <span className="rv-drilldown-plan">{s.plan || '—'}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Failed Payments */}

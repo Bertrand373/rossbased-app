@@ -388,7 +388,17 @@ const Timeline = () => {
           streakDay: inputs.streakDay,
           ageRange: inputs.ageRange,
           exercise: inputs.exercise,
-          priority: inputs.priority
+          priority: inputs.priority,
+          projection: projection ? {
+            currentPhase: { name: projection.currentPhase.name, summary: projection.currentPhase.summary, expect: projection.currentPhase.expect, insight: projection.currentPhase.insight },
+            daysInPhase: projection.daysInPhase,
+            daysRemaining: projection.daysRemaining,
+            ageMod: { label: projection.ageMod.label },
+            priorityData: projection.priorityData,
+            riskWindows: projection.riskWindows,
+            next30: projection.next30,
+            streakDay: projection.streakDay
+          } : null
         })
       });
 

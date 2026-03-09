@@ -4,7 +4,7 @@
 .ac-wrap {
   max-width: 860px;
   margin: 0 auto;
-  padding: 20px 18px 40px;
+  padding: 20px 18px calc(80px + env(safe-area-inset-bottom, 0px));
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -131,6 +131,25 @@
 .ac-refresh:hover {
   background: rgba(255,255,255,0.07);
   color: rgba(255,255,255,0.6);
+}
+
+.ac-refresh.spinning {
+  pointer-events: none;
+  color: rgba(255,255,255,0.5);
+}
+
+.ac-refresh.spinning svg {
+  animation: ac-spin 0.7s linear infinite;
+}
+
+.ac-refresh.done {
+  border-color: rgba(34,197,94,0.25);
+  color: rgba(34,197,94,0.7);
+  background: rgba(34,197,94,0.05);
+}
+
+@keyframes ac-spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ===== KPI STRIP ===== */
@@ -1304,7 +1323,7 @@
 
 /* ===== MOBILE ===== */
 @media (max-width: 640px) {
-  .ac-wrap { padding: 14px 12px 40px; }
+  .ac-wrap { padding: 14px 12px calc(80px + env(safe-area-inset-bottom, 0px)); }
   .ac-brand-name { font-size: 16px; }
   .ac-brand-mark { width: 28px; height: 28px; font-size: 10px; }
   .ac-brand-mark-img { width: 28px; height: 28px; }
@@ -1349,6 +1368,7 @@
   color: rgba(170,130,40,0.85);
 }
 [data-theme="light"] .ac-brand-mark-img { filter: invert(1); }
+[data-theme="light"] .ac-brand-icon { filter: invert(1); }
 [data-theme="light"] .ac-brand-wordmark { filter: none; }
 [data-theme="light"] .ac-loading-brand-img { filter: invert(1); }
 [data-theme="light"] .ac-section-brand-logo { filter: invert(1); }
@@ -1366,6 +1386,11 @@
 [data-theme="light"] .ac-refresh:hover {
   background: rgba(0,0,0,0.06);
   color: rgba(0,0,0,0.6);
+}
+[data-theme="light"] .ac-refresh.done {
+  border-color: rgba(22,163,74,0.25);
+  color: rgba(22,163,74,0.7);
+  background: rgba(22,163,74,0.05);
 }
 
 /* KPI Strip */
