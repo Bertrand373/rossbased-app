@@ -208,6 +208,7 @@ router.get('/evolution-log', authWrap, async (req, res) => {
 
 // PATCH /api/admin/oracle/evolution/:id
 // Approve/reject an evolution proposal
+// Approve → processes through Opus gate → creates active rules automatically
 router.patch('/evolution/:id', authWrap, async (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
   try {
@@ -216,6 +217,15 @@ router.patch('/evolution/:id', authWrap, async (req, res) => {
       return res.status(400).json({ error: 'Status must be approved, rejected, or partial' });
     }
 
+    if (status === 'approved') {
+      // Process through Opus verification gate → creates active DynamicRules
+      const { processProposal } = require('../services/dynamicRules');
+      const result = await processProposal(req.params.id);
+      const record = await OracleEvolution.findById(req.params.id);
+      return res.json({ record, opusResult: result });
+    }
+
+    // Rejected — just mark it
     const record = await OracleEvolution.findByIdAndUpdate(
       req.params.id,
       { status, reviewNotes, reviewedAt: new Date() },
@@ -223,7 +233,7 @@ router.patch('/evolution/:id', authWrap, async (req, res) => {
     );
 
     if (!record) return res.status(404).json({ error: 'Record not found' });
-    res.json(record);
+    res.json({ record });
   } catch (err) {
     console.error('Evolution review error:', err);
     res.status(500).json({ error: err.message });
@@ -380,6 +390,21 @@ function startScheduledJobs() {
       // Run pattern discovery if we have enough data
       await discoverPatterns();
       
+      // Auto-process pending proposals through Opus verification gate
+      try {
+        const { processProposal } = require('../services/dynamicRules');
+        const OracleEvolution = require('../models/OracleEvolution');
+        const pending = await OracleEvolution.find({ status: 'pending' }).select('_id').lean();
+        if (pending.length > 0) {
+          console.log(`[OracleEvolution] Processing ${pending.length} pending proposal(s) through Opus...`);
+          for (const p of pending) {
+            await processProposal(p._id);
+          }
+        }
+      } catch (opusErr) {
+        console.error('[OracleEvolution] Opus processing error:', opusErr.message);
+      }
+
       console.log('[OracleEvolution] Scheduled evolution complete');
     } catch (err) {
       console.error('[OracleEvolution] Scheduled evolution error:', err.message);

@@ -40,6 +40,7 @@ const discordLinkRoutes = require('./routes/discordLink');
 const timelineRoutes = require('./routes/timelineRoutes');
 const oracleEvolutionRoutes = require('./routes/oracleEvolutionRoutes');
 const transmissionApiRoutes = require('./routes/transmissionApiRoutes');
+const dynamicRulesRoutes = require('./routes/dynamicRulesRoutes');
 const { expireStaleTrials, expireStaleCanceled, checkPremiumAccess, syncStripeSubscriptions } = require('./middleware/subscriptionMiddleware');
 const { checkAndSendOnboardingNotification } = require('./services/notificationService');
 
@@ -1166,6 +1167,17 @@ async function buildOracleContext(user, timezone) {
     }
   } catch (rpErr) {
     // Non-blocking — risk profile is enhancement, not requirement
+  }
+
+  // --- DYNAMIC RULES (Oracle Evolution — auto-updated, no redeploy needed) ---
+  try {
+    const { getActiveRules } = require('./services/dynamicRules');
+    const dynamicRules = await getActiveRules();
+    if (dynamicRules) {
+      lines.push(dynamicRules);
+    }
+  } catch (drErr) {
+    // Non-blocking — dynamic rules are enhancement, not requirement
   }
 
   return lines.join('\n');
@@ -2699,6 +2711,7 @@ app.use('/api/admin/oracle', oracleEvolutionRoutes);
 oracleEvolutionRoutes.startScheduledJobs();
 app.use('/api/oracle/transmissions', authenticate, transmissionApiRoutes);
 app.use('/api/admin/oracle/transmissions', authenticate, transmissionApiRoutes);
+app.use('/api/admin/oracle/rules', authenticate, dynamicRulesRoutes);
 
 // Serve frontend build in production
 if (process.env.NODE_ENV === 'production') {

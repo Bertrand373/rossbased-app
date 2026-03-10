@@ -11,6 +11,7 @@ const OracleIntelligence = () => {
   const [intel, setIntel] = useState(null);
   const [txStats, setTxStats] = useState(null);
   const [evolutionLog, setEvolutionLog] = useState(null);
+  const [rules, setRules] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('layers');
   const [actionLoading, setActionLoading] = useState(null);
@@ -22,10 +23,11 @@ const OracleIntelligence = () => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
 
-      const [intelRes, txRes, evoRes] = await Promise.allSettled([
+      const [intelRes, txRes, evoRes, rulesRes] = await Promise.allSettled([
         fetch(`${API}/api/admin/oracle/intelligence`, { headers }),
         fetch(`${API}/api/admin/oracle/transmissions/stats`, { headers }),
-        fetch(`${API}/api/admin/oracle/evolution-log?limit=10`, { headers })
+        fetch(`${API}/api/admin/oracle/evolution-log?limit=10`, { headers }),
+        fetch(`${API}/api/admin/oracle/rules`, { headers })
       ]);
 
       if (intelRes.status === 'fulfilled' && intelRes.value.ok) {
@@ -36,6 +38,9 @@ const OracleIntelligence = () => {
       }
       if (evoRes.status === 'fulfilled' && evoRes.value.ok) {
         setEvolutionLog(await evoRes.value.json());
+      }
+      if (rulesRes.status === 'fulfilled' && rulesRes.value.ok) {
+        setRules(await rulesRes.value.json());
       }
     } catch (e) {
       console.error('Intelligence fetch error:', e);
@@ -79,6 +84,22 @@ const OracleIntelligence = () => {
     setActionLoading(null);
   };
 
+  // Deactivate a dynamic rule
+  const deactivateRule = async (id) => {
+    setActionLoading(id);
+    try {
+      await fetch(`${API}/api/admin/oracle/rules/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: 'Removed from admin panel' })
+      });
+      fetchAll();
+    } catch (e) {
+      console.error('Deactivate rule error:', e);
+    }
+    setActionLoading(null);
+  };
+
   if (loading) {
     return <div className="ac-card"><p className="ac-empty-msg">Loading intelligence...</p></div>;
   }
@@ -89,6 +110,7 @@ const OracleIntelligence = () => {
       <div className="ac-sub-nav">
         {[
           { id: 'layers', label: 'Layers' },
+          { id: 'rules', label: 'Rules' },
           { id: 'transmissions', label: 'Transmissions' },
           { id: 'evolution', label: 'Evolution' },
           { id: 'actions', label: 'Actions' }
@@ -142,6 +164,68 @@ const OracleIntelligence = () => {
               })}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* === ACTIVE RULES === */}
+      {activeSection === 'rules' && (
+        <div className="oi-section">
+          {rules?.active?.length > 0 ? (
+            <>
+              <div className="ac-card">
+                <h3 className="ac-card-title-sm">Active Rules ({rules.activeCount})</h3>
+                <p className="ac-card-sub">These are injected into Oracle's prompt on every conversation. No redeploy needed.</p>
+                <div className="oi-rules-list">
+                  {rules.active.map((r) => (
+                    <div key={r._id} className="oi-rule-card">
+                      <div className="oi-rule-top">
+                        <span className="oi-rule-category">{r.category}</span>
+                        <span className="oi-rule-source">{r.source?.replace(/-/g, ' ')}</span>
+                        {r.opusVerified && <span className="oi-rule-opus">Opus verified</span>}
+                      </div>
+                      <p className="oi-rule-text">{r.rule}</p>
+                      {r.opusAssessment && (
+                        <p className="oi-rule-assessment">{r.opusAssessment}</p>
+                      )}
+                      <div className="oi-rule-footer">
+                        <span className="oi-rule-date">
+                          Active since {new Date(r.activatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                        </span>
+                        <button 
+                          className="oi-btn reject"
+                          onClick={() => deactivateRule(r._id)}
+                          disabled={actionLoading === r._id}
+                        >
+                          {actionLoading === r._id ? '...' : 'Remove'}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {rules.inactive?.length > 0 && (
+                <div className="ac-card">
+                  <h3 className="ac-card-title-sm">Removed Rules</h3>
+                  <div className="oi-rules-list">
+                    {rules.inactive.map((r) => (
+                      <div key={r._id} className="oi-rule-card inactive">
+                        <p className="oi-rule-text">{r.rule}</p>
+                        <span className="oi-rule-date">
+                          Removed {r.deactivatedAt ? new Date(r.deactivatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : ''}
+                          {r.deactivatedReason ? ` — ${r.deactivatedReason}` : ''}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="ac-card">
+              <p className="ac-empty-msg">No active rules yet. Rules are created when evolution proposals pass Opus verification.</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -226,6 +310,11 @@ const OracleIntelligence = () => {
                       <span className={`oi-evo-status ${r.status}`}>{r.status}</span>
                     </div>
                     <p className="oi-evo-content">{r.content?.substring(0, 200)}{r.content?.length > 200 ? '...' : ''}</p>
+                    
+                    {/* Opus review notes — shows why it was approved/flagged */}
+                    {r.reviewNotes && (
+                      <p className="oi-evo-review-notes">{r.reviewNotes}</p>
+                    )}
                     
                     {/* Proposed changes preview */}
                     {r.findings?.promptChanges?.length > 0 && (

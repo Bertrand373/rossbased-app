@@ -449,3 +449,111 @@
 [data-theme="light"] .oi-action-desc { color: rgba(0,0,0,0.25); }
 [data-theme="light"] .oi-result-label { color: rgba(0,0,0,0.5); }
 [data-theme="light"] .oi-result-data { color: rgba(0,0,0,0.35); }
+
+/* ===== ACTIVE RULES ===== */
+.oi-rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.oi-rule-card {
+  padding: 12px;
+  background: rgba(255,255,255,0.015);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 8px;
+}
+
+.oi-rule-card.inactive { opacity: 0.4; }
+
+.oi-rule-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.oi-rule-category {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.04);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.oi-rule-source {
+  font-size: 9px;
+  color: rgba(255,255,255,0.15);
+  text-transform: capitalize;
+}
+
+.oi-rule-opus {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: rgba(189,163,0,0.6);
+  background: rgba(189,163,0,0.06);
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-left: auto;
+}
+
+.oi-rule-text {
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.oi-rule-assessment {
+  font-size: 10px;
+  color: rgba(255,255,255,0.2);
+  line-height: 1.4;
+  margin: 6px 0 0;
+  font-style: italic;
+}
+
+.oi-rule-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.03);
+}
+
+.oi-rule-date {
+  font-size: 9px;
+  color: rgba(255,255,255,0.15);
+}
+
+/* Light mode rules */
+[data-theme="light"] .oi-rule-card { background: rgba(0,0,0,0.015); border-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .oi-rule-category { color: rgba(0,0,0,0.35); background: rgba(0,0,0,0.04); }
+[data-theme="light"] .oi-rule-source { color: rgba(0,0,0,0.2); }
+[data-theme="light"] .oi-rule-opus { color: rgba(160,130,0,0.6); background: rgba(160,130,0,0.06); }
+[data-theme="light"] .oi-rule-text { color: rgba(0,0,0,0.55); }
+[data-theme="light"] .oi-rule-assessment { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .oi-rule-date { color: rgba(0,0,0,0.2); }
+
+/* ===== OPUS REVIEW NOTES ===== */
+.oi-evo-review-notes {
+  font-size: 11px;
+  color: rgba(189,163,0,0.5);
+  line-height: 1.5;
+  margin: 4px 0 8px;
+  padding: 6px 10px;
+  background: rgba(189,163,0,0.03);
+  border-radius: 6px;
+  border-left: 2px solid rgba(189,163,0,0.15);
+}
+
+[data-theme="light"] .oi-evo-review-notes {
+  color: rgba(160,130,0,0.5);
+  background: rgba(160,130,0,0.03);
+  border-left-color: rgba(160,130,0,0.15);
+}
