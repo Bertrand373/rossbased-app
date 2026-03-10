@@ -140,8 +140,18 @@ Should this rule go live in Oracle's system prompt?`
     try {
       parsed = JSON.parse(raw);
     } catch {
-      const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      parsed = JSON.parse(cleaned);
+      try {
+        const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        parsed = JSON.parse(cleaned);
+      } catch {
+        try {
+          const jsonMatch = raw.match(/\{[\s\S]*\}/);
+          if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+          else throw new Error('No JSON found in Opus response');
+        } catch (innerErr) {
+          throw new Error(`Opus JSON parse failed: ${innerErr.message}`);
+        }
+      }
     }
 
     return {

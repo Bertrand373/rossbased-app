@@ -273,8 +273,19 @@ Respond ONLY with valid JSON:
     try {
       parsed = JSON.parse(raw);
     } catch {
-      const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      parsed = JSON.parse(cleaned);
+      try {
+        const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        parsed = JSON.parse(cleaned);
+      } catch {
+        try {
+          const jsonMatch = raw.match(/\{[\s\S]*\}/);
+          if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+          else { console.error('[Transmission] No JSON in aggregate response'); return { sent: 0 }; }
+        } catch {
+          console.error('[Transmission] Aggregate JSON parse failed');
+          return { sent: 0 };
+        }
+      }
     }
 
     const transmissions = parsed.transmissions || [];

@@ -34,7 +34,7 @@ async function classifyResponseStrategy(oracleResponse, userMessage) {
 
     const response = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 100,
+      max_tokens: 200,
       system: `Classify this AI guide's response strategy. Respond ONLY with valid JSON.
 
 Valid strategies (pick 1-2): direct_confrontation, philosophical_reframe, practical_guidance, empathic_acknowledgment, pattern_mirror, mechanism_explanation, challenge_issued, boundary_held
@@ -55,8 +55,18 @@ responseLength: "brief", "moderate", "detailed"`,
     try {
       parsed = JSON.parse(raw);
     } catch {
-      const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      parsed = JSON.parse(cleaned);
+      try {
+        const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        parsed = JSON.parse(cleaned);
+      } catch {
+        try {
+          const jsonMatch = raw.match(/\{[\s\S]*\}/);
+          if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+          else return null;
+        } catch {
+          return null;
+        }
+      }
     }
 
     const strategies = Array.isArray(parsed.strategies)
