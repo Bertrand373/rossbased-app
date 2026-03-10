@@ -202,7 +202,7 @@ async function discoverPatterns() {
     // === AI PATTERN ANALYSIS ===
     const response = await anthropic.messages.create({
       model: process.env.ORACLE_MODEL || 'claude-sonnet-4-5-20250929',
-      max_tokens: 1500,
+      max_tokens: 3000,
       system: `You are an analytical system discovering novel patterns in semen retention data. You have access to cross-dimensional data: spermatogenesis cycles, lunar phases, benefit tracking, conversation topics, and measured outcomes.
 
 Your job: find patterns that NO HUMAN has articulated before. Not obvious things like "urges are hard." Look for:
@@ -246,8 +246,26 @@ Respond ONLY with valid JSON:
     try {
       parsed = JSON.parse(raw);
     } catch {
-      const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      parsed = JSON.parse(cleaned);
+      try {
+        // Strip markdown fences
+        const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        parsed = JSON.parse(cleaned);
+      } catch {
+        // Try to extract JSON object even if truncated
+        try {
+          const jsonMatch = raw.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            parsed = JSON.parse(jsonMatch[0]);
+          } else {
+            console.error('[PatternDiscovery] Could not parse AI response — raw length:', raw.length);
+            console.error('[PatternDiscovery] First 200 chars:', raw.substring(0, 200));
+            return null;
+          }
+        } catch {
+          console.error('[PatternDiscovery] All JSON parse attempts failed — raw length:', raw.length);
+          return null;
+        }
+      }
     }
 
     const patterns = (parsed.patterns || []).filter(p => p.sampleSize >= 5);

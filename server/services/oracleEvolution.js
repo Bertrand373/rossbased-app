@@ -20,6 +20,28 @@ const OracleEvolution = require('../models/OracleEvolution');
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 /**
+ * Robust JSON parser — handles markdown fences, truncation, all edge cases
+ */
+function safeParseJSON(raw, label = 'unknown') {
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    try {
+      const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      return JSON.parse(cleaned);
+    } catch {
+      try {
+        const jsonMatch = raw.match(/\{[\s\S]*\}/);
+        if (jsonMatch) return JSON.parse(jsonMatch[0]);
+      } catch { /* fall through */ }
+      console.error(`[OracleEvolution] JSON parse failed (${label}) — raw length: ${raw.length}, first 200: ${raw.substring(0, 200)}`);
+      return null;
+    }
+  }
+}
+
+/**
  * Layer 4: Voice Self-Assessment
  * Oracle reviews its own recent conversations against outcomes
  * and identifies what worked vs what didn't in its communication
@@ -93,13 +115,8 @@ Respond ONLY with valid JSON:
     });
 
     const raw = response.content[0]?.text?.trim();
-    let parsed;
-    try {
-      parsed = JSON.parse(raw);
-    } catch {
-      const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      parsed = JSON.parse(cleaned);
-    }
+    const parsed = safeParseJSON(raw, 'voice-assessment');
+    if (!parsed) return null;
 
     // Save evolution record
     await OracleEvolution.create({
@@ -192,7 +209,7 @@ async function buildPsychProfile(userId) {
 
     const response = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 400,
+      max_tokens: 600,
       system: `You are building a psychological profile of a semen retention practitioner for an AI guide called Oracle. This profile helps Oracle understand WHO this person is at a deep level — not just their stats.
 
 Write a concise but profound psychological summary (3-5 sentences) covering:
@@ -229,13 +246,8 @@ ${notes.join('\n')}`
     });
 
     const raw = response.content[0]?.text?.trim();
-    let parsed;
-    try {
-      parsed = JSON.parse(raw);
-    } catch {
-      const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      parsed = JSON.parse(cleaned);
-    }
+    const parsed = safeParseJSON(raw, 'psych-profile');
+    if (!parsed) return null;
 
     // Update the risk profile with psychological data
     profile.psychProfile = {
@@ -340,13 +352,8 @@ Respond ONLY with valid JSON:
     });
 
     const raw = response.content[0]?.text?.trim();
-    let parsed;
-    try {
-      parsed = JSON.parse(raw);
-    } catch {
-      const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      parsed = JSON.parse(cleaned);
-    }
+    const parsed = safeParseJSON(raw, 'prompt-proposal');
+    if (!parsed) return null;
 
     // Save as evolution record for Ross to review
     await OracleEvolution.create({
