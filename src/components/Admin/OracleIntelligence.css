@@ -1,0 +1,451 @@
+/* OracleIntelligence.css — Oracle Evolution Panel for AdminCockpit */
+/* Matches ac- design language: rgba opacity values, compact cards, minimal */
+
+.oi-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.oi-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: acFadeIn 0.2s ease;
+}
+
+/* ===== STAT GRID ===== */
+.oi-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+}
+
+.oi-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 6px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+}
+
+.oi-stat-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.8);
+  letter-spacing: -0.3px;
+}
+
+.oi-stat-label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.2);
+  margin-top: 2px;
+}
+
+/* ===== LAYER STATUS CARDS ===== */
+.oi-layers {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.oi-layer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.015);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 8px;
+  transition: border-color 0.15s;
+}
+
+.oi-layer.active {
+  border-color: rgba(34,197,94,0.15);
+}
+
+.oi-layer-num {
+  font-size: 10px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.15);
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+  width: 20px;
+}
+
+.oi-layer.active .oi-layer-num {
+  color: rgba(34,197,94,0.5);
+}
+
+.oi-layer-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.oi-layer-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  text-transform: capitalize;
+}
+
+.oi-layer-status {
+  font-size: 10px;
+  color: rgba(255,255,255,0.2);
+  font-weight: 500;
+}
+
+.oi-layer.active .oi-layer-status {
+  color: rgba(34,197,94,0.5);
+}
+
+.oi-layer-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+
+.oi-layer-dot.on {
+  background: rgba(34,197,94,0.7);
+  box-shadow: 0 0 6px rgba(34,197,94,0.3);
+}
+
+/* ===== TRANSMISSION LIST ===== */
+.oi-source-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.oi-source-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.oi-source-row:last-child { border-bottom: none; }
+
+.oi-source-name {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  text-transform: capitalize;
+}
+
+.oi-source-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+}
+
+.oi-tx-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.oi-tx-item {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.oi-tx-item:last-child { border-bottom: none; }
+
+.oi-tx-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.oi-tx-user {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.55);
+}
+
+.oi-tx-source {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.04);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.oi-tx-read {
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.15);
+  margin-left: auto;
+}
+
+.oi-tx-read.yes {
+  color: rgba(34,197,94,0.5);
+}
+
+.oi-tx-msg {
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ===== EVOLUTION LOG ===== */
+.oi-evo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.oi-evo-card {
+  padding: 14px;
+  background: rgba(255,255,255,0.015);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 10px;
+  position: relative;
+}
+
+.oi-evo-card.pending {
+  border-color: rgba(189,163,0,0.15);
+}
+
+.oi-evo-card.approved {
+  border-color: rgba(34,197,94,0.12);
+}
+
+.oi-evo-card.rejected {
+  opacity: 0.5;
+}
+
+.oi-evo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.oi-evo-type {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255,255,255,0.4);
+}
+
+.oi-evo-status {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.oi-evo-status.pending {
+  color: rgba(189,163,0,0.7);
+  background: rgba(189,163,0,0.08);
+}
+
+.oi-evo-status.approved {
+  color: rgba(34,197,94,0.7);
+  background: rgba(34,197,94,0.08);
+}
+
+.oi-evo-status.rejected {
+  color: rgba(239,68,68,0.5);
+  background: rgba(239,68,68,0.06);
+}
+
+.oi-evo-content {
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+  line-height: 1.5;
+  margin: 0 0 8px;
+}
+
+.oi-evo-changes {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.03);
+}
+
+.oi-evo-changes-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.25);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.oi-evo-change {
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  margin: 2px 0;
+  padding-left: 8px;
+  border-left: 2px solid rgba(255,255,255,0.05);
+}
+
+.oi-evo-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.oi-btn {
+  padding: 7px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.oi-btn:disabled { opacity: 0.4; cursor: default; }
+
+.oi-btn.approve {
+  background: rgba(34,197,94,0.12);
+  color: rgba(34,197,94,0.8);
+}
+
+.oi-btn.approve:hover:not(:disabled) { background: rgba(34,197,94,0.2); }
+
+.oi-btn.reject {
+  background: rgba(239,68,68,0.08);
+  color: rgba(239,68,68,0.6);
+}
+
+.oi-btn.reject:hover:not(:disabled) { background: rgba(239,68,68,0.15); }
+
+.oi-evo-date {
+  font-size: 9px;
+  color: rgba(255,255,255,0.12);
+  position: absolute;
+  top: 14px;
+  right: 50px;
+}
+
+/* ===== ACTION BUTTONS ===== */
+.oi-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.oi-action-card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+}
+
+.oi-action-card:hover:not(:disabled) {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.oi-action-card:disabled { opacity: 0.4; cursor: default; }
+
+.oi-action-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+}
+
+.oi-action-desc {
+  font-size: 10px;
+  color: rgba(255,255,255,0.2);
+  line-height: 1.4;
+}
+
+/* ===== ACTION RESULT ===== */
+.oi-result {
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.oi-result.success {
+  background: rgba(34,197,94,0.04);
+  border: 1px solid rgba(34,197,94,0.1);
+}
+
+.oi-result.error {
+  background: rgba(239,68,68,0.04);
+  border: 1px solid rgba(239,68,68,0.1);
+}
+
+.oi-result-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.oi-result-data {
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+  font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+}
+
+/* ===== LIGHT MODE ===== */
+[data-theme="light"] .oi-stat { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .oi-stat-val { color: rgba(0,0,0,0.8); }
+[data-theme="light"] .oi-stat-label { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .oi-layer { background: rgba(0,0,0,0.015); border-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .oi-layer.active { border-color: rgba(22,163,74,0.15); }
+[data-theme="light"] .oi-layer-num { color: rgba(0,0,0,0.12); }
+[data-theme="light"] .oi-layer.active .oi-layer-num { color: rgba(22,163,74,0.5); }
+[data-theme="light"] .oi-layer-name { color: rgba(0,0,0,0.6); }
+[data-theme="light"] .oi-layer-status { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .oi-layer-dot { background: rgba(0,0,0,0.06); }
+[data-theme="light"] .oi-layer-dot.on { background: rgba(22,163,74,0.7); }
+[data-theme="light"] .oi-source-name { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .oi-source-count { color: rgba(0,0,0,0.6); }
+[data-theme="light"] .oi-tx-user { color: rgba(0,0,0,0.55); }
+[data-theme="light"] .oi-tx-source { color: rgba(0,0,0,0.25); background: rgba(0,0,0,0.04); }
+[data-theme="light"] .oi-tx-read { color: rgba(0,0,0,0.15); }
+[data-theme="light"] .oi-tx-read.yes { color: rgba(22,163,74,0.6); }
+[data-theme="light"] .oi-tx-msg { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .oi-evo-card { background: rgba(0,0,0,0.015); border-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .oi-evo-card.pending { border-color: rgba(160,130,0,0.15); }
+[data-theme="light"] .oi-evo-card.approved { border-color: rgba(22,163,74,0.12); }
+[data-theme="light"] .oi-evo-type { color: rgba(0,0,0,0.45); }
+[data-theme="light"] .oi-evo-status.pending { color: rgba(160,130,0,0.7); background: rgba(160,130,0,0.08); }
+[data-theme="light"] .oi-evo-status.approved { color: rgba(22,163,74,0.7); background: rgba(22,163,74,0.08); }
+[data-theme="light"] .oi-evo-content { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .oi-evo-change { color: rgba(0,0,0,0.3); border-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .oi-action-card { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .oi-action-card:hover:not(:disabled) { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); }
+[data-theme="light"] .oi-action-name { color: rgba(0,0,0,0.7); }
+[data-theme="light"] .oi-action-desc { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .oi-result-label { color: rgba(0,0,0,0.5); }
+[data-theme="light"] .oi-result-data { color: rgba(0,0,0,0.35); }

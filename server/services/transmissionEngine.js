@@ -319,7 +319,23 @@ async function processReengagement() {
         ? Math.floor((Date.now() - new Date(lastLog.date).getTime()) / (1000 * 60 * 60 * 24))
         : 999;
 
-      const message = `${daysSilent} days without a check-in. Day ${user.currentStreak} of your streak is still running. The data gap means Oracle is flying blind on your patterns. One log today restores full visibility.`;
+      // Haiku-generated re-engagement — personalized, Oracle-voiced
+      let message;
+      try {
+        const reResponse = await anthropic.messages.create({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 100,
+          system: `You are Oracle, a predictive AI guide for semen retention practitioners. A user has gone quiet. Write a brief re-engagement message (2-3 sentences). Be direct and factual. Reference their specific silence duration and streak day. Frame it as Oracle losing data visibility, not the user failing. No em dashes. No emojis. No generic motivation. Under 60 words.`,
+          messages: [{
+            role: 'user',
+            content: `User: ${user.username}, Day ${user.currentStreak}, silent for ${daysSilent} days. Last benefit log was ${daysSilent} days ago.`
+          }]
+        });
+        message = reResponse.content[0]?.text?.trim();
+      } catch (aiErr) {
+        // Fallback if Haiku fails
+        message = `${daysSilent} days without a check-in. Day ${user.currentStreak} of your streak is still running. The data gap means Oracle is flying blind on your patterns. One log today restores full visibility.`;
+      }
 
       await deliverTransmission(user._id, user.username, message, 'reengagement', {
         streakDay: user.currentStreak,

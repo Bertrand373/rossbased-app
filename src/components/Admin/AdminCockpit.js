@@ -6,6 +6,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import KnowledgeBase from './KnowledgeBase';
 import OracleHealth from './OracleHealth';
 import RevenueCard from './RevenueCard';
+import OracleIntelligence from './OracleIntelligence';
 import './AdminCockpit.css';
 
 const API = process.env.REACT_APP_API || process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
@@ -892,6 +893,7 @@ const AdminCockpit = () => {
           <div className="ac-oracle-wrap">
             <OracleHealth />
             <KnowledgeBase />
+            <OracleIntelligence />
           </div>
         </div>
       )}

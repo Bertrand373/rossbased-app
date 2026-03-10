@@ -260,6 +260,43 @@ const notificationTemplates = {
     data: { url: '/stats', type: 'weekly_progress' }
   },
 
+  // ============================================================================
+  // ONBOARDING SEQUENCE - 6 notifications over 37 days
+  // Drives engagement + conversion. Only 2 mention premium.
+  // Triggered by notificationScheduler based on user signup date.
+  // ============================================================================
+
+  onboarding_day1: {
+    title: 'You\'re In',
+    body: 'Your streak starts now. Log your first day.',
+    data: { url: '/', type: 'onboarding' }
+  },
+  onboarding_day3: {
+    title: 'Day 3',
+    body: 'Still here. That already puts you ahead. Log today.',
+    data: { url: '/', type: 'onboarding' }
+  },
+  onboarding_day7: {
+    title: 'One Week',
+    body: 'Seven days. Check your stats — the data is building.',
+    data: { url: '/stats', type: 'onboarding' }
+  },
+  onboarding_day14: {
+    title: 'Two Weeks In',
+    body: 'Your patterns are forming. Premium unlocks ML predictions that learn yours.',
+    data: { url: '/stats', type: 'onboarding' }
+  },
+  onboarding_day25: {
+    title: 'Day 25',
+    body: 'Your data tells a story now. Unlock unlimited logging to keep it going.',
+    data: { url: '/', type: 'onboarding' }
+  },
+  onboarding_day37: {
+    title: 'Your Data Is Waiting',
+    body: 'Unlimited logging, ML predictions, full analytics. Upgrade to keep building.',
+    data: { url: '/stats', type: 'onboarding' }
+  },
+
   // ORACLE PROACTIVE TRANSMISSIONS
   oracle_transmission: {
     title: 'Oracle',
@@ -436,6 +473,62 @@ async function checkAndSendMilestoneNotification(username, currentStreak) {
 }
 
 // ============================================================================
+// ONBOARDING SEQUENCE HELPER
+// Checks user's account age and sends the appropriate onboarding notification.
+// Each notification is sent once — tracked via user.onboardingNotificationsSent[]
+// Called by notificationScheduler on a regular interval.
+// ============================================================================
+
+const ONBOARDING_SCHEDULE = [
+  { day: 1,  template: 'onboarding_day1' },
+  { day: 3,  template: 'onboarding_day3' },
+  { day: 7,  template: 'onboarding_day7' },
+  { day: 14, template: 'onboarding_day14' },
+  { day: 25, template: 'onboarding_day25' },
+  { day: 37, template: 'onboarding_day37' }
+];
+
+async function checkAndSendOnboardingNotification(user) {
+  try {
+    if (!user || !user.createdAt) return { success: false, reason: 'no_user_or_createdAt' };
+
+    // Skip premium users — they don't need onboarding conversion
+    if (user.isPremium) return { success: false, reason: 'user_is_premium' };
+
+    // Calculate account age in days
+    const accountAgeDays = Math.floor((Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24));
+
+    // Already-sent tracking (stored on user document)
+    const sent = user.onboardingNotificationsSent || [];
+
+    for (const step of ONBOARDING_SCHEDULE) {
+      // Check if this step is due and hasn't been sent
+      if (accountAgeDays >= step.day && !sent.includes(step.template)) {
+        const result = await sendNotificationToUser(user.username, step.template);
+
+        // Mark as sent regardless of delivery success (avoid spamming on failures)
+        await User.updateOne(
+          { _id: user._id },
+          { $addToSet: { onboardingNotificationsSent: step.template } }
+        );
+
+        if (result.success) {
+          console.log(`📬 Onboarding ${step.template} sent to ${user.username}`);
+        }
+
+        // Send only one per check cycle (spread out, don't batch)
+        return result;
+      }
+    }
+
+    return { success: false, reason: 'no_pending_onboarding' };
+  } catch (error) {
+    console.error(`❌ Onboarding check error for ${user?.username}:`, error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+// ============================================================================
 // EXPORTS
 // ============================================================================
 
@@ -444,6 +537,8 @@ module.exports = {
   sendNotificationToUser,
   sendBulkNotifications,
   checkAndSendMilestoneNotification,
+  checkAndSendOnboardingNotification,
+  ONBOARDING_SCHEDULE,
   notificationTemplates,
   shouldSendNotification,
   getCurrentTimeInTimezone
