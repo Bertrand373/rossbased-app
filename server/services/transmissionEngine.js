@@ -1,0 +1,384 @@
+// server/services/transmissionEngine.js
+// Oracle Proactive Transmissions — the delivery layer
+// Combines aggregate pattern transmissions with risk-based interventions
+// into a single pipeline that delivers via push notification + Oracle chat
+//
+// Cost: ~$0.01/day (one Haiku call for aggregate patterns)
+// Frequency: max 1 transmission per user per day, 2-3 per week target
+
+const Anthropic = require('@anthropic-ai/sdk');
+const User = require('../models/User');
+const OracleTransmission = require('../models/OracleTransmission');
+const OracleInteraction = require('../models/OracleInteraction');
+const OracleOutcome = require('../models/OracleOutcome');
+const UserRiskProfile = require('../models/UserRiskProfile');
+const { sendNotificationToUser } = require('./notificationService');
+const { getLunarData } = require('../utils/lunarData');
+const { getCommunityPulse } = require('./communityPulse');
+const { calculateRiskScore, generateIntervention } = require('./riskEngine');
+
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+// Constraints
+const MAX_TRANSMISSIONS_PER_WEEK = 3;
+const MIN_HOURS_BETWEEN = 20;  // At least 20 hours between transmissions
+const REENGAGEMENT_DAYS = 3;   // Days of silence before re-engagement
+
+/**
+ * Check if a user is eligible to receive a transmission right now
+ */
+async function isEligible(userId, username, isPremium) {
+  // Free users get max 1/week, premium gets 3/week
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const recentCount = await OracleTransmission.countDocuments({
+    userId,
+    createdAt: { $gte: weekAgo }
+  });
+
+  const weeklyLimit = isPremium ? MAX_TRANSMISSIONS_PER_WEEK : 1;
+  if (recentCount >= weeklyLimit) return false;
+
+  // Check minimum time between transmissions
+  const lastTransmission = await OracleTransmission.findOne({ userId })
+    .sort({ createdAt: -1 }).lean();
+  if (lastTransmission) {
+    const hoursSince = (Date.now() - new Date(lastTransmission.createdAt).getTime()) / (1000 * 60 * 60);
+    if (hoursSince < MIN_HOURS_BETWEEN) return false;
+  }
+
+  return true;
+}
+
+/**
+ * Deliver a transmission to a user (create record + push notification)
+ */
+async function deliverTransmission(userId, username, message, source, context = {}) {
+  try {
+    // Create the transmission record
+    const transmission = await OracleTransmission.create({
+      userId,
+      username,
+      message,
+      source,
+      context,
+      delivered: true,
+      deliveredAt: new Date()
+    });
+
+    // Send Firebase push notification
+    try {
+      const result = await sendNotificationToUser(username, 'oracle_transmission', {
+        transmissionId: transmission._id.toString()
+      });
+      if (result.success) {
+        transmission.pushSent = true;
+        transmission.pushSentAt = new Date();
+        await transmission.save();
+      }
+    } catch (pushErr) {
+      console.error(`[Transmission] Push failed for ${username}:`, pushErr.message);
+    }
+
+    return transmission;
+  } catch (err) {
+    console.error(`[Transmission] Delivery failed for ${username}:`, err.message);
+    return null;
+  }
+}
+
+/**
+ * PIPELINE 1: Risk-based interventions
+ * Uses the risk engine to find high-risk users and generate personalized messages
+ */
+async function processRiskInterventions() {
+  try {
+    const highRiskProfiles = await UserRiskProfile.find({
+      'currentRisk.score': { $gte: 50 }
+    }).lean();
+
+    if (highRiskProfiles.length === 0) return { sent: 0 };
+
+    let sent = 0;
+
+    for (const profile of highRiskProfiles) {
+      const user = await User.findById(profile.userId)
+        .select('_id username isPremium startDate currentStreak')
+        .lean();
+      if (!user) continue;
+
+      // Check eligibility
+      const eligible = await isEligible(user._id, user.username, user.isPremium);
+      if (!eligible) continue;
+
+      // Generate personalized intervention
+      const riskData = {
+        username: user.username,
+        currentDay: user.currentStreak || 0,
+        riskScore: profile.currentRisk.score,
+        factors: profile.currentRisk.factors || [],
+        trend: profile.currentRisk.trend
+      };
+
+      const message = await generateIntervention(riskData, profile);
+      if (!message) continue;
+
+      await deliverTransmission(user._id, user.username, message, 'risk_intervention', {
+        riskScore: profile.currentRisk.score,
+        streakDay: user.currentStreak,
+        matchCriteria: profile.currentRisk.factors.slice(0, 2).join('; ')
+      });
+
+      sent++;
+    }
+
+    return { sent };
+  } catch (err) {
+    console.error('[Transmission] Risk intervention error:', err.message);
+    return { sent: 0, error: err.message };
+  }
+}
+
+/**
+ * PIPELINE 2: Aggregate pattern transmissions
+ * One Haiku call generates cohort-matched message templates,
+ * then we find matching users and deliver
+ */
+async function processAggregateTransmissions() {
+  try {
+    // Gather aggregate data for Haiku
+    const lunar = getLunarData(new Date());
+    const communityPulse = await getCommunityPulse();
+
+    // Streak distribution of active users
+    const activeUsers = await User.find({
+      startDate: { $exists: true, $ne: null },
+      currentStreak: { $gte: 1 }
+    })
+      .select('_id username currentStreak isPremium startDate benefitTracking')
+      .lean();
+
+    if (activeUsers.length < 3) return { sent: 0 };
+
+    // Compute streak distributions
+    const streakBuckets = {};
+    activeUsers.forEach(u => {
+      let bucket;
+      const d = u.currentStreak;
+      if (d <= 7) bucket = '1-7';
+      else if (d <= 14) bucket = '8-14';
+      else if (d <= 21) bucket = '15-21';
+      else if (d <= 30) bucket = '22-30';
+      else if (d <= 45) bucket = '31-45';
+      else if (d <= 90) bucket = '46-90';
+      else bucket = '90+';
+      streakBuckets[bucket] = (streakBuckets[bucket] || 0) + 1;
+    });
+
+    // Recent outcome data summary
+    const recentOutcomes = await OracleOutcome.find({
+      'outcome.measured': true,
+      createdAt: { $gte: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000) }
+    })
+      .select('snapshot.streakDay snapshot.topic outcome.streakMaintained outcome.hadUrge')
+      .limit(100)
+      .lean();
+
+    // Topic frequency from recent interactions
+    const recentInteractions = await OracleInteraction.find({
+      timestamp: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
+    })
+      .select('topics streakDay')
+      .limit(200)
+      .lean();
+
+    const topicCounts = {};
+    recentInteractions.forEach(i => {
+      (i.topics || []).forEach(t => { topicCounts[t] = (topicCounts[t] || 0) + 1; });
+    });
+
+    // Build context for Haiku
+    const dataContext = {
+      lunarPhase: lunar.label || lunar.phase,
+      lunarIllumination: lunar.illumination,
+      streakDistribution: streakBuckets,
+      topCommunityTopics: Object.entries(topicCounts).sort((a, b) => b[1] - a[1]).slice(0, 5),
+      outcomesSummary: recentOutcomes.length > 0 ? {
+        total: recentOutcomes.length,
+        maintenanceRate: Math.round(recentOutcomes.filter(o => o.outcome?.streakMaintained).length / recentOutcomes.length * 100),
+        topRelapseDayRange: findPeakRelapseRange(recentOutcomes)
+      } : null,
+      communityPulseSummary: communityPulse ? communityPulse.substring(0, 300) : null
+    };
+
+    // One Haiku call: generate 1-2 targeted transmission templates
+    const response = await anthropic.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 400,
+      system: `You generate proactive Oracle transmissions for a semen retention community. Based on aggregate data, identify 1-2 user cohorts that would benefit from a message right now and write the message.
+
+Rules:
+- Each message is 2-4 sentences, Oracle's voice: calm certainty, pattern-based, no generic motivation
+- Start with the pattern observation, not a greeting
+- Reference specific data (day ranges, lunar phase, community patterns)
+- No em dashes, no emojis, no "Stay strong" endings
+- Under 80 words per message
+
+Respond ONLY with valid JSON:
+{
+  "transmissions": [
+    {
+      "targetCriteria": { "streakMin": N, "streakMax": N },
+      "message": "The actual message text",
+      "rationale": "Why this cohort needs this right now"
+    }
+  ]
+}`,
+      messages: [{
+        role: 'user',
+        content: `Generate transmissions based on this data:\n${JSON.stringify(dataContext, null, 2)}`
+      }]
+    });
+
+    const raw = response.content[0]?.text?.trim();
+    if (!raw) return { sent: 0 };
+
+    let parsed;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      parsed = JSON.parse(cleaned);
+    }
+
+    const transmissions = parsed.transmissions || [];
+    let sent = 0;
+
+    for (const tx of transmissions) {
+      const { streakMin, streakMax } = tx.targetCriteria || {};
+      if (!streakMin || !streakMax || !tx.message) continue;
+
+      // Find matching users
+      const matchingUsers = activeUsers.filter(u => {
+        const d = u.currentStreak;
+        return d >= streakMin && d <= streakMax;
+      });
+
+      for (const user of matchingUsers) {
+        const eligible = await isEligible(user._id, user.username, user.isPremium);
+        if (!eligible) continue;
+
+        await deliverTransmission(user._id, user.username, tx.message, 'aggregate_pattern', {
+          streakDay: user.currentStreak,
+          matchCriteria: `Days ${streakMin}-${streakMax}, ${lunar.label || ''}`
+        });
+
+        sent++;
+      }
+    }
+
+    return { sent, templates: transmissions.length };
+  } catch (err) {
+    console.error('[Transmission] Aggregate error:', err.message);
+    return { sent: 0, error: err.message };
+  }
+}
+
+/**
+ * PIPELINE 3: Re-engagement transmissions
+ * Target users who haven't opened the app in 3+ days
+ */
+async function processReengagement() {
+  try {
+    const cutoff = new Date(Date.now() - REENGAGEMENT_DAYS * 24 * 60 * 60 * 1000);
+
+    // Find users with streaks who haven't logged benefits recently
+    const quietUsers = await User.find({
+      startDate: { $exists: true, $ne: null },
+      currentStreak: { $gte: 5 }, // Only target users who had some traction
+      isPremium: true, // Premium re-engagement priority
+    })
+      .select('_id username currentStreak isPremium benefitTracking')
+      .lean();
+
+    const reengageTargets = quietUsers.filter(u => {
+      const lastLog = (u.benefitTracking || [])
+        .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+      if (!lastLog) return true; // Never logged
+      return new Date(lastLog.date) < cutoff;
+    });
+
+    let sent = 0;
+
+    for (const user of reengageTargets.slice(0, 10)) { // Cap at 10 per run
+      const eligible = await isEligible(user._id, user.username, user.isPremium);
+      if (!eligible) continue;
+
+      const lastLog = (user.benefitTracking || [])
+        .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+      const daysSilent = lastLog
+        ? Math.floor((Date.now() - new Date(lastLog.date).getTime()) / (1000 * 60 * 60 * 24))
+        : 999;
+
+      const message = `${daysSilent} days without a check-in. Day ${user.currentStreak} of your streak is still running. The data gap means Oracle is flying blind on your patterns. One log today restores full visibility.`;
+
+      await deliverTransmission(user._id, user.username, message, 'reengagement', {
+        streakDay: user.currentStreak,
+        matchCriteria: `${daysSilent} days silent`
+      });
+
+      sent++;
+    }
+
+    return { sent };
+  } catch (err) {
+    console.error('[Transmission] Reengagement error:', err.message);
+    return { sent: 0, error: err.message };
+  }
+}
+
+/**
+ * Run the full transmission pipeline
+ * Called by cron job once daily
+ */
+async function runTransmissionPipeline() {
+  console.log('[Transmission] ====== PIPELINE START ======');
+  const start = Date.now();
+
+  // Pipeline 1: Risk-based (highest priority)
+  const risk = await processRiskInterventions();
+  console.log(`[Transmission] Risk interventions: ${risk.sent} sent`);
+
+  // Pipeline 2: Aggregate patterns
+  const aggregate = await processAggregateTransmissions();
+  console.log(`[Transmission] Aggregate: ${aggregate.sent} sent (${aggregate.templates || 0} templates)`);
+
+  // Pipeline 3: Re-engagement
+  const reengage = await processReengagement();
+  console.log(`[Transmission] Re-engagement: ${reengage.sent} sent`);
+
+  const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+  const totalSent = (risk.sent || 0) + (aggregate.sent || 0) + (reengage.sent || 0);
+  console.log(`[Transmission] ====== COMPLETE: ${totalSent} total (${elapsed}s) ======`);
+
+  return { risk, aggregate, reengage, totalSent, elapsed };
+}
+
+// === HELPERS ===
+
+function findPeakRelapseRange(outcomes) {
+  const ranges = {};
+  outcomes.filter(o => !o.outcome?.streakMaintained).forEach(o => {
+    const d = o.snapshot?.streakDay;
+    if (!d) return;
+    let bucket;
+    if (d <= 14) bucket = '1-14';
+    else if (d <= 30) bucket = '15-30';
+    else if (d <= 60) bucket = '31-60';
+    else bucket = '60+';
+    ranges[bucket] = (ranges[bucket] || 0) + 1;
+  });
+  const sorted = Object.entries(ranges).sort((a, b) => b[1] - a[1]);
+  return sorted.length > 0 ? `Days ${sorted[0][0]}` : null;
+}
+
+module.exports = { runTransmissionPipeline, deliverTransmission, processRiskInterventions };

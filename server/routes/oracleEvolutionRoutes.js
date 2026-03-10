@@ -337,8 +337,17 @@ function startScheduledJobs() {
       const queue = await dailyRiskScan();
       if (queue.length > 0) {
         console.log(`[OracleEvolution] ${queue.length} users flagged for intervention`);
-        // TODO: Wire up Firebase push notifications here when ready
-        // For now, log to console and DM Ross
+        // Wire up proactive interventions via transmission engine
+        try {
+          const { processRiskInterventions } = require('../services/transmissionEngine');
+          const txResults = await processRiskInterventions();
+          if (txResults.sent > 0) {
+            console.log(`[OracleEvolution] ${txResults.sent} risk interventions delivered`);
+          }
+        } catch (txErr) {
+          console.error('[OracleEvolution] Transmission delivery error:', txErr.message);
+        }
+        // Also DM Ross with the flagged users
         try {
           const discordBot = require('../discord-bot');
           if (discordBot.client && discordBot.client.isReady()) {

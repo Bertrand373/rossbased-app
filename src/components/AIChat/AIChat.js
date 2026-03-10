@@ -94,13 +94,90 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
         }
       }
       fetchUsage();
+      fetchUnreadTransmissions();
     }
   }, [isLoggedIn]);
 
-  // Save chat history to localStorage
+  // Fetch unread transmissions when chat opens
+  useEffect(() => {
+    if (isOpen && isLoggedIn) {
+      fetchUnreadTransmissions();
+    }
+  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Check for unread transmissions periodically (for nav badge)
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const checkUnread = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const res = await fetch(`${API_URL}/api/oracle/transmissions`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const count = (data.transmissions || []).length;
+          // Expose unread count globally for nav badge
+          window.__oracleUnreadCount = count;
+          window.dispatchEvent(new CustomEvent('oracle-unread', { detail: count }));
+        }
+      } catch (e) { /* silent */ }
+    };
+    checkUnread();
+    const interval = setInterval(checkUnread, 5 * 60 * 1000); // Every 5 minutes
+    return () => clearInterval(interval);
+  }, [isLoggedIn]);
+
+  // Fetch and inject unread Oracle transmissions into chat
+  const fetchUnreadTransmissions = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      const res = await fetch(`${API_URL}/api/oracle/transmissions`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      const transmissions = data.transmissions || [];
+      if (transmissions.length === 0) return;
+
+      // Inject as Oracle messages (newest first, so reverse for chronological)
+      const txMessages = transmissions.reverse().map(tx => ({
+        role: 'assistant',
+        content: tx.message,
+        timestamp: tx.createdAt,
+        isTransmission: true
+      }));
+
+      setMessages(prev => {
+        // Avoid duplicates: check if we already have these transmission messages
+        const existingContent = new Set(prev.filter(m => m.isTransmission).map(m => m.content));
+        const newTx = txMessages.filter(m => !existingContent.has(m.content));
+        if (newTx.length === 0) return prev;
+        return [...newTx, ...prev];
+      });
+
+      // Mark as read
+      for (const tx of transmissions) {
+        fetch(`${API_URL}/api/oracle/transmissions/${tx._id}/read`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        }).catch(() => {}); // fire-and-forget
+      }
+
+      // Clear unread count
+      window.__oracleUnreadCount = 0;
+      window.dispatchEvent(new CustomEvent('oracle-unread', { detail: 0 }));
+    } catch (err) {
+      console.error('Failed to fetch transmissions:', err);
+    }
+  };
+
+  // Save chat history to localStorage (exclude server-delivered transmissions)
   useEffect(() => {
     if (messages.length > 0) {
-      const toStore = messages.slice(-MAX_STORED_MESSAGES);
+      const toStore = messages.filter(m => !m.isTransmission).slice(-MAX_STORED_MESSAGES);
       localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(toStore));
     }
   }, [messages]);
@@ -404,7 +481,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
             )}
 
             {messages.map((msg, index) => (
-              <div key={index} className={`ai-chat-message ${msg.role}`}>
+              <div key={index} className={`ai-chat-message ${msg.role}${msg.isTransmission ? ' transmission' : ''}`}>
                 {msg.role === 'user' && (
                   <div className="ai-chat-message-meta">
                     <span className="ai-chat-message-label">You</span>
@@ -415,6 +492,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                   <div className="ai-chat-message-row">
                     <img src="/The_Oracle.png" alt="" className="ai-chat-avatar" />
                     <div className="ai-chat-message-content">
+                      {msg.isTransmission && <span className="ai-chat-transmission-label" />}
                       {renderMarkdown(msg.content)}
                     </div>
                   </div>

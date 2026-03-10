@@ -39,6 +39,7 @@ const protocolRoutes = require('./routes/protocolRoutes');
 const discordLinkRoutes = require('./routes/discordLink');
 const timelineRoutes = require('./routes/timelineRoutes');
 const oracleEvolutionRoutes = require('./routes/oracleEvolutionRoutes');
+const transmissionApiRoutes = require('./routes/transmissionApiRoutes');
 const { expireStaleTrials, expireStaleCanceled, checkPremiumAccess, syncStripeSubscriptions } = require('./middleware/subscriptionMiddleware');
 const { checkAndSendOnboardingNotification } = require('./services/notificationService');
 
@@ -307,6 +308,23 @@ mongoose.connect(mongoUri, {
       } else {
         console.log('⚠️ YOUTUBE_API_KEY or YOUTUBE_CHANNEL_ID not set — YouTube integration disabled');
       }
+
+      // ============================================
+      // ORACLE TRANSMISSION PIPELINE (runs daily at 10 AM EST)
+      // Sends proactive Oracle messages via push + chat insertion
+      // ============================================
+      const cron = require('node-cron');
+      cron.schedule('0 15 * * *', async () => { // 15:00 UTC = 10 AM EST
+        try {
+          console.log('🔮 Running Oracle transmission pipeline...');
+          const { runTransmissionPipeline } = require('./services/transmissionEngine');
+          const results = await runTransmissionPipeline();
+          console.log(`🔮 Transmissions complete: ${results.totalSent} sent`);
+        } catch (e) {
+          console.error('Oracle transmission pipeline error:', e.message);
+        }
+      });
+      console.log('🔮 Oracle transmission pipeline scheduled (10 AM EST daily)');
     } catch (error) {
       console.error('Failed to initialize schedulers:', error);
     }
@@ -2679,6 +2697,8 @@ app.use('/api/timeline', timelineRoutes);
 oracleEvolutionRoutes.init(authenticate);
 app.use('/api/admin/oracle', oracleEvolutionRoutes);
 oracleEvolutionRoutes.startScheduledJobs();
+app.use('/api/oracle/transmissions', authenticate, transmissionApiRoutes);
+app.use('/api/admin/oracle/transmissions', authenticate, transmissionApiRoutes);
 
 // Serve frontend build in production
 if (process.env.NODE_ENV === 'production') {

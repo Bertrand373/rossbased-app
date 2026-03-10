@@ -820,3 +820,41 @@
     font-size: 0.9375rem;
   }
 }
+
+/* ============================================================
+   ORACLE TRANSMISSIONS — Gold dash + label, matching nav/toast language
+   ============================================================ */
+
+.ai-chat-transmission-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.ai-chat-transmission-label::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 2px;
+  background: rgba(189, 163, 0, 0.5);
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.ai-chat-transmission-label::after {
+  content: 'Transmission';
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(189, 163, 0, 0.4);
+}
+
+[data-theme="light"] .ai-chat-transmission-label::before {
+  background: rgba(160, 130, 0, 0.35);
+}
+
+[data-theme="light"] .ai-chat-transmission-label::after {
+  color: rgba(160, 130, 0, 0.35);
+}

@@ -258,6 +258,13 @@ const notificationTemplates = {
     title: 'Weekly Summary',
     body: 'Your weekly summary is ready.',
     data: { url: '/stats', type: 'weekly_progress' }
+  },
+
+  // ORACLE PROACTIVE TRANSMISSIONS
+  oracle_transmission: {
+    title: 'Oracle',
+    body: 'Oracle has a transmission for you.',
+    data: { url: '/oracle', type: 'oracle_transmission', icon: '/The_Oracle.png' }
   }
 };
 
@@ -294,8 +301,8 @@ async function sendNotification(fcmToken, notificationType, customData = {}) {
       data: {
         title: title,
         body: body,
-        icon: '/icon-192.png',
-        badge: '/icon-192.png',
+        icon: template.data?.icon || '/icon-192.png',
+        badge: template.data?.icon || '/icon-192.png',
         url: template.data?.url || '/',
         type: template.data?.type || '',
         ...customData,

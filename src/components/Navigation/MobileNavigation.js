@@ -1,6 +1,6 @@
 // MobileNavigation.js - TITANTRACK
 // 3-group layout: left tabs | Oracle center | right tabs + sliding dash
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import './MobileNavigation.css';
 
@@ -9,6 +9,14 @@ const MobileNavigation = ({ onOracleClick, isOracleActive }) => {
   const navRef = useRef(null);
   const dashRef = useRef(null);
   const initialized = useRef(false);
+  const [oracleUnread, setOracleUnread] = useState(window.__oracleUnreadCount || 0);
+
+  // Listen for unread transmission count changes from AIChat
+  useEffect(() => {
+    const handler = (e) => setOracleUnread(e.detail || 0);
+    window.addEventListener('oracle-unread', handler);
+    return () => window.removeEventListener('oracle-unread', handler);
+  }, []);
 
   // Position the dash under the active route tab
   useEffect(() => {
@@ -116,6 +124,7 @@ const MobileNavigation = ({ onOracleClick, isOracleActive }) => {
           aria-label="Open The Oracle"
         >
           <img src="/The_Oracle.png" alt="" className="mobile-nav-oracle-img" />
+          {oracleUnread > 0 && !isOracleActive && <span className="mobile-nav-oracle-dot" />}
         </button>
 
         {/* Right group */}

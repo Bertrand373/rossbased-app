@@ -140,6 +140,24 @@
   transform: scale(0.92);
 }
 
+/* Unread transmission dot — gold, positioned top-right of Oracle eye */
+.mobile-nav-oracle-dot {
+  position: absolute;
+  top: 6px;
+  right: 18px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(189, 163, 0, 0.85);
+  box-shadow: 0 0 8px rgba(189, 163, 0, 0.4);
+  pointer-events: none;
+}
+
+[data-theme="light"] .mobile-nav-oracle-dot {
+  background: rgba(160, 130, 0, 0.8);
+  box-shadow: 0 0 8px rgba(160, 130, 0, 0.3);
+}
+
 /* ============================================================
    DIVIDERS — Refined separators
    ============================================================ */
