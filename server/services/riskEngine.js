@@ -320,6 +320,33 @@ async function calculateRiskScore(userId) {
       }
     }
 
+    // === FACTOR 8: COMPOUND RISK — Mitotic phase + Waning Crescent (Oracle-discovered) ===
+    // Pattern discovery found: mitotic phase (days 1-16 of 74-day spermatogenesis cycle) is the 
+    // only phase with NEGATIVE benefit change. Waning Crescent has 72% maintenance vs 99% Full Moon.
+    // When these overlap, relapse risk compounds — avg relapse day is 23, exactly where these collide.
+    {
+      const spermaDay = ((currentDay - 1) % 74) + 1;
+      const inMitoticPhase = spermaDay >= 1 && spermaDay <= 16;
+      const lunarPhase = lunar.label || lunar.phase || '';
+      const isWaningCrescent = lunarPhase.toLowerCase().includes('waning crescent');
+      const isApproachingWaningCrescent = lunarPhase.toLowerCase().includes('waning gibbous') || 
+                                           lunarPhase.toLowerCase().includes('last quarter');
+
+      if (inMitoticPhase && isWaningCrescent) {
+        // Highest compound risk — both factors active simultaneously
+        score += 25;
+        factors.push(`COMPOUND RISK: Mitotic phase (sperma day ${spermaDay}/16) + Waning Crescent active`);
+      } else if (inMitoticPhase && isApproachingWaningCrescent) {
+        // Approaching compound risk — warn early
+        score += 15;
+        factors.push(`Approaching compound risk: Mitotic phase (sperma day ${spermaDay}/16) + Waning Crescent within days`);
+      } else if (inMitoticPhase && profile?.growthSignals?.benefitTrend === 'declining') {
+        // Mitotic + declining benefits = motivational debt accumulating
+        score += 12;
+        factors.push(`Mitotic phase with declining benefits — motivational debt building`);
+      }
+    }
+
     // Cap at 100
     score = Math.min(100, Math.max(0, score));
 
