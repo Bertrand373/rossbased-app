@@ -891,9 +891,9 @@ const AdminCockpit = () => {
             </span>
           </div>
           <div className="ac-oracle-wrap">
+            <OracleIntelligence />
             <OracleHealth />
             <KnowledgeBase />
-            <OracleIntelligence />
           </div>
         </div>
       )}
