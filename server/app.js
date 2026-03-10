@@ -38,6 +38,7 @@ const stripeRoutes = require('./routes/stripeRoutes');
 const protocolRoutes = require('./routes/protocolRoutes');
 const discordLinkRoutes = require('./routes/discordLink');
 const timelineRoutes = require('./routes/timelineRoutes');
+const oracleEvolutionRoutes = require('./routes/oracleEvolutionRoutes');
 const { expireStaleTrials, expireStaleCanceled, checkPremiumAccess, syncStripeSubscriptions } = require('./middleware/subscriptionMiddleware');
 const { checkAndSendOnboardingNotification } = require('./services/notificationService');
 
@@ -709,7 +710,7 @@ app.get('/api/discord/verify/:discordUsername', async (req, res) => {
 // This is what makes the in-app Oracle uncanny.
 // It sees patterns the user hasn't noticed yet.
 // ============================================
-function buildOracleContext(user, timezone) {
+async function buildOracleContext(user, timezone) {
   const lines = [];
   const relapses = user.relapseCount || 0;
   const wetDreams = user.wetDreamCount || 0;
@@ -1114,6 +1115,41 @@ function buildOracleContext(user, timezone) {
     }
   }
 
+  // --- RISK PROFILE + PSYCHOLOGICAL MODEL (Oracle Evolution Layers 2+6) ---
+  try {
+    const UserRiskProfile = require('./models/UserRiskProfile');
+    const profile = await UserRiskProfile.findOne({ userId: user._id }).lean();
+    if (profile) {
+      if (profile.currentRisk && profile.currentRisk.score > 0) {
+        lines.push('');
+        lines.push(`RISK ASSESSMENT: Score ${profile.currentRisk.score}/100 (${profile.currentRisk.trend}).`);
+        if (profile.currentRisk.factors && profile.currentRisk.factors.length > 0) {
+          lines.push(`Active factors: ${profile.currentRisk.factors.slice(0, 3).join('; ')}.`);
+        }
+      }
+      if (profile.psychProfile && profile.psychProfile.oracleSummary) {
+        lines.push('');
+        lines.push(`ORACLE'S UNDERSTANDING OF THIS USER:`);
+        lines.push(profile.psychProfile.oracleSummary);
+        if (profile.psychProfile.blindSpots && profile.psychProfile.blindSpots.length > 0) {
+          lines.push(`Known blind spots: ${profile.psychProfile.blindSpots.join(', ')}.`);
+        }
+        if (profile.psychProfile.growthEdges && profile.psychProfile.growthEdges.length > 0) {
+          lines.push(`Growth edges: ${profile.psychProfile.growthEdges.join(', ')}.`);
+        }
+      }
+      if (profile.behaviorProfile && profile.behaviorProfile.responseTonePreference) {
+        const prefs = profile.behaviorProfile.responseTonePreference;
+        const best = Object.entries(prefs).filter(([,v]) => v > 0.3).map(([k]) => k);
+        const worst = Object.entries(prefs).filter(([,v]) => v < -0.3).map(([k]) => k);
+        if (best.length > 0) lines.push(`This user responds best to: ${best.join(', ')}.`);
+        if (worst.length > 0) lines.push(`Avoid with this user: ${worst.join(', ')}.`);
+      }
+    }
+  } catch (rpErr) {
+    // Non-blocking — risk profile is enhancement, not requirement
+  }
+
   return lines.join('\n');
 }
 
@@ -1229,7 +1265,7 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     preStreamRemaining = Math.max(0, preStreamRemaining);
 
     // Build deep user context from their data
-    const userContext = buildOracleContext(user, userTimezone);
+    const userContext = await buildOracleContext(user, userTimezone);
     
     // Inject community pulse (async, cached — adds ~0ms after first fetch)
     const communityPulse = await getCommunityPulse();
@@ -1526,7 +1562,7 @@ Examples:
           message.toLowerCase().includes(t) || noteText.toLowerCase().includes(t)
         ) || 'general';
 
-        await OracleOutcome.create({
+        const newOutcome = await OracleOutcome.create({
           username: req.user.username,
           snapshot: {
             streakDay: noteStreakDay,
@@ -1544,6 +1580,22 @@ Examples:
           oracleNote: noteText,
           measureAt: new Date(Date.now() + 48 * 60 * 60 * 1000) // 48 hours from now
         });
+
+        // Layer 1: Classify Oracle's response strategy (fire-and-forget)
+        (async () => {
+          try {
+            const { classifyResponseStrategy } = require('./services/responseScoring');
+            const strategy = await classifyResponseStrategy(fullResponse, message);
+            if (strategy && newOutcome._id) {
+              const OracleOutcomeModel = require('./models/OracleOutcome');
+              await OracleOutcomeModel.findByIdAndUpdate(newOutcome._id, {
+                $set: { responseStrategy: strategy }
+              });
+            }
+          } catch (rsErr) {
+            console.error('Response strategy classification error (non-blocking):', rsErr.message);
+          }
+        })();
 
         // --- KNOWLEDGE EVOLUTION: Distill strong Oracle responses ---
         // Only for substantive responses on deep topics (100+ words)
@@ -2624,6 +2676,9 @@ app.use('/api/stripe', stripeRoutes);
 app.use('/api/protocol', protocolRoutes);
 app.use('/api/discord', discordLinkRoutes);
 app.use('/api/timeline', timelineRoutes);
+oracleEvolutionRoutes.init(authenticate);
+app.use('/api/admin/oracle', oracleEvolutionRoutes);
+oracleEvolutionRoutes.startScheduledJobs();
 
 // Serve frontend build in production
 if (process.env.NODE_ENV === 'production') {

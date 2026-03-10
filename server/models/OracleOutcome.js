@@ -24,6 +24,15 @@ const outcomeSchema = new mongoose.Schema({
   // What the Oracle said (summary, not full response)
   oracleNote: String,  // Reuse the Haiku-generated memory note
   
+  // Layer 1: How Oracle responded (classified by Haiku)
+  // Correlate response approach with outcomes to learn what works
+  responseStrategy: {
+    strategies: [{ type: String }],  // e.g., ['direct_confrontation', 'mechanism_explanation']
+    tone: String,                     // 'firm', 'warm', 'neutral', 'intense', 'measured'
+    challengeLevel: Number,           // 1-5
+    responseLength: String            // 'brief', 'moderate', 'detailed'
+  },
+  
   // Outcome measured 48h later
   outcome: {
     measured: { type: Boolean, default: false },
@@ -49,5 +58,8 @@ outcomeSchema.index({ createdAt: 1 }, { expireAfterSeconds: 90 * 24 * 60 * 60 })
 
 // Index for the measurement job
 outcomeSchema.index({ 'outcome.measured': 1, measureAt: 1 });
+
+// Index for response strategy analysis (Layer 1)
+outcomeSchema.index({ 'responseStrategy.strategies': 1, 'outcome.streakMaintained': 1 });
 
 module.exports = mongoose.model('OracleOutcome', outcomeSchema);
