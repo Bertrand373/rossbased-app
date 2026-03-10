@@ -35,7 +35,17 @@ function safeParseJSON(raw, label = 'unknown') {
         const jsonMatch = raw.match(/\{[\s\S]*\}/);
         if (jsonMatch) return JSON.parse(jsonMatch[0]);
       } catch { /* fall through */ }
-      console.error(`[OracleEvolution] JSON parse failed (${label}) — raw length: ${raw.length}, first 200: ${raw.substring(0, 200)}`);
+      // Try repairing truncated JSON
+      try {
+        let repaired = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        const openBraces = (repaired.match(/\{/g) || []).length - (repaired.match(/\}/g) || []).length;
+        const openBrackets = (repaired.match(/\[/g) || []).length - (repaired.match(/\]/g) || []).length;
+        for (let i = 0; i < openBrackets; i++) repaired += ']';
+        for (let i = 0; i < openBraces; i++) repaired += '}';
+        repaired = repaired.replace(/,\s*([}\]])/g, '$1');
+        return JSON.parse(repaired);
+      } catch { /* fall through */ }
+      console.error(`[OracleEvolution] JSON parse failed (${label}) — raw length: ${raw.length}`);
       return null;
     }
   }

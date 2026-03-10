@@ -202,21 +202,21 @@ async function discoverPatterns() {
     // === AI PATTERN ANALYSIS ===
     const response = await anthropic.messages.create({
       model: process.env.ORACLE_MODEL || 'claude-sonnet-4-5-20250929',
-      max_tokens: 3000,
+      max_tokens: 4096,
       system: `You are an analytical system discovering novel patterns in semen retention data. You have access to cross-dimensional data: spermatogenesis cycles, lunar phases, benefit tracking, conversation topics, and measured outcomes.
 
-Your job: find patterns that NO HUMAN has articulated before. Not obvious things like "urges are hard." Look for:
+Your job: find the 3-5 STRONGEST patterns. Not obvious things like "urges are hard." Focus on:
 - Non-obvious correlations between biological cycles and outcomes
-- Compound patterns (topic X + day range Y + lunar phase Z = specific outcome)
-- Benefit trajectory signatures that predict what happens next
+- Compound patterns (topic X + day range Y = specific outcome)
 - Timing patterns that could enable PREDICTIVE intervention
 
-For each discovery:
-1. State the pattern clearly and specifically
-2. Quantify it with the data provided
-3. Assess confidence (how many data points support it)
-4. Explain WHY this might be happening (mechanism)
-5. State whether Oracle can act on this (is it actionable?)
+For each discovery, be CONCISE:
+1. State the pattern clearly
+2. Quantify it
+3. Explain the mechanism in one sentence
+4. State whether Oracle can act on this
+
+CRITICAL: Keep your response under 3000 tokens. Limit to 5 patterns max. No lengthy explanations.
 
 Respond ONLY with valid JSON:
 {
@@ -247,23 +247,30 @@ Respond ONLY with valid JSON:
       parsed = JSON.parse(raw);
     } catch {
       try {
-        // Strip markdown fences
         const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         parsed = JSON.parse(cleaned);
       } catch {
-        // Try to extract JSON object even if truncated
         try {
           const jsonMatch = raw.match(/\{[\s\S]*\}/);
           if (jsonMatch) {
             parsed = JSON.parse(jsonMatch[0]);
           } else {
-            console.error('[PatternDiscovery] Could not parse AI response — raw length:', raw.length);
-            console.error('[PatternDiscovery] First 200 chars:', raw.substring(0, 200));
-            return null;
+            throw new Error('No JSON object found');
           }
         } catch {
-          console.error('[PatternDiscovery] All JSON parse attempts failed — raw length:', raw.length);
-          return null;
+          try {
+            let repaired = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+            const openBraces = (repaired.match(/\{/g) || []).length - (repaired.match(/\}/g) || []).length;
+            const openBrackets = (repaired.match(/\[/g) || []).length - (repaired.match(/\]/g) || []).length;
+            for (let i = 0; i < openBrackets; i++) repaired += ']';
+            for (let i = 0; i < openBraces; i++) repaired += '}';
+            repaired = repaired.replace(/,\s*([}\]])/g, '$1');
+            parsed = JSON.parse(repaired);
+            console.log('[PatternDiscovery] Repaired truncated JSON successfully');
+          } catch {
+            console.error('[PatternDiscovery] All parse attempts failed — raw length:', raw.length);
+            return null;
+          }
         }
       }
     }
