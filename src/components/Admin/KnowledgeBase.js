@@ -212,6 +212,19 @@ const KnowledgeBase = () => {
     }
   };
 
+  const timeAgo = (dateStr) => {
+    if (!dateStr) return '';
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    if (days < 30) return `${days}d ago`;
+    return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
   const isUploading = uploadState.status === 'uploading';
 
   if (loading) {
@@ -415,45 +428,47 @@ const KnowledgeBase = () => {
           ].filter(t => counts[t.key] > 0 || t.key === 'all');
 
           return (
-            <>
-              {/* Source tabs */}
-              <div className="kb-source-tabs">
-                {SOURCE_TABS.map(t => (
-                  <button key={t.key}
-                    className={`kb-source-tab ${docSource === t.key ? 'active' : ''}`}
-                    onClick={() => { setDocSource(t.key); setFilterCategory('all'); }}>
-                    {t.label}
-                    <span className="kb-source-tab-count">{counts[t.key]}</span>
-                  </button>
-                ))}
-              </div>
-
-              {/* Category + Status pills */}
-              {cats.length > 1 && (
-                <div className="kb-filters">
-                  <div className="kb-filter-pills kb-filter-pills-scroll">
-                    <button className={`kb-pill ${filterCategory === 'all' ? 'active' : ''}`} onClick={() => setFilterCategory('all')}>All</button>
-                    {cats.map(c => (
-                      <button key={c} className={`kb-pill ${filterCategory === c ? 'active' : ''}`} onClick={() => setFilterCategory(c)}>
-                        {catLabelMap[c] || c}
-                      </button>
-                    ))}
-                    <span className="kb-filter-sep" />
-                    <button className={`kb-pill kb-pill-status ${filterStatus === 'all' ? '' : 'active'}`}
-                      onClick={() => setFilterStatus(s => s === 'all' ? 'enabled' : s === 'enabled' ? 'disabled' : 'all')}>
-                      {filterStatus === 'all' ? 'All status' : filterStatus === 'enabled' ? 'Enabled' : 'Disabled'}
+            <div className="kb-docs-scroll-wrap">
+              <div className="kb-docs-sticky-header">
+                {/* Source tabs */}
+                <div className="kb-source-tabs">
+                  {SOURCE_TABS.map(t => (
+                    <button key={t.key}
+                      className={`kb-source-tab ${docSource === t.key ? 'active' : ''}`}
+                      onClick={() => { setDocSource(t.key); setFilterCategory('all'); }}>
+                      {t.label}
+                      <span className="kb-source-tab-count">{counts[t.key]}</span>
                     </button>
-                  </div>
+                  ))}
                 </div>
-              )}
 
-              {/* Result count when filtered */}
-              {(filterCategory !== 'all' || filterStatus !== 'all') && (
-                <div className="kb-filter-summary">
-                  {filtered.length} of {sourceFiltered.length}
-                  <button className="kb-clear-filters" onClick={() => { setFilterCategory('all'); setFilterStatus('all'); }}>Clear</button>
-                </div>
-              )}
+                {/* Category + Status pills */}
+                {cats.length > 1 && (
+                  <div className="kb-filters">
+                    <div className="kb-filter-pills kb-filter-pills-scroll">
+                      <button className={`kb-pill ${filterCategory === 'all' ? 'active' : ''}`} onClick={() => setFilterCategory('all')}>All</button>
+                      {cats.map(c => (
+                        <button key={c} className={`kb-pill ${filterCategory === c ? 'active' : ''}`} onClick={() => setFilterCategory(c)}>
+                          {catLabelMap[c] || c}
+                        </button>
+                      ))}
+                      <span className="kb-filter-sep" />
+                      <button className={`kb-pill kb-pill-status ${filterStatus === 'all' ? '' : 'active'}`}
+                        onClick={() => setFilterStatus(s => s === 'all' ? 'enabled' : s === 'enabled' ? 'disabled' : 'all')}>
+                        {filterStatus === 'all' ? 'All status' : filterStatus === 'enabled' ? 'Enabled' : 'Disabled'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Result count when filtered */}
+                {(filterCategory !== 'all' || filterStatus !== 'all') && (
+                  <div className="kb-filter-summary">
+                    {filtered.length} of {sourceFiltered.length}
+                    <button className="kb-clear-filters" onClick={() => { setFilterCategory('all'); setFilterStatus('all'); }}>Clear</button>
+                  </div>
+                )}
+              </div>
 
               {filtered.length === 0 ? (
                 <div className="kb-empty">
@@ -471,6 +486,9 @@ const KnowledgeBase = () => {
                           <span className="kb-doc-meta">
                             {doc.type} · {doc.chunks} chunks · ~{doc.totalTokens.toLocaleString()} tokens{doc.author ? ` · by ${doc.author}` : ''}
                           </span>
+                          {doc.createdAt && (
+                            <span className="kb-doc-date">{timeAgo(doc.createdAt)}</span>
+                          )}
                         </div>
                       </div>
                       <div className="kb-doc-actions">
@@ -494,7 +512,7 @@ const KnowledgeBase = () => {
                   ))}
                 </div>
               )}
-            </>
+            </div>
           );
         })()}
 
