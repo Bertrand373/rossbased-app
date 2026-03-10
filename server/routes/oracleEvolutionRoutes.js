@@ -24,11 +24,18 @@ const UserRiskProfile = require('../models/UserRiskProfile');
 const OracleEvolution = require('../models/OracleEvolution');
 const User = require('../models/User');
 
-// === AUTH MIDDLEWARE (passed from app.js) ===
-let authenticate;
+// === AUTH MIDDLEWARE (passed from app.js via init) ===
+let _authenticate;
 
 function init(authMiddleware) {
-  authenticate = authMiddleware;
+  _authenticate = authMiddleware;
+}
+
+// Lazy wrapper — routes are defined at require() time before init() is called
+// This defers the actual authenticate call to request time
+function authWrap(req, res, next) {
+  if (!_authenticate) return res.status(500).json({ error: 'Auth not initialized' });
+  _authenticate(req, res, next);
 }
 
 // Admin check helper
@@ -43,7 +50,7 @@ function isAdmin(req) {
 
 // GET /api/admin/oracle/response-effectiveness
 // View which Oracle response strategies produce the best outcomes
-router.get('/response-effectiveness', authenticate, async (req, res) => {
+router.get('/response-effectiveness', authWrap, async (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
   try {
     const report = await analyzeResponseEffectiveness();
@@ -61,7 +68,7 @@ router.get('/response-effectiveness', authenticate, async (req, res) => {
 
 // GET /api/admin/oracle/risk-scan
 // Run daily risk scan across all active users
-router.get('/risk-scan', authenticate, async (req, res) => {
+router.get('/risk-scan', authWrap, async (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
   try {
     const interventionQueue = await dailyRiskScan();
@@ -78,7 +85,7 @@ router.get('/risk-scan', authenticate, async (req, res) => {
 
 // GET /api/admin/oracle/risk-profile/:username
 // View a specific user's risk profile
-router.get('/risk-profile/:username', authenticate, async (req, res) => {
+router.get('/risk-profile/:username', authWrap, async (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
   try {
     const user = await User.findOne({ 
@@ -102,7 +109,7 @@ router.get('/risk-profile/:username', authenticate, async (req, res) => {
 
 // POST /api/admin/oracle/intervene/:username
 // Generate and preview a predictive intervention message
-router.post('/intervene/:username', authenticate, async (req, res) => {
+router.post('/intervene/:username', authWrap, async (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
   try {
     const user = await User.findOne({ 
@@ -130,7 +137,7 @@ router.post('/intervene/:username', authenticate, async (req, res) => {
 
 // GET /api/admin/oracle/discover-patterns
 // Run cross-dimensional pattern discovery
-router.get('/discover-patterns', authenticate, async (req, res) => {
+router.get('/discover-patterns', authWrap, async (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
   try {
     const results = await discoverPatterns();
@@ -148,7 +155,7 @@ router.get('/discover-patterns', authenticate, async (req, res) => {
 
 // POST /api/admin/oracle/evolve
 // Run the full evolution pipeline (voice assessment + psych profiles)
-router.post('/evolve', authenticate, async (req, res) => {
+router.post('/evolve', authWrap, async (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
   try {
     const results = await runEvolutionPipeline();
@@ -161,7 +168,7 @@ router.post('/evolve', authenticate, async (req, res) => {
 
 // POST /api/admin/oracle/prompt-proposal
 // Generate a Meta-Oracle system prompt evolution proposal
-router.post('/prompt-proposal', authenticate, async (req, res) => {
+router.post('/prompt-proposal', authWrap, async (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
   try {
     const proposal = await generatePromptProposal();
@@ -175,7 +182,7 @@ router.post('/prompt-proposal', authenticate, async (req, res) => {
 
 // GET /api/admin/oracle/evolution-log
 // View all evolution records (voice assessments, discoveries, proposals)
-router.get('/evolution-log', authenticate, async (req, res) => {
+router.get('/evolution-log', authWrap, async (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
   try {
     const records = await OracleEvolution.find()
@@ -201,7 +208,7 @@ router.get('/evolution-log', authenticate, async (req, res) => {
 
 // PATCH /api/admin/oracle/evolution/:id
 // Approve/reject an evolution proposal
-router.patch('/evolution/:id', authenticate, async (req, res) => {
+router.patch('/evolution/:id', authWrap, async (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
   try {
     const { status, reviewNotes } = req.body;
@@ -225,7 +232,7 @@ router.patch('/evolution/:id', authenticate, async (req, res) => {
 
 // GET /api/admin/oracle/psych-profile/:username
 // View a user's psychological profile
-router.get('/psych-profile/:username', authenticate, async (req, res) => {
+router.get('/psych-profile/:username', authWrap, async (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
   try {
     const user = await User.findOne({ 
@@ -254,7 +261,7 @@ router.get('/psych-profile/:username', authenticate, async (req, res) => {
 
 // GET /api/admin/oracle/intelligence
 // Full intelligence dashboard — everything in one view
-router.get('/intelligence', authenticate, async (req, res) => {
+router.get('/intelligence', authWrap, async (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
   try {
     const OracleOutcome = require('../models/OracleOutcome');
