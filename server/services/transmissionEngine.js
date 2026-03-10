@@ -20,23 +20,47 @@ const { calculateRiskScore, generateIntervention } = require('./riskEngine');
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // Constraints
-const MAX_TRANSMISSIONS_PER_WEEK = 3;
-const MIN_HOURS_BETWEEN = 20;  // At least 20 hours between transmissions
-const REENGAGEMENT_DAYS = 3;   // Days of silence before re-engagement
+const MAX_TRANSMISSIONS_PER_WEEK = 3;   // Premium + OG
+const FREE_MONTHLY_LIMIT = 1;            // Free users get 1 taste per month
+const MIN_HOURS_BETWEEN = 20;            // At least 20 hours between transmissions
+const REENGAGEMENT_DAYS = 3;             // Days of silence before re-engagement
+const GRANDFATHERED_CUTOFF = new Date('2026-02-17T00:00:00Z'); // OG Discord members before this date
+
+/**
+ * Check if user has premium or OG (grandfathered) access
+ * OG = has Discord linked + account created before Feb 17, 2026
+ */
+function hasPremiumOrOG(user) {
+  if (user.isPremium) return true;
+  // Grandfathered: linked Discord account created before cutoff
+  if (user.discordId && user.createdAt && new Date(user.createdAt) < GRANDFATHERED_CUTOFF) return true;
+  return false;
+}
 
 /**
  * Check if a user is eligible to receive a transmission right now
+ * Premium/OG: 3/week | Free: 1/month
  */
-async function isEligible(userId, username, isPremium) {
-  // Free users get max 1/week, premium gets 3/week
-  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const recentCount = await OracleTransmission.countDocuments({
-    userId,
-    createdAt: { $gte: weekAgo }
-  });
+async function isEligible(userId, username, user) {
+  const isPremiumOrOG = hasPremiumOrOG(user);
 
-  const weeklyLimit = isPremium ? MAX_TRANSMISSIONS_PER_WEEK : 1;
-  if (recentCount >= weeklyLimit) return false;
+  if (isPremiumOrOG) {
+    // Premium/OG: max 3 per week
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const recentCount = await OracleTransmission.countDocuments({
+      userId,
+      createdAt: { $gte: weekAgo }
+    });
+    if (recentCount >= MAX_TRANSMISSIONS_PER_WEEK) return false;
+  } else {
+    // Free: max 1 per month
+    const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const monthlyCount = await OracleTransmission.countDocuments({
+      userId,
+      createdAt: { $gte: monthAgo }
+    });
+    if (monthlyCount >= FREE_MONTHLY_LIMIT) return false;
+  }
 
   // Check minimum time between transmissions
   const lastTransmission = await OracleTransmission.findOne({ userId })
@@ -102,12 +126,15 @@ async function processRiskInterventions() {
 
     for (const profile of highRiskProfiles) {
       const user = await User.findById(profile.userId)
-        .select('_id username isPremium startDate currentStreak')
+        .select('_id username isPremium discordId createdAt startDate currentStreak')
         .lean();
       if (!user) continue;
 
+      // Risk interventions are premium/OG only
+      if (!hasPremiumOrOG(user)) continue;
+
       // Check eligibility
-      const eligible = await isEligible(user._id, user.username, user.isPremium);
+      const eligible = await isEligible(user._id, user.username, user);
       if (!eligible) continue;
 
       // Generate personalized intervention
@@ -154,7 +181,7 @@ async function processAggregateTransmissions() {
       startDate: { $exists: true, $ne: null },
       currentStreak: { $gte: 1 }
     })
-      .select('_id username currentStreak isPremium startDate benefitTracking')
+      .select('_id username currentStreak isPremium discordId createdAt startDate benefitTracking')
       .lean();
 
     if (activeUsers.length < 3) return { sent: 0 };
@@ -264,7 +291,7 @@ Respond ONLY with valid JSON:
       });
 
       for (const user of matchingUsers) {
-        const eligible = await isEligible(user._id, user.username, user.isPremium);
+        const eligible = await isEligible(user._id, user.username, user);
         if (!eligible) continue;
 
         await deliverTransmission(user._id, user.username, tx.message, 'aggregate_pattern', {
@@ -292,15 +319,17 @@ async function processReengagement() {
     const cutoff = new Date(Date.now() - REENGAGEMENT_DAYS * 24 * 60 * 60 * 1000);
 
     // Find users with streaks who haven't logged benefits recently
+    // Re-engagement is premium/OG only (proactive feature)
     const quietUsers = await User.find({
       startDate: { $exists: true, $ne: null },
       currentStreak: { $gte: 5 }, // Only target users who had some traction
-      isPremium: true, // Premium re-engagement priority
     })
-      .select('_id username currentStreak isPremium benefitTracking')
+      .select('_id username currentStreak isPremium discordId createdAt benefitTracking')
       .lean();
 
     const reengageTargets = quietUsers.filter(u => {
+      // Premium/OG only for re-engagement
+      if (!hasPremiumOrOG(u)) return false;
       const lastLog = (u.benefitTracking || [])
         .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
       if (!lastLog) return true; // Never logged
@@ -310,7 +339,7 @@ async function processReengagement() {
     let sent = 0;
 
     for (const user of reengageTargets.slice(0, 10)) { // Cap at 10 per run
-      const eligible = await isEligible(user._id, user.username, user.isPremium);
+      const eligible = await isEligible(user._id, user.username, user);
       if (!eligible) continue;
 
       const lastLog = (user.benefitTracking || [])
