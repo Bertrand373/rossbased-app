@@ -34,6 +34,12 @@ export const useNotifications = () => {
     const unsubscribe = onMessage(messaging, (payload) => {
       console.log('Foreground message received:', payload);
       
+      // Instant Oracle dot when transmission arrives while app is open
+      if (payload.data?.type === 'oracle_transmission') {
+        window.__oracleUnreadCount = (window.__oracleUnreadCount || 0) + 1;
+        window.dispatchEvent(new CustomEvent('oracle-unread', { detail: window.__oracleUnreadCount }));
+      }
+      
       // Show notification when app is in foreground
       if (Notification.permission === 'granted') {
         const notificationTitle = payload.notification?.title || payload.data?.title || 'TitanTrack';
