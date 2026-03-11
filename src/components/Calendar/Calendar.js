@@ -151,6 +151,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [swipedExerciseId, setSwipedExerciseId] = useState(null); // exercise showing delete
   const [removingExerciseId, setRemovingExerciseId] = useState(null);
   const exerciseTouchStartX = useRef(0);
+  const workoutOpenedDirect = useRef(false);
 
   // Week view metric selection
   const METRIC_OPTIONS = [
@@ -613,6 +614,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   };
 
   const closeDayInfo = () => {
+    workoutOpenedDirect.current = false;
     setDayInfoModal(false);
     setSelectedDate(null);
     setIsEditingNote(false);
@@ -686,6 +688,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   };
 
   const openWorkoutSheet = () => {
+    workoutOpenedDirect.current = false;
     const existing = getDayWorkout(selectedDate);
     if (existing && existing.exercises && existing.exercises.length > 0) {
       // Existing workout — load it
@@ -710,6 +713,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   // Open workout sheet directly from calendar grid dumbbell icon
   const openWorkoutDirect = (day) => {
     if (!isPremium) { openPlanModal && openPlanModal(); return; }
+    workoutOpenedDirect.current = true;
     const dayStr = format(day, 'yyyy-MM-dd');
     const existingNote = userData.notes && userData.notes[dayStr];
     setSelectedDate(day);
@@ -824,30 +828,57 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     const hasValid = workoutExercises.some(e => e.name && e.name.trim());
     toast.success(hasValid ? 'Workout saved' : 'Workout cleared');
     
-    // Transition back to day info
-    setCalSheetReady(false);
-    setTimeout(() => {
-      setShowSuggestions(null);
-      setSwipedExerciseId(null);
-      setSheetView('info');
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setCalSheetReady(true));
+    if (workoutOpenedDirect.current) {
+      // Opened from calendar grid — close everything
+      workoutOpenedDirect.current = false;
+      closeCalSheet(() => {
+        setDayInfoModal(false);
+        setSelectedDate(null);
+        setSheetView('info');
+        setShowSuggestions(null);
+        setSwipedExerciseId(null);
+        setWorkoutExercises([]);
       });
-    }, 300);
+    } else {
+      // Opened from day info modal — transition back to info
+      setCalSheetReady(false);
+      setTimeout(() => {
+        setShowSuggestions(null);
+        setSwipedExerciseId(null);
+        setSheetView('info');
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => setCalSheetReady(true));
+        });
+      }, 300);
+    }
   };
 
   // Back from workout to day info (without saving)
   const backFromWorkout = () => {
-    setCalSheetReady(false);
-    setTimeout(() => {
-      setShowSuggestions(null);
-      setSwipedExerciseId(null);
-      setWorkoutExercises([]);
-      setSheetView('info');
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setCalSheetReady(true));
+    if (workoutOpenedDirect.current) {
+      // Opened from calendar grid — close everything
+      workoutOpenedDirect.current = false;
+      closeCalSheet(() => {
+        setDayInfoModal(false);
+        setSelectedDate(null);
+        setSheetView('info');
+        setShowSuggestions(null);
+        setSwipedExerciseId(null);
+        setWorkoutExercises([]);
       });
-    }, 300);
+    } else {
+      // Opened from day info modal — transition back to info
+      setCalSheetReady(false);
+      setTimeout(() => {
+        setShowSuggestions(null);
+        setSwipedExerciseId(null);
+        setWorkoutExercises([]);
+        setSheetView('info');
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => setCalSheetReady(true));
+        });
+      }, 300);
+    }
   };
 
   // Delete entire workout for selected day
