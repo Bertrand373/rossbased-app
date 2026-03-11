@@ -1339,7 +1339,9 @@ body:has(.week-view-grid) {
   align-items: center;
   justify-content: center;
   color: var(--accent-gold-text);
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
+  padding: 2px;
 }
 
 /* Week view - inline with data indicators */
@@ -1349,6 +1351,8 @@ body:has(.week-view-grid) {
   justify-content: center;
   color: var(--accent-gold-text);
   margin-left: 6px;
+  cursor: pointer;
+  pointer-events: auto;
 }
 
 /* Light mode — dark dumbbells for visibility on light cells */

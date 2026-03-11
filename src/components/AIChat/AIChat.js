@@ -10,8 +10,17 @@ import { trackAIChatOpened, trackAIMessageSent, trackAIChatCleared, trackAILimit
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
-// Storage keys
-const CHAT_HISTORY_KEY = 'titantrack_ai_chat_history';
+// Storage keys — scoped by username so accounts don't share history
+const getChatHistoryKey = () => {
+  try {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const username = JSON.parse(atob(token.split('.')[1])).username;
+      if (username) return `titantrack_ai_chat_history_${username}`;
+    }
+  } catch {}
+  return 'titantrack_ai_chat_history'; // fallback for edge cases
+};
 const MAX_STORED_MESSAGES = 50;
 const MAX_CONTEXT_MESSAGES = 10; // Send last 10 to Claude
 
@@ -84,7 +93,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   // Load chat history from localStorage
   useEffect(() => {
     if (isLoggedIn) {
-      const stored = localStorage.getItem(CHAT_HISTORY_KEY);
+      const stored = localStorage.getItem(getChatHistoryKey());
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
@@ -178,7 +187,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   useEffect(() => {
     if (messages.length > 0) {
       const toStore = messages.filter(m => !m.isTransmission).slice(-MAX_STORED_MESSAGES);
-      localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(toStore));
+      localStorage.setItem(getChatHistoryKey(), JSON.stringify(toStore));
     }
   }, [messages]);
 
@@ -426,7 +435,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   // Clear chat history
   const handleClearChat = () => {
     setMessages([]);
-    localStorage.removeItem(CHAT_HISTORY_KEY);
+    localStorage.removeItem(getChatHistoryKey());
     setShowClearConfirm(false);
     trackAIChatCleared();
   };

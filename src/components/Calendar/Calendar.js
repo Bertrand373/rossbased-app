@@ -163,7 +163,10 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   ];
   const [weekMetrics, setWeekMetrics] = useState(() => {
     try {
-      const saved = localStorage.getItem('tt_weekMetrics');
+      // Try username-scoped key first, then legacy key
+      const username = userData?.username;
+      const scopedKey = username ? `tt_weekMetrics_${username}` : null;
+      const saved = (scopedKey && localStorage.getItem(scopedKey)) || localStorage.getItem('tt_weekMetrics');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length === 3) return parsed;
@@ -188,7 +191,8 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           next = [...prev, key];
         }
       }
-      localStorage.setItem('tt_weekMetrics', JSON.stringify(next));
+      const scopedKey = userData?.username ? `tt_weekMetrics_${userData.username}` : 'tt_weekMetrics';
+      localStorage.setItem(scopedKey, JSON.stringify(next));
       return next;
     });
   };
@@ -202,6 +206,18 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setMetricsSheetReady(false);
     setTimeout(() => setMetricsSheetOpen(false), 300);
   };
+
+  // Re-load weekMetrics from username-scoped key once userData loads
+  useEffect(() => {
+    if (!userData?.username) return;
+    try {
+      const saved = localStorage.getItem(`tt_weekMetrics_${userData.username}`);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length === 3) setWeekMetrics(parsed);
+      }
+    } catch {}
+  }, [userData?.username]);
 
   // Mark initial entrance animation as complete
   useEffect(() => {
@@ -689,6 +705,34 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         requestAnimationFrame(() => setCalSheetReady(true));
       });
     }, 300);
+  };
+
+  // Open workout sheet directly from calendar grid dumbbell icon
+  const openWorkoutDirect = (day) => {
+    if (!isPremium) { openPlanModal && openPlanModal(); return; }
+    const dayStr = format(day, 'yyyy-MM-dd');
+    const existingNote = userData.notes && userData.notes[dayStr];
+    setSelectedDate(day);
+    setNoteText(existingNote || '');
+    setIsEditingNote(false);
+    setShowTriggerSelection(false);
+    setEditingExistingTrigger(false);
+    setSelectedTrigger('');
+
+    // Load workout data for this day
+    const existing = getDayWorkout(day);
+    if (existing && existing.exercises && existing.exercises.length > 0) {
+      setWorkoutExercises(existing.exercises.map((e, i) => ({ ...e, id: `ex-${i}-${Date.now()}` })));
+    } else {
+      const template = getTemplateForDay(day);
+      setWorkoutExercises(template || []);
+    }
+    setShowSuggestions(null);
+    setSwipedExerciseId(null);
+
+    // Open modal straight to workout view
+    setSheetView('workout');
+    setDayInfoModal(true);
   };
 
   // Workout exercise CRUD
@@ -1463,9 +1507,9 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
             {hasData && !isFuture && (
               <span className="day-data-dash"></span>
             )}
-            {/* Workout indicator - tiny dumbbell glyph */}
+            {/* Workout indicator - tiny dumbbell glyph (clickable → opens workout sheet) */}
             {hasWorkout && (
-              <span className="day-workout-glyph">
+              <span className="day-workout-glyph" onClick={(e) => { e.stopPropagation(); openWorkoutDirect(currentDay); }}>
                 <DumbbellGlyph size={9} />
               </span>
             )}
@@ -1559,7 +1603,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                 <span className="week-data-dash"></span>
               )}
               {hasWorkout && (
-                <span className="week-workout-glyph">
+                <span className="week-workout-glyph" onClick={(e) => { e.stopPropagation(); openWorkoutDirect(day); }}>
                   <DumbbellGlyph size={10} />
                 </span>
               )}

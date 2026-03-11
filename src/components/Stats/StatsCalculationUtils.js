@@ -296,7 +296,12 @@ export const calculateAverage = (userData, selectedMetric, timeRange, isPremium)
       }
       
       const validValues = last7DaysData
-        .map(item => item.energy || 0)
+        .map(item => {
+          if (selectedMetric === 'sleep') {
+            return item[selectedMetric] || item.attraction || 0;
+          }
+          return item[selectedMetric] || 0;
+        })
         .filter(val => typeof val === 'number' && val >= 1 && val <= 10);
         
       if (validValues.length === 0) {
