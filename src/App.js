@@ -555,6 +555,7 @@ function App() {
         showAIChat={showAIChat}
         setShowAIChat={setShowAIChat}
         openOracle={openOracle}
+        oracleHasUnread={oracleHasUnread}
         setOracleHasUnread={setOracleHasUnread}
         isMobile={isMobile}
         hasSubscription={hasSubscription}
@@ -589,6 +590,7 @@ function AppContent({
   showAIChat,
   setShowAIChat,
   openOracle,
+  oracleHasUnread,
   setOracleHasUnread,
   isMobile,
   hasSubscription,
@@ -702,6 +704,7 @@ function AppContent({
               <MobileNavigation 
                 onOracleClick={openOracle}
                 isOracleActive={showAIChat}
+                oracleHasUnread={oracleHasUnread}
               />
             )}
             
