@@ -552,6 +552,8 @@ function App() {
         setShouldNavigateToTracker={setShouldNavigateToTracker}
         showAIChat={showAIChat}
         setShowAIChat={setShowAIChat}
+        openOracle={openOracle}
+        setOracleHasUnread={setOracleHasUnread}
         isMobile={isMobile}
         hasSubscription={hasSubscription}
         isGrandfathered={isGrandfathered}
@@ -584,6 +586,8 @@ function AppContent({
   setShouldNavigateToTracker,
   showAIChat,
   setShowAIChat,
+  openOracle,
+  setOracleHasUnread,
   isMobile,
   hasSubscription,
   isGrandfathered,
