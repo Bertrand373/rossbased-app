@@ -409,6 +409,30 @@ function App() {
   const [activeTab, setActiveTab] = useState('tracker');
   const [shouldNavigateToTracker, setShouldNavigateToTracker] = useState(false);
   const [showAIChat, setShowAIChat] = useState(false);
+  const [oracleHasUnread, setOracleHasUnread] = useState(false);
+
+  // Listen for Oracle unread transmission events (fired by AIChat.js)
+  useEffect(() => {
+    const handleUnread = (e) => {
+      const count = e.detail || 0;
+      setOracleHasUnread(count > 0);
+    };
+    window.addEventListener('oracle-unread', handleUnread);
+    return () => window.removeEventListener('oracle-unread', handleUnread);
+  }, []);
+
+  // Toggle CSS class on Oracle nav buttons for the unread dot
+  useEffect(() => {
+    document.querySelectorAll('.nav-link-oracle').forEach(el => {
+      el.classList.toggle('has-unread', oracleHasUnread);
+    });
+  }, [oracleHasUnread]);
+
+  // Wrapper to open Oracle and clear unread
+  const openOracle = () => {
+    setShowAIChat(true);
+    setOracleHasUnread(false);
+  };
   
   const [isRefreshLoading, setIsRefreshLoading] = useState(() => {
     return localStorage.getItem('isLoggedIn') === 'true';
@@ -659,7 +683,7 @@ function AppContent({
                 <img src={trackerLogo} alt="TitanTrack" className="app-logo" />
               </div>
               
-              {!isMobile && <HeaderNavigation onOracleClick={() => setShowAIChat(true)} />}
+              {!isMobile && <HeaderNavigation onOracleClick={openOracle} />}
               
               <div className="header-actions">
                 <ProfileButton userData={userData} />
@@ -670,7 +694,7 @@ function AppContent({
             
             {isMobile && (
               <MobileNavigation 
-                onOracleClick={() => setShowAIChat(true)}
+                onOracleClick={openOracle}
                 isOracleActive={showAIChat}
               />
             )}

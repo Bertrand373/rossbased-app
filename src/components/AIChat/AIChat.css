@@ -858,3 +858,29 @@
 [data-theme="light"] .ai-chat-transmission-label::after {
   color: rgba(160, 130, 0, 0.35);
 }
+
+/* ============================================================
+   ORACLE NAV UNREAD DOT
+   ============================================================ */
+
+.nav-link-oracle {
+  position: relative;
+}
+
+.nav-link-oracle.has-unread::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: #d4af37;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.6);
+  animation: oracleUnreadPulse 2s ease-in-out infinite;
+}
+
+@keyframes oracleUnreadPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

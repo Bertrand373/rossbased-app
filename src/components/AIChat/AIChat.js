@@ -155,7 +155,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
         const existingContent = new Set(prev.filter(m => m.isTransmission).map(m => m.content));
         const newTx = txMessages.filter(m => !existingContent.has(m.content));
         if (newTx.length === 0) return prev;
-        return [...newTx, ...prev];
+        return [...prev, ...newTx];
       });
 
       // Mark as read
@@ -182,11 +182,11 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     }
   }, [messages]);
 
-  // Scroll to bottom when user sends a message (to reveal loading indicator)
+  // Scroll to bottom when user sends a message or transmission arrives
   useEffect(() => {
     if (!isOpen) return;
     const lastMsg = messages[messages.length - 1];
-    if (lastMsg?.role === 'user') {
+    if (lastMsg?.role === 'user' || lastMsg?.isTransmission) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isOpen]);
@@ -453,7 +453,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
             <div className="ai-chat-header-content">
               <img src="/oracle-wordmark.png" alt="Oracle" className="ai-chat-header-wordmark" />
               <span className="ai-chat-subtitle">
-                {usage.messagesRemaining} remaining · {usage.isBetaPeriod ? 'Beta' : usage.isGrandfathered ? 'Lifetime' : usage.isPremium ? 'Premium' : `Free · ${usage.messagesLimit}/week`}
+                {usage.messagesRemaining >= 999 ? 'Unlimited · Admin' : `${usage.messagesRemaining} remaining · ${usage.isBetaPeriod ? 'Beta' : usage.isGrandfathered ? 'Lifetime' : usage.isPremium ? 'Premium' : `Free · ${usage.messagesLimit}/week`}`}
               </span>
             </div>
             <button 
