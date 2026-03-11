@@ -711,7 +711,7 @@ function AppContent({
             <AIChat 
               isLoggedIn={isLoggedIn} 
               isOpen={showAIChat}
-              onClose={() => setShowAIChat(false)}
+              onClose={() => { setShowAIChat(false); setOracleHasUnread(false); }}
               openPlanModal={openPlanModal}
             />
             
