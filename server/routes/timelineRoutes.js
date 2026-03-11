@@ -282,23 +282,40 @@ router.post('/subscribe', async (req, res) => {
       }
     }
 
-    // Add subscriber to Kit with tags
-    const response = await fetch('https://api.kit.com/v4/subscribers', {
+    // Step 1: Create subscriber in Kit (no tags yet)
+    const subResponse = await fetch('https://api.kit.com/v4/subscribers', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-Kit-Api-Key': KIT_API_KEY
       },
       body: JSON.stringify({
-        email_address: emailLower,
-        tags: tagIds
+        email_address: emailLower
       })
     });
 
-    if (!response.ok) {
-      const errData = await response.text();
-      console.error('Kit API error:', response.status, errData);
+    if (!subResponse.ok) {
+      const errData = await subResponse.text();
+      console.error('Kit subscriber create error:', subResponse.status, errData);
       return res.status(500).json({ error: 'Failed to subscribe' });
+    }
+
+    // Step 2: Tag subscriber separately (ensures automations fire)
+    for (const tagId of tagIds) {
+      try {
+        await fetch(`https://api.kit.com/v4/tags/${tagId}/subscribers`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Kit-Api-Key': KIT_API_KEY
+          },
+          body: JSON.stringify({
+            email_address: emailLower
+          })
+        });
+      } catch (tagErr) {
+        console.error(`Kit tag ${tagId} error:`, tagErr.message);
+      }
     }
 
     console.log(`📧 Timeline: subscriber captured — ${emailLower} [${tagNames.join(', ')}]`);

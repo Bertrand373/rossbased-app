@@ -164,29 +164,46 @@ async function handleProtocolPurchase(session) {
     // Purchase record exists — Ross can manually resend if needed
   }
 
-  // Tag buyer in Kit
+  // Tag buyer in Kit (two-step: ensure subscriber exists, then tag separately)
   try {
     const kitApiKey = process.env.KIT_API_KEY;
     const kitTagId = process.env.KIT_PROTOCOL_BUYER_TAG_ID;
 
     if (kitApiKey && kitTagId) {
-      const kitRes = await fetch('https://api.kit.com/v4/subscribers', {
+      // Step 1: Create or find the subscriber
+      const subRes = await fetch('https://api.kit.com/v4/subscribers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-Kit-Api-Key': kitApiKey
         },
         body: JSON.stringify({
-          email_address: emailLower,
-          tags: [kitTagId]
+          email_address: emailLower
         })
       });
 
-      if (!kitRes.ok) {
-        const body = await kitRes.text();
-        console.error('Kit API error:', kitRes.status, body);
+      if (!subRes.ok) {
+        const body = await subRes.text();
+        console.error('Kit subscriber create error:', subRes.status, body);
       } else {
-        console.log(`🏷️ Kit tag 'protocol-buyer' applied to ${emailLower}`);
+        // Step 2: Tag the subscriber via the tag endpoint
+        const tagRes = await fetch(`https://api.kit.com/v4/tags/${kitTagId}/subscribers`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Kit-Api-Key': kitApiKey
+          },
+          body: JSON.stringify({
+            email_address: emailLower
+          })
+        });
+
+        if (!tagRes.ok) {
+          const tagBody = await tagRes.text();
+          console.error('Kit tag error:', tagRes.status, tagBody);
+        } else {
+          console.log(`🏷️ Kit tag 'protocol-buyer' applied to ${emailLower}`);
+        }
       }
     } else {
       console.log('⚠️ Kit API key or tag ID not set — skipping Kit tagging');
