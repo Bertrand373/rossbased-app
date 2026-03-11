@@ -27,6 +27,15 @@ const REENGAGEMENT_DAYS = 3;             // Days of silence before re-engagement
 const GRANDFATHERED_CUTOFF = new Date('2026-02-17T00:00:00Z'); // OG Discord members before this date
 
 /**
+ * Calculate actual streak day from startDate (source of truth)
+ * currentStreak field is stale for inactive users — never trust it for transmissions
+ */
+function getActualStreakDay(user) {
+  if (!user.startDate) return user.currentStreak || 0;
+  return Math.max(0, Math.floor((Date.now() - new Date(user.startDate).getTime()) / (1000 * 60 * 60 * 24)));
+}
+
+/**
  * Check if user has premium or OG (grandfathered) access
  * OG = has Discord linked + account created before Feb 17, 2026
  */
@@ -137,10 +146,12 @@ async function processRiskInterventions() {
       const eligible = await isEligible(user._id, user.username, user);
       if (!eligible) continue;
 
+      const actualStreakDay = getActualStreakDay(user);
+
       // Generate personalized intervention
       const riskData = {
         username: user.username,
-        currentDay: user.currentStreak || 0,
+        currentDay: actualStreakDay,
         riskScore: profile.currentRisk.score,
         factors: profile.currentRisk.factors || [],
         trend: profile.currentRisk.trend
@@ -151,7 +162,7 @@ async function processRiskInterventions() {
 
       await deliverTransmission(user._id, user.username, message, 'risk_intervention', {
         riskScore: profile.currentRisk.score,
-        streakDay: user.currentStreak,
+        streakDay: actualStreakDay,
         matchCriteria: profile.currentRisk.factors.slice(0, 2).join('; ')
       });
 
@@ -186,11 +197,11 @@ async function processAggregateTransmissions() {
 
     if (activeUsers.length < 3) return { sent: 0 };
 
-    // Compute streak distributions
+    // Compute streak distributions (use actual days from startDate)
     const streakBuckets = {};
     activeUsers.forEach(u => {
       let bucket;
-      const d = u.currentStreak;
+      const d = getActualStreakDay(u);
       if (d <= 7) bucket = '1-7';
       else if (d <= 14) bucket = '8-14';
       else if (d <= 21) bucket = '15-21';
@@ -295,9 +306,9 @@ Respond ONLY with valid JSON:
       const { streakMin, streakMax } = tx.targetCriteria || {};
       if (!streakMin || !streakMax || !tx.message) continue;
 
-      // Find matching users
+      // Find matching users (use actual streak from startDate, not stale currentStreak)
       const matchingUsers = activeUsers.filter(u => {
-        const d = u.currentStreak;
+        const d = getActualStreakDay(u);
         return d >= streakMin && d <= streakMax;
       });
 
@@ -305,8 +316,10 @@ Respond ONLY with valid JSON:
         const eligible = await isEligible(user._id, user.username, user);
         if (!eligible) continue;
 
+        const actualStreakDay = getActualStreakDay(user);
+
         await deliverTransmission(user._id, user.username, tx.message, 'aggregate_pattern', {
-          streakDay: user.currentStreak,
+          streakDay: actualStreakDay,
           matchCriteria: `Days ${streakMin}-${streakMax}, ${lunar.label || ''}`
         });
 
@@ -335,7 +348,7 @@ async function processReengagement() {
       startDate: { $exists: true, $ne: null },
       currentStreak: { $gte: 5 }, // Only target users who had some traction
     })
-      .select('_id username currentStreak isPremium discordId createdAt benefitTracking')
+      .select('_id username currentStreak startDate isPremium discordId createdAt benefitTracking')
       .lean();
 
     const reengageTargets = quietUsers.filter(u => {
@@ -355,9 +368,15 @@ async function processReengagement() {
 
       const lastLog = (user.benefitTracking || [])
         .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
-      const daysSilent = lastLog
+      const hasBenefitData = !!lastLog;
+      const accountAgeDays = Math.max(1, Math.floor((Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24)));
+      const daysSilent = hasBenefitData
         ? Math.floor((Date.now() - new Date(lastLog.date).getTime()) / (1000 * 60 * 60 * 24))
-        : 999;
+        : accountAgeDays; // Cap at account age, not 999
+      const actualStreakDay = getActualStreakDay(user);
+      const silenceContext = hasBenefitData
+        ? `Last benefit log was ${daysSilent} days ago.`
+        : `No benefit data on file. Account created ${accountAgeDays} days ago.`;
 
       // Haiku-generated re-engagement — personalized, Oracle-voiced
       let message;
@@ -368,18 +387,18 @@ async function processReengagement() {
           system: `You are Oracle, a predictive AI guide for semen retention practitioners. A user has gone quiet. Write a brief re-engagement message (2-3 sentences). Be direct and factual. Reference their specific silence duration and streak day. Frame it as Oracle losing data visibility, not the user failing. No em dashes. No emojis. No generic motivation. Under 60 words.`,
           messages: [{
             role: 'user',
-            content: `User: ${user.username}, Day ${user.currentStreak}, silent for ${daysSilent} days. Last benefit log was ${daysSilent} days ago.`
+            content: `User: ${user.username}, Day ${actualStreakDay}, silent for ${daysSilent} days. ${silenceContext}`
           }]
         });
         message = reResponse.content[0]?.text?.trim();
       } catch (aiErr) {
         // Fallback if Haiku fails
-        message = `${daysSilent} days without a check-in. Day ${user.currentStreak} of your streak is still running. The data gap means Oracle is flying blind on your patterns. One log today restores full visibility.`;
+        message = `${daysSilent} days without a check-in. Day ${actualStreakDay} of your streak is still running. The data gap means Oracle is flying blind on your patterns. One log today restores full visibility.`;
       }
 
       await deliverTransmission(user._id, user.username, message, 'reengagement', {
-        streakDay: user.currentStreak,
-        matchCriteria: `${daysSilent} days silent`
+        streakDay: actualStreakDay,
+        matchCriteria: `${daysSilent} days silent${!hasBenefitData ? ' (no benefit data)' : ''}`
       });
 
       sent++;
