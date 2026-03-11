@@ -374,25 +374,53 @@ const OracleIntelligence = () => {
       {/* === ACTIONS === */}
       {activeSection === 'actions' && (
         <div className="oi-section">
-          <div className="oi-actions-grid">
-            {[
-              { label: 'Risk Scan', endpoint: '/api/admin/oracle/risk-scan', method: 'GET', desc: 'Scan all users for risk' },
-              { label: 'Run Evolution', endpoint: '/api/admin/oracle/evolve', method: 'POST', desc: 'Voice + psych profiles' },
-              { label: 'Discover Patterns', endpoint: '/api/admin/oracle/discover-patterns', method: 'GET', desc: 'Cross-dimensional analysis' },
-              { label: 'Prompt Proposal', endpoint: '/api/admin/oracle/prompt-proposal', method: 'POST', desc: 'Meta-Oracle generates changes' },
-              { label: 'Run Transmissions', endpoint: '/api/admin/oracle/transmissions/run', method: 'POST', desc: 'Fire transmission pipeline now' },
-              { label: 'Response Analysis', endpoint: '/api/admin/oracle/response-effectiveness', method: 'GET', desc: 'Which approaches work best' }
-            ].map((action) => (
-              <button
-                key={action.label}
-                className="oi-action-card"
-                onClick={() => runAction(action.endpoint, action.method, action.label)}
-                disabled={actionLoading === action.label}
-              >
-                <span className="oi-action-name">{actionLoading === action.label ? 'Running...' : action.label}</span>
-                <span className="oi-action-desc">{action.desc}</span>
-              </button>
-            ))}
+          {/* Weekly routine */}
+          <div className="ac-card">
+            <h3 className="ac-card-title-sm">Weekly Routine</h3>
+            <p className="oi-actions-hint">Run these once a week in order. After step 3, check the Evolution tab for pending proposals to approve or reject. That's it — Oracle adapts immediately.</p>
+            <div className="oi-actions-ordered">
+              {[
+                { step: 1, label: 'Run Evolution', endpoint: '/api/admin/oracle/evolve', method: 'POST', desc: 'Updates psych profiles and refines Oracle\'s voice from recent conversations. Takes ~30s.' },
+                { step: 2, label: 'Discover Patterns', endpoint: '/api/admin/oracle/discover-patterns', method: 'GET', desc: 'Finds statistical correlations across outcomes, streaks, lunar phases, and topics.' },
+                { step: 3, label: 'Prompt Proposal', endpoint: '/api/admin/oracle/prompt-proposal', method: 'POST', desc: 'Opus reviews all data and proposes rule changes. Pending items appear in Evolution tab for your approval.' }
+              ].map((action) => (
+                <button
+                  key={action.label}
+                  className="oi-action-step"
+                  onClick={() => runAction(action.endpoint, action.method, action.label)}
+                  disabled={!!actionLoading}
+                >
+                  <span className="oi-action-step-num">{action.step}</span>
+                  <div className="oi-action-step-body">
+                    <span className="oi-action-name">{actionLoading === action.label ? 'Running...' : action.label}</span>
+                    <span className="oi-action-desc">{action.desc}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* On demand */}
+          <div className="ac-card">
+            <h3 className="ac-card-title-sm">On Demand</h3>
+            <p className="oi-actions-hint">These run automatically or are just for checking in. Tap when curious.</p>
+            <div className="oi-actions-grid">
+              {[
+                { label: 'Risk Scan', endpoint: '/api/admin/oracle/risk-scan', method: 'GET', desc: 'Scores all users for relapse risk. Feeds into transmissions.' },
+                { label: 'Run Transmissions', endpoint: '/api/admin/oracle/transmissions/run', method: 'POST', desc: 'Fires the daily pipeline now instead of waiting for the cron.' },
+                { label: 'Response Analysis', endpoint: '/api/admin/oracle/response-effectiveness', method: 'GET', desc: 'Shows which Oracle response strategies actually kept users on track.' }
+              ].map((action) => (
+                <button
+                  key={action.label}
+                  className="oi-action-card"
+                  onClick={() => runAction(action.endpoint, action.method, action.label)}
+                  disabled={!!actionLoading}
+                >
+                  <span className="oi-action-name">{actionLoading === action.label ? 'Running...' : action.label}</span>
+                  <span className="oi-action-desc">{action.desc}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           {actionResult && (

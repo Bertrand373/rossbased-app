@@ -337,6 +337,63 @@
 }
 
 /* ===== ACTION BUTTONS ===== */
+.oi-actions-hint {
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+  line-height: 1.5;
+  margin: 0 0 12px;
+}
+
+.oi-actions-ordered {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.oi-action-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+}
+
+.oi-action-step:hover:not(:disabled) {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.oi-action-step:disabled { opacity: 0.4; cursor: default; }
+
+.oi-action-step-num {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: rgba(212,168,67,0.08);
+  border: 1px solid rgba(212,168,67,0.15);
+  color: rgba(212,168,67,0.7);
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.oi-action-step-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
 .oi-actions-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -445,6 +502,14 @@
 [data-theme="light"] .oi-action-card:hover:not(:disabled) { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); }
 [data-theme="light"] .oi-action-name { color: rgba(0,0,0,0.7); }
 [data-theme="light"] .oi-action-desc { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .oi-actions-hint { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .oi-action-step { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.06); }
+[data-theme="light"] .oi-action-step:hover:not(:disabled) { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.1); }
+[data-theme="light"] .oi-action-step-num {
+  background: rgba(170,130,40,0.06);
+  border-color: rgba(170,130,40,0.15);
+  color: rgba(170,130,40,0.7);
+}
 [data-theme="light"] .oi-result-label { color: rgba(0,0,0,0.5); }
 [data-theme="light"] .oi-result-data { color: rgba(0,0,0,0.35); }
 
