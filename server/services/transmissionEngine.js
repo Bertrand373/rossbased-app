@@ -123,7 +123,7 @@ async function deliverTransmission(userId, username, message, source, context = 
  * PIPELINE 1: Risk-based interventions
  * Uses the risk engine to find high-risk users and generate personalized messages
  */
-async function processRiskInterventions() {
+async function processRiskInterventions(targetUsername) {
   try {
     const highRiskProfiles = await UserRiskProfile.find({
       'currentRisk.score': { $gte: 50 }
@@ -139,8 +139,11 @@ async function processRiskInterventions() {
         .lean();
       if (!user) continue;
 
-      // Risk interventions are premium/OG only
-      if (!hasPremiumOrOG(user)) continue;
+      // If targeting a specific user, skip everyone else
+      if (targetUsername && user.username.toLowerCase() !== targetUsername.toLowerCase()) continue;
+
+      // Risk interventions are premium/OG only (unless targeting specific user for testing)
+      if (!targetUsername && !hasPremiumOrOG(user)) continue;
 
       // Check eligibility
       const eligible = await isEligible(user._id, user.username, user);
@@ -181,7 +184,7 @@ async function processRiskInterventions() {
  * One Haiku call generates cohort-matched message templates,
  * then we find matching users and deliver
  */
-async function processAggregateTransmissions() {
+async function processAggregateTransmissions(targetUsername) {
   try {
     // Gather aggregate data for Haiku
     const lunar = getLunarData(new Date());
@@ -309,7 +312,10 @@ Respond ONLY with valid JSON:
       // Find matching users (use actual streak from startDate, not stale currentStreak)
       const matchingUsers = activeUsers.filter(u => {
         const d = getActualStreakDay(u);
-        return d >= streakMin && d <= streakMax;
+        if (d < streakMin || d > streakMax) return false;
+        // If targeting a specific user, skip everyone else
+        if (targetUsername && u.username.toLowerCase() !== targetUsername.toLowerCase()) return false;
+        return true;
       });
 
       for (const user of matchingUsers) {
@@ -338,7 +344,7 @@ Respond ONLY with valid JSON:
  * PIPELINE 3: Re-engagement transmissions
  * Target users who haven't opened the app in 3+ days
  */
-async function processReengagement() {
+async function processReengagement(targetUsername) {
   try {
     const cutoff = new Date(Date.now() - REENGAGEMENT_DAYS * 24 * 60 * 60 * 1000);
 
@@ -352,8 +358,10 @@ async function processReengagement() {
       .lean();
 
     const reengageTargets = quietUsers.filter(u => {
-      // Premium/OG only for re-engagement
-      if (!hasPremiumOrOG(u)) return false;
+      // If targeting a specific user, skip everyone else
+      if (targetUsername && u.username.toLowerCase() !== targetUsername.toLowerCase()) return false;
+      // Premium/OG only for re-engagement (unless targeting specific user for testing)
+      if (!targetUsername && !hasPremiumOrOG(u)) return false;
       const lastLog = (u.benefitTracking || [])
         .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
       if (!lastLog) return true; // Never logged
@@ -415,20 +423,20 @@ async function processReengagement() {
  * Run the full transmission pipeline
  * Called by cron job once daily
  */
-async function runTransmissionPipeline() {
-  console.log('[Transmission] ====== PIPELINE START ======');
+async function runTransmissionPipeline({ targetUsername } = {}) {
+  console.log(`[Transmission] ====== PIPELINE START${targetUsername ? ` (target: ${targetUsername})` : ''} ======`);
   const start = Date.now();
 
   // Pipeline 1: Risk-based (highest priority)
-  const risk = await processRiskInterventions();
+  const risk = await processRiskInterventions(targetUsername);
   console.log(`[Transmission] Risk interventions: ${risk.sent} sent`);
 
   // Pipeline 2: Aggregate patterns
-  const aggregate = await processAggregateTransmissions();
+  const aggregate = await processAggregateTransmissions(targetUsername);
   console.log(`[Transmission] Aggregate: ${aggregate.sent} sent (${aggregate.templates || 0} templates)`);
 
   // Pipeline 3: Re-engagement
-  const reengage = await processReengagement();
+  const reengage = await processReengagement(targetUsername);
   console.log(`[Transmission] Re-engagement: ${reengage.sent} sent`);
 
   const elapsed = ((Date.now() - start) / 1000).toFixed(1);
