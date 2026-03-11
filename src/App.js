@@ -421,11 +421,13 @@ function App() {
     return () => window.removeEventListener('oracle-unread', handleUnread);
   }, []);
 
-  // Toggle CSS class on Oracle nav buttons for the unread dot
+  // Toggle body data attribute for Oracle unread dot (survives React re-renders)
   useEffect(() => {
-    document.querySelectorAll('.nav-link-oracle').forEach(el => {
-      el.classList.toggle('has-unread', oracleHasUnread);
-    });
+    if (oracleHasUnread) {
+      document.body.setAttribute('data-oracle-unread', 'true');
+    } else {
+      document.body.removeAttribute('data-oracle-unread');
+    }
   }, [oracleHasUnread]);
 
   // Wrapper to open Oracle and clear unread

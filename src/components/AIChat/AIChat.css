@@ -867,7 +867,7 @@
   position: relative;
 }
 
-.nav-link-oracle.has-unread::after {
+body[data-oracle-unread="true"] .nav-link-oracle::after {
   content: '';
   position: absolute;
   top: 0;
