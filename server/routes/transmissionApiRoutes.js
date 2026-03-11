@@ -65,8 +65,8 @@ router.post('/run', async (req, res) => {
   }
 
   try {
-    const { targetUsername } = req.body || {};
-    const results = await runTransmissionPipeline({ targetUsername });
+    const { targetUsername, force } = req.body || {};
+    const results = await runTransmissionPipeline({ targetUsername, force });
     res.json(results);
   } catch (err) {
     console.error('Transmission pipeline error:', err);

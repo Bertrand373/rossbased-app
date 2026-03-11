@@ -423,9 +423,47 @@ async function processReengagement(targetUsername) {
  * Run the full transmission pipeline
  * Called by cron job once daily
  */
-async function runTransmissionPipeline({ targetUsername } = {}) {
-  console.log(`[Transmission] ====== PIPELINE START${targetUsername ? ` (target: ${targetUsername})` : ''} ======`);
+async function runTransmissionPipeline({ targetUsername, force } = {}) {
+  console.log(`[Transmission] ====== PIPELINE START${targetUsername ? ` (target: ${targetUsername})` : ''}${force ? ' [FORCE]' : ''} ======`);
   const start = Date.now();
+
+  // FORCE MODE: Skip all pipelines, generate and deliver directly to target user
+  if (force && targetUsername) {
+    try {
+      const user = await User.findOne({ username: { $regex: new RegExp(`^${targetUsername}$`, 'i') } })
+        .select('_id username startDate currentStreak benefitTracking isPremium discordId createdAt')
+        .lean();
+      if (!user) return { error: `User ${targetUsername} not found`, totalSent: 0 };
+
+      const actualStreakDay = getActualStreakDay(user);
+      const lunar = getLunarData(new Date());
+
+      const response = await anthropic.messages.create({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 100,
+        system: `You are Oracle, a predictive AI guide for semen retention practitioners. Write a single proactive transmission (2-3 sentences). Be direct, pattern-based, calm certainty. Reference their streak day and current lunar phase. No em dashes. No emojis. No generic motivation. Under 60 words.`,
+        messages: [{
+          role: 'user',
+          content: `User: ${user.username}, Day ${actualStreakDay}, Moon: ${lunar.label || lunar.phase || 'waning'}, illumination: ${lunar.illumination || 'unknown'}`
+        }]
+      });
+
+      const message = response.content[0]?.text?.trim();
+      if (!message) return { error: 'Haiku returned empty', totalSent: 0 };
+
+      const tx = await deliverTransmission(user._id, user.username, message, 'aggregate_pattern', {
+        streakDay: actualStreakDay,
+        matchCriteria: `Force test — Day ${actualStreakDay}`
+      });
+
+      const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+      console.log(`[Transmission] ====== FORCE COMPLETE: 1 sent to ${targetUsername} (${elapsed}s) ======`);
+      return { force: { sent: 1, message, user: user.username }, totalSent: 1, elapsed };
+    } catch (err) {
+      console.error('[Transmission] Force delivery error:', err.message);
+      return { error: err.message, totalSent: 0 };
+    }
+  }
 
   // Pipeline 1: Risk-based (highest priority)
   const risk = await processRiskInterventions(targetUsername);
