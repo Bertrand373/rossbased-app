@@ -455,7 +455,7 @@ const KnowledgeBase = () => {
                       <span className="kb-filter-sep" />
                       <button className={`kb-pill kb-pill-status ${filterStatus === 'all' ? '' : 'active'}`}
                         onClick={() => setFilterStatus(s => s === 'all' ? 'enabled' : s === 'enabled' ? 'disabled' : 'all')}>
-                        {filterStatus === 'all' ? 'All status' : filterStatus === 'enabled' ? 'Enabled' : 'Disabled'}
+                        {filterStatus === 'all' ? 'Any status' : filterStatus === 'enabled' ? 'Enabled only' : 'Disabled only'}
                       </button>
                     </div>
                   </div>

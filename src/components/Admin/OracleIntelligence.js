@@ -307,6 +307,7 @@ const OracleIntelligence = () => {
                   <div key={r._id} className={`oi-evo-card ${r.status}`}>
                     <div className="oi-evo-header">
                       <span className="oi-evo-type">{r.type.replace(/-/g, ' ')}</span>
+                      <span className="oi-evo-date">{new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                       <span className={`oi-evo-status ${r.status}`}>{r.status}</span>
                     </div>
                     <p className="oi-evo-content">{r.content?.substring(0, 200)}{r.content?.length > 200 ? '...' : ''}</p>
@@ -360,8 +361,6 @@ const OracleIntelligence = () => {
                         </button>
                       </div>
                     )}
-
-                    <span className="oi-evo-date">{new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                   </div>
                 ))}
               </div>

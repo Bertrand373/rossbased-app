@@ -332,10 +332,8 @@
 
 .oi-evo-date {
   font-size: 9px;
-  color: rgba(255,255,255,0.12);
-  position: absolute;
-  top: 14px;
-  right: 50px;
+  color: rgba(255,255,255,0.15);
+  white-space: nowrap;
 }
 
 /* ===== ACTION BUTTONS ===== */

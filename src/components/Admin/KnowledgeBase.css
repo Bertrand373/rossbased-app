@@ -405,10 +405,18 @@
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 10px;
   padding: 3px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.kb-source-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .kb-source-tab {
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -527,8 +535,8 @@
   padding: 2px 8px;
   border: none;
   border-radius: 4px;
-  background: rgba(239, 68, 68, 0.06);
-  color: rgba(239, 68, 68, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.4);
   font-size: 10px;
   font-weight: 500;
   cursor: pointer;
@@ -536,8 +544,8 @@
 }
 
 .kb-clear-filters:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: rgba(239, 68, 68, 0.7);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* Document list */
@@ -551,6 +559,7 @@
 .kb-docs-scroll-wrap {
   max-height: 450px;
   overflow-y: auto;
+  overflow-x: hidden;
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.01);
@@ -934,12 +943,12 @@
   color: rgba(0,0,0,0.25);
 }
 [data-theme="light"] .kb-clear-filters {
-  background: rgba(220,50,50,0.04);
-  color: rgba(220,50,50,0.4);
+  background: rgba(0,0,0,0.05);
+  color: rgba(0,0,0,0.4);
 }
 [data-theme="light"] .kb-clear-filters:hover {
-  background: rgba(220,50,50,0.08);
-  color: rgba(220,50,50,0.6);
+  background: rgba(0,0,0,0.08);
+  color: rgba(0,0,0,0.6);
 }
 
 /* Scroll container + sticky header + timestamp */
