@@ -183,7 +183,8 @@ const userSchema = new mongoose.Schema({
       lifetimeCount: { type: Number, default: 0 },
       lastUsed: Date,
       weekStart: { type: String, default: '' },
-      weeklyCount: { type: Number, default: 0 }
+      weeklyCount: { type: Number, default: 0 },
+      lastIP: { type: String, default: '' }
     },
     default: {
       date: '',
@@ -191,7 +192,8 @@ const userSchema = new mongoose.Schema({
       lifetimeCount: 0,
       lastUsed: null,
       weekStart: '',
-      weeklyCount: 0
+      weeklyCount: 0,
+      lastIP: ''
     }
   },
   
@@ -278,6 +280,7 @@ userSchema.index({ googleId: 1 });
 userSchema.index({ email: 1 });
 userSchema.index({ 'subscription.status': 1 });
 userSchema.index({ 'subscription.stripeCustomerId': 1 });
+userSchema.index({ 'aiUsage.lastIP': 1 });
 
 const User = mongoose.model('User', userSchema);
 

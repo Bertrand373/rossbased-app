@@ -110,6 +110,7 @@ const NOTE_MODEL = process.env.NOTE_MODEL || 'claude-haiku-4-5-20251001';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const app = express();
+app.set('trust proxy', 1); // Render runs behind a proxy — get real client IP
 
 // Configure CORS
 app.use(cors({
@@ -456,13 +457,16 @@ app.post('/api/signup', async (req, res) => {
       return res.status(409).json({ error: 'Username already taken' });
     }
     
-    // Check if email already exists (if provided)
-    if (email) {
-      const existingEmail = await User.findOne({ email });
-      if (existingEmail) {
-        console.log('Signup failed - email taken:', email);
-        return res.status(409).json({ error: 'Email already registered' });
-      }
+    // Email is required for all signups
+    if (!email || !email.trim()) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+    
+    // Check if email already exists
+    const existingEmail = await User.findOne({ email: email.trim() });
+    if (existingEmail) {
+      console.log('Signup failed - email taken:', email);
+      return res.status(409).json({ error: 'Email already registered' });
     }
     
     // Create new user
@@ -470,7 +474,7 @@ app.post('/api/signup', async (req, res) => {
     const user = new User({
       username,
       password,
-      email: email || '',
+      email: email.trim(),
       startDate: new Date(),
       currentStreak: 0,
       longestStreak: 0,
@@ -1239,6 +1243,13 @@ async function getDiscordUsageForUser(user) {
   }
 }
 
+// Get real client IP (works behind Render proxy)
+function getClientIP(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) return forwarded.split(',')[0].trim();
+  return req.ip || '';
+}
+
 // AI Chat Streaming Endpoint
 app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
   const { message, conversationHistory, timezone } = req.body;
@@ -1286,6 +1297,42 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     const { hasPremium: userHasPremium } = checkPremiumAccess(user); // Always use subscription-aware check — never raw isPremium field (can be stale from beta)
     const discordUsageToday = isGrandfathered ? await getDiscordUsageForUser(user) : 0;
     const combinedCount = currentCount + discordUsageToday;
+    
+    // --- ANTI-ABUSE: 24-hour account age gate (free users only) ---
+    const isAdminUser = ['rossbased', 'ross'].includes(user.username?.toLowerCase());
+    if (!isAdminUser && !userHasPremium && !isGrandfathered) {
+      const accountAgeHours = (Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60);
+      if (accountAgeHours < 24) {
+        return res.status(403).json({ 
+          error: 'Account too new',
+          message: 'Oracle becomes available 24 hours after your journey begins. Use this time to explore your tracker and log your first benefits.'
+        });
+      }
+    }
+
+    // --- ANTI-ABUSE: IP-based multi-account detection (free users only) ---
+    const clientIP = getClientIP(req);
+    if (clientIP && !isAdminUser && !userHasPremium && !isGrandfathered) {
+      try {
+        const ipAbuser = await User.findOne({
+          'aiUsage.lastIP': clientIP,
+          username: { $ne: user.username },
+          'aiUsage.weekStart': currentWeekStart,
+          'aiUsage.weeklyCount': { $gte: FREE_WEEKLY_LIMIT }
+        }).select('username').lean();
+        
+        if (ipAbuser) {
+          console.log(`🚫 IP abuse blocked: ${user.username} shares IP ${clientIP} with maxed-out ${ipAbuser.username}`);
+          return res.status(429).json({ 
+            error: 'Access restricted',
+            message: 'Oracle recognizes this energy has already been served. If you seek deeper access, the path is through commitment, not circumvention.'
+          });
+        }
+      } catch (ipErr) {
+        console.error('IP abuse check failed (non-blocking):', ipErr.message);
+        // Non-blocking — allow through if check fails
+      }
+    }
     
     if (isBetaPeriod && currentCount >= BETA_DAILY_LIMIT) {
       return res.status(429).json({ 
@@ -1538,7 +1585,8 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
           'aiUsage.lifetimeCount': currentLifetime + 1,
           'aiUsage.lastUsed': now,
           'aiUsage.weekStart': currentWeekStart,
-          'aiUsage.weeklyCount': isNewWeek ? 1 : currentWeeklyCount + 1
+          'aiUsage.weeklyCount': isNewWeek ? 1 : currentWeeklyCount + 1,
+          'aiUsage.lastIP': clientIP || ''
         }
       }
     );
