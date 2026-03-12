@@ -97,8 +97,8 @@
 
 /* Progress */
 .et-progress {
-  max-width: 240px;
-  margin: 0 auto;
+  width: 100%;
+  padding: 0 4px;
 }
 
 .et-progress-bar {

@@ -1005,13 +1005,23 @@
 
 .stat-hero { animation: fadeInUp 500ms ease forwards; }
 
+.stat-progress {
+  animation: fadeInUp 500ms ease 30ms forwards;
+  opacity: 0;
+}
+
+.stat-supporting {
+  animation: fadeInUp 500ms ease 60ms forwards;
+  opacity: 0;
+}
+
 .stats-section:nth-of-type(1) {
-  animation: fadeInUp 500ms ease 50ms forwards;
+  animation: fadeInUp 500ms ease 90ms forwards;
   opacity: 0;
 }
 
 .stats-section:nth-of-type(2) {
-  animation: fadeInUp 500ms ease 100ms forwards;
+  animation: fadeInUp 500ms ease 120ms forwards;
   opacity: 0;
 }
 
@@ -1126,7 +1136,7 @@
    ============================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .stat-hero, .stat-supporting, .stats-section, .reset-menu, .stats-page .overlay, .stats-page .modal, .insight-loading-spinner {
+  .stat-hero, .stat-progress, .stat-supporting, .stats-section, .reset-menu, .stats-page .overlay, .stats-page .modal, .insight-loading-spinner {
     animation: none;
     opacity: 1;
   }

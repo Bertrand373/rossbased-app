@@ -3,7 +3,6 @@
 // REFACTORED: Sections are now data-driven, matching Landing page aesthetic
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import './StatsInsights.css';
 
 // ============================================================
@@ -393,10 +392,9 @@ export const RelapseAnalytics = ({
 // ============================================================
 export const PhaseContext = ({ 
   currentStreak, 
-  phaseInfo
+  phaseInfo,
+  onNavigateToTimeline
 }) => {
-  const navigate = useNavigate();
-  
   if (!phaseInfo) return null;
   
   // Map phase key to number (matches Emotional Timeline order)
@@ -411,16 +409,12 @@ export const PhaseContext = ({
     return phaseNumbers[key] || '01';
   };
   
-  const handleNavigateToTimeline = () => {
-    navigate('/timeline');
-  };
-  
   return (
     <div className="phase-context-section">
       <div className="phase-context-header">
         <span>Current Phase</span>
       </div>
-      <div className="phase-context-row" onClick={handleNavigateToTimeline}>
+      <div className="phase-context-row" onClick={onNavigateToTimeline}>
         <div className="phase-context-num">
           {getPhaseNumber(phaseInfo.key)}
         </div>

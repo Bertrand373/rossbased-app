@@ -702,6 +702,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
             <PhaseContext
               currentStreak={safeUserData.currentStreak}
               phaseInfo={memoizedInsights.phaseInfo}
+              onNavigateToTimeline={() => setActiveView('timeline')}
             />
           </>
         )}
