@@ -1133,7 +1133,7 @@ const Profile = ({
             {/* Links */}
             <div className="about-links">
               <button className="about-link" onClick={() => {
-                localStorage.removeItem('titantrack-seen-announcement');
+                Object.keys(localStorage).filter(k => k.startsWith('titantrack-seen-announcement')).forEach(k => localStorage.removeItem(k));
                 window.location.reload();
               }}>
                 What's New

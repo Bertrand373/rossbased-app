@@ -293,7 +293,7 @@ const AdminCockpit = () => {
         setAnnCommits('');
         setAnnEditId(null);
         // Clear seen key so admin sees the draft preview on next app load
-        localStorage.removeItem('titantrack-seen-announcement');
+        Object.keys(localStorage).filter(k => k.startsWith('titantrack-seen-announcement')).forEach(k => localStorage.removeItem(k));
       }
     } catch (err) {
       console.error('Save error:', err);
@@ -328,7 +328,7 @@ const AdminCockpit = () => {
         const updated = await res.json();
         setAnnouncements(prev => prev.map(a => a._id === id ? updated : a));
         // Clear seen key so Ross sees it fresh as a user would
-        localStorage.removeItem('titantrack-seen-announcement');
+        Object.keys(localStorage).filter(k => k.startsWith('titantrack-seen-announcement')).forEach(k => localStorage.removeItem(k));
       }
     } catch (err) {
       console.error('Go live error:', err);
@@ -1139,7 +1139,7 @@ const AdminCockpit = () => {
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}>Edit</button>
                         <button className="ac-ann-card-preview" onClick={() => {
-                          localStorage.removeItem('titantrack-seen-announcement');
+                          Object.keys(localStorage).filter(k => k.startsWith('titantrack-seen-announcement')).forEach(k => localStorage.removeItem(k));
                           window.location.href = '/';
                         }}>Preview</button>
                         <button className="ac-ann-card-live" onClick={() => handleGoLive(a._id)}>Go Live</button>

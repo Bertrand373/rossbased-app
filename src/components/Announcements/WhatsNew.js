@@ -9,7 +9,6 @@ import './WhatsNew.css';
 import '../../styles/BottomSheet.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
-const SEEN_KEY = 'titantrack-seen-announcement';
 
 const WhatsNew = ({ isLoggedIn, username }) => {
   const [announcement, setAnnouncement] = useState(null);
@@ -18,12 +17,15 @@ const WhatsNew = ({ isLoggedIn, username }) => {
   const sheetPanelRef = useRef(null);
   const navigate = useNavigate();
 
+  // User-specific seen key — prevents cross-account false dismissals
+  const seenKey = username ? `titantrack-seen-announcement-${username}` : 'titantrack-seen-announcement';
+
   // Check if current user is admin (sees drafts too)
   const isAdmin = username && ['rossbased', 'ross'].includes(username.toLowerCase());
 
   // Fetch latest announcement on login
   useEffect(() => {
-    if (!isLoggedIn) return;
+    if (!isLoggedIn || !username) return;
 
     const checkAnnouncement = async () => {
       try {
@@ -41,8 +43,8 @@ const WhatsNew = ({ isLoggedIn, username }) => {
         const data = await res.json();
         if (!data || !data._id) return;
 
-        // Check if user has already seen this one
-        const seenId = localStorage.getItem(SEEN_KEY);
+        // Check if THIS USER has already seen this one
+        const seenId = localStorage.getItem(seenKey);
         if (seenId === data._id) return;
 
         // Delay showing the sheet so the app has time to settle
@@ -56,7 +58,7 @@ const WhatsNew = ({ isLoggedIn, username }) => {
     };
 
     checkAnnouncement();
-  }, [isLoggedIn, isAdmin]);
+  }, [isLoggedIn, isAdmin, username, seenKey]);
 
   // Sheet animation
   useEffect(() => {
@@ -76,10 +78,10 @@ const WhatsNew = ({ isLoggedIn, username }) => {
 
   const dismiss = useCallback(() => {
     if (announcement?._id) {
-      localStorage.setItem(SEEN_KEY, announcement._id);
+      localStorage.setItem(seenKey, announcement._id);
     }
     closeSheet(() => setShowSheet(false));
-  }, [announcement, closeSheet]);
+  }, [announcement, closeSheet, seenKey]);
 
   // Swipe-to-dismiss
   useSheetSwipe(sheetPanelRef, showSheet, dismiss);
