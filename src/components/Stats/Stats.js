@@ -404,7 +404,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
   const confirmResetStreak = async () => {
     try {
-      const now = new Date();
+      const todayStr = format(new Date(), 'yyyy-MM-dd');
       const history = [...(safeUserData.streakHistory || [])];
       
       // Close out the active streak (reason: 'reset', NOT 'relapse')
@@ -412,18 +412,18 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       if (activeIdx !== -1) {
         history[activeIdx] = { 
           ...history[activeIdx], 
-          end: now, 
+          end: todayStr, 
           days: safeUserData.currentStreak || 0, 
           reason: 'reset' 
         };
       }
       
       // Start a fresh streak
-      history.push({ start: now, end: null, days: 0 });
+      history.push({ start: todayStr, end: null, days: 0 });
       
       await updateUserData({
         currentStreak: 0,
-        startDate: now,
+        startDate: todayStr,
         streakHistory: history
       });
       setShowResetStreakModal(false);
@@ -444,7 +444,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         relapseHistory: [],
         streakHistory: [],
         badges: safeUserData.badges?.map(b => ({ ...b, earned: false, date: null })) || [],
-        startDate: new Date()
+        startDate: format(new Date(), 'yyyy-MM-dd')
       });
       setShowResetAllModal(false);
       setResetConfirmText('');

@@ -4,6 +4,17 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { format } from 'date-fns';
 import useSheetSwipe from '../../hooks/useSheetSwipe';
 
+// Timezone-safe date parser for display formatting
+const toLocalMidnight = (val) => {
+  if (!val) return null;
+  if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val)) {
+    const [y, m, d] = val.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+  const d = new Date(val);
+  return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+};
+
 // Loading state component
 export const InsightLoadingState = ({ insight, isVisible }) => {
   if (!isVisible) return null;
@@ -73,7 +84,7 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
           label: 'Current Streak',
           description: 'Your active streak. Resets if you log a relapse.',
           details: [
-            { label: 'Started', value: userData?.startDate ? format(new Date(userData.startDate), 'MMM d, yyyy') : 'N/A' },
+            { label: 'Started', value: userData?.startDate ? format(toLocalMidnight(userData.startDate), 'MMM d, yyyy') : 'N/A' },
             { label: 'Longest', value: `${userData?.longestStreak || 0} days` }
           ]
         };
@@ -87,7 +98,7 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
         if (isActiveBest) {
           // On their best streak — show start date
           if (userData?.startDate) {
-            details.push({ label: 'Started', value: format(new Date(userData.startDate), 'MMM d, yyyy') });
+            details.push({ label: 'Started', value: format(toLocalMidnight(userData.startDate), 'MMM d, yyyy') });
           }
         } else {
           // Had a better streak before — show current + gap
@@ -120,7 +131,7 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
           .filter(s => s.reason === 'relapse' && s.end)
           .sort((a, b) => new Date(b.end) - new Date(a.end))[0];
         const daysSinceLast = lastRelapse 
-          ? Math.floor((new Date() - new Date(lastRelapse.end)) / (1000 * 60 * 60 * 24))
+          ? Math.floor((new Date() - toLocalMidnight(lastRelapse.end)) / (1000 * 60 * 60 * 24))
           : null;
         
         return {
