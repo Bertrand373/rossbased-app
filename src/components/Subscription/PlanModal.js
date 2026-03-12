@@ -176,7 +176,7 @@ const PlanModal = ({
             disabled={isProcessing}
           >
             {isProcessing ? 'Processing...' : 
-              isNewUser 
+              isNewUser && selectedTier !== 'ascended'
                 ? 'Start 7-Day Free Trial' 
                 : `Continue — $${selectedPlan === 'yearly' ? pricing.yearly + '/yr' : pricing.monthly + '/mo'}`
             }
@@ -184,7 +184,7 @@ const PlanModal = ({
 
           {/* Legal */}
           <p className="plan-legal">
-            {isNewUser 
+            {isNewUser && selectedTier !== 'ascended'
               ? 'Card required. Not charged until trial ends. Cancel anytime.'
               : 'Cancel anytime. Secure payment via Stripe.'
             }
