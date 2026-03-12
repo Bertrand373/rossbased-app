@@ -71,7 +71,11 @@ const formatMoonTime = (date) => {
 export const getLunarData = (date, lat = DEFAULT_LAT, lng = DEFAULT_LNG) => {
   const d = date instanceof Date ? date : new Date(date);
   
-  const moonIllum = SunCalc.getMoonIllumination(d);
+  // Normalize to noon for phase classification so the label is identical
+  // whether called at midnight (calendar day cells) or 2 PM (moon bar).
+  // Moonrise/moonset still use the original date for accuracy.
+  const noon = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0);
+  const moonIllum = SunCalc.getMoonIllumination(noon);
   const moonTimes = SunCalc.getMoonTimes(d, lat, lng);
   const entry = classifyPhase(moonIllum.phase);
   
@@ -81,7 +85,7 @@ export const getLunarData = (date, lat = DEFAULT_LAT, lng = DEFAULT_LNG) => {
   
   const moonrise = formatMoonTime(moonTimes.rise);
   const moonset = formatMoonTime(moonTimes.set);
-  const nextPhase = getNextPhaseTransition(d);
+  const nextPhase = getNextPhaseTransition(noon);
   const specialEvent = getSpecialEvent(d);
   const energy = ENERGY_MAP[entry.phase] || '';
   

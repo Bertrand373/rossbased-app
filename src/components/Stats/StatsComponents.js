@@ -85,12 +85,13 @@ export const StatCardModal = ({ showModal, selectedStatCard, onClose, userData }
           description: 'Your active streak. Resets if you log a relapse.',
           details: [
             { label: 'Started', value: userData?.startDate ? format(toLocalMidnight(userData.startDate), 'MMM d, yyyy') : 'N/A' },
-            { label: 'Longest', value: `${userData?.longestStreak || 0} days` }
+            { label: 'Longest', value: `${Math.max(userData?.longestStreak || 0, userData?.currentStreak || 0)} days` }
           ]
         };
       case 'longestStreak': {
         const current = userData?.currentStreak || 0;
-        const longest = userData?.longestStreak || 0;
+        // Guard: longestStreak in DB can go stale — always take the higher of current vs stored
+        const longest = Math.max(userData?.longestStreak || 0, current);
         const isActiveBest = current >= longest && current > 0;
         const gap = longest - current;
         

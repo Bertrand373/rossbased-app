@@ -526,7 +526,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       {/* Supporting Stats */}
       <div className="stat-supporting">
         <button className="stat-supporting-card" onClick={() => handleStatCardClick('longestStreak')}>
-          <span className="stat-supporting-num">{safeUserData.longestStreak || 0}</span>
+          <span className="stat-supporting-num">{Math.max(safeUserData.longestStreak || 0, safeUserData.currentStreak || 0)}</span>
           <span className="stat-supporting-label">Longest</span>
         </button>
         <div className="stat-supporting-divider" />
