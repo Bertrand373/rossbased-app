@@ -89,7 +89,16 @@ export const useUserData = () => {
 
   const calculateGoalTargetDate = (startDate, targetDays) => {
     if (!startDate || !targetDays) return null;
-    return addDays(new Date(startDate), targetDays - 1);
+    // Parse startDate as local midnight whether string or Date
+    let start;
+    if (typeof startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+      const [y, m, d] = startDate.split('-').map(Number);
+      start = new Date(y, m - 1, d);
+    } else {
+      start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+    }
+    return addDays(start, targetDays - 1);
   };
 
   const checkGoalAchievement = (currentStreak, targetDays) => {
@@ -120,14 +129,24 @@ export const useUserData = () => {
   const processUserData = (rawData) => {
     const processed = { ...rawData };
     
-    // Convert date strings to Date objects
+    // Streak sync on app load — timezone-safe
+    // startDate is now stored as "yyyy-MM-dd" string. Do NOT convert to Date object.
     if (processed.startDate) {
-      processed.startDate = new Date(processed.startDate);
+      // Parse startDate as local midnight regardless of format (string or legacy Date)
+      let startMidnight;
+      if (typeof processed.startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(processed.startDate)) {
+        const [y, m, d] = processed.startDate.split('-').map(Number);
+        startMidnight = new Date(y, m - 1, d); // Local midnight
+      } else {
+        startMidnight = new Date(processed.startDate);
+        startMidnight.setHours(0, 0, 0, 0);
+      }
       
       // SYNC STREAK ON APP LOAD - ensures accuracy after days away
       // ONE-BASED COUNTING: Day 1 = start day (matches calendar display)
       const today = new Date();
-      const daysDiff = Math.floor((today - processed.startDate) / (1000 * 60 * 60 * 24));
+      today.setHours(0, 0, 0, 0);
+      const daysDiff = Math.floor((today - startMidnight) / (1000 * 60 * 60 * 24));
       processed.currentStreak = Math.max(1, daysDiff + 1);
       
       // Also update longestStreak if current exceeds it
@@ -645,7 +664,7 @@ export const useUserData = () => {
       // Also set achievementDate for already-achieved goals
       if (isAchieved) {
         goalData.goal.achievementDate = userData.startDate ? 
-          addDays(new Date(userData.startDate), targetDays - 1) : null;
+          calculateGoalTargetDate(userData.startDate, targetDays) : null;
       }
 
       updateUserData(goalData);

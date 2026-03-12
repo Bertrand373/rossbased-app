@@ -6,6 +6,21 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 
+// Timezone-safe streak calculation — handles "yyyy-MM-dd" strings AND legacy Date objects
+function calcStreak(startDate) {
+  if (!startDate) return 0;
+  let y, m, d;
+  if (typeof startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+    [y, m, d] = startDate.split('-').map(Number);
+  } else {
+    const dt = new Date(startDate);
+    y = dt.getUTCFullYear(); m = dt.getUTCMonth() + 1; d = dt.getUTCDate();
+  }
+  const startMid = new Date(y, m - 1, d);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  return Math.max(1, Math.floor((today - startMid) / (1000 * 60 * 60 * 24)) + 1);
+}
+
 // POST /api/analytics/verify — check admin password
 router.post('/verify', (req, res) => {
   const { password } = req.body;
@@ -266,9 +281,7 @@ router.get('/users', adminCheck, async (req, res) => {
         // Compute real-time streak from startDate (same as Oracle)
         let streak = u.currentStreak || 0;
         if (u.startDate) {
-          const start = new Date(u.startDate); start.setHours(0, 0, 0, 0);
-          const today = new Date(); today.setHours(0, 0, 0, 0);
-          streak = Math.max(1, Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1);
+          streak = calcStreak(u.startDate);
         }
         return {
         username: u.username, email: u.email || '',

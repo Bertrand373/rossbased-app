@@ -59,6 +59,48 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+// Timezone-safe startDate parser — handles "yyyy-MM-dd" strings AND legacy Date objects
+// Used everywhere streak is calculated from startDate
+function parseStartDateToMidnight(startDate) {
+  if (!startDate) return null;
+  if (typeof startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+    const [y, m, d] = startDate.split('-').map(Number);
+    return new Date(y, m - 1, d); // Local midnight — no UTC offset issues
+  }
+  const d = new Date(startDate);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+// Calculate streak from startDate — single source of truth for backend
+function calcStreakFromStartDate(startDate, timezone) {
+  if (!startDate) return 1;
+  let startStr;
+  if (typeof startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+    startStr = startDate;
+  } else {
+    const d = new Date(startDate);
+    startStr = d.toISOString().split('T')[0];
+  }
+  const [sy, sm, sd] = startStr.split('-').map(Number);
+  const startMs = new Date(sy, sm - 1, sd).getTime();
+  
+  let todayMs;
+  if (timezone && timezone !== 'UTC') {
+    const now = new Date();
+    const userNow = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+    userNow.setHours(0, 0, 0, 0);
+    todayMs = userNow.getTime();
+  } else {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    todayMs = today.getTime();
+  }
+  
+  const diffDays = Math.floor((todayMs - startMs) / (1000 * 60 * 60 * 24));
+  return Math.max(1, diffDays + 1);
+}
+
 // Model strings — env vars so you can update from Render without redeploying
 // Alias defaults (no date pin) auto-update when Anthropic releases new versions
 const ORACLE_MODEL = process.env.ORACLE_MODEL || 'claude-sonnet-4-5-20250514';
@@ -158,11 +200,7 @@ mongoose.connect(mongoUri, {
               // Compute current streak
               let currentStreak = user.currentStreak || 0;
               if (user.startDate) {
-                const start = new Date(user.startDate);
-                start.setHours(0, 0, 0, 0);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                currentStreak = Math.max(1, Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1);
+                currentStreak = calcStreakFromStartDate(user.startDate);
               }
 
               // Get current benefit levels
@@ -740,14 +778,7 @@ async function buildOracleContext(user, timezone) {
   // The frontend computes from startDate every render. Oracle must do the same.
   let streak = user.currentStreak || 0;
   if (user.startDate) {
-    const now = new Date();
-    const userNow = new Date(now.toLocaleString('en-US', { timeZone: userTz }));
-    const start = new Date(user.startDate);
-    const userStart = new Date(start.toLocaleString('en-US', { timeZone: userTz }));
-    userNow.setHours(0, 0, 0, 0);
-    userStart.setHours(0, 0, 0, 0);
-    const diffDays = Math.floor((userNow - userStart) / (1000 * 60 * 60 * 24));
-    streak = Math.max(1, diffDays + 1);
+    streak = calcStreakFromStartDate(user.startDate, userTz);
   }
 
   // Longest streak should never be less than current computed streak
@@ -765,7 +796,8 @@ async function buildOracleContext(user, timezone) {
   lines.push(`Total relapses: ${relapses}.`);
   lines.push(`Wet dreams: ${wetDreams}.`);
   if (user.startDate) {
-    lines.push(`Streak start date: ${new Date(user.startDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}.`);
+    const startDisplay = parseStartDateToMidnight(user.startDate);
+    lines.push(`Streak start date: ${startDisplay.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}.`);
   }
 
   // --- SPERMATOGENESIS CYCLE POSITION ---
@@ -1003,9 +1035,9 @@ async function buildOracleContext(user, timezone) {
 
   // --- JOURNEY DURATION ---
   if (user.startDate) {
-    const totalDays = Math.floor(
-      (new Date() - new Date(user.startDate)) / (1000 * 60 * 60 * 24)
-    );
+    const startMid = parseStartDateToMidnight(user.startDate);
+    const todayMid = new Date(); todayMid.setHours(0, 0, 0, 0);
+    const totalDays = Math.floor((todayMid - startMid) / (1000 * 60 * 60 * 24));
     if (totalDays > streak + 30) {
       lines.push(`Total journey: ${totalDays} days (across multiple streaks). Not a beginner.`);
     }
@@ -1546,11 +1578,7 @@ Examples:
         // Compute real-time streak for the note
         let noteStreakDay = user.currentStreak || 0;
         if (user.startDate) {
-          const start = new Date(user.startDate);
-          start.setHours(0, 0, 0, 0);
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          noteStreakDay = Math.max(1, Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1);
+          noteStreakDay = calcStreakFromStartDate(user.startDate);
         }
 
         // Save note, cap at 20 (single atomic MongoDB operation)
@@ -1688,9 +1716,7 @@ Examples:
       try {
         let streakDay = user.currentStreak || 0;
         if (user.startDate) {
-          const s = new Date(user.startDate); s.setHours(0, 0, 0, 0);
-          const t = new Date(); t.setHours(0, 0, 0, 0);
-          streakDay = Math.max(1, Math.floor((t - s) / (1000 * 60 * 60 * 24)) + 1);
+          streakDay = calcStreakFromStartDate(user.startDate);
         }
         await classifyInteraction(message, {
           source: 'app',
