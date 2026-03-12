@@ -79,10 +79,10 @@
 @keyframes counterBreathe {
   0%, 100% { 
     text-shadow: 0 0 0px rgba(201, 169, 100, 0);
-    opacity: 0.92;
+    opacity: 0.87;
   }
   50% { 
-    text-shadow: 0 0 50px rgba(201, 169, 100, 0.05);
+    text-shadow: 0 0 30px rgba(201, 169, 100, 0.08);
     opacity: 1;
   }
 }
