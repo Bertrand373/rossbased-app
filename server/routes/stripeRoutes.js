@@ -26,6 +26,10 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const MONTHLY_PRICE_ID = process.env.STRIPE_PRICE_MONTHLY;
 const YEARLY_PRICE_ID = process.env.STRIPE_PRICE_YEARLY;
 
+// Ascended tier prices ($17/month, $170/year)
+const ASCENDED_MONTHLY_PRICE_ID = process.env.STRIPE_PRICE_ASCENDED_MONTHLY;
+const ASCENDED_YEARLY_PRICE_ID = process.env.STRIPE_PRICE_ASCENDED_YEARLY;
+
 // Frontend URL for redirects
 const CLIENT_URL = process.env.CLIENT_URL || 'https://titantrack.app';
 
@@ -71,6 +75,7 @@ router.get('/status', authenticate, async (req, res) => {
       subscription: {
         status: user.subscription?.status || 'none',
         plan: user.subscription?.plan || 'none',
+        tier: user.subscription?.tier || 'practitioner',
         trialEndDate: user.subscription?.trialEndDate || null,
         currentPeriodEnd: user.subscription?.currentPeriodEnd || null,
         cancelAtPeriodEnd: user.subscription?.cancelAtPeriodEnd || false,
@@ -89,7 +94,8 @@ router.get('/status', authenticate, async (req, res) => {
 // Redirects user to Stripe's hosted payment page
 router.post('/create-checkout', authenticate, async (req, res) => {
   try {
-    const { plan } = req.body; // 'monthly' or 'yearly'
+    const { plan, tier } = req.body; // plan: 'monthly' or 'yearly', tier: 'practitioner' or 'ascended'
+    const subTier = tier === 'ascended' ? 'ascended' : 'practitioner';
     
     const user = await User.findOne({ username: req.user.username });
     if (!user) {
@@ -101,8 +107,13 @@ router.post('/create-checkout', authenticate, async (req, res) => {
       return res.status(400).json({ error: 'You already have lifetime access' });
     }
     
-    // Select price ID based on plan
-    const priceId = plan === 'yearly' ? YEARLY_PRICE_ID : MONTHLY_PRICE_ID;
+    // Select price ID based on plan + tier
+    let priceId;
+    if (subTier === 'ascended') {
+      priceId = plan === 'yearly' ? ASCENDED_YEARLY_PRICE_ID : ASCENDED_MONTHLY_PRICE_ID;
+    } else {
+      priceId = plan === 'yearly' ? YEARLY_PRICE_ID : MONTHLY_PRICE_ID;
+    }
     
     if (!priceId) {
       console.error('Missing Stripe price ID for plan:', plan);
@@ -141,11 +152,13 @@ router.post('/create-checkout', authenticate, async (req, res) => {
       cancel_url: `${CLIENT_URL}/profile?checkout=canceled`,
       metadata: {
         titantrack_username: user.username,
-        plan: plan
+        plan: plan,
+        tier: subTier
       },
       subscription_data: {
         metadata: {
-          titantrack_username: user.username
+          titantrack_username: user.username,
+          tier: subTier
         }
       }
     };
@@ -159,7 +172,7 @@ router.post('/create-checkout', authenticate, async (req, res) => {
     
     const session = await stripe.checkout.sessions.create(sessionConfig);
     
-    console.log(`💳 Checkout session created for ${user.username} (${plan})`);
+    console.log(`💳 Checkout session created for ${user.username} (${subTier} ${plan})`);
     res.json({ url: session.url });
     
   } catch (error) {
@@ -232,6 +245,7 @@ router.post('/webhook', async (req, res) => {
         // --- TITANTRACK SUBSCRIPTION ---
         const username = session.metadata?.titantrack_username;
         const plan = session.metadata?.plan || 'monthly';
+        const checkoutTier = session.metadata?.tier || 'practitioner';
         
         if (!username) {
           console.error('No username in checkout metadata');
@@ -251,6 +265,7 @@ router.post('/webhook', async (req, res) => {
           ...user.subscription,
           status: subscription.status === 'trialing' ? 'trial' : 'active',
           plan: plan,
+          tier: checkoutTier,
           stripeCustomerId: session.customer,
           stripeSubscriptionId: session.subscription,
           trialStartDate: subscription.trial_start ? new Date(subscription.trial_start * 1000) : user.subscription?.trialStartDate,

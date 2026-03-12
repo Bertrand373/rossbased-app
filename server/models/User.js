@@ -140,6 +140,15 @@ const userSchema = new mongoose.Schema({
       default: 'none' 
     },
     
+    // Subscription tier — determines Oracle message limit
+    // 'practitioner' = $8/mo or $80/yr (3 Oracle/day)
+    // 'ascended'     = $17/mo or $170/yr (9 Oracle/day)
+    tier: {
+      type: String,
+      enum: ['practitioner', 'ascended'],
+      default: 'practitioner'
+    },
+    
     // Stripe identifiers
     stripeCustomerId: { type: String, default: null },
     stripeSubscriptionId: { type: String, default: null },

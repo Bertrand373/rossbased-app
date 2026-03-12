@@ -49,6 +49,7 @@ const USER_COOLDOWNS = new Map();
 const COOLDOWN_MS = 10000; // 10 seconds between messages per user
 const GRANDFATHERED_DAILY_POOL = 1;  // Shared pool across Discord + App for OG lifetime users
 const PREMIUM_DAILY_LIMIT = 3;       // Paid subscribers: 3/day shared across Discord + App
+const ASCENDED_DAILY_LIMIT = 9;      // Ascended subscribers: 9/day shared across Discord + App
 const FREE_WEEKLY_LIMIT = 3;         // Free linked users: 3/week shared across Discord + App
 const DAILY_USAGE = new Map();
 const PULSE_COOLDOWN_DAYS = 3;
@@ -755,8 +756,18 @@ const isRateLimited = async (userId, username) => {
       return { limited: false, tier: 'grandfathered', remaining: GRANDFATHERED_DAILY_POOL - combinedToday };
     }
 
+    const isAscended = userHasPremium && linkedUser.subscription?.tier === 'ascended';
+
+    if (isAscended) {
+      // Ascended: 9/day shared pool across Discord + App
+      if (combinedToday >= ASCENDED_DAILY_LIMIT) {
+        return { limited: true, reason: 'daily' };
+      }
+      return { limited: false, tier: 'ascended', remaining: ASCENDED_DAILY_LIMIT - combinedToday };
+    }
+
     if (userHasPremium) {
-      // Paid: 3/day shared pool across Discord + App
+      // Paid (Practitioner): 3/day shared pool across Discord + App
       if (combinedToday >= PREMIUM_DAILY_LIMIT) {
         return { limited: true, reason: 'daily' };
       }
@@ -2184,6 +2195,9 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
         if (isGrandfathered) {
           discordUserTier = 'grandfathered';
           remaining = GRANDFATHERED_DAILY_POOL - (discordUsedNow + appCountNow);
+        } else if (userHasPremium && linkedUser.subscription?.tier === 'ascended') {
+          discordUserTier = 'ascended';
+          remaining = ASCENDED_DAILY_LIMIT - (discordUsedNow + appCountNow);
         } else if (userHasPremium) {
           discordUserTier = 'premium';
           remaining = PREMIUM_DAILY_LIMIT - (discordUsedNow + appCountNow);
@@ -2199,6 +2213,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
     // Tier-aware last-message footer — only shown when this was their final message (0 remaining)
     const getTierFooter = (tier) => {
       if (tier === 'grandfathered') return 'Last message today · Resets midnight ';
+      if (tier === 'ascended') return 'Last message today · Resets midnight ';
       if (tier === 'premium') return 'Last message today · Resets midnight ';
       return 'Last message this week · Resets Monday ';
     };
