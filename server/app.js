@@ -451,8 +451,9 @@ app.post('/api/signup', async (req, res) => {
   const { username, password, email } = req.body;
   
   try {
-    // Check if username already exists
-    const existingUser = await User.findOne({ username });
+    // Check if username already exists (case-insensitive)
+    const escapedUsername = username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const existingUser = await User.findOne({ username: { $regex: new RegExp(`^${escapedUsername}$`, 'i') } });
     if (existingUser) {
       console.log('Signup failed - username taken:', username);
       return res.status(409).json({ error: 'Username already taken' });
@@ -1334,8 +1335,11 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
         // Non-blocking — allow through if check fails
       }
     }
-    
-    if (isBetaPeriod && currentCount >= BETA_DAILY_LIMIT) {
+
+    // Admin unlimited access — skip all rate limits
+    if (isAdminUser) {
+      // no-op: fall through to Oracle response
+    } else if (isBetaPeriod && currentCount >= BETA_DAILY_LIMIT) {
       return res.status(429).json({ 
         error: 'Daily limit reached',
         message: `You've used all ${BETA_DAILY_LIMIT} daily messages. Resets at midnight.`
@@ -1780,7 +1784,11 @@ Examples:
 
     // Calculate remaining
     let messagesRemaining, effectiveLimit, effectiveUsed;
-    if (isBetaPeriod) {
+    if (isAdminUser) {
+      effectiveUsed = currentCount + 1;
+      effectiveLimit = 999;
+      messagesRemaining = 999;
+    } else if (isBetaPeriod) {
       effectiveUsed = currentCount + 1;
       effectiveLimit = BETA_DAILY_LIMIT;
       messagesRemaining = BETA_DAILY_LIMIT - effectiveUsed;
@@ -1872,8 +1880,14 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
     const isGrandfathered = user.subscription?.status === 'grandfathered';
     const { hasPremium: userHasPremium } = checkPremiumAccess(user); // Always use subscription-aware check — never raw isPremium field (can be stale from beta)
     const discordUsageToday = isGrandfathered ? await getDiscordUsageForUser(user) : 0;
+    const isAdminUser = ['rossbased', 'ross'].includes(user.username?.toLowerCase());
 
-    if (isBetaPeriod) {
+    if (isAdminUser) {
+      messagesUsed = currentCount;
+      messagesLimit = 999;
+      messagesRemaining = 999;
+      resetsAt = 'never';
+    } else if (isBetaPeriod) {
       messagesUsed = currentCount;
       messagesLimit = BETA_DAILY_LIMIT;
       messagesRemaining = BETA_DAILY_LIMIT - currentCount;

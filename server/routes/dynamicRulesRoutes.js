@@ -10,7 +10,7 @@ const { manualApproveRule, deactivateRule, invalidateCache } = require('../servi
 // Admin check
 function isAdmin(req) {
   const username = req.user?.username?.toLowerCase();
-  return username === 'rossbased';
+  return username === 'rossbased' || username === 'ross';
 }
 
 // GET /api/admin/oracle/rules

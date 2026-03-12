@@ -39,7 +39,7 @@ const adminCheck = (req, res, next) => {
     const allowed = envAdmins.split(',').map(u => u.trim().toLowerCase());
     if (allowed.includes(lower)) return next();
   }
-  if (lower === 'rossbased') return next();
+  if (lower === 'rossbased' || lower === 'ross') return next();
   return res.status(403).json({ error: 'Admin access required' });
 };
 

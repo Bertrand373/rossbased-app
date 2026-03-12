@@ -41,7 +41,7 @@ const adminCheck = (req, res, next) => {
   }
   
   // Default: only rossbased is admin
-  if (lower === 'rossbased') return next();
+  if (lower === 'rossbased' || lower === 'ross') return next();
   
   console.log(`[Knowledge Admin] Access denied for: "${username}"`);
   return res.status(403).json({ 

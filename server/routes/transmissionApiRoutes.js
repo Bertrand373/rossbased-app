@@ -60,7 +60,7 @@ router.post('/:id/read', async (req, res) => {
 // ============================================================
 router.post('/run', async (req, res) => {
   const username = req.user?.username?.toLowerCase();
-  if (username !== 'rossbased') {
+  if (username !== 'rossbased' && username !== 'ross') {
     return res.status(403).json({ error: 'Admin only' });
   }
 
@@ -80,7 +80,7 @@ router.post('/run', async (req, res) => {
 // ============================================================
 router.get('/stats', async (req, res) => {
   const username = req.user?.username?.toLowerCase();
-  if (username !== 'rossbased') {
+  if (username !== 'rossbased' && username !== 'ross') {
     return res.status(403).json({ error: 'Admin only' });
   }
 
