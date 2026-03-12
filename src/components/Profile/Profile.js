@@ -1134,9 +1134,9 @@ const Profile = ({
             <div className="about-links">
               <button className="about-link" onClick={() => {
                 Object.keys(localStorage).filter(k => k.startsWith('titantrack-seen-announcement')).forEach(k => localStorage.removeItem(k));
-                window.location.reload();
+                window.dispatchEvent(new CustomEvent('show-whats-new'));
               }}>
-                What's New
+                Updates
               </button>
               <span className="about-link-divider" />
               <a href="https://discord.gg/RDFC5eUtuA" target="_blank" rel="noopener noreferrer" className="about-link">

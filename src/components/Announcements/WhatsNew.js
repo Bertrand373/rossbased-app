@@ -23,42 +23,52 @@ const WhatsNew = ({ isLoggedIn, username }) => {
   // Check if current user is admin (sees drafts too)
   const isAdmin = username && ['rossbased', 'ross'].includes(username.toLowerCase());
 
-  // Fetch latest announcement on login
-  useEffect(() => {
+  // Shared fetch logic — delay on auto-show, instant on manual trigger
+  const checkAnnouncement = useCallback(async (delay = 1500) => {
     if (!isLoggedIn || !username) return;
+    try {
+      let url = `${API_URL}/api/announcements/latest`;
+      const headers = {};
+      if (isAdmin) {
+        url += '?preview=true';
+        const token = localStorage.getItem('token');
+        if (token) headers.Authorization = `Bearer ${token}`;
+      }
 
-    const checkAnnouncement = async () => {
-      try {
-        // Admin sees drafts via preview mode, regular users see published only
-        let url = `${API_URL}/api/announcements/latest`;
-        const headers = {};
-        if (isAdmin) {
-          url += '?preview=true';
-          const token = localStorage.getItem('token');
-          if (token) headers.Authorization = `Bearer ${token}`;
-        }
+      const res = await fetch(url, { headers });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data || !data._id) return;
 
-        const res = await fetch(url, { headers });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!data || !data._id) return;
+      // Check if THIS USER has already seen this one
+      const seenId = localStorage.getItem(seenKey);
+      if (seenId === data._id) return;
 
-        // Check if THIS USER has already seen this one
-        const seenId = localStorage.getItem(seenKey);
-        if (seenId === data._id) return;
-
-        // Delay showing the sheet so the app has time to settle
+      if (delay > 0) {
         setTimeout(() => {
           setAnnouncement(data);
           setShowSheet(true);
-        }, 1500);
-      } catch (err) {
-        // Silent fail — announcements are non-critical
+        }, delay);
+      } else {
+        setAnnouncement(data);
+        setShowSheet(true);
       }
-    };
-
-    checkAnnouncement();
+    } catch (err) {
+      // Silent fail — announcements are non-critical
+    }
   }, [isLoggedIn, isAdmin, username, seenKey]);
+
+  // Auto-check on mount
+  useEffect(() => {
+    checkAnnouncement(1500);
+  }, [checkAnnouncement]);
+
+  // Manual trigger from Profile "Updates" link
+  useEffect(() => {
+    const handleManualShow = () => checkAnnouncement(0);
+    window.addEventListener('show-whats-new', handleManualShow);
+    return () => window.removeEventListener('show-whats-new', handleManualShow);
+  }, [checkAnnouncement]);
 
   // Sheet animation
   useEffect(() => {
@@ -127,8 +137,10 @@ const WhatsNew = ({ isLoggedIn, username }) => {
             )}
           </div>
 
-          {/* Announcement title */}
-          <h3 className="wn-announcement-title">{announcement.title}</h3>
+          {/* Announcement title — only if provided */}
+          {announcement.title && (
+            <h3 className="wn-announcement-title">{announcement.title}</h3>
+          )}
 
           {/* Body — lines starting with # render as section headers */}
           <div className="wn-body">

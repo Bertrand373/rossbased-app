@@ -83,12 +83,12 @@ router.post('/', authWrap, async (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
   try {
     const { version, title, body } = req.body;
-    if (!version || !title || !body) {
-      return res.status(400).json({ error: 'Version, title, and body are required' });
+    if (!version || !body) {
+      return res.status(400).json({ error: 'Version and body are required' });
     }
     const announcement = await Announcement.create({
       version: version.trim(),
-      title: title.trim(),
+      title: title ? title.trim() : '',
       body: body.trim(),
       status: 'draft',
       publishedBy: req.user.username

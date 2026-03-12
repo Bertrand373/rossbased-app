@@ -262,7 +262,7 @@ const AdminCockpit = () => {
   };
 
   const handlePublishAnnouncement = async () => {
-    if (!annVersion.trim() || !annTitle.trim() || !annBody.trim()) return;
+    if (!annVersion.trim() || !annBody.trim()) return;
     setAnnPublishing(true);
     try {
       const token = localStorage.getItem('token');
@@ -1051,7 +1051,7 @@ const AdminCockpit = () => {
             </div>
 
             <div className="ac-ann-row">
-              <label className="ac-ann-label">Title</label>
+              <label className="ac-ann-label">Title (optional)</label>
               <input
                 className="ac-ann-input"
                 type="text"
@@ -1075,7 +1075,7 @@ const AdminCockpit = () => {
             <button
               className="ac-ann-publish"
               onClick={handlePublishAnnouncement}
-              disabled={annPublishing || !annVersion.trim() || !annTitle.trim() || !annBody.trim()}
+              disabled={annPublishing || !annVersion.trim() || !annBody.trim()}
             >
               {annPublishing ? 'Saving...' : annEditId ? 'Update Draft' : 'Save Draft'}
             </button>
