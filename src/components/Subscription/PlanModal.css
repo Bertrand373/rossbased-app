@@ -100,6 +100,51 @@
 }
 
 /* =============================================================================
+   TIER TOGGLE — segmented control for Practitioner / Ascended
+   ============================================================================= */
+
+.plan-tier-toggle {
+  width: 100%;
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.plan-tier-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 200ms ease, color 200ms ease;
+  background: transparent;
+  color: var(--text-muted);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.plan-tier-btn.active {
+  background: var(--surface-raised);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.plan-tier-btn.plan-tier-ascended.active {
+  color: rgba(255, 221, 0, 0.85);
+}
+
+[data-theme="light"] .plan-tier-btn.plan-tier-ascended.active {
+  color: rgba(184, 134, 11, 0.85);
+}
+
+/* =============================================================================
    PLAN CARDS
    ============================================================================= */
 

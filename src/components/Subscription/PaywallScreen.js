@@ -12,6 +12,7 @@ const PaywallScreen = ({
   onLinkDiscord 
 }) => {
   const [selectedPlan, setSelectedPlan] = useState('yearly');
+  const [selectedTier, setSelectedTier] = useState('practitioner');
   const [isProcessing, setIsProcessing] = useState(false);
   
   // Reset processing state if user navigates back from Stripe
@@ -76,7 +77,7 @@ const PaywallScreen = ({
   const handleCheckout = async () => {
     setIsProcessing(true);
     try {
-      await onCheckout(selectedPlan);
+      await onCheckout(selectedPlan, selectedTier);
       // Safety net: if redirect somehow didn't happen, reset after 10s
       setTimeout(() => setIsProcessing(false), 10000);
     } catch (err) {
@@ -84,6 +85,11 @@ const PaywallScreen = ({
       setIsProcessing(false);
     }
   };
+
+  // Pricing config per tier
+  const pricing = selectedTier === 'ascended' 
+    ? { monthly: 17, yearly: 170, monthlyEquiv: '14.17', save: '17%', oracleLimit: 9 }
+    : { monthly: 8, yearly: 62, monthlyEquiv: '5.17', save: '35%', oracleLimit: 3 };
 
   return (
     <div className="paywall">
@@ -102,7 +108,23 @@ const PaywallScreen = ({
         <div className="paywall-features">
           <div className="paywall-feature">Unlimited benefit logging — track every day, not just 30</div>
           <div className="paywall-feature">ML predictions that learn your patterns and warn before urges</div>
-          <div className="paywall-feature">Full analytics, phase insights, and unlimited Oracle access</div>
+          <div className="paywall-feature">Full analytics, phase insights, and {pricing.oracleLimit} daily Oracle messages</div>
+        </div>
+
+        {/* Tier toggle */}
+        <div className="paywall-tier-toggle">
+          <button 
+            className={`paywall-tier-btn ${selectedTier === 'practitioner' ? 'active' : ''}`}
+            onClick={() => setSelectedTier('practitioner')}
+          >
+            Practitioner
+          </button>
+          <button 
+            className={`paywall-tier-btn paywall-tier-ascended ${selectedTier === 'ascended' ? 'active' : ''}`}
+            onClick={() => setSelectedTier('ascended')}
+          >
+            Ascended
+          </button>
         </div>
         
         {/* Plan selector */}
@@ -112,17 +134,17 @@ const PaywallScreen = ({
             onClick={() => setSelectedPlan('monthly')}
           >
             <span className="plan-label">Monthly</span>
-            <span className="plan-price">$8<span className="plan-period">/mo</span></span>
+            <span className="plan-price">${pricing.monthly}<span className="plan-period">/mo</span></span>
           </button>
           
           <button 
             className={`paywall-plan featured ${selectedPlan === 'yearly' ? 'selected' : ''}`}
             onClick={() => setSelectedPlan('yearly')}
           >
-            <span className="plan-badge">Save 35%</span>
+            <span className="plan-badge">Save {pricing.save}</span>
             <span className="plan-label">Annual</span>
-            <span className="plan-price">$62<span className="plan-period">/yr</span></span>
-            <span className="plan-monthly">$5.17/mo</span>
+            <span className="plan-price">${pricing.yearly}<span className="plan-period">/yr</span></span>
+            <span className="plan-monthly">${pricing.monthlyEquiv}/mo</span>
           </button>
         </div>
         
@@ -133,7 +155,7 @@ const PaywallScreen = ({
           disabled={isProcessing}
         >
           {isProcessing ? 'Processing...' : 
-            `Upgrade — $${selectedPlan === 'yearly' ? '62/yr' : '8/mo'}`
+            `Upgrade — $${selectedPlan === 'yearly' ? pricing.yearly + '/yr' : pricing.monthly + '/mo'}`
           }
         </button>
         

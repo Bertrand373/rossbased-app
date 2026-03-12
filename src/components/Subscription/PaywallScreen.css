@@ -106,6 +106,49 @@
 }
 
 /* =============================================================================
+   TIER TOGGLE — segmented control for Practitioner / Ascended
+   ============================================================================= */
+
+.paywall-tier-toggle {
+  width: 100%;
+  display: flex;
+  gap: 0;
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 3px;
+  animation: pwFadeIn 600ms ease 350ms forwards;
+  opacity: 0;
+}
+
+.paywall-tier-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 200ms ease, color 200ms ease;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.35);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.paywall-tier-btn.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.paywall-tier-btn.paywall-tier-ascended.active {
+  color: rgba(255, 221, 0, 0.85);
+}
+
+/* =============================================================================
    PLAN CARDS — 16px radius, landing-matched
    ============================================================================= */
 
@@ -314,6 +357,7 @@
   .paywall-headline,
   .paywall-subheadline,
   .paywall-features,
+  .paywall-tier-toggle,
   .paywall-plans,
   .paywall-cta {
     animation: none;

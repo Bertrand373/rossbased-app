@@ -79,7 +79,7 @@ export const useSubscription = (isLoggedIn) => {
   // ============================================
   // CREATE CHECKOUT SESSION (redirect to Stripe)
   // ============================================
-  const createCheckout = useCallback(async (plan = 'monthly') => {
+  const createCheckout = useCallback(async (plan = 'monthly', tier = 'practitioner') => {
     const token = localStorage.getItem('token');
     if (!token) return null;
     
@@ -90,7 +90,7 @@ export const useSubscription = (isLoggedIn) => {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ plan })
+        body: JSON.stringify({ plan, tier })
       });
       
       if (!response.ok) {

@@ -16,6 +16,7 @@ const PlanModal = ({
   subscriptionStatus 
 }) => {
   const [selectedPlan, setSelectedPlan] = useState('yearly');
+  const [selectedTier, setSelectedTier] = useState('practitioner');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showContent, setShowContent] = useState(false);
   const [sheetReady, setSheetReady] = useState(false);
@@ -43,6 +44,7 @@ const PlanModal = ({
   useEffect(() => {
     if (isOpen) {
       setSelectedPlan('yearly');
+      setSelectedTier('practitioner');
       setIsProcessing(false);
     }
   }, [isOpen]);
@@ -89,13 +91,18 @@ const PlanModal = ({
   const handleCheckout = async () => {
     setIsProcessing(true);
     try {
-      await onCheckout(selectedPlan);
+      await onCheckout(selectedPlan, selectedTier);
       // Stripe redirect will happen — safety timeout
       setTimeout(() => setIsProcessing(false), 10000);
     } catch (err) {
       setIsProcessing(false);
     }
   };
+
+  // Pricing config per tier
+  const pricing = selectedTier === 'ascended' 
+    ? { monthly: 17, yearly: 170, monthlyEquiv: '14.17', save: '17%', oracleLimit: 9 }
+    : { monthly: 8, yearly: 62, monthlyEquiv: '5.17', save: '35%', oracleLimit: 3 };
 
   return (
     <div className={`sheet-backdrop plan-backdrop${sheetReady ? ' open' : ''}`} onClick={handleClose}>
@@ -112,8 +119,24 @@ const PlanModal = ({
           {/* Header */}
           <div className="plan-header">
             <img src="/tt-icon-white.png" alt="" className="plan-icon" />
-            <h2 className="plan-title">Upgrade to Premium</h2>
-            <p className="plan-subtitle">Unlock the full system</p>
+            <h2 className="plan-title">{selectedTier === 'ascended' ? 'Go Deeper' : 'Upgrade to Premium'}</h2>
+            <p className="plan-subtitle">{selectedTier === 'ascended' ? '9 Oracle messages per day' : 'Unlock the full system'}</p>
+          </div>
+
+          {/* Tier toggle */}
+          <div className="plan-tier-toggle">
+            <button 
+              className={`plan-tier-btn ${selectedTier === 'practitioner' ? 'active' : ''}`}
+              onClick={() => setSelectedTier('practitioner')}
+            >
+              Practitioner
+            </button>
+            <button 
+              className={`plan-tier-btn plan-tier-ascended ${selectedTier === 'ascended' ? 'active' : ''}`}
+              onClick={() => setSelectedTier('ascended')}
+            >
+              Ascended
+            </button>
           </div>
 
           {/* What you get */}
@@ -121,7 +144,7 @@ const PlanModal = ({
             <div className="plan-feature">AI pattern recognition that learns you</div>
             <div className="plan-feature">Full benefit analytics and trend charts</div>
             <div className="plan-feature">Personalized relapse prediction</div>
-            <div className="plan-feature">3 daily Oracle messages</div>
+            <div className="plan-feature">{pricing.oracleLimit} daily Oracle messages</div>
             <div className="plan-feature">Subliminal mind program</div>
           </div>
 
@@ -132,17 +155,17 @@ const PlanModal = ({
               onClick={() => setSelectedPlan('monthly')}
             >
               <span className="plan-card-label">Monthly</span>
-              <span className="plan-card-price">$8<span className="plan-card-period">/mo</span></span>
+              <span className="plan-card-price">${pricing.monthly}<span className="plan-card-period">/mo</span></span>
             </button>
             
             <button 
               className={`plan-card ${selectedPlan === 'yearly' ? 'selected' : ''}`}
               onClick={() => setSelectedPlan('yearly')}
             >
-              <span className="plan-card-badge">Save 35%</span>
+              <span className="plan-card-badge">Save {pricing.save}</span>
               <span className="plan-card-label">Annual</span>
-              <span className="plan-card-price">$62<span className="plan-card-period">/yr</span></span>
-              <span className="plan-card-monthly">$5.17/mo</span>
+              <span className="plan-card-price">${pricing.yearly}<span className="plan-card-period">/yr</span></span>
+              <span className="plan-card-monthly">${pricing.monthlyEquiv}/mo</span>
             </button>
           </div>
 
@@ -155,7 +178,7 @@ const PlanModal = ({
             {isProcessing ? 'Processing...' : 
               isNewUser 
                 ? 'Start 7-Day Free Trial' 
-                : `Continue — $${selectedPlan === 'yearly' ? '62/yr' : '8/mo'}`
+                : `Continue — $${selectedPlan === 'yearly' ? pricing.yearly + '/yr' : pricing.monthly + '/mo'}`
             }
           </button>
 
