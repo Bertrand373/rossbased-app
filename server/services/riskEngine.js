@@ -12,6 +12,21 @@ const OracleInteraction = require('../models/OracleInteraction');
 const OracleOutcome = require('../models/OracleOutcome');
 const { getLunarData } = require('../utils/lunarData');
 
+// Timezone-safe streak calculation — handles "yyyy-MM-dd" strings AND legacy Date objects
+function calcStreakDay(startDate) {
+  if (!startDate) return 0;
+  let y, m, d;
+  if (typeof startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+    [y, m, d] = startDate.split('-').map(Number);
+  } else {
+    const dt = new Date(startDate);
+    y = dt.getUTCFullYear(); m = dt.getUTCMonth() + 1; d = dt.getUTCDate();
+  }
+  const startMid = new Date(y, m - 1, d);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  return Math.max(1, Math.floor((today - startMid) / (1000 * 60 * 60 * 24)) + 1);
+}
+
 /**
  * Build or update a user's risk profile from their full history
  * Called periodically (daily) for active users
@@ -55,7 +70,15 @@ async function buildRiskProfile(userId) {
         const lunarCounts = {};
         streakHistory.forEach(s => {
           if (s.end) {
-            const lunar = getLunarData(new Date(s.end));
+            // Parse as local date to avoid UTC offset issues
+            let endDate;
+            if (typeof s.end === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s.end)) {
+              const [y, m, d] = s.end.split('-').map(Number);
+              endDate = new Date(y, m - 1, d);
+            } else {
+              endDate = new Date(s.end);
+            }
+            const lunar = getLunarData(endDate);
             const phase = lunar.phase || lunar.label;
             if (phase) {
               lunarCounts[phase] = (lunarCounts[phase] || 0) + 1;
@@ -226,12 +249,7 @@ async function calculateRiskScore(userId) {
     const profile = await UserRiskProfile.findOne({ userId }).lean();
 
     // Compute current streak
-    const now = new Date();
-    const start = new Date(user.startDate);
-    start.setHours(0, 0, 0, 0);
-    const today = new Date(now);
-    today.setHours(0, 0, 0, 0);
-    const currentDay = Math.max(1, Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1);
+    const currentDay = calcStreakDay(user.startDate);
 
     let score = 0;
     const factors = [];

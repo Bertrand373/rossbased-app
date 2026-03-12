@@ -62,6 +62,21 @@ function getTodayET() {
   return new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); // 'en-CA' gives YYYY-MM-DD
 }
 
+// Timezone-safe streak calculation — handles "yyyy-MM-dd" strings AND legacy Date objects
+function calcStreakFromStartDate(startDate) {
+  if (!startDate) return 0;
+  let y, m, d;
+  if (typeof startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+    [y, m, d] = startDate.split('-').map(Number);
+  } else {
+    const dt = new Date(startDate);
+    y = dt.getUTCFullYear(); m = dt.getUTCMonth() + 1; d = dt.getUTCDate();
+  }
+  const startMid = new Date(y, m - 1, d);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  return Math.max(1, Math.floor((today - startMid) / (1000 * 60 * 60 * 24)) + 1);
+}
+
 // Conversation memory — persisted in MongoDB via DiscordMemory model
 // Survives deploys and restarts. Per-user, not per-channel.
 const MAX_STORED_MESSAGES = 50;  // Store 5 days (~50 msgs at 10/day) in MongoDB
@@ -1129,7 +1144,13 @@ async function gatherHealthData() {
   ).lean();
   const todayMid = new Date(); todayMid.setHours(0, 0, 0, 0);
   const streakData = streakers.map(u => {
-    const s = new Date(u.startDate); s.setHours(0, 0, 0, 0);
+    let s;
+    if (typeof u.startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(u.startDate)) {
+      const [y, m, d] = u.startDate.split('-').map(Number);
+      s = new Date(y, m - 1, d);
+    } else {
+      s = new Date(u.startDate); s.setHours(0, 0, 0, 0);
+    }
     return { username: u.username, days: Math.max(1, Math.floor((todayMid - s) / 86400000) + 1) };
   }).sort((a, b) => b.days - a.days);
 
@@ -2017,11 +2038,7 @@ client.on('messageCreate', async (message) => {
         // Streak info
         let currentStreak = linkedUser.currentStreak || 0;
         if (linkedUser.startDate) {
-          const start = new Date(linkedUser.startDate);
-          start.setHours(0, 0, 0, 0);
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          currentStreak = Math.max(1, Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1);
+          currentStreak = calcStreakFromStartDate(linkedUser.startDate);
         }
         lines.push(`This user has a linked TitanTrack account. Current streak: Day ${currentStreak}.`);
         
@@ -2239,11 +2256,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
           if (note.length > 10 && note.length < 300) {
             let currentStreak = linkedUser.currentStreak || 0;
             if (linkedUser.startDate) {
-              const start = new Date(linkedUser.startDate);
-              start.setHours(0, 0, 0, 0);
-              const today = new Date();
-              today.setHours(0, 0, 0, 0);
-              currentStreak = Math.max(1, Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1);
+              currentStreak = calcStreakFromStartDate(linkedUser.startDate);
             }
             
             await User.findOneAndUpdate(
@@ -2275,9 +2288,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       try {
         let streakDay = null;
         if (linkedUser && linkedUser.startDate) {
-          const s = new Date(linkedUser.startDate); s.setHours(0, 0, 0, 0);
-          const t = new Date(); t.setHours(0, 0, 0, 0);
-          streakDay = Math.max(1, Math.floor((t - s) / (1000 * 60 * 60 * 24)) + 1);
+          streakDay = calcStreakFromStartDate(linkedUser.startDate);
         } else if (linkedUser) {
           streakDay = linkedUser.currentStreak || null;
         }

@@ -32,7 +32,16 @@ const GRANDFATHERED_CUTOFF = new Date('2026-02-17T00:00:00Z'); // OG Discord mem
  */
 function getActualStreakDay(user) {
   if (!user.startDate) return user.currentStreak || 0;
-  return Math.max(0, Math.floor((Date.now() - new Date(user.startDate).getTime()) / (1000 * 60 * 60 * 24)));
+  let y, m, d;
+  if (typeof user.startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(user.startDate)) {
+    [y, m, d] = user.startDate.split('-').map(Number);
+  } else {
+    const dt = new Date(user.startDate);
+    y = dt.getUTCFullYear(); m = dt.getUTCMonth() + 1; d = dt.getUTCDate();
+  }
+  const startMid = new Date(y, m - 1, d);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  return Math.max(1, Math.floor((today - startMid) / (1000 * 60 * 60 * 24)) + 1);
 }
 
 /**
