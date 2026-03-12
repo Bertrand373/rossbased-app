@@ -166,7 +166,7 @@ router.post('/create-checkout', authenticate, async (req, res) => {
     // If user has an active trial, don't add another trial period
     // If user has never had a trial, add 7-day trial to the subscription
     const hadTrial = user.subscription?.trialStartDate;
-    if (!hadTrial) {
+    if (!hadTrial && subTier !== 'ascended') {
       sessionConfig.subscription_data.trial_period_days = 7;
     }
     
