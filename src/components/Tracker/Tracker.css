@@ -146,7 +146,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 0;
+  padding: 16px 12px;
 }
 
 .streak-gold-toggle-text {
@@ -174,24 +174,38 @@
   box-shadow: 0 0 6px rgba(160, 130, 0, 0.3);
 }
 
-.streak-gold-switch {
+/* Override .sheet button inherited styles on toggle switch */
+.sheet .streak-gold-switch {
+  display: block;
   position: relative;
   width: 50px;
+  min-width: 50px;
   height: 30px;
   background: var(--border);
   border: none;
   border-radius: 15px;
   cursor: pointer;
-  transition: background 200ms ease;
+  transition: background-color 200ms ease;
   flex-shrink: 0;
+  padding: 0;
+  text-align: left;
   -webkit-tap-highlight-color: transparent;
 }
 
-.streak-gold-switch.active {
+.sheet .streak-gold-switch:hover {
+  background: var(--border);
+}
+
+.sheet .streak-gold-switch.active {
   background: rgba(212, 175, 55, 0.35);
 }
 
-[data-theme="light"] .streak-gold-switch.active {
+.sheet .streak-gold-switch.active:hover {
+  background: rgba(212, 175, 55, 0.35);
+}
+
+[data-theme="light"] .sheet .streak-gold-switch.active,
+[data-theme="light"] .sheet .streak-gold-switch.active:hover {
   background: rgba(160, 130, 0, 0.25);
 }
 
@@ -203,15 +217,17 @@
   height: 24px;
   background: var(--text);
   border-radius: 50%;
-  transition: transform 200ms ease;
+  transition: transform 200ms ease, background-color 200ms ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
 }
 
-.streak-gold-switch.active .streak-gold-knob {
+.sheet .streak-gold-switch.active .streak-gold-knob {
   transform: translateX(20px);
   background: #d4af37;
 }
 
-[data-theme="light"] .streak-gold-switch.active .streak-gold-knob {
+[data-theme="light"] .sheet .streak-gold-switch.active .streak-gold-knob {
   background: #a08200;
 }
 
