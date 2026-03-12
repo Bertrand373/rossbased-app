@@ -28,6 +28,7 @@ import InstallPrompt from './components/InstallPrompt/InstallPrompt';
 import AIChat from './components/AIChat/AIChat';
 import AdminCockpit from './components/Admin/AdminCockpit';
 import ScrollIndicator from './components/Shared/ScrollIndicator';
+import WhatsNew from './components/Announcements/WhatsNew';
 
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
@@ -786,6 +787,9 @@ function AppContent({
               onCheckout={createCheckout}
               subscriptionStatus={subscriptionStatus}
             />
+            
+            {/* What's New announcement sheet */}
+            <WhatsNew isLoggedIn={true} />
           </>
         ) : (
           <Routes>

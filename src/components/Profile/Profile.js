@@ -60,6 +60,9 @@ const Profile = ({
   const [userRank, setUserRank] = useState(null);
   const [isLoadingRank, setIsLoadingRank] = useState(false);
   
+  // Dynamic app version (from latest announcement)
+  const [appVersion, setAppVersion] = useState('1.0.0');
+  
   // Privacy States (instant-save pattern for toggles)
   const [dataSharing, setDataSharing] = useState(userData.dataSharing || false);
   const [analyticsOptIn, setAnalyticsOptIn] = useState(userData.analyticsOptIn !== false);
@@ -203,6 +206,22 @@ const Profile = ({
   useEffect(() => {
     fetchUserRank();
   }, [fetchUserRank]);
+
+  // Fetch dynamic app version from latest announcement
+  useEffect(() => {
+    const fetchVersion = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/announcements/version`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.version) setAppVersion(data.version);
+        }
+      } catch (err) {
+        // Silent fail — keeps default "1.0.0"
+      }
+    };
+    fetchVersion();
+  }, []);
 
   const loadNotificationPreferences = async () => {
     try {
@@ -1094,13 +1113,20 @@ const Profile = ({
                 className="about-logo"
               />
               <span className="about-title">TitanTrack</span>
-              <span className="about-version">Version 1.0.0</span>
+              <span className="about-version">Version {appVersion}</span>
             </div>
 
             <div className="about-divider" />
 
             {/* Links */}
             <div className="about-links">
+              <button className="about-link" onClick={() => {
+                localStorage.removeItem('titantrack-seen-announcement');
+                window.location.reload();
+              }}>
+                What's New
+              </button>
+              <span className="about-link-divider" />
               <a href="https://discord.gg/RDFC5eUtuA" target="_blank" rel="noopener noreferrer" className="about-link">
                 Discord
               </a>

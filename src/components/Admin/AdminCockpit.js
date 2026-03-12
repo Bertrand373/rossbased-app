@@ -1,6 +1,6 @@
 // src/components/Admin/AdminCockpit.js
 // TitanTrack Admin — Elite branded dashboard
-// 5 tabs: Overview · Intelligence · Users · Revenue · Oracle
+// 6 tabs: Overview · Intelligence · Users · Revenue · Oracle · Updates
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import KnowledgeBase from './KnowledgeBase';
@@ -38,6 +38,7 @@ const NavIcon = ({ id }) => {
     case 'users': return <svg viewBox="0 0 24 24" {...s}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
     case 'revenue': return <svg viewBox="0 0 24 24" {...s}><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>;
     case 'oracle': return <svg viewBox="0 0 24 24" {...s}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>;
+    case 'updates': return <svg viewBox="0 0 24 24" {...s}><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>;
     default: return null;
   }
 };
@@ -146,6 +147,15 @@ const AdminCockpit = () => {
   const [lastRefresh, setLastRefresh] = useState(null);
   const [oracleStatus, setOracleStatus] = useState({ status: 'checking', latency: null });
 
+  // Announcements / Updates tab state
+  const [announcements, setAnnouncements] = useState([]);
+  const [annVersion, setAnnVersion] = useState('');
+  const [annTitle, setAnnTitle] = useState('');
+  const [annBody, setAnnBody] = useState('');
+  const [annCommits, setAnnCommits] = useState('');
+  const [annDrafting, setAnnDrafting] = useState(false);
+  const [annPublishing, setAnnPublishing] = useState(false);
+
   const fetchData = useCallback(async (endpoint, setter) => {
     try {
       const token = localStorage.getItem('token');
@@ -200,6 +210,98 @@ const AdminCockpit = () => {
     };
     checkOracle();
   }, [tab]);
+
+  // Announcements — load when Updates tab is active
+  useEffect(() => {
+    if (tab !== 'updates') return;
+    const loadAnnouncements = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API}/api/announcements`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setAnnouncements(data);
+          // Auto-suggest next version from latest
+          if (data.length > 0 && !annVersion) {
+            const parts = data[0].version.split('.').map(Number);
+            parts[2] = (parts[2] || 0) + 1;
+            setAnnVersion(parts.join('.'));
+          } else if (!annVersion) {
+            setAnnVersion('1.0.1');
+          }
+        }
+      } catch (err) {
+        console.error('Load announcements error:', err);
+      }
+    };
+    loadAnnouncements();
+  }, [tab]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleDraftFromCommits = async () => {
+    if (!annCommits.trim()) return;
+    setAnnDrafting(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API}/api/announcements/draft`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ commitMessages: annCommits })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAnnBody(data.draft || '');
+      }
+    } catch (err) {
+      console.error('Draft error:', err);
+    } finally {
+      setAnnDrafting(false);
+    }
+  };
+
+  const handlePublishAnnouncement = async () => {
+    if (!annVersion.trim() || !annTitle.trim() || !annBody.trim()) return;
+    setAnnPublishing(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API}/api/announcements`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ version: annVersion, title: annTitle, body: annBody })
+      });
+      if (res.ok) {
+        const created = await res.json();
+        setAnnouncements(prev => [created, ...prev]);
+        // Reset form and suggest next version
+        const parts = annVersion.split('.').map(Number);
+        parts[2] = (parts[2] || 0) + 1;
+        setAnnVersion(parts.join('.'));
+        setAnnTitle('');
+        setAnnBody('');
+        setAnnCommits('');
+      }
+    } catch (err) {
+      console.error('Publish error:', err);
+    } finally {
+      setAnnPublishing(false);
+    }
+  };
+
+  const handleDeleteAnnouncement = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API}/api/announcements/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setAnnouncements(prev => prev.filter(a => a._id !== id));
+      }
+    } catch (err) {
+      console.error('Delete announcement error:', err);
+    }
+  };
 
   // Computed
   const stickiness = overview?.dau > 0 && overview?.mau > 0 ? Math.round((overview.dau / overview.mau) * 100) : 0;
@@ -371,6 +473,7 @@ const AdminCockpit = () => {
           { id: 'users', label: 'Users' },
           { id: 'revenue', label: 'Revenue' },
           { id: 'oracle', label: 'Oracle' },
+          { id: 'updates', label: 'Updates' },
         ].map(t => (
           <button key={t.id} className={`ac-nav-btn ${tab === t.id ? 'active' : ''}`} onClick={() => setTab(t.id)}>
             <span className="ac-nav-label">{t.label}</span>
@@ -895,6 +998,96 @@ const AdminCockpit = () => {
             <OracleHealth />
             <KnowledgeBase />
           </div>
+        </div>
+      )}
+
+      {/* ===== UPDATES (Announcements) ===== */}
+      {tab === 'updates' && (
+        <div className="ac-section">
+          <div className="ac-ann-editor">
+            <h3 className="ac-ann-heading">New Announcement</h3>
+
+            <div className="ac-ann-row">
+              <label className="ac-ann-label">Version</label>
+              <input
+                className="ac-ann-input"
+                type="text"
+                value={annVersion}
+                onChange={e => setAnnVersion(e.target.value)}
+                placeholder="1.0.1"
+              />
+            </div>
+
+            <div className="ac-ann-row">
+              <label className="ac-ann-label">Title</label>
+              <input
+                className="ac-ann-input"
+                type="text"
+                value={annTitle}
+                onChange={e => setAnnTitle(e.target.value)}
+                placeholder="Oracle Gets Smarter"
+              />
+            </div>
+
+            <div className="ac-ann-row">
+              <label className="ac-ann-label">Body</label>
+              <textarea
+                className="ac-ann-textarea"
+                value={annBody}
+                onChange={e => setAnnBody(e.target.value)}
+                placeholder="What changed for users..."
+                rows={5}
+              />
+            </div>
+
+            <button
+              className="ac-ann-publish"
+              onClick={handlePublishAnnouncement}
+              disabled={annPublishing || !annVersion.trim() || !annTitle.trim() || !annBody.trim()}
+            >
+              {annPublishing ? 'Publishing...' : 'Publish'}
+            </button>
+
+            {/* Haiku Draft Helper */}
+            <div className="ac-ann-draft-section">
+              <h4 className="ac-ann-draft-heading">Load Recent Changes</h4>
+              <p className="ac-ann-draft-hint">Paste commit messages below — Haiku will draft user-friendly copy</p>
+              <textarea
+                className="ac-ann-textarea"
+                value={annCommits}
+                onChange={e => setAnnCommits(e.target.value)}
+                placeholder="Paste git commit messages here..."
+                rows={4}
+              />
+              <button
+                className="ac-ann-draft-btn"
+                onClick={handleDraftFromCommits}
+                disabled={annDrafting || !annCommits.trim()}
+              >
+                {annDrafting ? 'Generating...' : 'Generate Draft'}
+              </button>
+            </div>
+          </div>
+
+          {/* Past Announcements */}
+          {announcements.length > 0 && (
+            <div className="ac-ann-history">
+              <h3 className="ac-ann-heading">Published</h3>
+              {announcements.map(a => (
+                <div key={a._id} className="ac-ann-card">
+                  <div className="ac-ann-card-top">
+                    <span className="ac-ann-card-version">v{a.version}</span>
+                    <span className="ac-ann-card-date">
+                      {new Date(a.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                  </div>
+                  <span className="ac-ann-card-title">{a.title}</span>
+                  <p className="ac-ann-card-body">{a.body}</p>
+                  <button className="ac-ann-card-delete" onClick={() => handleDeleteAnnouncement(a._id)}>Delete</button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
