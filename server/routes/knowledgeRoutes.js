@@ -26,7 +26,7 @@ const upload = multer({
 // ============================================================
 // ADMIN CHECK MIDDLEWARE
 // Only Ross (or specified admins) can manage knowledge base
-// Uses env var ADMIN_USERNAMES, or defaults to matching 'ross' prefix
+// Uses env var ADMIN_USERNAMES, or defaults to 'rossbased'
 // ============================================================
 
 const adminCheck = (req, res, next) => {
@@ -40,8 +40,8 @@ const adminCheck = (req, res, next) => {
     if (allowed.includes(lower)) return next();
   }
   
-  // Default: any username starting with 'ross' is admin
-  if (lower.startsWith('ross')) return next();
+  // Default: only rossbased is admin
+  if (lower === 'rossbased') return next();
   
   console.log(`[Knowledge Admin] Access denied for: "${username}"`);
   return res.status(403).json({ 

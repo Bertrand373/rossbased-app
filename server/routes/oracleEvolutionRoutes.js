@@ -41,7 +41,7 @@ function authWrap(req, res, next) {
 // Admin check helper
 function isAdmin(req) {
   const username = req.user?.username?.toLowerCase();
-  return username === 'rossbased' || username === 'ross';
+  return username === 'rossbased';
 }
 
 // ============================================================
