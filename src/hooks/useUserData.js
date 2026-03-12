@@ -95,8 +95,9 @@ export const useUserData = () => {
       const [y, m, d] = startDate.split('-').map(Number);
       start = new Date(y, m - 1, d);
     } else {
-      start = new Date(startDate);
-      start.setHours(0, 0, 0, 0);
+      // Legacy Date object — extract UTC components to avoid timezone shift
+      const d = new Date(startDate);
+      start = new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
     }
     return addDays(start, targetDays - 1);
   };
@@ -138,8 +139,9 @@ export const useUserData = () => {
         const [y, m, d] = processed.startDate.split('-').map(Number);
         startMidnight = new Date(y, m - 1, d); // Local midnight
       } else {
-        startMidnight = new Date(processed.startDate);
-        startMidnight.setHours(0, 0, 0, 0);
+        // Legacy Date object — extract UTC components to avoid timezone shift
+        const d = new Date(processed.startDate);
+        startMidnight = new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
       }
       
       // SYNC STREAK ON APP LOAD - ensures accuracy after days away

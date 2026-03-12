@@ -39,9 +39,9 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       const [y, m, d] = val.split('-').map(Number);
       return new Date(y, m - 1, d);
     }
+    // Legacy Date object — extract UTC components to avoid timezone shift
     const d = new Date(val);
-    d.setHours(0, 0, 0, 0);
-    return d;
+    return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
   };
   
   // FIXED: Only show date picker if user has completed onboarding but hasn't set date

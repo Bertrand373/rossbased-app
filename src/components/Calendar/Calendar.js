@@ -123,10 +123,10 @@ const toLocalMidnight = (val) => {
     const [y, m, d] = val.split('-').map(Number);
     return new Date(y, m - 1, d); // Local midnight
   }
-  // Legacy Date object or ISO string — normalize to local midnight
+  // Legacy Date object or ISO string — extract UTC date components
+  // to avoid timezone shift (e.g. UTC midnight April 15 → EST April 14 8PM → wrong day)
   const d = new Date(val);
-  d.setHours(0, 0, 0, 0);
-  return d;
+  return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
 };
 
 // Convert any date value to a "yyyy-MM-dd" string for storage

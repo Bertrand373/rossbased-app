@@ -8,6 +8,19 @@ import { validateUserData, getFilteredBenefitData, calculateAverage } from './St
 // UNIFIED TRIGGER SYSTEM
 import { getTriggerLabel, normalizeTrigger } from '../../constants/triggerConstants';
 
+// Timezone-safe date parser — handles "yyyy-MM-dd" strings AND legacy Date objects
+const toLocalMidnight = (val) => {
+  if (!val) return null;
+  if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val)) {
+    const [y, m, d] = val.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+  const d = new Date(val);
+  if (isNaN(d.getTime())) return null;
+  // Extract UTC components to avoid timezone shift on UTC midnight dates
+  return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+};
+
 // ============================================================
 // THRESHOLD CONSTANTS
 // ============================================================
@@ -47,7 +60,7 @@ export const calculateStreakPhaseAverages = (userData) => {
     const benefitTracking = safeData.benefitTracking || [];
     const streakHistory = safeData.streakHistory || [];
     const currentStreak = safeData.currentStreak || 0;
-    const startDate = safeData.startDate ? new Date(safeData.startDate) : null;
+    const startDate = safeData.startDate ? toLocalMidnight(safeData.startDate) : null;
     
     if (benefitTracking.length < BASIC_PATTERNS_THRESHOLD) {
       return null;
@@ -90,10 +103,10 @@ export const calculateStreakPhaseAverages = (userData) => {
       for (const streak of streakHistory) {
         if (!streak.start || !streak.end) continue;
         
-        const streakStart = new Date(streak.start);
-        const streakEnd = new Date(streak.end);
+        const streakStart = toLocalMidnight(streak.start);
+        const streakEnd = toLocalMidnight(streak.end);
         
-        if (isNaN(streakStart.getTime()) || isNaN(streakEnd.getTime())) continue;
+        if (!streakStart || !streakEnd) continue;
         
         if (targetDate >= streakStart && targetDate <= streakEnd) {
           return differenceInDays(targetDate, streakStart) + 1;
