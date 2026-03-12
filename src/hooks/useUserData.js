@@ -279,7 +279,9 @@ export const useUserData = () => {
     if (MOCK_MODE) return true;
     
     const token = localStorage.getItem('token');
-    const username = dataToSync.username || localStorage.getItem('username');
+    // Always use stored username for URL path (current identity in DB)
+    // dataToSync.username may contain a NEW username the user is changing to
+    const username = localStorage.getItem('username');
     
     if (!token || !username) {
       console.warn('Cannot sync: missing token or username');
@@ -304,9 +306,25 @@ export const useUserData = () => {
         return false;
       }
       
+      // Handle username conflict (409) — throw so caller can revert
+      if (response.status === 409) {
+        const errorData = await response.json().catch(() => ({}));
+        const err = new Error(errorData.error || 'Username already taken');
+        err.status = 409;
+        throw err;
+      }
+      
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || `Sync failed with status ${response.status}`);
+      }
+      
+      // Parse response to check for new token (username change)
+      const responseData = await response.json();
+      if (responseData.newToken) {
+        localStorage.setItem('token', responseData.newToken);
+        localStorage.setItem('username', dataToSync.username);
+        console.log('🔑 Username changed — token and identity updated');
       }
       
       setSyncStatus('success');
@@ -315,6 +333,10 @@ export const useUserData = () => {
     } catch (err) {
       console.error('❌ Failed to sync to MongoDB:', err);
       setSyncStatus('error');
+      // Re-throw 409 conflicts so updateUserData can revert optimistic update
+      if (err.status === 409) {
+        throw err;
+      }
       // Show error toast so user knows sync failed
       toast.error('Data sync failed. Changes saved locally.', { 
         duration: 3000,
@@ -593,6 +615,7 @@ export const useUserData = () => {
   // UPDATE USER DATA - NOW WITH PROPER SYNC
   // ================================================================
   const updateUserData = async (newData) => {
+    const previousData = { ...userData };
     try {
       const updatedData = { ...userData, ...newData };
       
@@ -638,7 +661,10 @@ export const useUserData = () => {
       return true;
     } catch (err) {
       console.error('Update user data error:', err);
-      toast.error('Failed to update data');
+      // Revert optimistic update so UI doesn't show stale/wrong data
+      setUserData(previousData);
+      localStorage.setItem('userData', JSON.stringify(previousData));
+      toast.error(err.message || 'Failed to update data');
       return false;
     }
   };

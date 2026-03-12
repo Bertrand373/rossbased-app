@@ -570,6 +570,17 @@ app.put('/api/user/:username', authenticate, async (req, res) => {
       }
     }
 
+    // ── Username change: case-insensitive duplicate check ──
+    let usernameChanging = false;
+    if (req.body.username && req.body.username.toLowerCase() !== req.params.username.toLowerCase()) {
+      usernameChanging = true;
+      const escapedNewUsername = req.body.username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const existingUser = await User.findOne({ username: { $regex: new RegExp(`^${escapedNewUsername}$`, 'i') } });
+      if (existingUser) {
+        return res.status(409).json({ error: 'Username already taken' });
+      }
+    }
+
     const user = await User.findOneAndUpdate(
       { username: req.params.username },
       { $set: req.body },
@@ -601,8 +612,20 @@ app.put('/api/user/:username', authenticate, async (req, res) => {
       }
     }
     
-    console.log('User updated:', req.params.username);
-    res.json(user);
+    // ── Issue new JWT if username changed ──
+    let newToken = null;
+    if (usernameChanging) {
+      const jwtSecret = process.env.JWT_SECRET || 'rossbased_secret_key';
+      newToken = jwt.sign({ username: req.body.username }, jwtSecret, { expiresIn: '7d' });
+      console.log('🔑 Username changed:', req.params.username, '→', req.body.username, '— new JWT issued');
+    }
+
+    console.log('User updated:', user.username);
+    const responseData = user.toObject();
+    if (newToken) {
+      responseData.newToken = newToken;
+    }
+    res.json(responseData);
   } catch (err) {
     console.error('Error updating user:', err);
     res.status(500).json({ error: 'Server error' });

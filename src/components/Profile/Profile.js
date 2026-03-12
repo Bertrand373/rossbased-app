@@ -390,7 +390,7 @@ const Profile = ({
     : 'Unknown';
 
   // Profile save - saves text fields including birth date
-  const handleProfileUpdate = () => {
+  const handleProfileUpdate = async () => {
     // Parse birthDate at noon UTC to avoid timezone shifting the day
     let parsedBirthDate = null;
     if (birthDate) {
@@ -398,14 +398,22 @@ const Profile = ({
       parsedBirthDate = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
     }
     
-    updateUserData({
+    const success = await updateUserData({
       username: username.trim(),
       email: email.trim(),
       discordUsername: discordUsername.trim(),
       birthDate: parsedBirthDate
     });
-    setIsEditingProfile(false);
-    toast.success('Profile updated', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
+    
+    if (success) {
+      setIsEditingProfile(false);
+      toast.success('Profile updated', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
+    } else {
+      // Revert local input fields to last-known-good values
+      setUsername(localStorage.getItem('username') || '');
+      setEmail(userData.email || '');
+      setDiscordUsername(userData.discordUsername || '');
+    }
   };
 
   // Cancel editing - reset to saved values
