@@ -1012,7 +1012,7 @@ const splitResponse = (text) => {
 // Every DM includes a persistent command footer — no memorization needed.
 // ============================================================
 
-const ADMIN_DM_FOOTER = '!status · !revenue · !users · !pool · !models · !brief · !pulse-stats · !youtube · !content · !announce · !reset-channel #name confirm';
+const ADMIN_DM_FOOTER = '!status · !revenue · !users · !pool · !models · !brief · !email · !pulse-stats · !youtube · !content · !announce · !reset-channel #name confirm';
 const ORACLE_ICON = 'https://titantrack.app/The_Oracle.png';
 const BRIEFING_HOUR_ET = parseInt(process.env.BRIEFING_HOUR || '9'); // 9am ET default
 
@@ -1209,6 +1209,7 @@ async function handleAdminDM(message) {
       case '!pool': return await dmPool(message);
       case '!models': return await dmModels(message);
       case '!brief': return await dmBriefing(message);
+      case '!email': return await dmEmail(message);
       case '!pulse-stats': return await dmPulseStats(message);
       case '!youtube': return await dmYouTube(message);
       case '!content': return await dmContent(message);
@@ -1661,6 +1662,247 @@ async function dmBriefing(message) {
   await message.reply({ embeds: [new EmbedBuilder().setColor(ORACLE_COLOR).setDescription('⏳ Generating briefing...')] });
   const embed = await buildDailyBriefing();
   await message.channel.send({ embeds: [embed] });
+}
+
+// ============================================================
+// WEEKLY EMAIL PIPELINE — Oracle writes your email broadcast
+// Pulls Community Pulse, YouTube comments, lunar phase, streak
+// distribution, trending Oracle topics → Sonnet drafts email
+// in Ross's voice → DMs it ready to paste into Kit
+// ============================================================
+
+const WEEKLY_EMAIL_HOUR_ET = parseInt(process.env.WEEKLY_EMAIL_HOUR || '10'); // 10am ET Monday default
+const WEEKLY_EMAIL_DAY = parseInt(process.env.WEEKLY_EMAIL_DAY || '1'); // 1=Monday
+
+async function gatherEmailIntelligence() {
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  // 1. Community Pulse (already cached, just grab it)
+  let pulse = '';
+  try { pulse = await getCommunityPulse() || ''; } catch {}
+
+  // 2. YouTube comments from own channel (last 7 days)
+  let ytComments = [];
+  try {
+    const { getRecentOwnComments } = require('./services/youtubeComments');
+    ytComments = await getRecentOwnComments(168); // 7 days in hours
+  } catch {}
+
+  // 3. Lunar phase
+  let lunar = {};
+  try { lunar = require('./utils/lunarData').getLunarData(); } catch {}
+
+  // 4. Streak distribution
+  const streakers = await User.find(
+    { startDate: { $exists: true } }, { startDate: 1 }
+  ).lean();
+  const todayMid = new Date(); todayMid.setHours(0, 0, 0, 0);
+  const streakDays = streakers.map(u => {
+    if (typeof u.startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(u.startDate)) {
+      const [y, m, d] = u.startDate.split('-').map(Number);
+      return Math.max(1, Math.floor((todayMid - new Date(y, m - 1, d)) / 86400000) + 1);
+    }
+    const s = new Date(u.startDate); s.setHours(0, 0, 0, 0);
+    return Math.max(1, Math.floor((todayMid - s) / 86400000) + 1);
+  });
+  const under30 = streakDays.filter(d => d < 30).length;
+  const range30to90 = streakDays.filter(d => d >= 30 && d < 90).length;
+  const range90to180 = streakDays.filter(d => d >= 90 && d < 180).length;
+  const over180 = streakDays.filter(d => d >= 180).length;
+  const totalTracking = streakDays.length;
+
+  // 5. Trending Oracle topics (last 7 days)
+  let trendingTopics = [];
+  try {
+    const OracleInteraction = require('./models/OracleInteraction');
+    const topicAgg = await OracleInteraction.aggregate([
+      { $match: { timestamp: { $gte: sevenDaysAgo } } },
+      { $unwind: '$topics' },
+      { $group: { _id: '$topics', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 8 }
+    ]);
+    trendingTopics = topicAgg.map(t => ({ topic: t._id, count: t.count }));
+  } catch {}
+
+  // 6. Sentiment distribution this week
+  let sentimentDist = [];
+  try {
+    const OracleInteraction = require('./models/OracleInteraction');
+    const sentAgg = await OracleInteraction.aggregate([
+      { $match: { timestamp: { $gte: sevenDaysAgo }, sentiment: { $ne: null } } },
+      { $group: { _id: '$sentiment', count: { $sum: 1 } } },
+      { $sort: { count: -1 } }
+    ]);
+    sentimentDist = sentAgg.map(s => ({ sentiment: s._id, count: s.count }));
+  } catch {}
+
+  // 7. Discord ServerPulse raw themes (last 7 days)
+  let discordThemes = [];
+  try {
+    const ServerPulse = require('./models/ServerPulse');
+    const topicAgg = await ServerPulse.aggregate([
+      { $match: { createdAt: { $gte: sevenDaysAgo } } },
+      { $unwind: '$topics' },
+      { $group: { _id: '$topics', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 8 }
+    ]);
+    discordThemes = topicAgg.map(t => ({ topic: t._id, count: t.count }));
+  } catch {}
+
+  return {
+    pulse, ytComments, lunar, trendingTopics, sentimentDist, discordThemes,
+    streakDistribution: { totalTracking, under30, range30to90, range90to180, over180 }
+  };
+}
+
+async function buildWeeklyEmailDraft() {
+  const intel = await gatherEmailIntelligence();
+
+  // Build the intelligence briefing for Sonnet
+  let dataBlock = `WEEKLY INTELLIGENCE FOR EMAIL DRAFT:\n\n`;
+
+  // Lunar
+  if (intel.lunar?.label) {
+    dataBlock += `LUNAR PHASE: ${intel.lunar.label} (${intel.lunar.illumination || '?'}% illuminated)\n`;
+    dataBlock += `Energy: ${intel.lunar.energy || 'N/A'}\n\n`;
+  }
+
+  // Streak distribution
+  const sd = intel.streakDistribution;
+  dataBlock += `STREAK DISTRIBUTION (${sd.totalTracking} practitioners tracking):\n`;
+  dataBlock += `Under 30 days: ${sd.under30} | 30-90 days: ${sd.range30to90} | 90-180 days: ${sd.range90to180} | 180+ days: ${sd.over180}\n\n`;
+
+  // Trending Oracle topics
+  if (intel.trendingTopics.length > 0) {
+    dataBlock += `TOP ORACLE TOPICS THIS WEEK:\n`;
+    intel.trendingTopics.forEach(t => { dataBlock += `- ${t.topic}: ${t.count} conversations\n`; });
+    dataBlock += '\n';
+  }
+
+  // Sentiment
+  if (intel.sentimentDist.length > 0) {
+    dataBlock += `COMMUNITY SENTIMENT THIS WEEK:\n`;
+    intel.sentimentDist.forEach(s => { dataBlock += `- ${s.sentiment}: ${s.count}\n`; });
+    dataBlock += '\n';
+  }
+
+  // Discord themes
+  if (intel.discordThemes.length > 0) {
+    dataBlock += `DISCORD CONVERSATION THEMES:\n`;
+    intel.discordThemes.forEach(t => { dataBlock += `- ${t.topic}: ${t.count} mentions\n`; });
+    dataBlock += '\n';
+  }
+
+  // Community Pulse summary
+  if (intel.pulse) {
+    dataBlock += `COMMUNITY PULSE SUMMARY:\n${intel.pulse.substring(0, 1500)}\n\n`;
+  }
+
+  // YouTube comments (sample top ones)
+  if (intel.ytComments.length > 0) {
+    dataBlock += `YOUTUBE COMMENTS THIS WEEK (${intel.ytComments.length} total, top samples):\n`;
+    intel.ytComments.slice(0, 15).forEach(c => {
+      dataBlock += `- "${c.text.substring(0, 200)}"\n`;
+    });
+    dataBlock += '\n';
+  }
+
+  // Call Sonnet to write the email
+  const emailPrompt = `You are ghostwriting a weekly email for Ross, the creator of TitanTrack (a semen retention tracking app) and author of "The Protocol" ebook. This email goes to his full subscriber list (1,300+ people).
+
+Ross's voice: Direct, no-fluff, speaks from 7+ years of personal retention experience (2,500+ day streak). Uses short sentences. Doesn't lecture. Talks like a guy who's been through it and is reporting back from the other side. Never uses em dashes. Never opens with "Hey" or "Hope you're doing well." Never closes with generic motivation. References real community data naturally without making it sound clinical.
+
+PURPOSE: Value-first weekly transmission. Not a sales email. This rebuilds domain reputation by delivering genuine content. Include ONE natural CTA at the end, either toward TitanTrack (titantrack.app) or The Protocol (rossbased.com/protocol) depending on what fits the week's theme. The CTA should feel like a natural extension of the content, not a pivot to sales.
+
+STRUCTURE:
+- Subject line (compelling, 5-8 words, no clickbait)
+- Opening line that hooks immediately (reference something specific from the data)
+- 2-3 short paragraphs covering the week's real patterns, insights, or observations
+- Close with the single CTA
+- Sign off as "-Ross"
+
+Total length: 150-250 words. Tight. Every sentence earns its place.
+
+${dataBlock}
+
+Write the complete email now. Output ONLY the email with the subject line on the first line prefixed with "SUBJECT: ". No preamble, no commentary.`;
+
+  const response = await anthropic.messages.create({
+    model: ORACLE_MODEL,
+    max_tokens: 800,
+    messages: [{ role: 'user', content: emailPrompt }]
+  });
+
+  return {
+    draft: response.content[0].text.trim(),
+    intel
+  };
+}
+
+async function dmEmail(message) {
+  await message.reply({ embeds: [new EmbedBuilder().setColor(ORACLE_COLOR).setDescription('⏳ Oracle is analyzing the week and writing your email...')] });
+
+  try {
+    const { draft, intel } = await buildWeeklyEmailDraft();
+
+    // DM 1: Intelligence summary
+    const sd = intel.streakDistribution;
+    let intelSummary = `**📊 This Week's Intelligence**\n`;
+    intelSummary += `Practitioners tracking: ${sd.totalTracking}\n`;
+    intelSummary += `Streaks: ${sd.under30} early · ${sd.range30to90} building · ${sd.range90to180} deep · ${sd.over180} masters\n`;
+
+    if (intel.trendingTopics.length > 0) {
+      intelSummary += `\n**Top Oracle topics:** ${intel.trendingTopics.slice(0, 5).map(t => `${t.topic} (${t.count})`).join(', ')}\n`;
+    }
+    if (intel.sentimentDist.length > 0) {
+      intelSummary += `**Sentiment:** ${intel.sentimentDist.slice(0, 4).map(s => `${s.sentiment} (${s.count})`).join(', ')}\n`;
+    }
+    if (intel.lunar?.label) {
+      intelSummary += `**Lunar:** ${intel.lunar.label} (${intel.lunar.illumination}%)\n`;
+    }
+    intelSummary += `**YouTube comments:** ${intel.ytComments.length} this week`;
+
+    const intelEmbed = new EmbedBuilder()
+      .setColor(ORACLE_COLOR)
+      .setTitle('🔮 Weekly Email Intelligence')
+      .setDescription(intelSummary)
+      .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
+      .setTimestamp();
+
+    await message.channel.send({ embeds: [intelEmbed] });
+
+    // DM 2: The actual email draft (plain text, ready to copy-paste)
+    // Split into chunks if needed (Discord 2000 char limit)
+    const draftHeader = '**📧 Ready-to-Send Email Draft**\nCopy everything below the line into Kit:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
+    const fullDraft = `${draftHeader}\n\n${draft}`;
+
+    // Discord embed description limit is 4096, plain message limit is 2000
+    // Use embed for the draft so we get more room
+    const draftEmbed = new EmbedBuilder()
+      .setColor(0x22C55E)
+      .setTitle('📧 Weekly Email Draft')
+      .setDescription(`Copy everything below into Kit as a broadcast:\n\n${draft.substring(0, 3900)}`)
+      .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
+      .setTimestamp();
+
+    await message.channel.send({ embeds: [draftEmbed] });
+
+    // If draft is very long, send overflow as plain text
+    if (draft.length > 3900) {
+      await message.channel.send(draft.substring(3900));
+    }
+
+  } catch (err) {
+    console.error('[Email] Draft generation failed:', err.message);
+    await message.channel.send({ embeds: [
+      new EmbedBuilder()
+        .setColor(0xEF4444)
+        .setDescription(`Email draft failed: ${err.message}`)
+        .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
+    ]});
+  }
 }
 
 // ============================================================
@@ -2588,6 +2830,76 @@ client.once('ready', () => {
       console.log('[Briefing] Daily briefing sent');
     } catch (err) {
       console.error('[Briefing] Error:', err.message);
+    }
+  }, 60 * 60 * 1000); // Check every hour
+
+  // ============================================================
+  // WEEKLY EMAIL DRAFT — DM Ross every Monday with ready-to-send email
+  // Oracle synthesizes all intelligence → writes email in Ross's voice
+  // ============================================================
+
+  let lastEmailDraftDate = null;
+
+  setInterval(async () => {
+    try {
+      const now = new Date();
+      const etDay = parseInt(now.toLocaleString('en-US', { timeZone: 'America/New_York', weekday: 'numeric' }));
+      // toLocaleString weekday 'numeric': Sunday=1, Monday=2, etc.
+      // Convert: Monday = 2 in toLocaleString, but we store as 1 (JS getDay convention)
+      const dayOfWeek = etDay - 1; // Now 0=Sunday, 1=Monday, etc.
+      if (dayOfWeek !== WEEKLY_EMAIL_DAY) return;
+
+      const etHour = getETHour();
+      if (etHour !== WEEKLY_EMAIL_HOUR_ET) return;
+
+      const today = getTodayET();
+      if (lastEmailDraftDate === today) return;
+      lastEmailDraftDate = today;
+
+      console.log('[Email] Weekly email draft trigger firing...');
+
+      const admin = await findAdminMember();
+      if (!admin) { console.log('[Email] Admin not found'); return; }
+
+      const { draft, intel } = await buildWeeklyEmailDraft();
+
+      // Send intelligence summary
+      const sd = intel.streakDistribution;
+      let intelSummary = `**📊 This Week's Intelligence**\n`;
+      intelSummary += `Practitioners: ${sd.totalTracking} | Early: ${sd.under30} | Building: ${sd.range30to90} | Deep: ${sd.range90to180} | Masters: ${sd.over180}\n`;
+      if (intel.trendingTopics.length > 0) {
+        intelSummary += `**Top topics:** ${intel.trendingTopics.slice(0, 5).map(t => `${t.topic} (${t.count})`).join(', ')}\n`;
+      }
+      if (intel.lunar?.label) {
+        intelSummary += `**Lunar:** ${intel.lunar.label} (${intel.lunar.illumination}%)`;
+      }
+
+      await admin.send({ embeds: [
+        new EmbedBuilder()
+          .setColor(ORACLE_COLOR)
+          .setTitle('🔮 Monday Email Intelligence')
+          .setDescription(intelSummary)
+          .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
+          .setTimestamp()
+      ]});
+
+      // Send the draft
+      await admin.send({ embeds: [
+        new EmbedBuilder()
+          .setColor(0x22C55E)
+          .setTitle('📧 Weekly Email Draft — Ready to Send')
+          .setDescription(`Copy into Kit as a broadcast:\n\n${draft.substring(0, 3900)}`)
+          .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
+          .setTimestamp()
+      ]});
+
+      if (draft.length > 3900) {
+        await admin.send(draft.substring(3900));
+      }
+
+      console.log('[Email] Weekly email draft sent to admin');
+    } catch (err) {
+      console.error('[Email] Scheduler error:', err.message);
     }
   }, 60 * 60 * 1000); // Check every hour
 
