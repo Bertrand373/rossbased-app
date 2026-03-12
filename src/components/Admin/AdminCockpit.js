@@ -155,6 +155,7 @@ const AdminCockpit = () => {
   const [annCommits, setAnnCommits] = useState('');
   const [annDrafting, setAnnDrafting] = useState(false);
   const [annPublishing, setAnnPublishing] = useState(false);
+  const [annEditId, setAnnEditId] = useState(null);
 
   const fetchData = useCallback(async (endpoint, setter) => {
     try {
@@ -265,26 +266,37 @@ const AdminCockpit = () => {
     setAnnPublishing(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${API}/api/announcements`, {
-        method: 'POST',
+      const isEdit = !!annEditId;
+      const url = isEdit ? `${API}/api/announcements/${annEditId}` : `${API}/api/announcements`;
+      const method = isEdit ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ version: annVersion, title: annTitle, body: annBody })
       });
       if (res.ok) {
-        const created = await res.json();
-        setAnnouncements(prev => [created, ...prev]);
-        // Reset form and suggest next version
-        const parts = annVersion.split('.').map(Number);
-        parts[2] = (parts[2] || 0) + 1;
-        setAnnVersion(parts.join('.'));
+        const result = await res.json();
+        if (isEdit) {
+          setAnnouncements(prev => prev.map(a => a._id === annEditId ? result : a));
+        } else {
+          setAnnouncements(prev => [result, ...prev]);
+        }
+        // Reset form
+        if (!isEdit) {
+          const parts = annVersion.split('.').map(Number);
+          parts[2] = (parts[2] || 0) + 1;
+          setAnnVersion(parts.join('.'));
+        }
         setAnnTitle('');
         setAnnBody('');
         setAnnCommits('');
+        setAnnEditId(null);
         // Clear seen key so admin sees the draft preview on next app load
         localStorage.removeItem('titantrack-seen-announcement');
       }
     } catch (err) {
-      console.error('Publish error:', err);
+      console.error('Save error:', err);
     } finally {
       setAnnPublishing(false);
     }
@@ -1065,8 +1077,16 @@ const AdminCockpit = () => {
               onClick={handlePublishAnnouncement}
               disabled={annPublishing || !annVersion.trim() || !annTitle.trim() || !annBody.trim()}
             >
-              {annPublishing ? 'Saving...' : 'Save Draft'}
+              {annPublishing ? 'Saving...' : annEditId ? 'Update Draft' : 'Save Draft'}
             </button>
+            {annEditId && (
+              <button
+                className="ac-ann-draft-btn"
+                onClick={() => { setAnnEditId(null); setAnnTitle(''); setAnnBody(''); setAnnCommits(''); }}
+              >
+                Cancel Edit
+              </button>
+            )}
 
             {/* Haiku Draft Helper */}
             <div className="ac-ann-draft-section">
@@ -1111,6 +1131,13 @@ const AdminCockpit = () => {
                   <div className="ac-ann-card-actions">
                     {a.status === 'draft' && (
                       <>
+                        <button className="ac-ann-card-edit" onClick={() => {
+                          setAnnEditId(a._id);
+                          setAnnVersion(a.version);
+                          setAnnTitle(a.title);
+                          setAnnBody(a.body);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}>Edit</button>
                         <button className="ac-ann-card-preview" onClick={() => {
                           localStorage.removeItem('titantrack-seen-announcement');
                           window.location.href = '/';

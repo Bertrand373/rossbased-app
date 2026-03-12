@@ -5,7 +5,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useSheetSwipe from '../../hooks/useSheetSwipe';
-import { useTheme } from '../../App';
 import './WhatsNew.css';
 import '../../styles/BottomSheet.css';
 
@@ -18,7 +17,6 @@ const WhatsNew = ({ isLoggedIn, username }) => {
   const [sheetReady, setSheetReady] = useState(false);
   const sheetPanelRef = useRef(null);
   const navigate = useNavigate();
-  const { theme } = useTheme();
 
   // Check if current user is admin (sees drafts too)
   const isAdmin = username && ['rossbased', 'ross'].includes(username.toLowerCase());
@@ -89,7 +87,7 @@ const WhatsNew = ({ isLoggedIn, username }) => {
   const handleFeedback = () => {
     dismiss();
     // Small delay so the sheet finishes closing before navigating
-    setTimeout(() => navigate('/profile'), 350);
+    setTimeout(() => navigate('/profile?feedback=true'), 350);
   };
 
   if (!showSheet || !announcement) return null;
@@ -116,7 +114,7 @@ const WhatsNew = ({ isLoggedIn, username }) => {
           {/* Header */}
           <div className="wn-header">
             <img 
-              src={theme === 'light' ? '/icon-192-black.png' : '/icon-192.png'} 
+              src="/tt-icon-white.png" 
               alt="" 
               className="wn-icon" 
             />
@@ -135,8 +133,9 @@ const WhatsNew = ({ isLoggedIn, username }) => {
             {announcement.body.split('\n').map((line, i) => {
               const trimmed = line.trim();
               if (!trimmed) return null;
-              if (trimmed.startsWith('# ')) {
-                return <h4 key={i} className="wn-section-header">{trimmed.slice(2)}</h4>;
+              if (trimmed.startsWith('#')) {
+                const headerText = trimmed.replace(/^#+\s*/, '');
+                return <h4 key={i} className="wn-section-header">{headerText}</h4>;
               }
               return <p key={i}>{trimmed}</p>;
             })}

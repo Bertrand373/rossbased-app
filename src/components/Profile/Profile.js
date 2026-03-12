@@ -1,7 +1,7 @@
 // Profile.js - TITANTRACK MINIMAL
 // Premium app patterns: instant-save toggles, always-visible notification prefs
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import './Profile.css';
@@ -31,6 +31,7 @@ const Profile = ({
 }) => {
   const [activeTab, setActiveTab] = useState('account');
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const location = useLocation();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [showExportModal, setShowExportModal] = useState(false);
@@ -133,6 +134,17 @@ const Profile = ({
     setDeleteConfirmText('');
   }, []);
   useSheetSwipe(sheetPanelRef, sheetVisible, () => closeSheet(handleSwipeDismiss));
+
+  // Auto-open feedback sheet when navigated with ?feedback=true
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('feedback') === 'true') {
+      setActiveTab('account');
+      setTimeout(() => setShowFeedbackModal(true), 200);
+      // Clean up URL
+      window.history.replaceState({}, '', '/profile');
+    }
+  }, [location.search]);
 
   const tabs = [
     { id: 'account', label: 'Account' },

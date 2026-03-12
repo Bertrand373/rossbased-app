@@ -42,9 +42,9 @@
 }
 
 .wn-icon {
-  width: 36px;
-  height: 36px;
-  opacity: 0.7;
+  width: 44px;
+  height: 44px;
+  opacity: 0.8;
   margin-bottom: 14px;
 }
 
@@ -61,27 +61,18 @@
 }
 
 .wn-version {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
-  padding: 3px 10px;
-  border: 1px solid var(--border);
-  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-muted);
 }
 
 .wn-draft-badge {
   font-size: 0.625rem;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(234, 179, 8, 0.8);
-  padding: 3px 10px;
-  border: 1px solid rgba(234, 179, 8, 0.25);
-  border-radius: 9999px;
-  background: rgba(234, 179, 8, 0.06);
-  margin-top: 6px;
+  color: rgba(234, 179, 8, 0.7);
+  margin-top: 4px;
 }
 
 /* =============================================================================
