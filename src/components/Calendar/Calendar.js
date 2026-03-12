@@ -114,6 +114,28 @@ const DumbbellIcon = ({ size = 18, filled = false }) => (
   </svg>
 );
 
+// Timezone-safe date helpers — handles both legacy Date objects and new "yyyy-MM-dd" strings
+// This is the foundation of correct day counting. Every comparison goes through here.
+const toLocalMidnight = (val) => {
+  if (!val) return null;
+  // Already a yyyy-MM-dd string? Parse as local date (NOT UTC)
+  if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val)) {
+    const [y, m, d] = val.split('-').map(Number);
+    return new Date(y, m - 1, d); // Local midnight
+  }
+  // Legacy Date object or ISO string — normalize to local midnight
+  const d = new Date(val);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+// Convert any date value to a "yyyy-MM-dd" string for storage
+const toDateString = (val) => {
+  if (!val) return null;
+  if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+  return format(new Date(val), 'yyyy-MM-dd');
+};
+
 const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
@@ -476,26 +498,25 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     
     if (isAfter(checkDay, today)) return null;
     
-    const relapseDay = userData.streakHistory?.find(streak => 
-      streak.end && streak.reason === 'relapse' && isSameDay(new Date(streak.end), checkDay)
-    );
+    const relapseDay = userData.streakHistory?.find(streak => {
+      if (!streak.end || streak.reason !== 'relapse') return false;
+      const endDay = toLocalMidnight(streak.end);
+      return endDay && endDay.getTime() === checkDay.getTime();
+    });
     if (relapseDay) return { type: 'relapse', trigger: relapseDay.trigger };
     
     const formerStreak = userData.streakHistory?.find(streak => {
       if (!streak.start || !streak.end) return false;
-      const streakStart = new Date(streak.start);
-      const streakEnd = new Date(streak.end);
-      streakStart.setHours(0, 0, 0, 0);
-      streakEnd.setHours(0, 0, 0, 0);
-      return checkDay >= streakStart && checkDay < streakEnd;
+      const streakStart = toLocalMidnight(streak.start);
+      const streakEnd = toLocalMidnight(streak.end);
+      return streakStart && streakEnd && checkDay >= streakStart && checkDay < streakEnd;
     });
     if (formerStreak) return { type: 'former-streak' };
     
     const currentStreak = userData.streakHistory?.find(streak => streak.start && !streak.end);
     if (currentStreak) {
-      const streakStart = new Date(currentStreak.start);
-      streakStart.setHours(0, 0, 0, 0);
-      if (checkDay >= streakStart && checkDay <= today) return { type: 'current-streak' };
+      const streakStart = toLocalMidnight(currentStreak.start);
+      if (streakStart && checkDay >= streakStart && checkDay <= today) return { type: 'current-streak' };
     }
     
     return null;
@@ -553,26 +574,29 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       return null;
     }
     
+    // Normalize the calendar day to local midnight for accurate differenceInDays
+    const dayMidnight = toLocalMidnight(day);
+    
     if (dayStatus.type === 'current-streak') {
       const currentStreak = userData.streakHistory?.find(streak => streak.start && !streak.end);
       if (currentStreak) {
-        const streakStart = new Date(currentStreak.start);
-        const dayNumber = differenceInDays(day, streakStart) + 1;
-        return { dayNumber: dayNumber > 0 ? dayNumber : 0, totalDays: null };
+        const streakStart = toLocalMidnight(currentStreak.start);
+        const dayNumber = differenceInDays(dayMidnight, streakStart) + 1;
+        return { dayNumber: dayNumber > 0 ? dayNumber : 1, totalDays: null };
       }
     }
     
     if (dayStatus.type === 'former-streak') {
       const formerStreak = userData.streakHistory?.find(streak => {
         if (!streak.start || !streak.end) return false;
-        const streakStart = new Date(streak.start);
-        const streakEnd = new Date(streak.end);
-        return day >= streakStart && day < streakEnd;
+        const streakStart = toLocalMidnight(streak.start);
+        const streakEnd = toLocalMidnight(streak.end);
+        return streakStart && streakEnd && dayMidnight >= streakStart && dayMidnight < streakEnd;
       });
       if (formerStreak) {
-        const streakStart = new Date(formerStreak.start);
-        const dayNumber = differenceInDays(day, streakStart) + 1;
-        return { dayNumber: dayNumber > 0 ? dayNumber : 0, totalDays: formerStreak.days };
+        const streakStart = toLocalMidnight(formerStreak.start);
+        const dayNumber = differenceInDays(dayMidnight, streakStart) + 1;
+        return { dayNumber: dayNumber > 0 ? dayNumber : 1, totalDays: formerStreak.days };
       }
     }
     return null;
@@ -1139,9 +1163,12 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     if (!selectedDate || !updateUserData || !selectedTrigger) return;
     
     let updatedStreakHistory = [...(userData.streakHistory || [])];
-    const relapseIndex = updatedStreakHistory.findIndex(streak => 
-      streak.end && streak.reason === 'relapse' && isSameDay(new Date(streak.end), selectedDate)
-    );
+    const selectedMidnight = toLocalMidnight(selectedDate);
+    const relapseIndex = updatedStreakHistory.findIndex(streak => {
+      if (!streak.end || streak.reason !== 'relapse') return false;
+      const endDay = toLocalMidnight(streak.end);
+      return endDay && endDay.getTime() === selectedMidnight.getTime();
+    });
     
     if (relapseIndex !== -1) {
       updatedStreakHistory[relapseIndex] = {
@@ -1168,25 +1195,34 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     const today = new Date();
     today.setHours(23, 59, 59, 999);
     
+    // Calendar dates as yyyy-MM-dd strings — timezone-safe
+    const relapseDateStr = format(selectedDate, 'yyyy-MM-dd');
+    const tomorrowDate = addDays(selectedDate, 1);
+    const tomorrowStr = format(tomorrowDate, 'yyyy-MM-dd');
+    
     let updatedStreakHistory = [...(userData.streakHistory || [])];
     const activeStreakIndex = updatedStreakHistory.findIndex(streak => !streak.end);
     
     if (activeStreakIndex !== -1) {
-      const currentStreak = updatedStreakHistory[activeStreakIndex];
-      const streakDays = differenceInDays(selectedDate, new Date(currentStreak.start)) + 1;
+      const currentStreakEntry = updatedStreakHistory[activeStreakIndex];
+      const streakStart = toLocalMidnight(currentStreakEntry.start);
+      const relapseDay = toLocalMidnight(selectedDate);
+      const streakDays = differenceInDays(relapseDay, streakStart) + 1;
+      
+      // Close current streak on relapse date
       updatedStreakHistory[activeStreakIndex] = {
-        ...currentStreak,
-        end: selectedDate,
+        ...currentStreakEntry,
+        start: toDateString(currentStreakEntry.start), // Normalize legacy dates too
+        end: relapseDateStr,
         days: streakDays,
         reason: 'relapse',
         trigger: selectedTrigger
       };
       
-      // Create new streak starting tomorrow
-      const tomorrow = addDays(selectedDate, 1);
-      if (!isAfter(tomorrow, today)) {
+      // New streak starts day AFTER relapse (you don't get credit for relapse day)
+      if (!isAfter(tomorrowDate, today)) {
         updatedStreakHistory.push({
-          start: tomorrow,
+          start: tomorrowStr,
           end: null,
           days: 0
         });
@@ -1198,25 +1234,29 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           selectedTrigger,
           null, // No risk level from calendar
           streakDays,
-          new Date(currentStreak.start)
+          streakStart
         );
       } catch (err) {
         console.log('ML feedback recording skipped:', err.message);
       }
       
-      const newCurrentStreak = !isAfter(tomorrow, today) 
-        ? differenceInDays(new Date(), tomorrow) + 1 
+      // Calculate new current streak from tomorrow to today
+      const tomorrowMidnight = toLocalMidnight(tomorrowStr);
+      const todayMidnight = new Date();
+      todayMidnight.setHours(0, 0, 0, 0);
+      const newCurrentStreak = !isAfter(tomorrowDate, today) 
+        ? differenceInDays(todayMidnight, tomorrowMidnight) + 1 
         : 0;
       
-      // Keep startDate in sync — Calendar relapse must match Tracker reset behavior
-      const newStartDate = !isAfter(tomorrow, today) ? tomorrow : new Date();
+      // startDate stored as date string for timezone safety
+      const newStartDate = !isAfter(tomorrowDate, today) ? tomorrowStr : format(new Date(), 'yyyy-MM-dd');
       
       updateUserData({
         streakHistory: updatedStreakHistory,
         currentStreak: newCurrentStreak,
         startDate: newStartDate,
         relapseCount: (userData.relapseCount || 0) + 1,
-        lastRelapse: selectedDate,
+        lastRelapse: relapseDateStr,
         lastTrigger: selectedTrigger
       });
       
@@ -1231,11 +1271,14 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     if (!selectedDate || !updateUserData) return;
     
     let updatedStreakHistory = [...(userData.streakHistory || [])];
+    const selectedMidnight = toLocalMidnight(selectedDate);
     
     // Find the relapse entry for this date
-    const relapseIndex = updatedStreakHistory.findIndex(streak => 
-      streak.end && streak.reason === 'relapse' && isSameDay(new Date(streak.end), selectedDate)
-    );
+    const relapseIndex = updatedStreakHistory.findIndex(streak => {
+      if (!streak.end || streak.reason !== 'relapse') return false;
+      const endDay = toLocalMidnight(streak.end);
+      return endDay && endDay.getTime() === selectedMidnight.getTime();
+    });
     
     if (relapseIndex === -1) {
       toast.error('Relapse not found');
@@ -1245,11 +1288,11 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     const relapseEntry = updatedStreakHistory[relapseIndex];
     
     // Find the streak that started after this relapse (if any)
+    const dayAfterRelapse = addDays(selectedMidnight, 1);
     const nextStreakIndex = updatedStreakHistory.findIndex(streak => {
       if (!streak.start) return false;
-      const streakStart = new Date(streak.start);
-      const dayAfterRelapse = addDays(selectedDate, 1);
-      return isSameDay(streakStart, dayAfterRelapse);
+      const streakStart = toLocalMidnight(streak.start);
+      return streakStart && streakStart.getTime() === dayAfterRelapse.getTime();
     });
     
     // Merge: extend the relapse entry to continue (remove its end)
@@ -1258,12 +1301,14 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       // There's a streak after this relapse - merge them
       const nextStreak = updatedStreakHistory[nextStreakIndex];
       
-      // Update the original streak to continue (remove end, reason, trigger)
+      const mergedStart = toDateString(relapseEntry.start);
+      const mergedEnd = nextStreak.end ? toDateString(nextStreak.end) : null;
+      
       updatedStreakHistory[relapseIndex] = {
-        start: relapseEntry.start,
-        end: nextStreak.end || null,
-        days: nextStreak.end 
-          ? differenceInDays(new Date(nextStreak.end), new Date(relapseEntry.start)) + 1
+        start: mergedStart,
+        end: mergedEnd,
+        days: mergedEnd 
+          ? differenceInDays(toLocalMidnight(mergedEnd), toLocalMidnight(mergedStart)) + 1
           : null
       };
       
@@ -1272,22 +1317,24 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     } else {
       // No streak after - just remove the end to make it active again
       updatedStreakHistory[relapseIndex] = {
-        start: relapseEntry.start,
+        start: toDateString(relapseEntry.start),
         end: null,
         days: null
       };
     }
     
     // Recalculate current streak
+    const todayMidnight = new Date();
+    todayMidnight.setHours(0, 0, 0, 0);
     const activeStreak = updatedStreakHistory.find(s => !s.end);
     const newCurrentStreak = activeStreak 
-      ? differenceInDays(new Date(), new Date(activeStreak.start)) + 1
+      ? differenceInDays(todayMidnight, toLocalMidnight(activeStreak.start)) + 1
       : 0;
     
     // Recalculate longest streak
     const allStreakLengths = updatedStreakHistory.map(s => {
       if (s.end) return s.days || 0;
-      return differenceInDays(new Date(), new Date(s.start)) + 1;
+      return differenceInDays(todayMidnight, toLocalMidnight(s.start)) + 1;
     });
     const newLongestStreak = Math.max(...allStreakLengths, 0);
     
@@ -1295,7 +1342,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       streakHistory: updatedStreakHistory,
       currentStreak: newCurrentStreak,
       longestStreak: newLongestStreak,
-      startDate: activeStreak ? new Date(activeStreak.start) : new Date(),
+      startDate: activeStreak ? toDateString(activeStreak.start) : format(new Date(), 'yyyy-MM-dd'),
       relapseCount: Math.max((userData.relapseCount || 1) - 1, 0)
     });
     

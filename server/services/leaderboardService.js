@@ -49,9 +49,23 @@ async function getSetting(key) {
 function calculateStreakFromStartDate(startDate) {
   if (!startDate) return 0;
   
-  const start = new Date(startDate);
+  // Handle "yyyy-MM-dd" date strings (new format) vs legacy Date/ISO strings
+  let y, m, d;
+  if (typeof startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+    [y, m, d] = startDate.split('-').map(Number);
+  } else {
+    // Legacy Date/ISO string — extract date in UTC
+    const dt = new Date(startDate);
+    y = dt.getUTCFullYear();
+    m = dt.getUTCMonth() + 1;
+    d = dt.getUTCDate();
+  }
+  
+  const startMidnight = new Date(y, m - 1, d);
   const today = new Date();
-  const daysDiff = Math.floor((today - start) / (1000 * 60 * 60 * 24));
+  today.setHours(0, 0, 0, 0);
+  
+  const daysDiff = Math.floor((today - startMidnight) / (1000 * 60 * 60 * 24));
   return Math.max(1, daysDiff + 1); // Day 1 = start day
 }
 

@@ -24,6 +24,25 @@ import { trackDailyLog, trackStreakReset } from '../../utils/mixpanel';
 
 const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   const navigate = useNavigate();
+
+  // Timezone-safe date utility — convert any date value to "yyyy-MM-dd" for storage
+  const toDateString = (val) => {
+    if (!val) return null;
+    if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+    return format(new Date(val), 'yyyy-MM-dd');
+  };
+
+  // Parse any stored date (string or legacy Date) to local midnight for math
+  const toLocalMidnight = (val) => {
+    if (!val) return null;
+    if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val)) {
+      const [y, m, d] = val.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+    const d = new Date(val);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
   
   // FIXED: Only show date picker if user has completed onboarding but hasn't set date
   const [showDatePicker, setShowDatePicker] = useState(!userData.startDate && userData.hasSeenOnboarding);
@@ -250,9 +269,14 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   // Date submit - no toast, modal closing is confirmation
   const handleDateSubmit = (date) => {
     const now = new Date();
-    const daysDiff = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+    now.setHours(0, 0, 0, 0);
+    const picked = new Date(date);
+    picked.setHours(0, 0, 0, 0);
+    const daysDiff = Math.floor((now - picked) / (1000 * 60 * 60 * 24));
     // ONE-BASED COUNTING: Day 1 = start day (matches calendar display)
     const newStreak = Math.max(1, daysDiff + 1);
+    
+    const dateStr = toDateString(date);
     
     // Update streakHistory to include the current active streak
     // This is required for the Calendar to properly display streak days
@@ -267,7 +291,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     // Add the new active streak with the selected start date
     updatedStreakHistory.push({
       id: updatedStreakHistory.length + 1,
-      start: date,
+      start: dateStr,
       end: null,
       days: newStreak,
       reason: null,
@@ -275,7 +299,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     });
     
     updateUserData({
-      startDate: date,
+      startDate: dateStr,
       currentStreak: newStreak,
       longestStreak: Math.max(userData.longestStreak || 0, newStreak),
       streakHistory: updatedStreakHistory
@@ -339,20 +363,27 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   // Reset streak (relapse) - keep toast, this is significant
   const handleReset = () => {
     const now = new Date();
+    const todayStr = toDateString(now);
     const history = [...(userData.streakHistory || [])];
     const currentIdx = history.findIndex(s => !s.end);
     
     if (currentIdx !== -1) {
-      history[currentIdx] = { ...history[currentIdx], end: now, days: streak, reason: 'relapse' };
+      history[currentIdx] = { 
+        ...history[currentIdx], 
+        start: toDateString(history[currentIdx].start), // normalize legacy
+        end: todayStr, 
+        days: streak, 
+        reason: 'relapse' 
+      };
     }
-    // ONE-BASED COUNTING: New streak starts at Day 1
-    history.push({ start: now, end: null, days: 1 });
+    // ONE-BASED COUNTING: New streak starts at Day 1 (today)
+    history.push({ start: todayStr, end: null, days: 1 });
 
     updateUserData({
       currentStreak: 1,
-      startDate: now,
+      startDate: todayStr,
       streakHistory: history,
-      lastRelapse: now, 
+      lastRelapse: todayStr, 
       relapseCount: (userData.relapseCount || 0) + 1 
     });
 
@@ -1427,7 +1458,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
             <DatePicker
               onSubmit={(date) => closeSheet(() => handleDateSubmit(date))}
               onCancel={userData.startDate ? () => closeSheet(() => setShowDatePicker(false)) : null}
-              initialDate={userData.startDate ? new Date(userData.startDate) : new Date()}
+              initialDate={userData.startDate ? toLocalMidnight(userData.startDate) : new Date()}
               title={userData.startDate ? "Edit start date" : "When did you start?"}
             />
           </div>

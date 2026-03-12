@@ -127,20 +127,28 @@ ${PHASE_WISDOM[phase]}
 const calculateStreakFromStartDate = (startDate, timezone = 'UTC') => {
   if (!startDate) return 1;
   
-  // Get current date in user's timezone
+  // Handle "yyyy-MM-dd" date strings (new format) vs legacy Date/ISO strings
+  let startDateStr;
+  if (typeof startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+    startDateStr = startDate;
+  } else {
+    // Legacy Date/ISO string — extract date portion in UTC
+    const d = new Date(startDate);
+    startDateStr = d.toISOString().split('T')[0];
+  }
+  
+  // Get today's date in user's timezone
   const now = new Date();
   const userNow = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+  const todayStr = `${userNow.getFullYear()}-${String(userNow.getMonth()+1).padStart(2,'0')}-${String(userNow.getDate()).padStart(2,'0')}`;
   
-  // Get start date in user's timezone
-  const start = new Date(startDate);
-  const userStart = new Date(start.toLocaleString('en-US', { timeZone: timezone }));
+  // Parse both as local midnight for clean day math (no timezone offset artifacts)
+  const [sy, sm, sd] = startDateStr.split('-').map(Number);
+  const [ty, tm, td] = todayStr.split('-').map(Number);
+  const startMs = new Date(sy, sm - 1, sd).getTime();
+  const todayMs = new Date(ty, tm - 1, td).getTime();
   
-  // Reset time portions for accurate day calculation
-  userStart.setHours(0, 0, 0, 0);
-  userNow.setHours(0, 0, 0, 0);
-  
-  const diffTime = userNow.getTime() - userStart.getTime();
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  const diffDays = Math.floor((todayMs - startMs) / (1000 * 60 * 60 * 24));
   
   // Return at least 1 (day 1 is the start day)
   return Math.max(1, diffDays + 1);
