@@ -152,8 +152,15 @@ export const useUserData = () => {
       const daysDiff = Math.floor((today - startMidnight) / (1000 * 60 * 60 * 24));
       processed.currentStreak = Math.max(1, daysDiff + 1);
       
-      // Also update longestStreak if current exceeds it
-      if (processed.currentStreak > (processed.longestStreak || 0)) {
+      // Also update longestStreak
+      // If user has never relapsed, longestStreak IS currentStreak by definition —
+      // there's no prior broken streak that could be longer.
+      // Otherwise, only bump up (preserve genuine historical best).
+      const hasRelapseHistory = (processed.relapseCount || 0) > 0 || 
+        (processed.streakHistory || []).some(s => s.reason === 'relapse');
+      if (!hasRelapseHistory) {
+        processed.longestStreak = processed.currentStreak;
+      } else if (processed.currentStreak > (processed.longestStreak || 0)) {
         processed.longestStreak = processed.currentStreak;
       }
     }
