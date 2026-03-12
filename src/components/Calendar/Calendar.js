@@ -186,7 +186,10 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   ];
   const [weekMetrics, setWeekMetrics] = useState(() => {
     try {
-      // Try username-scoped key first, then legacy key
+      // Priority: 1) userData from server, 2) localStorage cache, 3) default
+      if (Array.isArray(userData?.weekMetrics) && userData.weekMetrics.length === 3) {
+        return userData.weekMetrics;
+      }
       const username = userData?.username;
       const scopedKey = username ? `tt_weekMetrics_${username}` : null;
       const saved = (scopedKey && localStorage.getItem(scopedKey)) || localStorage.getItem('tt_weekMetrics');
@@ -214,8 +217,13 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           next = [...prev, key];
         }
       }
+      // Save to localStorage cache
       const scopedKey = userData?.username ? `tt_weekMetrics_${userData.username}` : 'tt_weekMetrics';
       localStorage.setItem(scopedKey, JSON.stringify(next));
+      // Sync to server via updateUserData
+      if (updateUserData) {
+        updateUserData({ weekMetrics: next });
+      }
       return next;
     });
   };
@@ -230,17 +238,31 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setTimeout(() => setMetricsSheetOpen(false), 300);
   };
 
-  // Re-load weekMetrics from username-scoped key once userData loads
+  // Sync weekMetrics from server when userData loads (server is source of truth)
   useEffect(() => {
     if (!userData?.username) return;
+    // Server value takes priority if it exists
+    if (Array.isArray(userData.weekMetrics) && userData.weekMetrics.length === 3) {
+      setWeekMetrics(userData.weekMetrics);
+      // Update localStorage cache to match server
+      localStorage.setItem(`tt_weekMetrics_${userData.username}`, JSON.stringify(userData.weekMetrics));
+      return;
+    }
+    // Fall back to localStorage if server has no value yet
     try {
       const saved = localStorage.getItem(`tt_weekMetrics_${userData.username}`);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length === 3) setWeekMetrics(parsed);
+        if (Array.isArray(parsed) && parsed.length === 3) {
+          setWeekMetrics(parsed);
+          // Migrate localStorage value to server
+          if (updateUserData) {
+            updateUserData({ weekMetrics: parsed });
+          }
+        }
       }
     } catch {}
-  }, [userData?.username]);
+  }, [userData?.username, userData?.weekMetrics]);
 
   // Mark initial entrance animation as complete
   useEffect(() => {

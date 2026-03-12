@@ -235,6 +235,12 @@ const userSchema = new mongoose.Schema({
     startDate: { type: String, default: null },
     lastConfirmedDate: { type: String, default: null },
     isComplete: { type: Boolean, default: false }
+  },
+  
+  // Week View Metric Preferences — synced across devices
+  weekMetrics: {
+    type: [String],
+    default: ['energy', 'focus', 'confidence']
   }
   
 }, {

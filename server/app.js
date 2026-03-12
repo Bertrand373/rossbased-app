@@ -41,6 +41,7 @@ const timelineRoutes = require('./routes/timelineRoutes');
 const oracleEvolutionRoutes = require('./routes/oracleEvolutionRoutes');
 const transmissionApiRoutes = require('./routes/transmissionApiRoutes');
 const dynamicRulesRoutes = require('./routes/dynamicRulesRoutes');
+const oracleChatRoutes = require('./routes/oracleChatRoutes');
 const { expireStaleTrials, expireStaleCanceled, checkPremiumAccess, syncStripeSubscriptions } = require('./middleware/subscriptionMiddleware');
 const { checkAndSendOnboardingNotification } = require('./services/notificationService');
 
@@ -2786,6 +2787,7 @@ oracleEvolutionRoutes.startScheduledJobs();
 app.use('/api/oracle/transmissions', authenticate, transmissionApiRoutes);
 app.use('/api/admin/oracle/transmissions', authenticate, transmissionApiRoutes);
 app.use('/api/admin/oracle/rules', authenticate, dynamicRulesRoutes);
+app.use('/api/oracle/chat-history', authenticate, oracleChatRoutes);
 
 // Serve frontend build in production
 if (process.env.NODE_ENV === 'production') {

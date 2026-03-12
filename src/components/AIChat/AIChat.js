@@ -78,6 +78,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   const hasTrackedOpen = useRef(false);
   const streamingMessageRef = useRef(null);
   const hasScrolledToStreamStart = useRef(false);
+  const chatSyncTimer = useRef(null); // Debounced server sync
 
   // Track chat opened (once per open)
   useEffect(() => {
@@ -90,9 +91,10 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     }
   }, [isOpen]);
 
-  // Load chat history from localStorage
+  // Load chat history — server is source of truth, localStorage is fallback
   useEffect(() => {
     if (isLoggedIn) {
+      // Load localStorage immediately (fast, offline-safe)
       const stored = localStorage.getItem(getChatHistoryKey());
       if (stored) {
         try {
@@ -102,6 +104,25 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
           console.error('Failed to parse chat history:', e);
         }
       }
+
+      // Then fetch from server (source of truth) and overwrite if available
+      const token = localStorage.getItem('token');
+      if (token) {
+        fetch(`${API_URL}/api/oracle/chat-history`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            if (data?.messages && data.messages.length > 0) {
+              setMessages(data.messages.slice(-MAX_STORED_MESSAGES));
+              // Update localStorage cache with server truth
+              const toCache = data.messages.filter(m => !m.isTransmission).slice(-MAX_STORED_MESSAGES);
+              localStorage.setItem(getChatHistoryKey(), JSON.stringify(toCache));
+            }
+          })
+          .catch(() => { /* offline — localStorage is already loaded */ });
+      }
+
       fetchUsage();
       fetchUnreadTransmissions();
     }
@@ -183,12 +204,25 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     }
   };
 
-  // Save chat history to localStorage (exclude server-delivered transmissions)
+  // Save chat history to localStorage + debounced server sync
   useEffect(() => {
     if (messages.length > 0) {
       const toStore = messages.filter(m => !m.isTransmission).slice(-MAX_STORED_MESSAGES);
       localStorage.setItem(getChatHistoryKey(), JSON.stringify(toStore));
+
+      // Debounced server sync (2s after last message change)
+      if (chatSyncTimer.current) clearTimeout(chatSyncTimer.current);
+      chatSyncTimer.current = setTimeout(() => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        fetch(`${API_URL}/api/oracle/chat-history`, {
+          method: 'PUT',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: toStore })
+        }).catch(() => { /* offline — localStorage has it */ });
+      }, 2000);
     }
+    return () => { if (chatSyncTimer.current) clearTimeout(chatSyncTimer.current); };
   }, [messages]);
 
   // Scroll to bottom when user sends a message or transmission arrives
@@ -432,10 +466,18 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     });
   };
 
-  // Clear chat history
+  // Clear chat history (local + server)
   const handleClearChat = () => {
     setMessages([]);
     localStorage.removeItem(getChatHistoryKey());
+    // Clear server-side too
+    const token = localStorage.getItem('token');
+    if (token) {
+      fetch(`${API_URL}/api/oracle/chat-history`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      }).catch(() => { /* silent */ });
+    }
     setShowClearConfirm(false);
     trackAIChatCleared();
   };
