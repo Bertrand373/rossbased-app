@@ -130,11 +130,16 @@ const WhatsNew = ({ isLoggedIn, username }) => {
           {/* Announcement title */}
           <h3 className="wn-announcement-title">{announcement.title}</h3>
 
-          {/* Body */}
+          {/* Body — lines starting with # render as section headers */}
           <div className="wn-body">
-            {announcement.body.split('\n').map((line, i) => (
-              line.trim() ? <p key={i}>{line}</p> : null
-            ))}
+            {announcement.body.split('\n').map((line, i) => {
+              const trimmed = line.trim();
+              if (!trimmed) return null;
+              if (trimmed.startsWith('# ')) {
+                return <h4 key={i} className="wn-section-header">{trimmed.slice(2)}</h4>;
+              }
+              return <p key={i}>{trimmed}</p>;
+            })}
           </div>
 
           {/* Date */}

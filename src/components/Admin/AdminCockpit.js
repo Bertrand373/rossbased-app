@@ -1110,7 +1110,13 @@ const AdminCockpit = () => {
                   <p className="ac-ann-card-body">{a.body}</p>
                   <div className="ac-ann-card-actions">
                     {a.status === 'draft' && (
-                      <button className="ac-ann-card-live" onClick={() => handleGoLive(a._id)}>Go Live</button>
+                      <>
+                        <button className="ac-ann-card-preview" onClick={() => {
+                          localStorage.removeItem('titantrack-seen-announcement');
+                          window.location.href = '/';
+                        }}>Preview</button>
+                        <button className="ac-ann-card-live" onClick={() => handleGoLive(a._id)}>Go Live</button>
+                      </>
                     )}
                     <button className="ac-ann-card-delete" onClick={() => handleDeleteAnnouncement(a._id)}>Delete</button>
                   </div>

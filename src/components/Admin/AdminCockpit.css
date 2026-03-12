@@ -1845,6 +1845,25 @@
   margin-top: 8px;
 }
 
+.ac-ann-card-preview {
+  padding: 5px 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  color: rgba(255,255,255,0.5);
+  font-size: 10px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.ac-ann-card-preview:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.8);
+}
+
 .ac-ann-card-live {
   padding: 5px 12px;
   background: rgba(34,197,94,0.08);
@@ -1918,3 +1937,5 @@
 [data-theme="light"] .ac-ann-label { color: rgba(0,0,0,0.35); }
 [data-theme="light"] .ac-ann-draft-heading { color: rgba(0,0,0,0.45); }
 [data-theme="light"] .ac-ann-draft-hint { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .ac-ann-card-preview { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.1); color: rgba(0,0,0,0.5); }
+[data-theme="light"] .ac-ann-card-preview:hover { background: rgba(0,0,0,0.06); color: rgba(0,0,0,0.7); }

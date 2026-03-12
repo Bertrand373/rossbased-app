@@ -106,12 +106,26 @@
   margin-bottom: 16px;
 }
 
+.wn-section-header {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 6px 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.wn-section-header:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
 .wn-body p {
   font-size: 0.8125rem;
   font-weight: 400;
-  line-height: 1.6;
+  line-height: 1.5;
   color: var(--text-secondary);
-  margin: 0 0 8px 0;
+  margin: 0 0 12px 0;
 }
 
 .wn-body p:last-child {
