@@ -8,6 +8,7 @@ const announcementSchema = new mongoose.Schema({
   version: { type: String, required: true },       // e.g. "1.1.0"
   title: { type: String, required: true },          // e.g. "Oracle Gets Smarter"
   body: { type: String, required: true },           // Markdown-ish plain text
+  status: { type: String, enum: ['draft', 'published'], default: 'draft' },
   publishedBy: { type: String, default: 'rossbased' },
   publishedAt: { type: Date, default: Date.now }
 }, {

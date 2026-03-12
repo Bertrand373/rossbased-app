@@ -23,10 +23,26 @@ function isAdmin(req) {
 
 // ============================================
 // PUBLIC: Get latest announcement (for What's New sheet)
+// Regular users see only 'published'. Admin with ?preview=true sees latest draft.
 // ============================================
 router.get('/latest', async (req, res) => {
   try {
-    const latest = await Announcement.findOne().sort({ publishedAt: -1 }).lean();
+    const preview = req.query.preview === 'true';
+
+    if (preview) {
+      // Admin preview — authenticate and check admin, then return latest regardless of status
+      if (!_authenticate) return res.json(null);
+      _authenticate(req, res, async () => {
+        if (!isAdmin(req)) return res.json(null);
+        const latest = await Announcement.findOne().sort({ publishedAt: -1 }).lean();
+        if (!latest) return res.json(null);
+        res.json(latest);
+      });
+      return;
+    }
+
+    // Regular users — published only
+    const latest = await Announcement.findOne({ status: 'published' }).sort({ publishedAt: -1 }).lean();
     if (!latest) return res.json(null);
     res.json(latest);
   } catch (err) {
@@ -40,7 +56,7 @@ router.get('/latest', async (req, res) => {
 // ============================================
 router.get('/version', async (req, res) => {
   try {
-    const latest = await Announcement.findOne().sort({ publishedAt: -1 }).select('version').lean();
+    const latest = await Announcement.findOne({ status: 'published' }).sort({ publishedAt: -1 }).select('version').lean();
     res.json({ version: latest?.version || '1.0.0' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch version' });
@@ -61,7 +77,7 @@ router.get('/', authWrap, async (req, res) => {
 });
 
 // ============================================
-// ADMIN: Publish new announcement
+// ADMIN: Create new announcement (as draft)
 // ============================================
 router.post('/', authWrap, async (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
@@ -74,9 +90,10 @@ router.post('/', authWrap, async (req, res) => {
       version: version.trim(),
       title: title.trim(),
       body: body.trim(),
+      status: 'draft',
       publishedBy: req.user.username
     });
-    console.log(`📢 Announcement published: v${announcement.version} — ${announcement.title}`);
+    console.log(`📝 Announcement draft created: v${announcement.version} — ${announcement.title}`);
     res.json(announcement);
   } catch (err) {
     console.error('Create announcement error:', err);
@@ -100,6 +117,25 @@ router.put('/:id', authWrap, async (req, res) => {
     res.json(updated);
   } catch (err) {
     res.status(500).json({ error: 'Failed to update announcement' });
+  }
+});
+
+// ============================================
+// ADMIN: Go Live — flip draft → published
+// ============================================
+router.put('/:id/publish', authWrap, async (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
+  try {
+    const updated = await Announcement.findByIdAndUpdate(
+      req.params.id,
+      { status: 'published', publishedAt: new Date() },
+      { new: true }
+    );
+    if (!updated) return res.status(404).json({ error: 'Announcement not found' });
+    console.log(`📢 Announcement published: v${updated.version} — ${updated.title}`);
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to publish announcement' });
   }
 });
 

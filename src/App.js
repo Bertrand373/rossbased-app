@@ -789,7 +789,7 @@ function AppContent({
             />
             
             {/* What's New announcement sheet */}
-            <WhatsNew isLoggedIn={true} />
+            <WhatsNew isLoggedIn={true} username={userData?.username} />
           </>
         ) : (
           <Routes>

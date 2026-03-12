@@ -71,6 +71,19 @@
   border-radius: 9999px;
 }
 
+.wn-draft-badge {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(234, 179, 8, 0.8);
+  padding: 3px 10px;
+  border: 1px solid rgba(234, 179, 8, 0.25);
+  border-radius: 9999px;
+  background: rgba(234, 179, 8, 0.06);
+  margin-top: 6px;
+}
+
 /* =============================================================================
    ANNOUNCEMENT TITLE
    ============================================================================= */

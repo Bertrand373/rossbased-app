@@ -12,7 +12,7 @@ import '../../styles/BottomSheet.css';
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 const SEEN_KEY = 'titantrack-seen-announcement';
 
-const WhatsNew = ({ isLoggedIn }) => {
+const WhatsNew = ({ isLoggedIn, username }) => {
   const [announcement, setAnnouncement] = useState(null);
   const [showSheet, setShowSheet] = useState(false);
   const [sheetReady, setSheetReady] = useState(false);
@@ -20,13 +20,25 @@ const WhatsNew = ({ isLoggedIn }) => {
   const navigate = useNavigate();
   const { theme } = useTheme();
 
+  // Check if current user is admin (sees drafts too)
+  const isAdmin = username && ['rossbased', 'ross'].includes(username.toLowerCase());
+
   // Fetch latest announcement on login
   useEffect(() => {
     if (!isLoggedIn) return;
 
     const checkAnnouncement = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/announcements/latest`);
+        // Admin sees drafts via preview mode, regular users see published only
+        let url = `${API_URL}/api/announcements/latest`;
+        const headers = {};
+        if (isAdmin) {
+          url += '?preview=true';
+          const token = localStorage.getItem('token');
+          if (token) headers.Authorization = `Bearer ${token}`;
+        }
+
+        const res = await fetch(url, { headers });
         if (!res.ok) return;
         const data = await res.json();
         if (!data || !data._id) return;
@@ -46,7 +58,7 @@ const WhatsNew = ({ isLoggedIn }) => {
     };
 
     checkAnnouncement();
-  }, [isLoggedIn]);
+  }, [isLoggedIn, isAdmin]);
 
   // Sheet animation
   useEffect(() => {
@@ -110,6 +122,9 @@ const WhatsNew = ({ isLoggedIn }) => {
             />
             <h2 className="wn-title">What's New</h2>
             <span className="wn-version">v{announcement.version}</span>
+            {announcement.status === 'draft' && (
+              <span className="wn-draft-badge">Draft Preview</span>
+            )}
           </div>
 
           {/* Announcement title */}

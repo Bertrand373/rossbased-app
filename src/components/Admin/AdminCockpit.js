@@ -280,6 +280,8 @@ const AdminCockpit = () => {
         setAnnTitle('');
         setAnnBody('');
         setAnnCommits('');
+        // Clear seen key so admin sees the draft preview on next app load
+        localStorage.removeItem('titantrack-seen-announcement');
       }
     } catch (err) {
       console.error('Publish error:', err);
@@ -300,6 +302,24 @@ const AdminCockpit = () => {
       }
     } catch (err) {
       console.error('Delete announcement error:', err);
+    }
+  };
+
+  const handleGoLive = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API}/api/announcements/${id}/publish`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setAnnouncements(prev => prev.map(a => a._id === id ? updated : a));
+        // Clear seen key so Ross sees it fresh as a user would
+        localStorage.removeItem('titantrack-seen-announcement');
+      }
+    } catch (err) {
+      console.error('Go live error:', err);
     }
   };
 
@@ -1045,7 +1065,7 @@ const AdminCockpit = () => {
               onClick={handlePublishAnnouncement}
               disabled={annPublishing || !annVersion.trim() || !annTitle.trim() || !annBody.trim()}
             >
-              {annPublishing ? 'Publishing...' : 'Publish'}
+              {annPublishing ? 'Saving...' : 'Save Draft'}
             </button>
 
             {/* Haiku Draft Helper */}
@@ -1077,13 +1097,23 @@ const AdminCockpit = () => {
                 <div key={a._id} className="ac-ann-card">
                   <div className="ac-ann-card-top">
                     <span className="ac-ann-card-version">v{a.version}</span>
-                    <span className="ac-ann-card-date">
-                      {new Date(a.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </span>
+                    <div className="ac-ann-card-meta">
+                      <span className={`ac-ann-card-status ac-ann-status-${a.status || 'published'}`}>
+                        {a.status === 'draft' ? 'Draft' : 'Live'}
+                      </span>
+                      <span className="ac-ann-card-date">
+                        {new Date(a.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
+                    </div>
                   </div>
                   <span className="ac-ann-card-title">{a.title}</span>
                   <p className="ac-ann-card-body">{a.body}</p>
-                  <button className="ac-ann-card-delete" onClick={() => handleDeleteAnnouncement(a._id)}>Delete</button>
+                  <div className="ac-ann-card-actions">
+                    {a.status === 'draft' && (
+                      <button className="ac-ann-card-live" onClick={() => handleGoLive(a._id)}>Go Live</button>
+                    )}
+                    <button className="ac-ann-card-delete" onClick={() => handleDeleteAnnouncement(a._id)}>Delete</button>
+                  </div>
                 </div>
               ))}
             </div>
