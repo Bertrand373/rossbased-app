@@ -359,3 +359,23 @@
     animation: none;
   }
 }
+
+/* ============================================================
+   ORACLE'S GOLD — Premium streak color on share card
+   ============================================================ */
+
+.share-mini-day.oracle-gold {
+  color: #d4af37;
+}
+
+.share-modal-day.oracle-gold {
+  color: #d4af37;
+}
+
+[data-theme="light"] .share-mini-day.oracle-gold {
+  color: #a08200;
+}
+
+[data-theme="light"] .share-modal-day.oracle-gold {
+  color: #a08200;
+}

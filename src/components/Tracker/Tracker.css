@@ -96,6 +96,125 @@
   text-transform: lowercase;
 }
 
+/* ============================================================
+   ORACLE'S GOLD — Premium streak color
+   ============================================================ */
+
+.streak-num.oracle-gold {
+  color: #d4af37;
+  animation: counterBreatheGold 8s ease-in-out infinite;
+}
+
+@keyframes counterBreatheGold {
+  0%, 100% { 
+    text-shadow: 0 0 0px rgba(212, 175, 55, 0);
+    opacity: 0.87;
+  }
+  50% { 
+    text-shadow: 0 0 40px rgba(212, 175, 55, 0.12);
+    opacity: 1;
+  }
+}
+
+.streak-unit.oracle-gold {
+  color: rgba(212, 175, 55, 0.5);
+}
+
+/* Light theme — darker gold for contrast */
+[data-theme="light"] .streak-num.oracle-gold {
+  color: #a08200;
+  animation: counterBreatheGoldLight 8s ease-in-out infinite;
+}
+
+@keyframes counterBreatheGoldLight {
+  0%, 100% { 
+    text-shadow: 0 0 0px rgba(160, 130, 0, 0);
+    opacity: 0.87;
+  }
+  50% { 
+    text-shadow: 0 0 30px rgba(160, 130, 0, 0.08);
+    opacity: 1;
+  }
+}
+
+[data-theme="light"] .streak-unit.oracle-gold {
+  color: rgba(160, 130, 0, 0.55);
+}
+
+/* Oracle's Gold Toggle — inside streak options sheet */
+.streak-gold-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+}
+
+.streak-gold-toggle-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.streak-gold-toggle-label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.streak-gold-toggle-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #d4af37;
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.4);
+}
+
+[data-theme="light"] .streak-gold-toggle-dot {
+  background: #a08200;
+  box-shadow: 0 0 6px rgba(160, 130, 0, 0.3);
+}
+
+.streak-gold-switch {
+  position: relative;
+  width: 50px;
+  height: 30px;
+  background: var(--border);
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background 200ms ease;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.streak-gold-switch.active {
+  background: rgba(212, 175, 55, 0.35);
+}
+
+[data-theme="light"] .streak-gold-switch.active {
+  background: rgba(160, 130, 0, 0.25);
+}
+
+.streak-gold-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  background: var(--text);
+  border-radius: 50%;
+  transition: transform 200ms ease;
+}
+
+.streak-gold-switch.active .streak-gold-knob {
+  transform: translateX(20px);
+  background: #d4af37;
+}
+
+[data-theme="light"] .streak-gold-switch.active .streak-gold-knob {
+  background: #a08200;
+}
+
 .milestone {
   font-size: 0.8125rem;
   font-weight: 400;
@@ -926,6 +1045,7 @@
   .benefits-modal,
   .confirm-modal,
   .streak-num,
+  .streak-num.oracle-gold,
   .tracker .btn-primary.benefits-trigger {
     animation: none;
     opacity: 1;

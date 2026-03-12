@@ -106,6 +106,9 @@ const userSchema = new mongoose.Schema({
     updatedAt: Date
   },
   
+  // Streak display preference — Oracle's Gold color (premium/OG only)
+  streakColorGold: { type: Boolean, default: false },
+  
   // Theme preference
   theme: { type: String, enum: ['dark', 'light'], default: 'dark' },
   

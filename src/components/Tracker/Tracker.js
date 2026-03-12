@@ -1372,6 +1372,23 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
             <div className="sheet">
               <h3 className="sheet-title">Streak Options</h3>
               <div className="sheet-content">
+                {isPremium && (
+                  <>
+                    <div className="streak-gold-toggle">
+                      <div className="streak-gold-toggle-text">
+                        <span className="streak-gold-toggle-label">Oracle's Gold</span>
+                        <span className="streak-gold-toggle-dot" />
+                      </div>
+                      <button 
+                        className={`streak-gold-switch${userData.streakColorGold ? ' active' : ''}`}
+                        onClick={() => updateUserData({ streakColorGold: !userData.streakColorGold })}
+                      >
+                        <span className="streak-gold-knob" />
+                      </button>
+                    </div>
+                    <div className="sheet-divider" />
+                  </>
+                )}
                 <button onClick={() => closeSheet(() => { setShowStreakOptions(false); setShowDatePicker(true); })}>
                   Edit start date
                 </button>
@@ -1598,8 +1615,8 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         
         {/* ONBOARDING TARGET: streak-counter */}
         <button className="streak streak-counter" onClick={() => setShowStreakOptions(true)}>
-          <span className="streak-num">{streak}</span>
-          <span className="streak-unit">days</span>
+          <span className={`streak-num${userData.streakColorGold ? ' oracle-gold' : ''}`}>{streak}</span>
+          <span className={`streak-unit${userData.streakColorGold ? ' oracle-gold' : ''}`}>days</span>
         </button>
         
         {milestone && (

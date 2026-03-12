@@ -57,6 +57,7 @@ const ShareCard = ({ userData, isVisible = true }) => {
   }, []);
 
   const streak = userData?.currentStreak || 0;
+  const streakColorGold = userData?.streakColorGold || false;
   const today = format(new Date(), 'MMM d, yyyy');
 
   // Milestone detection
@@ -127,7 +128,9 @@ const ShareCard = ({ userData, isVisible = true }) => {
       const dayY = hasExtra ? height * 0.36 : height * 0.45;
 
       // Day number - Outfit 200, matching hero streak
-      ctx.fillStyle = textColor;
+      ctx.fillStyle = streakColorGold 
+        ? (isDarkTheme ? '#d4af37' : '#a08200')
+        : textColor;
       ctx.font = '200 320px "Outfit", -apple-system, BlinkMacSystemFont, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -181,7 +184,7 @@ const ShareCard = ({ userData, isVisible = true }) => {
 
       resolve(canvas);
     });
-  }, [streak, today, isDarkTheme, benefitScore, isMilestone, milestoneLabel]);
+  }, [streak, today, isDarkTheme, benefitScore, isMilestone, milestoneLabel, streakColorGold]);
 
   // Open preview - mount then animate in
   const openPreview = useCallback(() => {
@@ -269,7 +272,7 @@ const ShareCard = ({ userData, isVisible = true }) => {
         
         <div className="share-card-preview" onClick={openPreview}>
           <div className="share-card-mini">
-            <span className="share-mini-day">{streak}</span>
+            <span className={`share-mini-day${streakColorGold ? ' oracle-gold' : ''}`}>{streak}</span>
             <span className="share-mini-label">days</span>
           </div>
           {benefitScore !== null && (
@@ -300,7 +303,7 @@ const ShareCard = ({ userData, isVisible = true }) => {
             <div className="sheet-header" />
 
             <div className="share-modal-card">
-              <span className="share-modal-day">{streak}</span>
+              <span className={`share-modal-day${streakColorGold ? ' oracle-gold' : ''}`}>{streak}</span>
               <span className="share-modal-day-label">DAYS</span>
               {isMilestone && (
                 <span className="share-modal-milestone">{milestoneLabel}</span>

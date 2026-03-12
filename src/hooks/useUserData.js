@@ -80,7 +80,8 @@ export const useUserData = () => {
     darkMode: true,
     notifications: true,
     language: 'en',
-    wisdomMode: false
+    wisdomMode: false,
+    streakColorGold: false
   });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
@@ -234,6 +235,7 @@ export const useUserData = () => {
     processed.notifications = processed.notifications !== false;
     processed.language = processed.language || 'en';
     processed.wisdomMode = processed.wisdomMode || false;
+    processed.streakColorGold = processed.streakColorGold || false;
     // isPremium is now determined by subscription status from the server
     // Do NOT override here - let the real subscription system handle this
     
