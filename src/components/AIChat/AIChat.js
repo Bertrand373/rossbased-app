@@ -73,9 +73,8 @@ const generateShareCard = (messageText) => {
     const R = 16 * S;
     const fontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-    // Header
-    const eyeSize = 22 * S;
-    const eyeGap = 10 * S;
+    // Header — uses oracle-wordmark.png (the branded wordmark with Eye of Horus)
+    const wmHeight = 22 * S;
     const headerGap = 22 * S;
 
     // Message typography — matches .ai-chat-message.assistant
@@ -168,16 +167,16 @@ const generateShareCard = (messageText) => {
     }
 
     // Derive card height
-    const contentY = padTop + eyeSize + headerGap;
+    const contentY = padTop + wmHeight + headerGap;
     const msgEndY = contentY + textH;
     const sepY = msgEndY + footGap;
     const footTextY = sepY + footPad;
     const H = Math.ceil(footTextY + footFont + padBot);
 
-    // Load Oracle eye then draw
-    const eye = new Image();
-    eye.crossOrigin = 'anonymous';
-    let eyeOk = false;
+    // Load Oracle wordmark then draw
+    const wm = new Image();
+    wm.crossOrigin = 'anonymous';
+    let wmOk = false;
 
     const draw = () => {
       const c = document.createElement('canvas');
@@ -210,23 +209,13 @@ const generateShareCard = (messageText) => {
       ctx.lineWidth = S;
       ctx.stroke();
 
-      // — Oracle eye —
-      if (eyeOk) {
-        ctx.globalAlpha = 0.5;
-        ctx.drawImage(eye, padX, padTop, eyeSize, eyeSize);
+      // — Oracle wordmark (oracle-wordmark.png — branded with Eye of Horus) —
+      if (wmOk) {
+        const aspect = wm.naturalWidth / wm.naturalHeight;
+        const drawW = wmHeight * aspect;
+        ctx.globalAlpha = 0.85;
+        ctx.drawImage(wm, padX, padTop, drawW, wmHeight);
         ctx.globalAlpha = 1;
-      }
-
-      // — "ORACLE" wordmark (spaced characters) —
-      ctx.textBaseline = 'middle';
-      ctx.font = `300 ${13 * S}px ${fontStack}`;
-      ctx.fillStyle = 'rgba(255,255,255,0.35)';
-      const wmSpacing = 3.5 * S;
-      let wx = padX + eyeSize + eyeGap;
-      const wy = padTop + eyeSize / 2;
-      for (const ch of 'ORACLE') {
-        ctx.fillText(ch, wx, wy);
-        wx += ctx.measureText(ch).width + wmSpacing;
       }
 
       // — Left border line —
@@ -284,25 +273,70 @@ const generateShareCard = (messageText) => {
       c.toBlob((blob) => resolve(blob), 'image/png');
     };
 
-    eye.onload = () => { eyeOk = true; draw(); };
-    eye.onerror = () => draw();
-    eye.src = '/The_Oracle.png';
+    wm.onload = () => { wmOk = true; draw(); };
+    wm.onerror = () => draw();
+    wm.src = '/oracle-wordmark.png';
   });
 };
 
-// Share an Oracle message as a branded card image
-const handleShareMessage = async (text) => {
+// Share an Oracle message — link-first (immersive page), canvas PNG fallback
+const handleShareMessage = async (text, isTransmission) => {
   try {
+    const token = localStorage.getItem('token');
+    let shareUrl = null;
+
+    // 1. Try creating a share link (immersive branded page)
+    if (token) {
+      try {
+        const res = await fetch(`${API_URL}/api/oracle/share`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ message: text, isTransmission: !!isTransmission })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          shareUrl = data.url;
+        }
+      } catch (_) { /* offline — fall through to canvas */ }
+    }
+
+    // 2. Share via native share sheet (link or image)
+    if (shareUrl && navigator.share) {
+      try {
+        await navigator.share({
+          text: shareUrl
+        });
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+        // Native share failed — try clipboard
+      }
+    }
+
+    // 3. Desktop with link: copy to clipboard
+    if (shareUrl) {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        toast('Link copied', {
+          icon: '⚡',
+          style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' }
+        });
+        return;
+      } catch (_) { /* fall through to canvas */ }
+    }
+
+    // 4. Fallback: canvas-generated branded PNG (offline / link failed)
     const blob = await generateShareCard(text);
     const file = new File([blob], 'oracle.png', { type: 'image/png' });
 
-    // Native share (mobile — iMessage, WhatsApp, etc.)
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       await navigator.share({ files: [file] });
       return;
     }
 
-    // Desktop: copy image to clipboard
     if (navigator.clipboard?.write) {
       try {
         await navigator.clipboard.write([
@@ -316,7 +350,7 @@ const handleShareMessage = async (text) => {
       } catch (_) { /* fall through to download */ }
     }
 
-    // Fallback: download
+    // 5. Last resort: download image
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -829,7 +863,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                     </div>
                     <button
                       className="ai-chat-share-btn"
-                      onClick={() => handleShareMessage(msg.content)}
+                      onClick={() => handleShareMessage(msg.content, msg.isTransmission)}
                       aria-label="Share message"
                     >
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

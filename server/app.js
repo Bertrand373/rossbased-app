@@ -42,6 +42,7 @@ const oracleEvolutionRoutes = require('./routes/oracleEvolutionRoutes');
 const transmissionApiRoutes = require('./routes/transmissionApiRoutes');
 const dynamicRulesRoutes = require('./routes/dynamicRulesRoutes');
 const oracleChatRoutes = require('./routes/oracleChatRoutes');
+const { apiRouter: oracleShareApi, pageRouter: oracleSharePage } = require('./routes/oracleShareRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
 const { expireStaleTrials, expireStaleCanceled, checkPremiumAccess, syncStripeSubscriptions } = require('./middleware/subscriptionMiddleware');
 const { checkAndSendOnboardingNotification } = require('./services/notificationService');
@@ -2853,6 +2854,8 @@ app.use('/api/oracle/transmissions', authenticate, transmissionApiRoutes);
 app.use('/api/admin/oracle/transmissions', authenticate, transmissionApiRoutes);
 app.use('/api/admin/oracle/rules', authenticate, dynamicRulesRoutes);
 app.use('/api/oracle/chat-history', authenticate, oracleChatRoutes);
+app.use('/api/oracle/share', authenticate, oracleShareApi);
+app.use('/o', oracleSharePage);
 announcementRoutes.init(authenticate);
 app.use('/api/announcements', announcementRoutes);
 
