@@ -433,9 +433,10 @@ export const LunarPatterns = ({ lunarCorrelation, currentLunar }) => {
     <div className="insight-card">
       <div className="insight-card-header">
         <span>Lunar Patterns</span>
+        <span className="header-sub">avg by phase</span>
       </div>
       <div className="insight-card-content">
-        {/* Current phase indicator */}
+        {/* Current phase indicator — no separator, flows into rows */}
         {currentLunar && (
           <div className="lunar-current-phase">
             <LunarMoon phase={currentLunar.phase} size={18} />
@@ -448,29 +449,29 @@ export const LunarPatterns = ({ lunarCorrelation, currentLunar }) => {
         <div className="relapse-stats">
           <div className="relapse-stat-row">
             <span className="relapse-stat-label">
-              <LunarMoon phase={best[0]} size={13} />
-              <span className="lunar-row-text">Peak phase</span>
+              <span className="lunar-moon-cell"><LunarMoon phase={best[0]} size={13} /></span>
+              <span className="lunar-row-text">Strongest</span>
             </span>
             <span className="relapse-stat-value">
-              {PHASE_LABELS[best[0]]} · {best[1].avg}
+              {PHASE_LABELS[best[0]]} · {best[1].avg}/10
             </span>
           </div>
           
           <div className="relapse-stat-row">
             <span className="relapse-stat-label">
-              <LunarMoon phase={worst[0]} size={13} />
-              <span className="lunar-row-text">Low phase</span>
+              <span className="lunar-moon-cell"><LunarMoon phase={worst[0]} size={13} /></span>
+              <span className="lunar-row-text">Weakest</span>
             </span>
             <span className="relapse-stat-value">
-              {PHASE_LABELS[worst[0]]} · {worst[1].avg}
+              {PHASE_LABELS[worst[0]]} · {worst[1].avg}/10
             </span>
           </div>
           
           {currentLunar && lunarCorrelation[currentLunar.phase] && (
             <div className="relapse-stat-row">
               <span className="relapse-stat-label">
-                <LunarMoon phase={currentLunar.phase} size={13} />
-                <span className="lunar-row-text">Current avg</span>
+                <span className="lunar-moon-cell"><LunarMoon phase={currentLunar.phase} size={13} /></span>
+                <span className="lunar-row-text">Tonight</span>
               </span>
               <span className="relapse-stat-value">
                 {lunarCorrelation[currentLunar.phase].avg}/10

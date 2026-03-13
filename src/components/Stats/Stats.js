@@ -53,6 +53,47 @@ import {
   generateMLOptimization
 } from './StatsAnalyticsUtils';
 
+// ============================================================
+// Chart.js inline plugin — Lunar phase vertical markers
+// Draws subtle dotted lines + tinted moon emoji at full/new moon dates
+// ============================================================
+const lunarChartPlugin = {
+  id: 'lunarMarkers',
+  afterDraw(chart) {
+    const config = chart.options.plugins?.lunarMarkers;
+    if (!config?.data?.length) return;
+    
+    const { ctx } = chart;
+    const xAxis = chart.scales.x;
+    const yAxis = chart.scales.y;
+    const lineColor = config.isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)';
+    
+    config.data.forEach(marker => {
+      const x = xAxis.getPixelForValue(marker.index);
+      
+      // Subtle dotted vertical line — chart area only
+      ctx.save();
+      ctx.beginPath();
+      ctx.setLineDash([2, 4]);
+      ctx.strokeStyle = lineColor;
+      ctx.lineWidth = 1;
+      ctx.moveTo(x, yAxis.top + 2);
+      ctx.lineTo(x, yAxis.bottom);
+      ctx.stroke();
+      ctx.restore();
+      
+      // Tinted moon emoji above chart area — matches Calendar/Almanac filter
+      ctx.save();
+      try { ctx.filter = 'grayscale(1) brightness(1.5) drop-shadow(0 0 2px rgba(200,210,220,0.3))'; } catch (e) { /* older browsers — emoji still renders, just untinted */ }
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText(marker.emoji, x, yAxis.top - 3);
+      ctx.restore();
+    });
+  }
+};
+
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
@@ -417,6 +458,41 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     };
   }, [safeUserData, selectedMetric, timeRange, isDarkTheme]);
 
+  // Lunar markers for chart overlay — full moon + new moon vertical lines
+  const lunarMarkers = useMemo(() => {
+    if (timeRange === 'quarter') return []; // Quarter aggregates weekly — markers would misalign
+    const days = timeRange === 'week' ? 7 : 30;
+    const markers = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date();
+      date.setHours(0, 0, 0, 0);
+      date.setDate(date.getDate() - i);
+      try {
+        const lunar = getLunarData(date);
+        if (lunar.phase === 'full' || lunar.phase === 'new') {
+          markers.push({ 
+            index: days - 1 - i, 
+            phase: lunar.phase, 
+            emoji: lunar.phase === 'full' ? '🌕' : '🌑'
+          });
+        }
+      } catch (e) { /* suncalc unavailable — skip silently */ }
+    }
+    return markers;
+  }, [timeRange]);
+
+  // Merge lunar markers into chart options — stable reference for Chart.js
+  const finalChartOptions = useMemo(() => ({
+    ...chartOptions,
+    layout: {
+      padding: { top: lunarMarkers.length > 0 ? 30 : 20, right: 8, bottom: 0, left: 0 }
+    },
+    plugins: {
+      ...chartOptions.plugins,
+      lunarMarkers: { data: lunarMarkers, isDark: isDarkTheme }
+    }
+  }), [chartOptions, lunarMarkers, isDarkTheme]);
+
   const handleStatCardClick = (statType) => {
     setSelectedStatCard(statType);
     setShowStatModal(true);
@@ -667,7 +743,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                 <span className="chart-empty-sub">Check in daily to see your trends</span>
               </div>
             );
-            return <Line ref={chartRef} data={chartData} options={chartOptions} />;
+            return <Line ref={chartRef} data={chartData} options={finalChartOptions} plugins={[lunarChartPlugin]} />;
           })()}
         </div>
 

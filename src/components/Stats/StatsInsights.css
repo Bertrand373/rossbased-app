@@ -485,8 +485,6 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-subtle);
 }
 
 .lunar-current-label {
@@ -498,6 +496,15 @@
 .stats-moon-icon {
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
+}
+
+/* Fixed-width moon column — aligns all labels to same start position */
+.lunar-moon-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
   flex-shrink: 0;
 }
 
