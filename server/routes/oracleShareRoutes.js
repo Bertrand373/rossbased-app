@@ -113,6 +113,7 @@ body{
   display:flex;
   flex-direction:column;
   align-items:center;
+  justify-content:center;
   background:#0a0a0c;
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
@@ -123,18 +124,15 @@ body{
 .card{
   width:100%;
   max-width:480px;
-  min-height:100vh;
-  min-height:100dvh;
   display:flex;
   flex-direction:column;
   position:relative;
   background:linear-gradient(180deg, rgba(255,255,255,0.025) 0%, transparent 40%);
 }
 
-/* Subtle side borders on larger screens */
+/* Desktop: floating card */
 @media(min-width:481px){
   .card{
-    min-height:auto;
     margin:40px 0;
     border-radius:20px;
     border:1px solid rgba(255,255,255,0.06);
@@ -142,15 +140,22 @@ body{
     background:
       linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 40%),
       linear-gradient(168deg, #141416 0%, #0c0c0e 100%);
-    overflow:hidden;
+    overflow:clip;
   }
 }
 
-/* ===== Header ===== */
+/* ===== Header — sticky with glass blur ===== */
 .header{
-  padding:28px 20px 0;
+  position:sticky;
+  top:0;
+  z-index:10;
+  padding:20px 20px 16px;
   display:flex;
   justify-content:center;
+  background:rgba(10,10,12,0.7);
+  backdrop-filter:blur(20px) saturate(1.2);
+  -webkit-backdrop-filter:blur(20px) saturate(1.2);
+  border-bottom:1px solid rgba(255,255,255,0.04);
   opacity:0;
   animation:fadeUp 800ms ease forwards;
 }
@@ -163,7 +168,28 @@ body{
   filter:brightness(1.1);
 }
 
-/* ===== Message — matches Oracle chat layout ===== */
+/* Scroll fade — under sticky header */
+.scroll-fade-top{
+  position:sticky;
+  top:57px;
+  z-index:5;
+  height:20px;
+  margin-bottom:-20px;
+  background:linear-gradient(to bottom, rgba(10,10,12,0.9), transparent);
+  pointer-events:none;
+}
+
+.scroll-fade-bottom{
+  position:sticky;
+  bottom:0;
+  z-index:5;
+  height:24px;
+  margin-top:-24px;
+  background:linear-gradient(to top, rgba(10,10,12,0.95), transparent);
+  pointer-events:none;
+}
+
+/* ===== Message area ===== */
 .message{
   flex:1;
   padding:24px 20px 40px;
@@ -177,13 +203,14 @@ body{
   gap:10px;
 }
 
+/* Oracle eye — sticky, stays in place while text scrolls */
 .eye{
   width:28px;
   height:28px;
   object-fit:contain;
-  opacity:0.5;
   flex-shrink:0;
-  margin-top:2px;
+  position:sticky;
+  top:66px;
   animation:breathe 4s ease-in-out infinite;
 }
 
@@ -192,6 +219,7 @@ body{
   50%{opacity:0.65}
 }
 
+/* Message text — matches Oracle chat typography */
 .message-inner{
   padding-left:14px;
   border-left:1px solid rgba(255,255,255,0.08);
@@ -222,7 +250,7 @@ body{
   color:rgba(255,255,255,0.6);
 }
 
-/* ===== Footer / CTA ===== */
+/* ===== Footer / CTA — reveals after content ===== */
 .footer{
   padding:0 20px 36px;
   display:flex;
@@ -279,6 +307,20 @@ body{
   to{opacity:1;transform:translateY(0)}
 }
 
+/* Desktop refinements */
+@media(min-width:481px){
+  .header{
+    background:rgba(20,20,22,0.75);
+    border-radius:20px 20px 0 0;
+  }
+  .scroll-fade-top{
+    background:linear-gradient(to bottom, rgba(16,16,18,0.9), transparent);
+  }
+  .scroll-fade-bottom{
+    background:linear-gradient(to top, rgba(12,12,14,0.95), transparent);
+  }
+}
+
 @media(prefers-reduced-motion:reduce){
   .header,.message,.footer{animation:none;opacity:1}
   .eye{animation:none;opacity:0.5}
@@ -292,6 +334,8 @@ body{
     <img src="${CLIENT_URL}/oracle-wordmark.png" alt="Oracle" class="wordmark">
   </div>
 
+  <div class="scroll-fade-top"></div>
+
   <div class="message">
     <div class="message-row">
       <img src="${CLIENT_URL}/The_Oracle.png" alt="" class="eye">
@@ -300,6 +344,8 @@ body{
       </div>
     </div>
   </div>
+
+  <div class="scroll-fade-bottom"></div>
 
   <div class="footer">
     <div class="sep"></div>
