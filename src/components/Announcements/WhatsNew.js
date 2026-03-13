@@ -16,6 +16,7 @@ const WhatsNew = ({ isLoggedIn, username }) => {
   const [sheetReady, setSheetReady] = useState(false);
   const sheetPanelRef = useRef(null);
   const navigate = useNavigate();
+  const autoCheckedRef = useRef(false);
 
   // User-specific seen key — prevents cross-account false dismissals
   const seenKey = username ? `titantrack-seen-announcement-${username}` : 'titantrack-seen-announcement';
@@ -58,12 +59,14 @@ const WhatsNew = ({ isLoggedIn, username }) => {
     }
   }, [isLoggedIn, isAdmin, username, seenKey]);
 
-  // Auto-check on mount
+  // Auto-check ONCE when username is ready — ref prevents re-triggers from dep changes
   useEffect(() => {
+    if (!username || autoCheckedRef.current) return;
+    autoCheckedRef.current = true;
     checkAnnouncement(1500);
-  }, [checkAnnouncement]);
+  }, [username, checkAnnouncement]);
 
-  // Manual trigger from Profile "Updates" link
+  // Manual trigger from Profile "Updates" link — always allowed
   useEffect(() => {
     const handleManualShow = () => checkAnnouncement(0);
     window.addEventListener('show-whats-new', handleManualShow);
