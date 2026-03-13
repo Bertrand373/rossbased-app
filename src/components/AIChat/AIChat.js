@@ -4,6 +4,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './AIChat.css';
 import useSheetSwipe from '../../hooks/useSheetSwipe';
+import toast from 'react-hot-toast';
 
 // Mixpanel tracking
 import { trackAIChatOpened, trackAIMessageSent, trackAIChatCleared, trackAILimitReached } from '../../utils/mixpanel';
@@ -53,6 +54,284 @@ const renderMarkdown = (text) => {
   }
 
   return parts.length > 0 ? parts : text;
+};
+
+// ============================================================
+// SHARE CARD — Canvas-generated branded PNG
+// Draws a dark glass card matching the Oracle chat aesthetic,
+// with eye icon, ORACLE wordmark, styled message, and footer.
+// Supports **bold**, *italic*, multi-paragraph, auto word-wrap.
+// ============================================================
+
+const generateShareCard = (messageText) => {
+  return new Promise((resolve) => {
+    const S = 2; // retina scale
+    const W = 360 * S;
+    const padX = 24 * S;
+    const padTop = 28 * S;
+    const padBot = 22 * S;
+    const R = 16 * S;
+    const fontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+
+    // Header
+    const eyeSize = 22 * S;
+    const eyeGap = 10 * S;
+    const headerGap = 22 * S;
+
+    // Message typography — matches .ai-chat-message.assistant
+    const msgSize = 14.5 * S;
+    const msgLH = Math.round(msgSize * 1.85);
+    const borderPad = 14 * S;
+    const textX = padX + borderPad;
+    const textW = W - textX - padX;
+    const paraGap = 20 * S;
+
+    const fonts = {
+      regular: `300 ${msgSize}px ${fontStack}`,
+      bold:    `500 ${msgSize}px ${fontStack}`,
+      italic:  `italic 300 ${msgSize}px ${fontStack}`
+    };
+    const colors = {
+      regular: 'rgba(255,255,255,0.85)',
+      bold:    'rgba(255,255,255,0.95)',
+      italic:  'rgba(255,255,255,0.65)'
+    };
+
+    // Footer
+    const footGap = 24 * S;
+    const footPad = 16 * S;
+    const footFont = 11 * S;
+    const ttFont = 8.5 * S;
+
+    // Parse **bold** and *italic* segments
+    const parseSegments = (text) => {
+      const segs = [];
+      const rx = /\*\*(.+?)\*\*|\*(.+?)\*/gs;
+      let last = 0, m;
+      while ((m = rx.exec(text)) !== null) {
+        if (m.index > last) segs.push({ text: text.slice(last, m.index), style: 'regular' });
+        if (m[1]) segs.push({ text: m[1], style: 'bold' });
+        else if (m[2]) segs.push({ text: m[2], style: 'italic' });
+        last = rx.lastIndex;
+      }
+      if (last < text.length) segs.push({ text: text.slice(last), style: 'regular' });
+      return segs.length > 0 ? segs : [{ text, style: 'regular' }];
+    };
+
+    // Measurement context
+    const mc = document.createElement('canvas').getContext('2d');
+
+    // Word-wrap styled segments to fit textW
+    const wrapLine = (segs) => {
+      const tokens = [];
+      for (const s of segs) {
+        for (const p of s.text.split(/( +)/)) {
+          if (p) tokens.push({ text: p, style: s.style });
+        }
+      }
+      const lines = [];
+      let line = [], lw = 0;
+      for (const tok of tokens) {
+        mc.font = fonts[tok.style];
+        const w = mc.measureText(tok.text).width;
+        if (lw + w > textW && line.length > 0 && tok.text.trim()) {
+          while (line.length && !line[line.length - 1].text.trim()) line.pop();
+          lines.push(line);
+          line = []; lw = 0;
+          if (!tok.text.trim()) continue;
+        }
+        line.push(tok);
+        lw += w;
+      }
+      if (line.length) lines.push(line);
+      return lines;
+    };
+
+    // Process: split paragraphs (\n\n), then lines (\n), then word-wrap
+    const clean = messageText.replace(/\r/g, '');
+    const paras = clean.split(/\n\n+/).filter(p => p.trim());
+    const allLines = []; // array of line-token-arrays or null (paragraph break)
+    for (let p = 0; p < paras.length; p++) {
+      const subLines = paras[p].split('\n');
+      for (const sub of subLines) {
+        if (!sub.trim()) continue;
+        const wrapped = wrapLine(parseSegments(sub.trim()));
+        allLines.push(...wrapped);
+      }
+      if (p < paras.length - 1) allLines.push(null); // paragraph gap marker
+    }
+
+    // Calculate total text height
+    let textH = 0;
+    for (const line of allLines) {
+      textH += line === null ? paraGap : msgLH;
+    }
+
+    // Derive card height
+    const contentY = padTop + eyeSize + headerGap;
+    const msgEndY = contentY + textH;
+    const sepY = msgEndY + footGap;
+    const footTextY = sepY + footPad;
+    const H = Math.ceil(footTextY + footFont + padBot);
+
+    // Load Oracle eye then draw
+    const eye = new Image();
+    eye.crossOrigin = 'anonymous';
+    let eyeOk = false;
+
+    const draw = () => {
+      const c = document.createElement('canvas');
+      c.width = W; c.height = H;
+      const ctx = c.getContext('2d');
+
+      // — Background (clipped to rounded rect) —
+      ctx.save();
+      ctx.beginPath();
+      ctx.roundRect(0, 0, W, H, R);
+      ctx.clip();
+      const bg = ctx.createLinearGradient(W * 0.2, 0, W * 0.8, H);
+      bg.addColorStop(0, '#1c1c1e');
+      bg.addColorStop(1, '#0e0e10');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, W, H);
+
+      // Glass highlight (top 50%)
+      const gl = ctx.createLinearGradient(0, 0, 0, H * 0.5);
+      gl.addColorStop(0, 'rgba(255,255,255,0.04)');
+      gl.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = gl;
+      ctx.fillRect(0, 0, W, H * 0.5);
+      ctx.restore();
+
+      // — Card border —
+      ctx.beginPath();
+      ctx.roundRect(S * 0.5, S * 0.5, W - S, H - S, R);
+      ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+      ctx.lineWidth = S;
+      ctx.stroke();
+
+      // — Oracle eye —
+      if (eyeOk) {
+        ctx.globalAlpha = 0.5;
+        ctx.drawImage(eye, padX, padTop, eyeSize, eyeSize);
+        ctx.globalAlpha = 1;
+      }
+
+      // — "ORACLE" wordmark (spaced characters) —
+      ctx.textBaseline = 'middle';
+      ctx.font = `300 ${13 * S}px ${fontStack}`;
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      const wmSpacing = 3.5 * S;
+      let wx = padX + eyeSize + eyeGap;
+      const wy = padTop + eyeSize / 2;
+      for (const ch of 'ORACLE') {
+        ctx.fillText(ch, wx, wy);
+        wx += ctx.measureText(ch).width + wmSpacing;
+      }
+
+      // — Left border line —
+      ctx.beginPath();
+      ctx.moveTo(padX + S * 0.5, contentY);
+      ctx.lineTo(padX + S * 0.5, msgEndY);
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = S;
+      ctx.stroke();
+
+      // — Message text —
+      ctx.textBaseline = 'top';
+      let y = contentY;
+      for (const line of allLines) {
+        if (line === null) { y += paraGap; continue; }
+        let lx = textX;
+        for (const tok of line) {
+          ctx.font = fonts[tok.style];
+          ctx.fillStyle = colors[tok.style];
+          ctx.fillText(tok.text, lx, y);
+          lx += ctx.measureText(tok.text).width;
+        }
+        y += msgLH;
+      }
+
+      // — Footer separator —
+      ctx.beginPath();
+      ctx.moveTo(padX, sepY);
+      ctx.lineTo(W - padX, sepY);
+      ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+      ctx.lineWidth = S;
+      ctx.stroke();
+
+      // — Footer: titantrack.app (left) —
+      ctx.textBaseline = 'middle';
+      const fmid = footTextY + footFont / 2;
+      ctx.font = `400 ${footFont}px ${fontStack}`;
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.fillText('titantrack.app', padX, fmid);
+
+      // — Footer: TITANTRACK (right, spaced) —
+      ctx.font = `700 ${ttFont}px ${fontStack}`;
+      ctx.fillStyle = 'rgba(255,255,255,0.1)';
+      const ttSp = 2.5 * S;
+      const ttChars = 'TITANTRACK'.split('');
+      let ttW = 0;
+      for (const ch of ttChars) ttW += ctx.measureText(ch).width + ttSp;
+      ttW -= ttSp;
+      let tx = W - padX - ttW;
+      for (const ch of ttChars) {
+        ctx.fillText(ch, tx, fmid);
+        tx += ctx.measureText(ch).width + ttSp;
+      }
+
+      c.toBlob((blob) => resolve(blob), 'image/png');
+    };
+
+    eye.onload = () => { eyeOk = true; draw(); };
+    eye.onerror = () => draw();
+    eye.src = '/The_Oracle.png';
+  });
+};
+
+// Share an Oracle message as a branded card image
+const handleShareMessage = async (text) => {
+  try {
+    const blob = await generateShareCard(text);
+    const file = new File([blob], 'oracle.png', { type: 'image/png' });
+
+    // Native share (mobile — iMessage, WhatsApp, etc.)
+    if (navigator.share && navigator.canShare?.({ files: [file] })) {
+      await navigator.share({ files: [file] });
+      return;
+    }
+
+    // Desktop: copy image to clipboard
+    if (navigator.clipboard?.write) {
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]);
+        toast('Copied to clipboard', {
+          icon: '⚡',
+          style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' }
+        });
+        return;
+      } catch (_) { /* fall through to download */ }
+    }
+
+    // Fallback: download
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'oracle.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Image saved', {
+      icon: '⚡',
+      style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' }
+    });
+  } catch (err) {
+    if (err.name !== 'AbortError') console.error('Share failed:', err);
+  }
 };
 
 const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
@@ -540,13 +819,27 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                   </div>
                 )}
                 {msg.role === 'assistant' ? (
-                  <div className="ai-chat-message-row">
-                    <img src="/The_Oracle.png" alt="" className="ai-chat-avatar" />
-                    <div className="ai-chat-message-content">
-                      {msg.isTransmission && <span className="ai-chat-transmission-label" />}
-                      {renderMarkdown(msg.content)}
+                  <>
+                    <div className="ai-chat-message-row">
+                      <img src="/The_Oracle.png" alt="" className="ai-chat-avatar" />
+                      <div className="ai-chat-message-content">
+                        {msg.isTransmission && <span className="ai-chat-transmission-label" />}
+                        {renderMarkdown(msg.content)}
+                      </div>
                     </div>
-                  </div>
+                    <button
+                      className="ai-chat-share-btn"
+                      onClick={() => handleShareMessage(msg.content)}
+                      aria-label="Share message"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                        <polyline points="16 6 12 2 8 6" />
+                        <line x1="12" y1="2" x2="12" y2="15" />
+                      </svg>
+                      Share
+                    </button>
+                  </>
                 ) : (
                   <div className="ai-chat-message-content">
                     {msg.content}

@@ -884,3 +884,52 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
+
+/* ============================================================
+   SHARE BUTTON — Oracle messages
+   ============================================================ */
+
+.ai-chat-share-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 2px 0 0 38px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 200ms ease, color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  font-family: inherit;
+}
+
+/* Desktop: show on hover */
+.ai-chat-message.assistant:hover .ai-chat-share-btn,
+.ai-chat-message.assistant:active .ai-chat-share-btn,
+.ai-chat-message.assistant .ai-chat-share-btn:focus-visible {
+  opacity: 0.5;
+}
+
+.ai-chat-share-btn:hover,
+.ai-chat-share-btn:active {
+  opacity: 0.8 !important;
+  color: var(--text-secondary);
+}
+
+/* Mobile: always show (no hover) */
+@media (max-width: 768px) {
+  .ai-chat-share-btn {
+    opacity: 0.4;
+  }
+}
+
+@media (max-width: 480px) {
+  .ai-chat-share-btn {
+    padding-left: 38px;
+  }
+}
