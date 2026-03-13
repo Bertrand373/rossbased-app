@@ -284,8 +284,8 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
     const metrics = [
       { 
         key: 'anxiety', 
-        label: 'Anxiety',
-        invert: true // Lower is better
+        label: 'Calm',
+        invert: false // After migration: high = calm = good
       },
       { 
         key: 'mood', 

@@ -925,7 +925,7 @@ async function buildOracleContext(user, timezone) {
     
     if (latest) {
       const parts = [];
-      if (latest.anxiety !== undefined) parts.push(`anxiety: ${latest.anxiety}/10`);
+      if (latest.anxiety !== undefined) parts.push(`calm: ${latest.anxiety}/10`);
       if (latest.moodStability !== undefined) parts.push(`mood stability: ${latest.moodStability}/10`);
       if (latest.mentalClarity !== undefined) parts.push(`mental clarity: ${latest.mentalClarity}/10`);
       if (latest.emotionalProcessing !== undefined) parts.push(`emotional processing: ${latest.emotionalProcessing}/10`);

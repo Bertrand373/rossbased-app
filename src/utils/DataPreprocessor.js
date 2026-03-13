@@ -76,7 +76,7 @@ class DataPreprocessor {
       // These are the MOST PREDICTIVE features for relapse risk
       const emotionalData = this.getLatestEmotionalData(userData, date);
       
-      const anxiety = emotionalData.anxiety;           // High = high risk
+      const anxiety = emotionalData.anxiety;           // Now "calm" scale: High = calm = low risk
       const moodStability = emotionalData.mood;        // Low = high risk
       const mentalClarity = emotionalData.clarity;     // Low = impaired judgment
       const emotionalProcessing = emotionalData.processing; // Low = blocked emotions

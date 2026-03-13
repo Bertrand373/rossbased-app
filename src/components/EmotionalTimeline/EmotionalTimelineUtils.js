@@ -424,8 +424,8 @@ const generateDataPatternAnalysis = (recentData) => {
   const avgMentalClarity = recentData.reduce((sum, entry) => sum + (entry.mentalClarity || 5), 0) / recentData.length;
   const avgEmotionalProcessing = recentData.reduce((sum, entry) => sum + (entry.emotionalProcessing || 5), 0) / recentData.length;
 
-  // Calculate wellbeing score
-  const wellbeingScore = (avgMoodStability + avgMentalClarity + avgEmotionalProcessing + (10 - avgAnxiety)) / 4;
+  // Calculate wellbeing score (all metrics: higher = better after calm migration)
+  const wellbeingScore = (avgMoodStability + avgMentalClarity + avgEmotionalProcessing + avgAnxiety) / 4;
 
   // Trend analysis (if enough data)
   let trends = null;
@@ -460,19 +460,14 @@ const getTrend = (recent, earlier, metric) => {
   const recentAvg = recent.reduce((sum, entry) => sum + (entry[metric] || 5), 0) / recent.length;
   const earlierAvg = earlier.reduce((sum, entry) => sum + (entry[metric] || 5), 0) / earlier.length;
   
-  if (metric === 'anxiety') {
-    return recentAvg < earlierAvg - 0.5 ? 'improving' : 
-           recentAvg > earlierAvg + 0.5 ? 'concerning' : 'stable';
-  } else {
-    return recentAvg > earlierAvg + 0.5 ? 'improving' : 
-           recentAvg < earlierAvg - 0.5 ? 'concerning' : 'stable';
-  }
+  return recentAvg > earlierAvg + 0.5 ? 'improving' : 
+         recentAvg < earlierAvg - 0.5 ? 'concerning' : 'stable';
 };
 
 // Phase alignment evaluation
 const evaluatePhaseAlignment = (anxiety, mood, clarity, processing) => {
   const generalExpected = {
-    expectedAnxiety: [3, 7],
+    expectedAnxiety: [4, 8],
     expectedMood: [4, 8],
     expectedClarity: [4, 8],
     expectedProcessing: [4, 8]
@@ -513,9 +508,9 @@ const generateChallengeAnalysis = (currentPhase, recentData) => {
   const challengePatterns = {
     1: { // Initial Adaptation
       highAnxiety: {
-        condition: avgData.anxiety > 7,
+        condition: avgData.anxiety < 4,
         challenge: "Intense urge management difficulty",
-        explanation: "High anxiety indicates strong dopamine-seeking from established ejaculation patterns",
+        explanation: "Low calm levels indicate strong dopamine-seeking from established ejaculation patterns",
         solution: "Increase cold exposure and physical exercise. Remove all triggers from environment immediately."
       },
       lowEnergy: {
@@ -533,7 +528,7 @@ const generateChallengeAnalysis = (currentPhase, recentData) => {
         solution: "Journal extensively. Accept emotions without resistance. This is healing, not pathology."
       },
       overwhelm: {
-        condition: avgData.anxiety > 7 && avgData.processing < 3,
+        condition: avgData.anxiety < 4 && avgData.processing < 3,
         challenge: "Emotional flooding beyond capacity",
         explanation: "Years of suppressed content releasing faster than processing ability",
         solution: "Consider professional therapy. Use cold water for emotional regulation."
@@ -600,9 +595,9 @@ const generateChallengeAnalysis = (currentPhase, recentData) => {
 // Helper function for challenge severity assessment
 const getSeverity = (avgData, challengeType) => {
   const severityThresholds = {
-    highAnxiety: avgData.anxiety > 8.5 ? 'high' : 'moderate',
+    highAnxiety: avgData.anxiety < 2.5 ? 'high' : 'moderate',
     emotionalVolatility: avgData.mood < 3 ? 'high' : 'moderate',
-    overwhelm: (avgData.anxiety > 8 && avgData.processing < 2) ? 'high' : 'moderate',
+    overwhelm: (avgData.anxiety < 3 && avgData.processing < 2) ? 'high' : 'moderate',
     clarity_plateau: avgData.clarity < 4 ? 'high' : 'moderate'
   };
   
@@ -710,7 +705,7 @@ const generateActionableStrategies = (currentPhase, recentData) => {
   // Phase-specific strategies
   const strategies = {
     1: {
-      urgent: avgData?.anxiety > 7 ? ["Immediate cold shower protocol: 2-5 minutes daily", "Remove ALL triggers from environment NOW"] : [],
+      urgent: avgData?.anxiety < 4 ? ["Immediate cold shower protocol: 2-5 minutes daily", "Remove ALL triggers from environment NOW"] : [],
       daily: ["Establish non-negotiable morning routine", "Practice 4-7-8 breathing during urges", "Intense physical exercise to channel energy"],
       weekly: ["Track urge patterns and triggers", "Build support system connections", "Study retention science and benefits"],
       longTerm: ["Commit to 90-day minimum trial", "Prepare for emotional processing phase", "Develop urge management toolkit"]

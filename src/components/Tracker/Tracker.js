@@ -432,7 +432,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
   // Emotional state sliders (optional, saves alongside benefits)
   const emotionalList = [
-    { key: 'anxiety', label: 'Anxiety', desc: '1 = calm · 10 = severe' },
+    { key: 'anxiety', label: 'Calm', desc: '1 = anxious · 10 = calm' },
     { key: 'mood', label: 'Mood', desc: '1 = volatile · 10 = stable' },
     { key: 'clarity', label: 'Drive', desc: '1 = unmotivated · 10 = unstoppable' }
   ];
@@ -766,7 +766,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     // ------------------------------------------------------------------
     // 10. LIFT-DAY BENEFIT BOOST (score: 86) — needs 5+ workout days
     //     "Days you lift, Energy averages 8.1 vs 6.2"
-    //     Scans core + emotional metrics (anxiety inverted: lower on lift days = boost)
+    //     Scans core + emotional metrics (all higher = better after calm migration)
     // ------------------------------------------------------------------
     if (workoutLog.length >= 5 && allLogs.length >= 10) {
       const workoutDates = new Set(workoutLog.map(w => format(new Date(w.date), 'yyyy-MM-dd')));
@@ -774,7 +774,8 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       const restDayLogs = previousLogs.filter(l => !workoutDates.has(format(new Date(l.date), 'yyyy-MM-dd')));
       
       if (liftDayLogs.length >= 3 && restDayLogs.length >= 3) {
-        const allMetrics = [...coreKeys, 'mood', 'clarity'];
+        const allMetrics = [...coreKeys, 'anxiety', 'mood', 'clarity'];
+        const metricLabel = { anxiety: 'Calm' }; // display name overrides
         let bestBoost = null;
         for (const key of allMetrics) {
           const liftWith = liftDayLogs.filter(l => typeof l[key] === 'number');
@@ -787,21 +788,9 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
             bestBoost = { key, liftAvg: liftAvg.toFixed(1), restAvg: restAvg.toFixed(1), boost };
           }
         }
-        // Anxiety is inverted — lower on lift days is the insight
-        const anxLift = liftDayLogs.filter(l => typeof l.anxiety === 'number');
-        const anxRest = restDayLogs.filter(l => typeof l.anxiety === 'number');
-        if (anxLift.length >= 3 && anxRest.length >= 3) {
-          const anxLiftAvg = anxLift.reduce((s, l) => s + l.anxiety, 0) / anxLift.length;
-          const anxRestAvg = anxRest.reduce((s, l) => s + l.anxiety, 0) / anxRest.length;
-          const anxDrop = anxRestAvg - anxLiftAvg; // positive = anxiety lower on lift days
-          if (anxDrop >= 1.0 && (!bestBoost || anxDrop > bestBoost.boost)) {
-            bestBoost = { key: 'anxiety', liftAvg: anxLiftAvg.toFixed(1), restAvg: anxRestAvg.toFixed(1), boost: anxDrop, inverted: true };
-          }
-        }
         if (bestBoost) {
-          const line = bestBoost.inverted
-            ? `Anxiety: ${bestBoost.liftAvg} on lift days vs ${bestBoost.restAvg} on rest days`
-            : `${cap(bestBoost.key)}: ${bestBoost.liftAvg} on lift days vs ${bestBoost.restAvg} on rest days`;
+          const displayName = metricLabel[bestBoost.key] || cap(bestBoost.key);
+          const line = `${displayName}: ${bestBoost.liftAvg} on lift days vs ${bestBoost.restAvg} on rest days`;
           candidates.push({ score: 86, insight: {
             phase: dayLabel,
             line,
@@ -1027,16 +1016,9 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         if (highLogs.length >= 3 && lowLogs.length >= 3) {
           let bestEmotional = null;
           
-          // Anxiety — lower is better (inverted)
-          const anxHigh = highLogs.reduce((s, l) => s + l.anxiety, 0) / highLogs.length;
-          const anxLow = lowLogs.reduce((s, l) => s + l.anxiety, 0) / lowLogs.length;
-          const anxDrop = anxLow - anxHigh;
-          if (anxDrop >= 1.0) {
-            bestEmotional = { key: 'Anxiety', highAvg: anxHigh.toFixed(1), lowAvg: anxLow.toFixed(1), delta: anxDrop, inverted: true };
-          }
-          
-          // Mood, Clarity, Processing — higher is better
-          for (const key of ['mood', 'clarity']) {
+          // All emotional metrics — higher is better (calm scale already flipped)
+          const emotionalLabel = { anxiety: 'Calm', mood: 'Mood', clarity: 'Drive' };
+          for (const key of ['anxiety', 'mood', 'clarity']) {
             const hWith = highLogs.filter(l => typeof l[key] === 'number');
             const lWith = lowLogs.filter(l => typeof l[key] === 'number');
             if (hWith.length < 3 || lWith.length < 3) continue;
@@ -1044,14 +1026,12 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
             const lAvg = lWith.reduce((s, l) => s + l[key], 0) / lWith.length;
             const boost = hAvg - lAvg;
             if (boost >= 1.0 && (!bestEmotional || boost > bestEmotional.delta)) {
-              bestEmotional = { key: cap(key), highAvg: hAvg.toFixed(1), lowAvg: lAvg.toFixed(1), delta: boost, inverted: false };
+              bestEmotional = { key: emotionalLabel[key], highAvg: hAvg.toFixed(1), lowAvg: lAvg.toFixed(1), delta: boost };
             }
           }
           
           if (bestEmotional) {
-            const line = bestEmotional.inverted
-              ? `${bestEmotional.key}: ${bestEmotional.highAvg} in heavy training weeks vs ${bestEmotional.lowAvg} in light weeks`
-              : `${bestEmotional.key}: ${bestEmotional.highAvg} in heavy training weeks vs ${bestEmotional.lowAvg} in light weeks`;
+            const line = `${bestEmotional.key}: ${bestEmotional.highAvg} in heavy training weeks vs ${bestEmotional.lowAvg} in light weeks`;
             candidates.push({ score: 83, insight: {
               phase: dayLabel,
               line,
