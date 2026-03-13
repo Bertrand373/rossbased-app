@@ -274,6 +274,14 @@ function scheduleMorningAwareness() {
         startDate: { $exists: true, $ne: null }
       });
       
+      // Compute lunar once per hourly tick, not per-user
+      let lunarLabel = '';
+      try {
+        const { getLunarData } = require('../utils/lunarData');
+        const lunar = getLunarData();
+        lunarLabel = `${lunar.emoji} ${lunar.label}`;
+      } catch {}
+      
       let sentCount = 0;
       
       for (const user of users) {
@@ -284,7 +292,8 @@ function scheduleMorningAwareness() {
         if (userCurrentHour === 7) {
           const streak = user.currentStreak || 1;
           const result = await sendNotificationToUser(user.username, 'morning_awareness', {
-            streakDay: streak.toString()
+            streakDay: streak.toString(),
+            lunarPhase: lunarLabel
           });
           if (result.success) {
             sentCount++;
@@ -305,6 +314,73 @@ function scheduleMorningAwareness() {
 }
 
 // ============================================================================
+// LUNAR PHASE NOTIFICATIONS - Full Moon & New Moon awareness
+// ============================================================================
+
+/**
+ * Lunar phase notifications — Full Moon & New Moon alerts
+ * Checks every hour; fires at 7 PM local time on the day of a full or new moon
+ * Users receive at most one lunar notification per phase transition
+ */
+function scheduleLunarNotifications() {
+  cron.schedule('0 * * * *', async () => {
+    try {
+      let lunar;
+      try {
+        const { getLunarData } = require('../utils/lunarData');
+        lunar = getLunarData();
+      } catch { return; } // suncalc not available — skip silently
+
+      // Only fire on significant phases
+      if (lunar.phase !== 'full' && lunar.phase !== 'new') return;
+
+      const users = await User.find({
+        'notificationPreferences.dailyReminderEnabled': true
+      });
+
+      let sentCount = 0;
+
+      for (const user of users) {
+        const timezone = user.notificationPreferences?.timezone || 'America/New_York';
+        const userCurrentHour = getCurrentHourInTimezone(timezone);
+
+        // Fire at 7 PM local time
+        if (userCurrentHour !== 19) continue;
+
+        // Deduplicate: store last lunar notification phase to prevent repeat sends
+        const lastLunarNotif = user.lastLunarNotification || '';
+        const todayPhaseKey = `${lunar.phase}-${new Date().toISOString().split('T')[0]}`;
+        if (lastLunarNotif === todayPhaseKey) continue;
+
+        const templateKey = lunar.phase === 'full' ? 'lunar_full_moon' : 'lunar_new_moon';
+        const result = await sendNotificationToUser(user.username, templateKey, {
+          moonEmoji: lunar.emoji,
+          moonLabel: lunar.label,
+          illumination: (lunar.illumination || 0).toString(),
+          energy: lunar.energy || ''
+        });
+
+        if (result.success) {
+          sentCount++;
+          await User.updateOne(
+            { _id: user._id },
+            { $set: { lastLunarNotification: todayPhaseKey } }
+          );
+        }
+      }
+
+      if (sentCount > 0) {
+        console.log(`🌙 Sent ${lunar.label} notifications to ${sentCount} users`);
+      }
+    } catch (error) {
+      console.error('❌ Error in lunar notification scheduler:', error);
+    }
+  });
+
+  console.log('✅ Lunar phase notification scheduler started');
+}
+
+// ============================================================================
 // INITIALIZE ALL SCHEDULERS
 // ============================================================================
 
@@ -317,6 +393,7 @@ function initializeSchedulers() {
   scheduleWeeklyMotivation();
   scheduleMilestoneChecks();
   scheduleLeaderboardPost();
+  scheduleLunarNotifications();
   
   console.log('✅ All notification schedulers initialized successfully');
 }

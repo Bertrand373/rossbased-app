@@ -15,6 +15,7 @@ import PatternInsightCard from '../PatternInsight/PatternInsightCard';
 import EnergyAlmanac from '../EnergyAlmanac/EnergyAlmanac';
 import OnboardingGuide from '../OnboardingGuide/OnboardingGuide';
 import DailyQuote from '../DailyQuote/DailyQuote';
+import { getLunarData } from '../../utils/lunarData';
 
 // NEW: Import InterventionService for ML feedback loop
 import interventionService from '../../services/InterventionService';
@@ -366,6 +367,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     const todayStr = toDateString(now);
     const history = [...(userData.streakHistory || [])];
     const currentIdx = history.findIndex(s => !s.end);
+    const lunar = getLunarData(now);
     
     if (currentIdx !== -1) {
       history[currentIdx] = { 
@@ -373,7 +375,9 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         start: toDateString(history[currentIdx].start), // normalize legacy
         end: todayStr, 
         days: streak, 
-        reason: 'relapse' 
+        reason: 'relapse',
+        moonPhase: lunar.phase,
+        moonIllumination: lunar.illumination
       };
     }
     // ONE-BASED COUNTING: New streak starts at Day 1 (today)
@@ -409,7 +413,8 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   // Wet dream - no streak reset, just log
   const handleLogWetDream = () => {
     const wetDreams = userData.wetDreams || [];
-    wetDreams.push({ date: new Date(), streakDay: streak });
+    const lunar = getLunarData(new Date());
+    wetDreams.push({ date: new Date(), streakDay: streak, moonPhase: lunar.phase, moonIllumination: lunar.illumination });
     updateUserData({ wetDreams });
     setShowResetConfirm(false);
     setShowStreakOptions(false);
@@ -1092,6 +1097,9 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       workout: Math.round(benefits.workout)
     };
     
+    // Tag with lunar phase for streak-lunar correlation engine
+    const lunar = getLunarData(new Date());
+    
     const entry = { 
       date: new Date(), 
       ...rounded,
@@ -1101,7 +1109,9 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         clarity: Math.round(benefits.clarity),
         processing: Math.round(benefits.processing)
       } : {}),
-      streakDay: streak 
+      streakDay: streak,
+      moonPhase: lunar.phase,
+      moonIllumination: lunar.illumination
     };
     
     if (existingIdx >= 0) {

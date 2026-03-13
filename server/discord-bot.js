@@ -1650,6 +1650,14 @@ async function buildDailyBriefing() {
     desc += `\n✅ All systems healthy`;
   }
 
+  // Lunar awareness
+  try {
+    const lunar = require('./utils/lunarData').getLunarData();
+    desc += `\n\n**🌙 Lunar**\n${lunar.emoji} ${lunar.label} · ${lunar.illumination}% · Day ${lunar.cycleDay}/${lunar.cycleTotal}`;
+    if (lunar.nextPhase) desc += ` · ${lunar.nextPhase.label} in ${lunar.nextPhase.daysUntil}d`;
+    if (lunar.specialEvent) desc += `\n✨ ${lunar.specialEvent.name}`;
+  } catch {}
+
   return new EmbedBuilder()
     .setColor(warnings.length > 0 ? 0xEF4444 : ORACLE_COLOR)
     .setTitle(`☀️ Daily Briefing — ${dateStr}`)
@@ -1766,7 +1774,14 @@ async function buildWeeklyEmailDraft() {
   // Lunar
   if (intel.lunar?.label) {
     dataBlock += `LUNAR PHASE: ${intel.lunar.label} (${intel.lunar.illumination || '?'}% illuminated)\n`;
-    dataBlock += `Energy: ${intel.lunar.energy || 'N/A'}\n\n`;
+    dataBlock += `Energy: ${intel.lunar.energy || 'N/A'}\n`;
+    if (intel.lunar.nextPhase) {
+      dataBlock += `Next phase: ${intel.lunar.nextPhase.label} in ${intel.lunar.nextPhase.daysUntil} days\n`;
+    }
+    if (intel.lunar.specialEvent) {
+      dataBlock += `Special event: ${intel.lunar.specialEvent.name}\n`;
+    }
+    dataBlock += '\n';
   }
 
   // Streak distribution

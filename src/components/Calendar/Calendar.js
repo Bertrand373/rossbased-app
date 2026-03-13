@@ -1157,9 +1157,10 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       // Get current streak day for this date
       const dayCount = getDayCount(selectedDate);
       const streakDay = dayCount?.dayNumber || userData.currentStreak || 0;
+      const lunar = getLunarData(selectedDate);
       
       // Store wet dream with date (like Tracker.js does)
-      const updatedWetDreams = [...(userData.wetDreams || []), { date: selectedDate, streakDay }];
+      const updatedWetDreams = [...(userData.wetDreams || []), { date: selectedDate, streakDay, moonPhase: lunar.phase, moonIllumination: lunar.illumination }];
       updateUserData({ 
         wetDreams: updatedWetDreams,
         wetDreamCount: updatedWetDreams.length,
@@ -1224,6 +1225,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     
     let updatedStreakHistory = [...(userData.streakHistory || [])];
     const activeStreakIndex = updatedStreakHistory.findIndex(streak => !streak.end);
+    const lunar = getLunarData(selectedDate);
     
     if (activeStreakIndex !== -1) {
       const currentStreakEntry = updatedStreakHistory[activeStreakIndex];
@@ -1238,7 +1240,9 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         end: relapseDateStr,
         days: streakDays,
         reason: 'relapse',
-        trigger: selectedTrigger
+        trigger: selectedTrigger,
+        moonPhase: lunar.phase,
+        moonIllumination: lunar.illumination
       };
       
       // New streak starts day AFTER relapse (you don't get credit for relapse day)
