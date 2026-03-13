@@ -600,13 +600,20 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
         {/* Metric toggles — pipe-divider style matching app toggle DNA */}
         <div className="toggle-row benefits-row">
-          {['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'].map((metric, index) => (
+          {[
+            { key: 'energy', label: 'Energy' },
+            { key: 'focus', label: 'Focus' },
+            { key: 'confidence', label: 'Confidence' },
+            { key: 'aura', label: 'Aura' },
+            { key: 'sleep', label: 'Sleep' },
+            { key: 'workout', label: 'Body' }
+          ].map(({ key: metric, label }, index) => (
             <React.Fragment key={metric}>
               <button
                 className={`toggle-btn ${selectedMetric === metric ? 'active' : ''}`}
                 onClick={() => setSelectedMetric(metric)}
               >
-                {metric.charAt(0).toUpperCase() + metric.slice(1)}
+                {label}
               </button>
               {index < 5 && <div className="toggle-divider" />}
             </React.Fragment>

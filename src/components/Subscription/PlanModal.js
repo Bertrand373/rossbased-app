@@ -87,6 +87,7 @@ const PlanModal = ({
 
   const reason = subscriptionStatus?.reason || 'no_subscription';
   const isNewUser = reason === 'no_subscription';
+  const isGfUser = subscriptionStatus?.reason === 'grandfathered' || !!subscriptionStatus?.subscription?.grandfatheredAt;
 
   const handleCheckout = async () => {
     setIsProcessing(true);
@@ -119,8 +120,8 @@ const PlanModal = ({
           {/* Header */}
           <div className="plan-header">
             <img src="/tt-icon-white.png" alt="" className="plan-icon" />
-            <h2 className="plan-title">{selectedTier === 'ascended' ? 'Go Deeper' : 'Upgrade to Premium'}</h2>
-            <p className="plan-subtitle">{selectedTier === 'ascended' ? '9 Oracle messages per day' : 'Unlock the full system'}</p>
+            <h2 className="plan-title">{isGfUser ? 'Unlock Deeper Oracle Access' : selectedTier === 'ascended' ? 'Go Deeper' : 'Upgrade to Premium'}</h2>
+            <p className="plan-subtitle">{isGfUser ? `${pricing.oracleLimit} Oracle messages per day` : selectedTier === 'ascended' ? '9 Oracle messages per day' : 'Unlock the full system'}</p>
           </div>
 
           {/* Tier toggle */}
@@ -176,7 +177,7 @@ const PlanModal = ({
             disabled={isProcessing}
           >
             {isProcessing ? 'Processing...' : 
-              isNewUser && selectedTier !== 'ascended'
+              isNewUser && selectedTier !== 'ascended' && !isGfUser
                 ? 'Start 7-Day Free Trial' 
                 : `Continue — $${selectedPlan === 'yearly' ? pricing.yearly + '/yr' : pricing.monthly + '/mo'}`
             }
@@ -184,7 +185,7 @@ const PlanModal = ({
 
           {/* Legal */}
           <p className="plan-legal">
-            {isNewUser && selectedTier !== 'ascended'
+            {isNewUser && selectedTier !== 'ascended' && !isGfUser
               ? 'Card required. Not charged until trial ends. Cancel anytime.'
               : 'Cancel anytime. Secure payment via Stripe.'
             }

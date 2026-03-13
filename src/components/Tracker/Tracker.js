@@ -89,7 +89,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   
   const [benefits, setBenefits] = useState({ 
     energy: 5, focus: 5, confidence: 5, aura: 5, sleep: 5, workout: 5,
-    anxiety: 5, mood: 5, clarity: 5, processing: 5
+    anxiety: 5, mood: 5, clarity: 5
   });
   
   // Track if user touched any emotional slider (prevents logging defaults as real data)
@@ -216,8 +216,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         workout: existing.workout || 5,
         anxiety: existing.anxiety || 5,
         mood: existing.mood || 5,
-        clarity: existing.clarity || 5,
-        processing: existing.processing || 5
+        clarity: existing.clarity || 5
       });
       // If this entry already has emotional data, mark as touched
       if (typeof existing.anxiety === 'number') {
@@ -428,15 +427,14 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     { key: 'confidence', label: 'Confidence', desc: 'Self-assurance in interactions' },
     { key: 'aura', label: 'Aura', desc: 'Presence and magnetism others notice' },
     { key: 'sleep', label: 'Sleep', desc: 'Quality and restfulness of sleep' },
-    { key: 'workout', label: 'Workout', desc: 'Physical performance and recovery' }
+    { key: 'workout', label: 'Body', desc: 'How your physical body feels today' }
   ];
 
   // Emotional state sliders (optional, saves alongside benefits)
   const emotionalList = [
     { key: 'anxiety', label: 'Anxiety', desc: '1 = calm · 10 = severe' },
     { key: 'mood', label: 'Mood', desc: '1 = volatile · 10 = stable' },
-    { key: 'clarity', label: 'Clarity', desc: '1 = foggy · 10 = sharp' },
-    { key: 'processing', label: 'Processing', desc: '1 = blocked · 10 = flowing' }
+    { key: 'clarity', label: 'Drive', desc: '1 = unmotivated · 10 = unstoppable' }
   ];
 
   // Handle benefit change — stores raw float for continuous drag movement
@@ -445,7 +443,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     setBenefits(prev => ({ ...prev, [key]: rawValue }));
     
     // Mark emotional sliders as touched if user interacts with one
-    if (['anxiety', 'mood', 'clarity', 'processing'].includes(key)) {
+    if (['anxiety', 'mood', 'clarity'].includes(key)) {
       setEmotionalTouched(true);
     }
   }, []);
@@ -776,7 +774,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       const restDayLogs = previousLogs.filter(l => !workoutDates.has(format(new Date(l.date), 'yyyy-MM-dd')));
       
       if (liftDayLogs.length >= 3 && restDayLogs.length >= 3) {
-        const allMetrics = [...coreKeys, 'mood', 'clarity', 'processing'];
+        const allMetrics = [...coreKeys, 'mood', 'clarity'];
         let bestBoost = null;
         for (const key of allMetrics) {
           const liftWith = liftDayLogs.filter(l => typeof l[key] === 'number');
@@ -870,7 +868,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       if (workoutScore >= 8) {
         candidates.push({ score: 78, insight: {
           phase: dayLabel,
-          line: `${exerciseCount} exercises logged · Workout rated ${workoutScore}/10`,
+          line: `${exerciseCount} exercises logged · Body rated ${workoutScore}/10`,
           sub: totalVolume > 0 ? `${totalVolume.toLocaleString()}${hasWeighted ? ' lbs' : ' reps'} total volume` : 'Training data locked in'
         }});
       }
@@ -1022,7 +1020,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       const lowTrainWeeks = new Set(Object.entries(weekWorkoutCounts).filter(([, c]) => c <= 1).map(([k]) => k));
       
       if (highTrainWeeks.size >= 2 && lowTrainWeeks.size >= 2) {
-        const emotionalKeys = ['anxiety', 'mood', 'clarity', 'processing'];
+        const emotionalKeys = ['anxiety', 'mood', 'clarity'];
         const highLogs = previousLogs.filter(l => highTrainWeeks.has(getWeekKey(l.date)) && typeof l.anxiety === 'number');
         const lowLogs = previousLogs.filter(l => lowTrainWeeks.has(getWeekKey(l.date)) && typeof l.anxiety === 'number');
         
@@ -1038,7 +1036,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
           }
           
           // Mood, Clarity, Processing — higher is better
-          for (const key of ['mood', 'clarity', 'processing']) {
+          for (const key of ['mood', 'clarity']) {
             const hWith = highLogs.filter(l => typeof l[key] === 'number');
             const lWith = lowLogs.filter(l => typeof l[key] === 'number');
             if (hWith.length < 3 || lWith.length < 3) continue;
@@ -1106,8 +1104,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       ...(emotionalTouched ? {
         anxiety: Math.round(benefits.anxiety),
         mood: Math.round(benefits.mood),
-        clarity: Math.round(benefits.clarity),
-        processing: Math.round(benefits.processing)
+        clarity: Math.round(benefits.clarity)
       } : {}),
       streakDay: streak,
       moonPhase: lunar.phase,

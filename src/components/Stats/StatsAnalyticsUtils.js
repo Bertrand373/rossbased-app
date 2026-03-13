@@ -17,8 +17,8 @@ const toLocalMidnight = (val) => {
   }
   const d = new Date(val);
   if (isNaN(d.getTime())) return null;
-  // Extract UTC components to avoid timezone shift on UTC midnight dates
-  return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  d.setHours(0, 0, 0, 0);
+  return d;
 };
 
 // ============================================================
@@ -651,7 +651,7 @@ const formatMetricName = (metric) => {
     confidence: 'Confidence',
     aura: 'Aura',
     sleep: 'Sleep',
-    workout: 'Workout'
+    workout: 'Body'
   };
   return names[metric] || metric;
 };
@@ -1178,7 +1178,7 @@ const formatAIFactorName = (factor) => {
     'confidence': 'Confidence levels',
     'sleep': 'Sleep quality',
     'aura': 'Aura/presence',
-    'workout': 'Workout intensity',
+    'workout': 'Body/physical state',
     'recentRelapseCount': 'Recent relapse frequency',
     'avgBenefitScore': 'Overall benefit score',
     'daysSinceLastRelapse': 'Recovery momentum'

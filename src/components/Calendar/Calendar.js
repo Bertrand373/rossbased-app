@@ -182,7 +182,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     { key: 'confidence', label: 'Confidence' },
     { key: 'aura', label: 'Aura' },
     { key: 'sleep', label: 'Sleep' },
-    { key: 'workout', label: 'Workout' }
+    { key: 'workout', label: 'Body' }
   ];
   const [weekMetrics, setWeekMetrics] = useState(() => {
     try {
@@ -1686,9 +1686,10 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
               const val = metric === 'sleep' ? (dayBenefits.sleep || dayBenefits.attraction || 5)
                 : metric === 'workout' ? (dayBenefits.workout || dayBenefits.gymPerformance || 5)
                 : (dayBenefits[metric] || 5);
+              const metricLabel = metric === 'workout' ? 'body' : metric;
               return (
               <div key={metric} className="week-benefit-item">
-                <span className="week-benefit-label-top">{metric}</span>
+                <span className="week-benefit-label-top">{metricLabel}</span>
                 <div className="week-benefit-bar">
                   <div 
                     className="week-benefit-fill" 
@@ -1838,7 +1839,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                     { label: 'Confidence', value: dayBenefits.confidence },
                     { label: 'Aura', value: dayBenefits.aura || 5 },
                     { label: 'Sleep', value: dayBenefits.sleep || dayBenefits.attraction || 5 },
-                    { label: 'Workout', value: dayBenefits.workout || dayBenefits.gymPerformance || 5 }
+                    { label: 'Body', value: dayBenefits.workout || dayBenefits.gymPerformance || 5 }
                   ] : [];
                   
                   return (

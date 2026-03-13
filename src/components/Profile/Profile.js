@@ -870,6 +870,12 @@ const Profile = ({
                 </div>
               )}
 
+              {isGrandfathered && openPlanModal && (
+                <button className="billing-manage-btn" onClick={openPlanModal}>
+                  Upgrade Oracle Access
+                </button>
+              )}
+
               {(subscriptionStatus?.subscription?.status === 'canceled' || subscriptionStatus?.subscription?.cancelAtPeriodEnd) && isPremium && (
                 <div className="billing-note">
                   You still have access until your billing period ends. Resubscribe anytime.

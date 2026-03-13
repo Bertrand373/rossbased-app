@@ -102,10 +102,8 @@ router.post('/create-checkout', authenticate, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
     
-    // Don't allow checkout if already grandfathered
-    if (user.subscription?.status === 'grandfathered') {
-      return res.status(400).json({ error: 'You already have lifetime access' });
-    }
+    // No trial for grandfathered users or Ascended tier — they pay from day one
+    const isGfUser = !!user.subscription?.grandfatheredAt;
     
     // Select price ID based on plan + tier
     let priceId;
@@ -166,7 +164,7 @@ router.post('/create-checkout', authenticate, async (req, res) => {
     // If user has an active trial, don't add another trial period
     // If user has never had a trial, add 7-day trial to the subscription
     const hadTrial = user.subscription?.trialStartDate;
-    if (!hadTrial && subTier !== 'ascended') {
+    if (!hadTrial && subTier !== 'ascended' && !isGfUser) {
       sessionConfig.subscription_data.trial_period_days = 7;
     }
     
@@ -321,7 +319,16 @@ router.post('/webhook', async (req, res) => {
           cancelAtPeriodEnd: subscription.cancel_at_period_end || false,
           canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000) : null
         };
-        user.isPremium = ['active', 'trial'].includes(status);
+        
+        // GF fallback: if sub expired but user was originally grandfathered, restore GF status
+        if (!['active', 'trial'].includes(status) && user.subscription?.grandfatheredAt) {
+          user.subscription.status = 'grandfathered';
+          user.subscription.plan = 'lifetime';
+          user.isPremium = true;
+          console.log(`🔄 Subscription ended for ${username}, restored to grandfathered`);
+        } else {
+          user.isPremium = ['active', 'trial'].includes(status);
+        }
         
         await user.save({ validateModifiedOnly: true });
         console.log(`🔄 Subscription updated for ${username}: ${status}`);
@@ -338,18 +345,27 @@ router.post('/webhook', async (req, res) => {
         const user = await User.findOne({ username });
         if (!user) break;
         
-        // Don't override grandfather status
-        if (user.subscription?.status === 'grandfathered') break;
-        
-        user.subscription = {
-          ...user.subscription,
-          status: 'expired',
-          cancelAtPeriodEnd: false
-        };
-        user.isPremium = false;
-        
-        await user.save({ validateModifiedOnly: true });
-        console.log(`❌ Subscription ended for ${username}`);
+        // GF fallback: restore grandfathered status instead of expiring
+        if (user.subscription?.grandfatheredAt) {
+          user.subscription = {
+            ...user.subscription,
+            status: 'grandfathered',
+            plan: 'lifetime',
+            cancelAtPeriodEnd: false
+          };
+          user.isPremium = true;
+          await user.save({ validateModifiedOnly: true });
+          console.log(`🔄 Subscription ended for ${username}, restored to grandfathered`);
+        } else {
+          user.subscription = {
+            ...user.subscription,
+            status: 'expired',
+            cancelAtPeriodEnd: false
+          };
+          user.isPremium = false;
+          await user.save({ validateModifiedOnly: true });
+          console.log(`❌ Subscription ended for ${username}`);
+        }
         break;
       }
       
@@ -377,7 +393,16 @@ router.post('/webhook', async (req, res) => {
         const customerId = invoice.customer;
         
         const user = await User.findOne({ 'subscription.stripeCustomerId': customerId });
-        if (user && user.subscription?.status !== 'grandfathered') {
+        if (!user) break;
+        
+        // GF fallback: restore grandfathered instead of expiring
+        if (user.subscription?.grandfatheredAt) {
+          user.subscription.status = 'grandfathered';
+          user.subscription.plan = 'lifetime';
+          user.isPremium = true;
+          await user.save({ validateModifiedOnly: true });
+          console.log(`❌ Payment failed for ${user.username}, restored to grandfathered`);
+        } else if (user.subscription?.status !== 'grandfathered') {
           user.subscription.status = 'expired';
           user.isPremium = false;
           await user.save({ validateModifiedOnly: true });

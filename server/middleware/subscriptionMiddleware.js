@@ -155,10 +155,12 @@ const checkAndApplyGrandfather = async (user, discordId) => {
 const expireStaleTrials = async () => {
   const now = new Date();
   
+  // Non-GF users: expire as normal
   const result = await User.updateMany(
     {
       'subscription.status': 'trial',
-      'subscription.trialEndDate': { $lt: now }
+      'subscription.trialEndDate': { $lt: now },
+      'subscription.grandfatheredAt': null
     },
     {
       $set: {
@@ -168,11 +170,31 @@ const expireStaleTrials = async () => {
     }
   );
   
+  // GF users with expired trials: fall back to grandfathered, not expired
+  const gfResult = await User.updateMany(
+    {
+      'subscription.status': 'trial',
+      'subscription.trialEndDate': { $lt: now },
+      'subscription.grandfatheredAt': { $ne: null }
+    },
+    {
+      $set: {
+        'subscription.status': 'grandfathered',
+        'subscription.plan': 'lifetime',
+        'isPremium': true
+      }
+    }
+  );
+  
+  const total = result.modifiedCount + gfResult.modifiedCount;
   if (result.modifiedCount > 0) {
     console.log(`⏰ Expired ${result.modifiedCount} stale trials`);
   }
+  if (gfResult.modifiedCount > 0) {
+    console.log(`⏰ Restored ${gfResult.modifiedCount} grandfathered users from stale trials`);
+  }
   
-  return result.modifiedCount;
+  return total;
 };
 
 // ============================================
@@ -181,10 +203,12 @@ const expireStaleTrials = async () => {
 const expireStaleCanceled = async () => {
   const now = new Date();
   
+  // Non-GF users: expire as normal
   const result = await User.updateMany(
     {
       'subscription.status': 'canceled',
-      'subscription.currentPeriodEnd': { $lt: now }
+      'subscription.currentPeriodEnd': { $lt: now },
+      'subscription.grandfatheredAt': null
     },
     {
       $set: {
@@ -194,11 +218,31 @@ const expireStaleCanceled = async () => {
     }
   );
   
+  // GF users with expired cancellations: fall back to grandfathered
+  const gfResult = await User.updateMany(
+    {
+      'subscription.status': 'canceled',
+      'subscription.currentPeriodEnd': { $lt: now },
+      'subscription.grandfatheredAt': { $ne: null }
+    },
+    {
+      $set: {
+        'subscription.status': 'grandfathered',
+        'subscription.plan': 'lifetime',
+        'isPremium': true
+      }
+    }
+  );
+  
+  const total = result.modifiedCount + gfResult.modifiedCount;
   if (result.modifiedCount > 0) {
     console.log(`⏰ Expired ${result.modifiedCount} canceled subscriptions`);
   }
+  if (gfResult.modifiedCount > 0) {
+    console.log(`⏰ Restored ${gfResult.modifiedCount} grandfathered users from canceled subscriptions`);
+  }
   
-  return result.modifiedCount;
+  return total;
 };
 
 // ============================================
@@ -236,22 +280,30 @@ const syncStripeSubscriptions = async () => {
         );
 
         if (['canceled', 'incomplete_expired', 'unpaid', 'past_due'].includes(stripeSub.status)) {
+          const isGf = !!user.subscription?.grandfatheredAt;
           await User.updateOne(
             { _id: user._id },
-            { $set: { 'subscription.status': 'expired', 'isPremium': false } }
+            { $set: isGf 
+              ? { 'subscription.status': 'grandfathered', 'subscription.plan': 'lifetime', 'isPremium': true }
+              : { 'subscription.status': 'expired', 'isPremium': false }
+            }
           );
           fixed++;
-          console.log(`🔄 Stripe sync: ${user.username} → expired (Stripe: ${stripeSub.status})`);
+          console.log(`🔄 Stripe sync: ${user.username} → ${isGf ? 'grandfathered' : 'expired'} (Stripe: ${stripeSub.status})`);
         }
         else if (stripeSub.status === 'trialing') {
           const trialEnd = new Date(stripeSub.trial_end * 1000);
           if (trialEnd < new Date()) {
+            const isGf = !!user.subscription?.grandfatheredAt;
             await User.updateOne(
               { _id: user._id },
-              { $set: { 'subscription.status': 'expired', 'isPremium': false } }
+              { $set: isGf
+                ? { 'subscription.status': 'grandfathered', 'subscription.plan': 'lifetime', 'isPremium': true }
+                : { 'subscription.status': 'expired', 'isPremium': false }
+              }
             );
             fixed++;
-            console.log(`🔄 Stripe sync: ${user.username} → expired (trial ended)`);
+            console.log(`🔄 Stripe sync: ${user.username} → ${isGf ? 'grandfathered' : 'expired'} (trial ended)`);
           } else {
             await User.updateOne(
               { _id: user._id },
@@ -263,12 +315,16 @@ const syncStripeSubscriptions = async () => {
         }
       } catch (err) {
         if (err.code === 'resource_missing') {
+          const isGf = !!user.subscription?.grandfatheredAt;
           await User.updateOne(
             { _id: user._id },
-            { $set: { 'subscription.status': 'expired', 'isPremium': false } }
+            { $set: isGf
+              ? { 'subscription.status': 'grandfathered', 'subscription.plan': 'lifetime', 'isPremium': true }
+              : { 'subscription.status': 'expired', 'isPremium': false }
+            }
           );
           fixed++;
-          console.log(`🔄 Stripe sync: ${user.username} → expired (sub not found in Stripe)`);
+          console.log(`🔄 Stripe sync: ${user.username} → ${isGf ? 'grandfathered' : 'expired'} (sub not found in Stripe)`);
         } else {
           console.error(`⚠️ Stripe sync error for ${user.username}:`, err.message);
         }

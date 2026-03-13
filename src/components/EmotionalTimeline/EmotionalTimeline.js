@@ -294,12 +294,7 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
       },
       { 
         key: 'clarity', 
-        label: 'Clarity',
-        invert: false
-      },
-      { 
-        key: 'processing', 
-        label: 'Processing',
+        label: 'Drive',
         invert: false
       }
     ];

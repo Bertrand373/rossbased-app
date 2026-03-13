@@ -1012,6 +1012,11 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                     : 'Weekly limit reached · Resets Monday'
                   }
                 </span>
+                {usage.isGrandfathered && openPlanModal && (
+                  <button className="ai-chat-upgrade-btn" onClick={() => { onClose(); openPlanModal(); }}>
+                    Unlock More Oracle Access
+                  </button>
+                )}
                 {!usage.isPremium && !usage.isGrandfathered && openPlanModal && (
                   <button className="ai-chat-upgrade-btn" onClick={() => { onClose(); openPlanModal(); }}>
                     Upgrade to Premium

@@ -117,6 +117,7 @@ export const YourPatterns = ({
   // Format metric name for display
   const formatMetric = (metric) => {
     if (metric === 'sleep') return 'sleep quality';
+    if (metric === 'workout') return 'body';
     return metric;
   };
   
@@ -178,7 +179,7 @@ export const YourPatterns = ({
         if (workoutCorr && workoutCorr.difference >= 0.8) {
           insights.push({
             type: 'correlation',
-            text: `Workout intensity boosts energy`,
+            text: `Physical state boosts energy`,
             detail: `+${workoutCorr.difference} on active days`
           });
         }
