@@ -148,47 +148,55 @@ body{
 
 /* ===== Header ===== */
 .header{
-  padding:36px 28px 0;
+  padding:28px 20px 0;
   display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:24px;
+  justify-content:center;
   opacity:0;
   animation:fadeUp 800ms ease forwards;
 }
 
 .wordmark{
-  height:20px;
+  height:18px;
   width:auto;
   object-fit:contain;
-  opacity:0.7;
+  opacity:0.55;
   filter:brightness(1.1);
 }
 
-.eye{
-  width:48px;
-  height:48px;
-  object-fit:contain;
-  opacity:0.35;
-  animation:breathe 4s ease-in-out infinite;
-}
-
-@keyframes breathe{
-  0%,100%{opacity:0.25;transform:scale(1)}
-  50%{opacity:0.5;transform:scale(1.04)}
-}
-
-/* ===== Message ===== */
+/* ===== Message — matches Oracle chat layout ===== */
 .message{
   flex:1;
-  padding:32px 28px 40px;
+  padding:24px 20px 40px;
   opacity:0;
   animation:fadeUp 800ms ease 200ms forwards;
 }
 
+.message-row{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+}
+
+.eye{
+  width:28px;
+  height:28px;
+  object-fit:contain;
+  opacity:0.5;
+  flex-shrink:0;
+  margin-top:2px;
+  animation:breathe 4s ease-in-out infinite;
+}
+
+@keyframes breathe{
+  0%,100%{opacity:0.4}
+  50%{opacity:0.65}
+}
+
 .message-inner{
-  padding-left:16px;
+  padding-left:14px;
   border-left:1px solid rgba(255,255,255,0.08);
+  flex:1;
+  min-width:0;
 }
 
 .message-inner p{
@@ -216,7 +224,7 @@ body{
 
 /* ===== Footer / CTA ===== */
 .footer{
-  padding:0 28px 36px;
+  padding:0 20px 36px;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -273,7 +281,7 @@ body{
 
 @media(prefers-reduced-motion:reduce){
   .header,.message,.footer{animation:none;opacity:1}
-  .eye{animation:none;opacity:0.35}
+  .eye{animation:none;opacity:0.5}
 }
 </style>
 </head>
@@ -282,12 +290,14 @@ body{
 <div class="card">
   <div class="header">
     <img src="${CLIENT_URL}/oracle-wordmark.png" alt="Oracle" class="wordmark">
-    <img src="${CLIENT_URL}/The_Oracle.png" alt="" class="eye">
   </div>
 
   <div class="message">
-    <div class="message-inner">
-      ${messageHtml}
+    <div class="message-row">
+      <img src="${CLIENT_URL}/The_Oracle.png" alt="" class="eye">
+      <div class="message-inner">
+        ${messageHtml}
+      </div>
     </div>
   </div>
 
