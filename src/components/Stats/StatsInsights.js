@@ -18,6 +18,12 @@ export const YourNumbers = ({
 }) => {
   const metrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
   
+  // Display names for benefit metrics (keys stay unchanged for data compatibility)
+  const metricDisplayName = {
+    energy: 'Energy', focus: 'Focus', confidence: 'Confidence',
+    aura: 'Aura', sleep: 'Sleep', workout: 'Body'
+  };
+  
   // Render trend indicator
   const renderDelta = (metric) => {
     if (!metricTrends || !metricTrends[metric]) {
@@ -64,7 +70,7 @@ export const YourNumbers = ({
               <div className="numbers-grid">
                 {metrics.map(metric => (
                   <div key={metric} className="number-item">
-                    <span className="number-label">{metric}</span>
+                    <span className="number-label">{metricDisplayName[metric] || metric}</span>
                     <span className="number-value">{getValue(metric)}</span>
                     {daysTracked >= 14 && renderDelta(metric)}
                   </div>
@@ -76,11 +82,11 @@ export const YourNumbers = ({
                 <div className="extremes-row">
                   <div className="extreme-item">
                     <span className="extreme-label">Strongest</span>
-                    <span className="extreme-value">{metricExtremes.strongest.metric}</span>
+                    <span className="extreme-value">{metricDisplayName[metricExtremes.strongest.metric] || metricExtremes.strongest.metric}</span>
                   </div>
                   <div className="extreme-item">
                     <span className="extreme-label">Growth area</span>
-                    <span className="extreme-value">{metricExtremes.growthArea.metric}</span>
+                    <span className="extreme-value">{metricDisplayName[metricExtremes.growthArea.metric] || metricExtremes.growthArea.metric}</span>
                   </div>
                 </div>
               )}
