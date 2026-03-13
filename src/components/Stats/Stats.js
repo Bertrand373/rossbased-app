@@ -19,6 +19,7 @@ import {
   YourPatterns,
   AIInsights,
   RelapseAnalytics,
+  LunarPatterns,
   PhaseContext
 } from './StatsInsights';
 
@@ -724,47 +725,13 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
               />
               
               {/* Section 5: Lunar Patterns - Shows when enough moonPhase-tagged data exists */}
-              {memoizedInsights.lunarCorrelation && (() => {
-                const lunar = getLunarData(new Date());
-                const PHASE_LABELS = {
-                  'new': 'New Moon', 'waxing-crescent': 'Waxing Crescent', 'first-quarter': 'First Quarter',
-                  'waxing-gibbous': 'Waxing Gibbous', 'full': 'Full Moon', 'waning-gibbous': 'Waning Gibbous',
-                  'last-quarter': 'Last Quarter', 'waning-crescent': 'Waning Crescent'
-                };
-                const PHASE_EMOJI = {
-                  'new': '🌑', 'waxing-crescent': '🌒', 'first-quarter': '🌓', 'waxing-gibbous': '🌔',
-                  'full': '🌕', 'waning-gibbous': '🌖', 'last-quarter': '🌗', 'waning-crescent': '🌘'
-                };
-                const sorted = Object.entries(memoizedInsights.lunarCorrelation)
-                  .sort((a, b) => parseFloat(b[1].avg) - parseFloat(a[1].avg));
-                const best = sorted[0];
-                const worst = sorted[sorted.length - 1];
-                return (
-                  <div className="analytics-card">
-                    <h3>Lunar Patterns</h3>
-                    <p className="analytics-card-sub">
-                      {PHASE_EMOJI[lunar.phase]} Currently {lunar.label} · {lunar.illumination}% illuminated
-                    </p>
-                    <div className="stat-row">
-                      <span className="stat-row-label">{PHASE_EMOJI[best[0]]} Peak phase</span>
-                      <span className="stat-row-value">{PHASE_LABELS[best[0]] || best[0]} · {best[1].avg} avg ({best[1].count} logs)</span>
-                    </div>
-                    <div className="stat-row">
-                      <span className="stat-row-label">{PHASE_EMOJI[worst[0]]} Low phase</span>
-                      <span className="stat-row-value">{PHASE_LABELS[worst[0]] || worst[0]} · {worst[1].avg} avg ({worst[1].count} logs)</span>
-                    </div>
-                    {memoizedInsights.lunarCorrelation[lunar.phase] && (
-                      <div className="stat-row">
-                        <span className="stat-row-label">📍 Current phase avg</span>
-                        <span className="stat-row-value">{memoizedInsights.lunarCorrelation[lunar.phase].avg}/10</span>
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
+              <LunarPatterns
+                lunarCorrelation={memoizedInsights.lunarCorrelation}
+                currentLunar={memoizedInsights.lunarCorrelation ? getLunarData(new Date()) : null}
+              />
             </div>
             
-            {/* Section 5: Phase Context - Styled like ET/Urge headers */}
+            {/* Section 6: Phase Context - Styled like ET/Urge headers */}
             <PhaseContext
               currentStreak={safeUserData.currentStreak}
               phaseInfo={memoizedInsights.phaseInfo}

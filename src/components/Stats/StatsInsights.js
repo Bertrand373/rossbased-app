@@ -388,7 +388,103 @@ export const RelapseAnalytics = ({
 };
 
 // ============================================================
-// SECTION 5: PHASE CONTEXT - Styled like ET/Urge headers with number
+// SECTION 5: LUNAR PATTERNS - Shows when 10+ moonPhase-tagged logs exist
+// Correlates benefit scores with lunar phases
+// ============================================================
+
+// Moon tint styles — matches Calendar/Almanac getMoonTintStyle default
+const MOON_TINT = { filter: 'grayscale(1) brightness(1.5) drop-shadow(0 0 3px rgba(200,210,220,0.35))' };
+
+const PHASE_LABELS = {
+  'new': 'New Moon', 'waxing-crescent': 'Waxing Crescent', 'first-quarter': 'First Quarter',
+  'waxing-gibbous': 'Waxing Gibbous', 'full': 'Full Moon', 'waning-gibbous': 'Waning Gibbous',
+  'last-quarter': 'Last Quarter', 'waning-crescent': 'Waning Crescent'
+};
+
+const PHASE_EMOJI = {
+  'new': '🌑', 'waxing-crescent': '🌒', 'first-quarter': '🌓', 'waxing-gibbous': '🌔',
+  'full': '🌕', 'waning-gibbous': '🌖', 'last-quarter': '🌗', 'waning-crescent': '🌘'
+};
+
+// Tinted moon — matches Calendar MoonIcon rendering
+const LunarMoon = ({ phase, size = 14 }) => (
+  <span 
+    className="stats-moon-icon" 
+    style={{ fontSize: `${size}px`, lineHeight: 1, ...MOON_TINT }}
+    role="img" 
+    aria-label={phase}
+  >
+    {PHASE_EMOJI[phase] || '🌕'}
+  </span>
+);
+
+export const LunarPatterns = ({ lunarCorrelation, currentLunar }) => {
+  if (!lunarCorrelation) return null;
+  
+  const sorted = Object.entries(lunarCorrelation)
+    .sort((a, b) => parseFloat(b[1].avg) - parseFloat(a[1].avg));
+  
+  if (sorted.length < 2) return null;
+  
+  const best = sorted[0];
+  const worst = sorted[sorted.length - 1];
+  
+  return (
+    <div className="insight-card">
+      <div className="insight-card-header">
+        <span>Lunar Patterns</span>
+      </div>
+      <div className="insight-card-content">
+        {/* Current phase indicator */}
+        {currentLunar && (
+          <div className="lunar-current-phase">
+            <LunarMoon phase={currentLunar.phase} size={18} />
+            <span className="lunar-current-label">
+              {currentLunar.label} · {currentLunar.illumination}%
+            </span>
+          </div>
+        )}
+        
+        <div className="relapse-stats">
+          <div className="relapse-stat-row">
+            <span className="relapse-stat-label">
+              <LunarMoon phase={best[0]} size={13} />
+              <span className="lunar-row-text">Peak phase</span>
+            </span>
+            <span className="relapse-stat-value">
+              {PHASE_LABELS[best[0]]} · {best[1].avg}
+            </span>
+          </div>
+          
+          <div className="relapse-stat-row">
+            <span className="relapse-stat-label">
+              <LunarMoon phase={worst[0]} size={13} />
+              <span className="lunar-row-text">Low phase</span>
+            </span>
+            <span className="relapse-stat-value">
+              {PHASE_LABELS[worst[0]]} · {worst[1].avg}
+            </span>
+          </div>
+          
+          {currentLunar && lunarCorrelation[currentLunar.phase] && (
+            <div className="relapse-stat-row">
+              <span className="relapse-stat-label">
+                <LunarMoon phase={currentLunar.phase} size={13} />
+                <span className="lunar-row-text">Current avg</span>
+              </span>
+              <span className="relapse-stat-value">
+                {lunarCorrelation[currentLunar.phase].avg}/10
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// SECTION 6: PHASE CONTEXT - Styled like ET/Urge headers with number
 // ============================================================
 export const PhaseContext = ({ 
   currentStreak, 
@@ -446,6 +542,7 @@ export default {
   YourPatterns,
   AIInsights,
   RelapseAnalytics,
+  LunarPatterns,
   PhaseContext,
   InsightLoadingState
 };
