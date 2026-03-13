@@ -1650,14 +1650,6 @@ async function buildDailyBriefing() {
     desc += `\n✅ All systems healthy`;
   }
 
-  // Lunar awareness
-  try {
-    const lunar = require('./utils/lunarData').getLunarData();
-    desc += `\n\n**🌙 Lunar**\n${lunar.emoji} ${lunar.label} · ${lunar.illumination}% · Day ${lunar.cycleDay}/${lunar.cycleTotal}`;
-    if (lunar.nextPhase) desc += ` · ${lunar.nextPhase.label} in ${lunar.nextPhase.daysUntil}d`;
-    if (lunar.specialEvent) desc += `\n✨ ${lunar.specialEvent.name}`;
-  } catch {}
-
   return new EmbedBuilder()
     .setColor(warnings.length > 0 ? 0xEF4444 : ORACLE_COLOR)
     .setTitle(`☀️ Daily Briefing — ${dateStr}`)
@@ -1679,8 +1671,8 @@ async function dmBriefing(message) {
 // in Ross's voice → DMs it ready to paste into Kit
 // ============================================================
 
-const WEEKLY_EMAIL_HOUR_ET = parseInt(process.env.WEEKLY_EMAIL_HOUR || '10'); // 10am ET Monday default
-const WEEKLY_EMAIL_DAY = parseInt(process.env.WEEKLY_EMAIL_DAY || '1'); // 1=Monday
+const WEEKLY_EMAIL_HOUR_ET = parseInt(process.env.WEEKLY_EMAIL_HOUR || '11'); // 11am ET Friday default
+const WEEKLY_EMAIL_DAY = parseInt(process.env.WEEKLY_EMAIL_DAY || '5'); // 5=Friday
 
 async function gatherEmailIntelligence() {
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -1774,14 +1766,7 @@ async function buildWeeklyEmailDraft() {
   // Lunar
   if (intel.lunar?.label) {
     dataBlock += `LUNAR PHASE: ${intel.lunar.label} (${intel.lunar.illumination || '?'}% illuminated)\n`;
-    dataBlock += `Energy: ${intel.lunar.energy || 'N/A'}\n`;
-    if (intel.lunar.nextPhase) {
-      dataBlock += `Next phase: ${intel.lunar.nextPhase.label} in ${intel.lunar.nextPhase.daysUntil} days\n`;
-    }
-    if (intel.lunar.specialEvent) {
-      dataBlock += `Special event: ${intel.lunar.specialEvent.name}\n`;
-    }
-    dataBlock += '\n';
+    dataBlock += `Energy: ${intel.lunar.energy || 'N/A'}\n\n`;
   }
 
   // Streak distribution
@@ -1827,16 +1812,30 @@ async function buildWeeklyEmailDraft() {
   // Call Sonnet to write the email
   const emailPrompt = `You are ghostwriting a weekly email for Ross, the creator of TitanTrack (a semen retention tracking app) and author of "The Protocol" ebook. This email goes to his full subscriber list (1,300+ people).
 
-Ross's voice: Direct, no-fluff, speaks from 7+ years of personal retention experience (2,500+ day streak). Uses short sentences. Doesn't lecture. Talks like a guy who's been through it and is reporting back from the other side. Never uses em dashes. Never opens with "Hey" or "Hope you're doing well." Never closes with generic motivation. References real community data naturally without making it sound clinical.
+Ross's voice rules (these are NON-NEGOTIABLE):
+- Opens with a HOOK. Never "Hey" or "Hope you're doing well." Hit them with something specific and confrontational right away. A question, a challenge, a bold claim.
+- Short punchy sentences. "Yea. It can get crazy. It probably will." That rhythm.
+- Uses "brother" or "my friend" naturally (not every email, but when it fits).
+- Uses ... (ellipsis) for pauses. NEVER em dashes. NEVER.
+- Uses CAPS for emphasis on key phrases. Not constantly, but when something needs to HIT.
+- Casual grammar is intentional. "Its" not "It's" sometimes. "Im" not "I'm" sometimes. This is a guy texting you truth, not writing an essay.
+- References frequency, energy, vibration, aura naturally because that's how he sees the world.
+- Self-aware humor. Can joke about himself or the absurdity of things.
+- Rhetorical questions that challenge: "What are the chances that...? Yea..."
+- Zero filler. His biggest pet peeve is unnecessary filler. Every sentence earns its place or it gets cut.
+- Signs off as "-Ross"
+- Speaks from 7+ years of personal retention experience (2,500+ day streak). Reports back from the other side, doesn't lecture from above.
 
-PURPOSE: Value-first weekly transmission. Not a sales email. This rebuilds domain reputation by delivering genuine content. Include ONE natural CTA at the end, either toward TitanTrack (titantrack.app) or The Protocol (rossbased.com/protocol) depending on what fits the week's theme. The CTA should feel like a natural extension of the content, not a pivot to sales.
+PURPOSE: Value-first weekly transmission that rebuilds domain reputation. These subscribers were promised they'd only hear from Ross about new content and products. This IS new content... live observations from the TitanTrack community powered by Oracle's intelligence.
+
+PRODUCT MENTIONS: The email body is 100% value content. Ross has a persistent footer in Kit with links to titantrack.app and The Protocol — you do NOT need to include links or CTAs in the email body. When the week's data naturally connects to something Protocol covers (urges trending? wet dreams spiking?), you can reference it as useful context: "this is exactly what Chapter 7 was built for" — but never make Protocol the POINT of the email. TitanTrack/Oracle get referenced naturally when the data involves them, which it usually will since that's where the data comes from. The distinction: describing what Oracle observed IS content. Saying "go sign up for TitanTrack" is a pitch. Do the first, never the second.
 
 STRUCTURE:
 - Subject line (compelling, 5-8 words, no clickbait)
 - Opening line that hooks immediately (reference something specific from the data)
 - 2-3 short paragraphs covering the week's real patterns, insights, or observations
-- Close with the single CTA
-- Sign off as "-Ross"
+- Close with a thought that sits with them... something they'll think about over the weekend
+- Sign off as "-Ross" (Kit footer with product links appears automatically below this)
 
 Total length: 150-250 words. Tight. Every sentence earns its place.
 
@@ -1888,25 +1887,28 @@ async function dmEmail(message) {
 
     await message.channel.send({ embeds: [intelEmbed] });
 
-    // DM 2: The actual email draft (plain text, ready to copy-paste)
-    // Split into chunks if needed (Discord 2000 char limit)
-    const draftHeader = '**📧 Ready-to-Send Email Draft**\nCopy everything below the line into Kit:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
-    const fullDraft = `${draftHeader}\n\n${draft}`;
+    // DM 2: The actual email draft as PLAIN TEXT (not embed) so Ross can copy it
+    const draftHeader = '📧 **Ready-to-Send Email Draft**\nCopy everything below the line into Kit:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
 
-    // Discord embed description limit is 4096, plain message limit is 2000
-    // Use embed for the draft so we get more room
-    const draftEmbed = new EmbedBuilder()
-      .setColor(0x22C55E)
-      .setTitle('📧 Weekly Email Draft')
-      .setDescription(`Copy everything below into Kit as a broadcast:\n\n${draft.substring(0, 3900)}`)
-      .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
-      .setTimestamp();
+    // Discord plain message limit is 2000 chars — chunk if needed
+    const fullDraft = draftHeader + draft;
+    const chunks = [];
+    let remaining = fullDraft;
+    while (remaining.length > 0) {
+      if (remaining.length <= 2000) {
+        chunks.push(remaining);
+        break;
+      }
+      // Find a good break point near 1900 chars
+      let splitAt = remaining.lastIndexOf('\n\n', 1900);
+      if (splitAt < 500) splitAt = remaining.lastIndexOf('\n', 1900);
+      if (splitAt < 500) splitAt = 1900;
+      chunks.push(remaining.substring(0, splitAt));
+      remaining = remaining.substring(splitAt).trimStart();
+    }
 
-    await message.channel.send({ embeds: [draftEmbed] });
-
-    // If draft is very long, send overflow as plain text
-    if (draft.length > 3900) {
-      await message.channel.send(draft.substring(3900));
+    for (const chunk of chunks) {
+      await message.channel.send(chunk);
     }
 
   } catch (err) {
@@ -2849,7 +2851,7 @@ client.once('ready', () => {
   }, 60 * 60 * 1000); // Check every hour
 
   // ============================================================
-  // WEEKLY EMAIL DRAFT — DM Ross every Monday with ready-to-send email
+  // WEEKLY EMAIL DRAFT — DM Ross every Friday with ready-to-send email
   // Oracle synthesizes all intelligence → writes email in Ross's voice
   // ============================================================
 
@@ -2892,25 +2894,26 @@ client.once('ready', () => {
       await admin.send({ embeds: [
         new EmbedBuilder()
           .setColor(ORACLE_COLOR)
-          .setTitle('🔮 Monday Email Intelligence')
+          .setTitle('🔮 Friday Email Intelligence')
           .setDescription(intelSummary)
           .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
           .setTimestamp()
       ]});
 
-      // Send the draft
-      await admin.send({ embeds: [
-        new EmbedBuilder()
-          .setColor(0x22C55E)
-          .setTitle('📧 Weekly Email Draft — Ready to Send')
-          .setDescription(`Copy into Kit as a broadcast:\n\n${draft.substring(0, 3900)}`)
-          .setFooter({ text: `Oracle · ${ADMIN_DM_FOOTER}`, iconURL: ORACLE_ICON })
-          .setTimestamp()
-      ]});
-
-      if (draft.length > 3900) {
-        await admin.send(draft.substring(3900));
+      // Send the draft as PLAIN TEXT (not embed) so Ross can copy it
+      const draftHeader = '📧 **Weekly Email Draft — Ready to Send**\nCopy everything below the line into Kit:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+      const fullDraft = draftHeader + draft;
+      const chunks = [];
+      let remaining = fullDraft;
+      while (remaining.length > 0) {
+        if (remaining.length <= 2000) { chunks.push(remaining); break; }
+        let splitAt = remaining.lastIndexOf('\n\n', 1900);
+        if (splitAt < 500) splitAt = remaining.lastIndexOf('\n', 1900);
+        if (splitAt < 500) splitAt = 1900;
+        chunks.push(remaining.substring(0, splitAt));
+        remaining = remaining.substring(splitAt).trimStart();
       }
+      for (const chunk of chunks) { await admin.send(chunk); }
 
       console.log('[Email] Weekly email draft sent to admin');
     } catch (err) {
