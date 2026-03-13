@@ -477,48 +477,6 @@
 }
 
 /* ============================================================
-   LUNAR PATTERNS - Tinted moons matching Calendar/Almanac
-   ============================================================ */
-
-.lunar-current-phase {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.lunar-current-label {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-.stats-moon-icon {
-  display: inline-flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-/* Fixed-width moon column — aligns all labels to same start position */
-.lunar-moon-cell {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  flex-shrink: 0;
-}
-
-.lunar-row-text {
-  margin-left: 8px;
-}
-
-/* Override relapse-stat-label to support inline moon + text */
-.relapse-stat-row .relapse-stat-label:has(.stats-moon-icon) {
-  display: flex;
-  align-items: center;
-}
-
-/* ============================================================
    ANALYTICS STACK CONTAINER
    ============================================================ */
 
