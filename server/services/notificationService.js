@@ -113,13 +113,14 @@ async function shouldSendNotification(username, notificationType) {
       'streak': 'milestones',
       'daily': 'dailyReminder',
       'morning': 'dailyReminder',
-      'motivational': 'weeklyProgress'
+      'motivational': 'weeklyProgress',
+      'lunar': 'dailyReminder'
     };
     
     const prefKey = typeMapping[typeCategory];
     
-    // Special handling for daily reminder and morning awareness - check if specifically enabled
-    if (typeCategory === 'daily' || typeCategory === 'morning') {
+    // Special handling for daily reminder, morning awareness, and lunar — check if specifically enabled
+    if (typeCategory === 'daily' || typeCategory === 'morning' || typeCategory === 'lunar') {
       if (!prefs.dailyReminderEnabled) {
         console.log(`⏸️ Daily reminders disabled for ${username}`);
         return false;
@@ -174,7 +175,7 @@ const notificationTemplates = {
   // MORNING AWARENESS (7 AM — streak awareness, not a log prompt)
   morning_awareness: {
     title: 'Day {streakDay}',
-    body: 'Stay locked in.',
+    body: '{lunarPhase}',
     data: { url: '/', type: 'morning_awareness' }
   },
   
@@ -302,6 +303,18 @@ const notificationTemplates = {
     title: 'Oracle',
     body: 'Oracle has a transmission for you.',
     data: { url: '/oracle', type: 'oracle_transmission', icon: '/The_Oracle.png' }
+  },
+
+  // LUNAR PHASE NOTIFICATIONS - Full Moon & New Moon awareness
+  lunar_full_moon: {
+    title: 'Full Moon',
+    body: 'Peak lunar energy tonight. Channel it.',
+    data: { url: '/calendar', type: 'lunar_phase' }
+  },
+  lunar_new_moon: {
+    title: 'New Moon',
+    body: 'New moon. Set your intentions.',
+    data: { url: '/calendar', type: 'lunar_phase' }
   }
 };
 

@@ -275,11 +275,11 @@ function scheduleMorningAwareness() {
       });
       
       // Compute lunar once per hourly tick, not per-user
-      let lunarLabel = '';
+      let morningBody = 'Stay locked in.';
       try {
         const { getLunarData } = require('../utils/lunarData');
         const lunar = getLunarData();
-        lunarLabel = `${lunar.emoji} ${lunar.label}`;
+        morningBody = `${lunar.emoji} ${lunar.label} · Stay locked in.`;
       } catch {}
       
       let sentCount = 0;
@@ -293,7 +293,7 @@ function scheduleMorningAwareness() {
           const streak = user.currentStreak || 1;
           const result = await sendNotificationToUser(user.username, 'morning_awareness', {
             streakDay: streak.toString(),
-            lunarPhase: lunarLabel
+            lunarPhase: morningBody
           });
           if (result.success) {
             sentCount++;
