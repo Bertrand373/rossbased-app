@@ -152,7 +152,7 @@ body{
   padding:20px 20px 16px;
   display:flex;
   justify-content:center;
-  background:rgba(10,10,12,0.7);
+  background:rgba(10,10,12,0.96);
   backdrop-filter:blur(20px) saturate(1.2);
   -webkit-backdrop-filter:blur(20px) saturate(1.2);
   border-bottom:1px solid rgba(255,255,255,0.04);
@@ -173,9 +173,9 @@ body{
   position:sticky;
   top:57px;
   z-index:5;
-  height:20px;
-  margin-bottom:-20px;
-  background:linear-gradient(to bottom, rgba(10,10,12,0.9), transparent);
+  height:24px;
+  margin-bottom:-24px;
+  background:linear-gradient(to bottom, rgba(10,10,12,1), transparent);
   pointer-events:none;
 }
 
@@ -310,11 +310,11 @@ body{
 /* Desktop refinements */
 @media(min-width:481px){
   .header{
-    background:rgba(20,20,22,0.75);
+    background:rgba(18,18,20,0.97);
     border-radius:20px 20px 0 0;
   }
   .scroll-fade-top{
-    background:linear-gradient(to bottom, rgba(16,16,18,0.9), transparent);
+    background:linear-gradient(to bottom, rgba(16,16,18,1), transparent);
   }
   .scroll-fade-bottom{
     background:linear-gradient(to top, rgba(12,12,14,0.95), transparent);
