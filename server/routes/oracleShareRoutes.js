@@ -144,7 +144,7 @@ body{
   }
 }
 
-/* ===== Header — sticky with glass blur ===== */
+/* ===== Header — sticky with built-in scroll fade ===== */
 .header{
   position:sticky;
   top:0;
@@ -152,12 +152,21 @@ body{
   padding:20px 20px 16px;
   display:flex;
   justify-content:center;
-  background:rgba(10,10,12,0.96);
-  backdrop-filter:blur(20px) saturate(1.2);
-  -webkit-backdrop-filter:blur(20px) saturate(1.2);
-  border-bottom:1px solid rgba(255,255,255,0.04);
+  background:#0a0a0c;
+  border-bottom:none;
   opacity:0;
   animation:fadeUp 800ms ease forwards;
+}
+
+.header::after{
+  content:'';
+  position:absolute;
+  top:100%;
+  left:0;
+  right:0;
+  height:32px;
+  background:linear-gradient(to bottom, #0a0a0c, transparent);
+  pointer-events:none;
 }
 
 .wordmark{
@@ -166,17 +175,6 @@ body{
   object-fit:contain;
   opacity:0.55;
   filter:brightness(1.1);
-}
-
-/* Scroll fade — under sticky header */
-.scroll-fade-top{
-  position:sticky;
-  top:57px;
-  z-index:5;
-  height:24px;
-  margin-bottom:-24px;
-  background:linear-gradient(to bottom, rgba(10,10,12,1), transparent);
-  pointer-events:none;
 }
 
 .scroll-fade-bottom{
@@ -310,11 +308,11 @@ body{
 /* Desktop refinements */
 @media(min-width:481px){
   .header{
-    background:rgba(18,18,20,0.97);
+    background:#121214;
     border-radius:20px 20px 0 0;
   }
-  .scroll-fade-top{
-    background:linear-gradient(to bottom, rgba(16,16,18,1), transparent);
+  .header::after{
+    background:linear-gradient(to bottom, #121214, transparent);
   }
   .scroll-fade-bottom{
     background:linear-gradient(to top, rgba(12,12,14,0.95), transparent);
@@ -333,8 +331,6 @@ body{
   <div class="header">
     <img src="${CLIENT_URL}/oracle-wordmark.png" alt="Oracle" class="wordmark">
   </div>
-
-  <div class="scroll-fade-top"></div>
 
   <div class="message">
     <div class="message-row">
