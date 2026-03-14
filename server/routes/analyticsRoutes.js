@@ -267,13 +267,13 @@ router.get('/retention', adminCheck, async (req, res) => {
 // GET /api/analytics/users
 router.get('/users', adminCheck, async (req, res) => {
   try {
-    const { sort = 'recent', limit = 50 } = req.query;
+    const { sort = 'recent', limit = 500 } = req.query;
     let sortObj = { createdAt: -1 };
     if (sort === 'streak') sortObj = { currentStreak: -1 };
     if (sort === 'active') sortObj = { lastSeen: -1 };
 
     const users = await User.find({},
-      'username email currentStreak startDate longestStreak relapseCount isPremium subscription.status subscription.trialEndDate subscription.currentPeriodEnd createdAt updatedAt lastSeen benefitTracking urgeLog aiUsage showOnLeaderboard discordUsername'
+      'username email currentStreak startDate longestStreak relapseCount isPremium subscription.status subscription.trialEndDate subscription.currentPeriodEnd subscription.grandfatheredAt subscription.stripeSubscriptionId createdAt updatedAt lastSeen benefitTracking urgeLog aiUsage showOnLeaderboard discordUsername'
     ).sort(sortObj).limit(parseInt(limit)).lean();
 
     res.json({
@@ -296,6 +296,7 @@ router.get('/users', adminCheck, async (req, res) => {
           return false;
         })(),
         subStatus: u.subscription?.status || 'none',
+        isOG: !!u.subscription?.grandfatheredAt,
         totalLogs: u.benefitTracking?.length || 0, totalUrges: u.urgeLog?.length || 0,
         aiMessages: u.aiUsage?.lifetimeCount || 0,
         leaderboard: u.showOnLeaderboard || false, discord: u.discordUsername || '',

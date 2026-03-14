@@ -6,7 +6,7 @@ const express = require('express');
 const router = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-// Admin check — same pattern as analyticsRoutes.js
+// Admin check — FIXED: exact match only (was startsWith which is a security hole)
 const adminCheck = (req, res, next) => {
   const username = req.user?.username || '';
   const lower = username.toLowerCase();
@@ -15,7 +15,7 @@ const adminCheck = (req, res, next) => {
     const allowed = envAdmins.split(',').map(u => u.trim().toLowerCase());
     if (allowed.includes(lower)) return next();
   }
-  if (lower.startsWith('ross')) return next();
+  if (lower === 'rossbased' || lower === 'ross') return next();
   return res.status(403).json({ error: 'Admin access required' });
 };
 
@@ -93,11 +93,17 @@ router.get('/revenue', adminCheck, async (req, res) => {
       }));
 
     // 5. Canceled in last 30 days
-    const canceledRecent = await stripe.subscriptions.list({ 
+    // FIXED: Filter by canceled_at timestamp, not created timestamp.
+    // Stripe API doesn't support filtering by canceled_at directly,
+    // so we fetch recent canceled subs and filter server-side.
+    const thirtyDaysAgoTs = Math.floor(Date.now() / 1000) - 30 * 24 * 60 * 60;
+    const allCanceled = await stripe.subscriptions.list({ 
       status: 'canceled', 
-      limit: 100,
-      created: { gte: Math.floor(Date.now() / 1000) - 30 * 24 * 60 * 60 }
+      limit: 100
     });
+    const canceledLast30d = allCanceled.data.filter(
+      s => s.canceled_at && s.canceled_at >= thirtyDaysAgoTs
+    );
 
     res.json({
       balance: {
@@ -109,7 +115,7 @@ router.get('/revenue', adminCheck, async (req, res) => {
       subscribers: {
         active: activeSubs.length,
         trialing: trialingSubs.data.length,
-        canceledLast30d: canceledRecent.data.length,
+        canceledLast30d: canceledLast30d.length,
       },
       recentCharges,
       failedPayments: failed,
@@ -153,12 +159,13 @@ router.get('/revenue/subscribers/:status', adminCheck, async (req, res) => {
       const batch = await stripe.subscriptions.list({ status: 'trialing', limit: 100 });
       stripeSubs = batch.data;
     } else if (status === 'canceled') {
+      // FIXED: Filter by canceled_at, not created
       const batch = await stripe.subscriptions.list({
         status: 'canceled',
-        limit: 100,
-        created: { gte: Math.floor(Date.now() / 1000) - 30 * 24 * 60 * 60 }
+        limit: 100
       });
-      stripeSubs = batch.data;
+      const thirtyDaysAgoTs = Math.floor(Date.now() / 1000) - 30 * 24 * 60 * 60;
+      stripeSubs = batch.data.filter(s => s.canceled_at && s.canceled_at >= thirtyDaysAgoTs);
     } else {
       return res.status(400).json({ error: 'Invalid status. Use: active, trialing, canceled' });
     }
@@ -183,12 +190,15 @@ router.get('/revenue/subscribers/:status', adminCheck, async (req, res) => {
         dbUser = await User.findOne({ 'subscription.stripeCustomerId': customerId }).select('username email').lean();
       }
 
-      const priceInterval = sub.items?.data?.[0]?.price?.recurring?.interval;
+      const priceItem = sub.items?.data?.[0]?.price;
+      const priceInterval = priceItem?.recurring?.interval;
+      const priceAmount = priceItem?.unit_amount || 0; // in cents
 
       subscribers.push({
         username: dbUser?.username || username || '—',
         email: dbUser?.email || email,
         plan: priceInterval === 'year' ? 'yearly' : priceInterval === 'month' ? 'monthly' : '—',
+        amount: priceAmount, // NEW: price in cents ($800 = $8, $1700 = $17, etc.)
         trialEnd: sub.trial_end ? new Date(sub.trial_end * 1000).toISOString() : null,
         periodEnd: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
         canceledAt: sub.canceled_at ? new Date(sub.canceled_at * 1000).toISOString() : null,
