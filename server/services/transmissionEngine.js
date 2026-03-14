@@ -264,12 +264,14 @@ async function processAggregateTransmissions(targetUsername) {
     const response = await anthropic.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 400,
-      system: `You generate proactive Oracle transmissions for a semen retention community. Based on aggregate data, identify 1-2 user cohorts that would benefit from a message right now and write the message.
+      system: `You are Oracle, a predictive AI guide speaking directly TO one individual semen retention practitioner. Based on aggregate community data, identify 1-2 user cohorts that would benefit from a message right now and write the message.
 
-Rules:
+CRITICAL RULES:
+- You are speaking TO the user, not ABOUT the community. NEVER say "your X members" or reference member counts or community size. The user is a practitioner, not a leader.
 - Each message is 2-4 sentences, Oracle's voice: calm certainty, pattern-based, no generic motivation
-- Start with the pattern observation, not a greeting
-- Reference specific data (day ranges, lunar phase, community patterns)
+- Start with a pattern observation relevant to THEIR streak day range, not a greeting
+- You may reference community patterns indirectly ("practitioners at your stage" or "the data at this phase shows") but NEVER expose raw numbers or statistics from the data provided
+- Reference lunar phase naturally if relevant
 - No em dashes, no emojis, no "Stay strong" endings
 - Under 80 words per message
 
@@ -359,9 +361,10 @@ async function processReengagement(targetUsername) {
 
     // Find users with streaks who haven't logged benefits recently
     // Re-engagement is premium/OG only (proactive feature)
+    // FIXED: Filter by startDate age instead of stale currentStreak field
+    const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
     const quietUsers = await User.find({
-      startDate: { $exists: true, $ne: null },
-      currentStreak: { $gte: 5 }, // Only target users who had some traction
+      startDate: { $exists: true, $ne: null, $lte: fiveDaysAgo }, // Streak is at least 5 days old
     })
       .select('_id username currentStreak startDate isPremium discordId createdAt benefitTracking')
       .lean();
@@ -391,26 +394,44 @@ async function processReengagement(targetUsername) {
         ? Math.floor((Date.now() - new Date(lastLog.date).getTime()) / (1000 * 60 * 60 * 24))
         : accountAgeDays; // Cap at account age, not 999
       const actualStreakDay = getActualStreakDay(user);
-      const silenceContext = hasBenefitData
-        ? `Last benefit log was ${daysSilent} days ago.`
-        : `No benefit data on file. Account created ${accountAgeDays} days ago.`;
 
       // Haiku-generated re-engagement — personalized, Oracle-voiced
       let message;
       try {
+        // FIXED: Different prompts for "stopped logging" vs "never logged"
+        const systemPrompt = hasBenefitData
+          ? `You are Oracle, a predictive AI guide for semen retention practitioners. A user who previously logged data has stopped. Write a brief re-engagement message (2-3 sentences).
+
+CRITICAL ACCURACY RULES:
+- Their CURRENT streak is Day ${actualStreakDay} (computed from their start date, this is accurate right now)
+- Their last benefit log was ${daysSilent} days ago (this is when they stopped logging, NOT when their streak started)
+- These are TWO SEPARATE facts. Do NOT conflate them. Do NOT say they "went dark on Day X" unless X equals their streak day minus their silence days.
+- Frame it as Oracle losing data visibility, not the user failing
+- Be direct and factual. No em dashes. No emojis. No generic motivation. Under 60 words.`
+          : `You are Oracle, a predictive AI guide for semen retention practitioners. A user has an active streak but has NEVER logged any benefit data. Write a brief message (2-3 sentences).
+
+CRITICAL ACCURACY RULES:
+- Their CURRENT streak is Day ${actualStreakDay} (this is accurate right now)
+- They have never submitted a single benefit log since creating their account ${accountAgeDays} days ago
+- Frame this as Oracle having zero data to work with, not as the user going silent. They never started.
+- Encourage them to log their first entry so Oracle can begin tracking patterns
+- Be direct and factual. No em dashes. No emojis. No generic motivation. Under 60 words.`;
+
         const reResponse = await anthropic.messages.create({
           model: 'claude-haiku-4-5-20251001',
           max_tokens: 100,
-          system: `You are Oracle, a predictive AI guide for semen retention practitioners. A user has gone quiet. Write a brief re-engagement message (2-3 sentences). Be direct and factual. Reference their specific silence duration and streak day. Frame it as Oracle losing data visibility, not the user failing. No em dashes. No emojis. No generic motivation. Under 60 words.`,
+          system: systemPrompt,
           messages: [{
             role: 'user',
-            content: `User: ${user.username}, Day ${actualStreakDay}, silent for ${daysSilent} days. ${silenceContext}`
+            content: `User: ${user.username}`
           }]
         });
         message = reResponse.content[0]?.text?.trim();
       } catch (aiErr) {
         // Fallback if Haiku fails
-        message = `${daysSilent} days without a check-in. Day ${actualStreakDay} of your streak is still running. The data gap means Oracle is flying blind on your patterns. One log today restores full visibility.`;
+        message = hasBenefitData
+          ? `${daysSilent} days since your last check-in. Your streak is at Day ${actualStreakDay} but Oracle has no recent data to analyze. One log today restores full pattern visibility.`
+          : `Day ${actualStreakDay} of your streak and Oracle has zero benefit data on file. One log unlocks pattern tracking for your entire journey so far.`;
       }
 
       await deliverTransmission(user._id, user.username, message, 'reengagement', {
