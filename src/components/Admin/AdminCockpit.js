@@ -970,10 +970,10 @@ const AdminCockpit = () => {
                       <td>{u.aiMessages}</td>
                       <td><span className={`ac-sub-badge ${u.subStatus}`}>{
                         u.subStatus === 'grandfathered' ? 'OG' :
-                        u.subStatus === 'active' ? 'PRO' :
-                        u.subStatus === 'trial' ? 'TRIAL' :
-                        u.subStatus === 'canceled' ? 'END' :
-                        u.subStatus === 'expired' ? 'EXP' : '—'
+                        u.subStatus === 'active' ? (u.isOG ? 'OG·PRO' : 'PRO') :
+                        u.subStatus === 'trial' ? (u.isOG ? 'OG·TRIAL' : 'TRIAL') :
+                        u.subStatus === 'canceled' ? (u.isOG ? 'OG·END' : 'END') :
+                        u.subStatus === 'expired' ? (u.isOG ? 'OG' : 'EXP') : '—'
                       }</span></td>
                       <td className="ac-dim">{formatDate(u.joinedAt)}</td>
                       <td className="ac-dim">{(() => {

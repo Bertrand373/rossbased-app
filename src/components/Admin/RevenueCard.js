@@ -205,7 +205,7 @@ const RevenueCard = () => {
                       {s.trialEnd && <span className="rv-drilldown-date">trial ends {fmtShortDate(s.trialEnd)}</span>}
                       {s.periodEnd && !s.trialEnd && <span className="rv-drilldown-date">ends {fmtShortDate(s.periodEnd)}</span>}
                       {s.canceledAt && <span className="rv-drilldown-date">canceled {fmtShortDate(s.canceledAt)}</span>}
-                      <span className="rv-drilldown-plan">{s.plan || '—'}</span>
+                      <span className="rv-drilldown-plan">{s.amount ? `$${(s.amount / 100).toFixed(0)}` : ''}{s.amount ? '/' : ''}{s.plan === 'monthly' ? 'mo' : s.plan === 'yearly' ? 'yr' : s.plan || '—'}</span>
                     </div>
                   </div>
                 ))}
