@@ -937,7 +937,7 @@ const AdminCockpit = () => {
       {/* ===== USERS ===== */}
       {tab === 'users' && users && (
         <div className="ac-section">
-          <div className="ac-card">
+          <div className="ac-card ac-users-card">
             <div className="ac-users-head">
               <h3>{userSearch ? `${sortedUsers.length} of ${users.total}` : `${users.total} Users`}</h3>
               <div className="ac-users-search-wrap">
@@ -945,47 +945,50 @@ const AdminCockpit = () => {
                 {userSearch && <button className="ac-users-clear" onClick={() => setUserSearch('')}>×</button>}
               </div>
             </div>
-            <div className="ac-table-wrap">
-              <table className="ac-table">
-                <thead><tr>
-                  {[
-                    { id: 'user', label: 'User' },
-                    { id: 'streak', label: 'Streak' },
-                    { id: 'logs', label: 'Logs' },
-                    { id: 'ai', label: 'AI' },
-                    { id: 'sub', label: 'Sub', noSort: true },
-                    { id: 'joined', label: 'Joined' },
-                    { id: 'active', label: 'Active' },
-                  ].map(col => (
-                    <th key={col.id} className={col.noSort ? '' : 'ac-th-sort'} onClick={() => !col.noSort && handleColSort(col.id)}>
-                      {col.label}{sortCol === col.id ? (sortDir === 'desc' ? ' ↓' : ' ↑') : ''}
-                    </th>
-                  ))}
-                </tr></thead>
-                <tbody>
-                  {sortedUsers.map((u, i) => (
-                    <tr key={i}>
-                      <td><span className="ac-uname">{u.username}</span>{u.discord && <span className="ac-udiscord">{u.discord}</span>}</td>
-                      <td><span className="ac-streak-pill">{u.currentStreak}d</span></td>
-                      <td>{u.totalLogs}</td>
-                      <td>{u.aiMessages}</td>
-                      <td><span className={`ac-sub-badge ${u.subStatus}`}>{
-                        u.subStatus === 'grandfathered' ? 'OG' :
-                        u.subStatus === 'active' ? (u.isOG ? 'OG·PRO' : 'PRO') :
-                        u.subStatus === 'trial' ? (u.isOG ? 'OG·TRIAL' : 'TRIAL') :
-                        u.subStatus === 'canceled' ? (u.isOG ? 'OG·END' : 'END') :
-                        u.subStatus === 'expired' ? (u.isOG ? 'OG' : 'EXP') : '—'
-                      }</span></td>
-                      <td className="ac-dim">{formatDate(u.joinedAt)}</td>
-                      <td className="ac-dim">{(() => {
-                        const ago = timeAgo(u.lastActive);
-                        const isOnline = u.lastActive && (Date.now() - new Date(u.lastActive).getTime()) < 10 * 60 * 1000;
-                        return isOnline ? <span className="ac-online-badge">now</span> : ago;
-                      })()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            {/* Sort controls */}
+            <div className="ac-sort-row">
+              {[
+                { id: 'active', label: 'Active' },
+                { id: 'streak', label: 'Streak' },
+                { id: 'ai', label: 'AI' },
+                { id: 'logs', label: 'Logs' },
+                { id: 'joined', label: 'Joined' },
+                { id: 'user', label: 'Name' },
+              ].map(col => (
+                <button key={col.id} className={`ac-sort-pill ${sortCol === col.id ? 'active' : ''}`} onClick={() => handleColSort(col.id)}>
+                  {col.label}{sortCol === col.id ? (sortDir === 'desc' ? ' ↓' : ' ↑') : ''}
+                </button>
+              ))}
+            </div>
+            {/* Scrollable user list */}
+            <div className="ac-users-scroll">
+              {sortedUsers.map((u, i) => {
+                const isOnline = u.lastActive && (Date.now() - new Date(u.lastActive).getTime()) < 10 * 60 * 1000;
+                const ago = timeAgo(u.lastActive);
+                const subLabel = u.subStatus === 'grandfathered' ? 'OG' :
+                  u.subStatus === 'active' ? (u.isOG ? 'OG·PRO' : 'PRO') :
+                  u.subStatus === 'trial' ? (u.isOG ? 'OG·TRIAL' : 'TRIAL') :
+                  u.subStatus === 'canceled' ? (u.isOG ? 'OG·END' : 'END') :
+                  u.subStatus === 'expired' ? (u.isOG ? 'OG' : 'EXP') : null;
+                return (
+                  <div key={i} className={`ac-user-card ${isOnline ? 'ac-user-online' : ''}`}>
+                    <div className="ac-uc-row1">
+                      <span className="ac-uc-name">{u.username}</span>
+                      <div className="ac-uc-badges">
+                        {subLabel && <span className={`ac-sub-badge ${u.subStatus}`}>{subLabel}</span>}
+                        {isOnline ? <span className="ac-online-badge">now</span> : <span className="ac-uc-ago">{ago}</span>}
+                      </div>
+                    </div>
+                    {u.discord && <span className="ac-uc-discord">{u.discord}</span>}
+                    <div className="ac-uc-stats">
+                      <span className="ac-streak-pill">{u.currentStreak}d</span>
+                      <span className="ac-uc-stat">{u.totalLogs} logs</span>
+                      <span className="ac-uc-stat">{u.aiMessages} ai</span>
+                      <span className="ac-uc-joined">{formatDate(u.joinedAt)}</span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

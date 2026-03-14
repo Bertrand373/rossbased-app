@@ -1011,6 +1011,132 @@
   padding: 2px 5px;
 }
 
+/* ===== USERS CARD LAYOUT ===== */
+.ac-users-card {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0 !important;
+}
+
+.ac-sort-row {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+}
+
+.ac-sort-row::-webkit-scrollbar { display: none; }
+
+.ac-sort-pill {
+  flex: 0 0 auto;
+  padding: 5px 10px;
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.02);
+  color: rgba(255,255,255,0.25);
+  font-size: 10px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.12s;
+}
+
+.ac-sort-pill:hover { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.4); }
+.ac-sort-pill.active {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.7);
+}
+
+.ac-users-scroll {
+  overflow-y: auto;
+  max-height: calc(100vh - 260px);
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.06) transparent;
+  padding-bottom: 12px;
+}
+
+.ac-users-scroll::-webkit-scrollbar { width: 3px; }
+.ac-users-scroll::-webkit-scrollbar-track { background: transparent; }
+.ac-users-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 3px; }
+
+.ac-user-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.01);
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+  transition: background 0.12s;
+}
+
+.ac-user-card:hover { background: rgba(255,255,255,0.025); }
+.ac-user-card.ac-user-online { border-left: 2px solid rgba(34,197,94,0.3); }
+
+.ac-uc-row1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ac-uc-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.6);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.ac-uc-badges {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.ac-uc-ago {
+  font-size: 10px;
+  color: rgba(255,255,255,0.12);
+  white-space: nowrap;
+}
+
+.ac-uc-discord {
+  font-size: 9px;
+  color: rgba(255,255,255,0.1);
+  margin-top: -1px;
+}
+
+.ac-uc-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.ac-uc-stat {
+  font-size: 10px;
+  color: rgba(255,255,255,0.18);
+  font-weight: 500;
+}
+
+.ac-uc-joined {
+  font-size: 10px;
+  color: rgba(255,255,255,0.1);
+  margin-left: auto;
+}
+
 /* ===== ORACLE WRAPPER ===== */
 .ac-oracle-wrap .kb-container {
   max-width: 100%;
@@ -1607,6 +1733,20 @@
 [data-theme="light"] .ac-dot { background: rgba(0,0,0,0.08); }
 [data-theme="light"] .ac-dot.on { background: rgba(0,0,0,0.45); }
 [data-theme="light"] .ac-dim { color: rgba(0,0,0,0.2); }
+
+/* Users card layout — light */
+[data-theme="light"] .ac-sort-pill { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.06); color: rgba(0,0,0,0.3); }
+[data-theme="light"] .ac-sort-pill:hover { background: rgba(0,0,0,0.04); color: rgba(0,0,0,0.5); }
+[data-theme="light"] .ac-sort-pill.active { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.12); color: rgba(0,0,0,0.7); }
+[data-theme="light"] .ac-users-scroll { scrollbar-color: rgba(0,0,0,0.06) transparent; }
+[data-theme="light"] .ac-user-card { background: rgba(0,0,0,0.01); border-bottom-color: rgba(0,0,0,0.04); }
+[data-theme="light"] .ac-user-card:hover { background: rgba(0,0,0,0.03); }
+[data-theme="light"] .ac-user-card.ac-user-online { border-left-color: rgba(22,163,74,0.3); }
+[data-theme="light"] .ac-uc-name { color: rgba(0,0,0,0.65); }
+[data-theme="light"] .ac-uc-ago { color: rgba(0,0,0,0.2); }
+[data-theme="light"] .ac-uc-discord { color: rgba(0,0,0,0.15); }
+[data-theme="light"] .ac-uc-stat { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .ac-uc-joined { color: rgba(0,0,0,0.15); }
 
 /* Page legend */
 [data-theme="light"] .ac-page-legend { border-top-color: rgba(0,0,0,0.05); }
