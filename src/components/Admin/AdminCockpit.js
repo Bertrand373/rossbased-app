@@ -624,7 +624,8 @@ const AdminCockpit = () => {
                     { name: 'Urge Logging', u: engagement.features.urgeLogs.users, t: engagement.features.urgeLogs.totalLogs, tl: 'urges' },
                     { name: 'Urge Toolkit', u: engagement.features.urgeToolkit.users, t: engagement.features.urgeToolkit.totalUsage, tl: 'uses' },
                     { name: 'Journal', u: engagement.features.journal.users, t: engagement.features.journal.totalEntries, tl: 'entries' },
-                    { name: 'AI Guide', u: engagement.features.aiGuide.users, t: engagement.features.aiGuide.totalMessages, tl: 'msgs' },
+                    { name: 'Oracle', u: engagement.features.oracle?.users || 0, t: engagement.features.oracle?.totalMessages || 0, tl: 'msgs' },
+                    { name: 'Wet Dreams', u: engagement.features.wetDreams?.users || 0, t: engagement.features.wetDreams?.totalLogged || 0, tl: 'logged' },
                     { name: 'Goals', u: engagement.features.goals.users, t: 0 },
                     { name: 'Leaderboard', u: engagement.features.leaderboard.users, t: 0 },
                   ].map((f, i) => {

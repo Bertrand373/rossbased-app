@@ -788,8 +788,8 @@ function AppContent({
               subscriptionStatus={subscriptionStatus}
             />
             
-            {/* What's New announcement sheet */}
-            <WhatsNew isLoggedIn={true} username={userData?.username} />
+            {/* What's New announcement sheet — suppressed during onboarding */}
+            <WhatsNew isLoggedIn={true} username={userData?.username} suppress={!userData?.hasSeenOnboarding} />
           </>
         ) : (
           <Routes>

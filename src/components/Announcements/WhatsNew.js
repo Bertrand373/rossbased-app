@@ -10,7 +10,7 @@ import '../../styles/BottomSheet.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
-const WhatsNew = ({ isLoggedIn, username }) => {
+const WhatsNew = ({ isLoggedIn, username, suppress }) => {
   const [announcement, setAnnouncement] = useState(null);
   const [showSheet, setShowSheet] = useState(false);
   const [sheetReady, setSheetReady] = useState(false);
@@ -60,11 +60,12 @@ const WhatsNew = ({ isLoggedIn, username }) => {
   }, [isLoggedIn, isAdmin, username, seenKey]);
 
   // Auto-check ONCE when username is ready — ref prevents re-triggers from dep changes
+  // Suppressed during onboarding so the guide runs uninterrupted
   useEffect(() => {
-    if (!username || autoCheckedRef.current) return;
+    if (!username || autoCheckedRef.current || suppress) return;
     autoCheckedRef.current = true;
     checkAnnouncement(1500);
-  }, [username, checkAnnouncement]);
+  }, [username, checkAnnouncement, suppress]);
 
   // Manual trigger from Profile "Updates" link — always allowed
   useEffect(() => {

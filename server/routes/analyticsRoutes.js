@@ -120,6 +120,7 @@ router.get('/overview', adminCheck, async (req, res) => {
 router.get('/engagement', adminCheck, async (req, res) => {
   try {
     const featureAdoption = await User.aggregate([
+      { $match: adminFilter },
       {
         $project: {
           hasBenefitLogs: { $gt: [{ $size: { $ifNull: ['$benefitTracking', []] } }, 0] },
@@ -130,12 +131,14 @@ router.get('/engagement', adminCheck, async (req, res) => {
           hasGoal: { $eq: ['$goal.isActive', true] },
           usesLeaderboard: '$showOnLeaderboard',
           usesAI: { $gt: [{ $ifNull: ['$aiUsage.lifetimeCount', 0] }, 0] },
+          hasWetDreams: { $gt: [{ $ifNull: ['$wetDreamCount', 0] }, 0] },
           totalBenefitLogs: { $size: { $ifNull: ['$benefitTracking', []] } },
           totalUrgeLogs: { $size: { $ifNull: ['$urgeLog', []] } },
           totalEmotionalLogs: { $size: { $ifNull: ['$emotionalTracking', []] } },
           totalToolUsage: { $size: { $ifNull: ['$urgeToolUsage', []] } },
           totalJournalEntries: { $size: { $objectToArray: { $ifNull: ['$notes', {}] } } },
-          aiLifetimeCount: { $ifNull: ['$aiUsage.lifetimeCount', 0] }
+          aiLifetimeCount: { $ifNull: ['$aiUsage.lifetimeCount', 0] },
+          totalWetDreams: { $ifNull: ['$wetDreamCount', 0] }
         }
       },
       {
@@ -150,12 +153,14 @@ router.get('/engagement', adminCheck, async (req, res) => {
           goalUsers: { $sum: { $cond: ['$hasGoal', 1, 0] } },
           leaderboardUsers: { $sum: { $cond: ['$usesLeaderboard', 1, 0] } },
           aiUsers: { $sum: { $cond: ['$usesAI', 1, 0] } },
+          wetDreamUsers: { $sum: { $cond: ['$hasWetDreams', 1, 0] } },
           totalBenefitLogs: { $sum: '$totalBenefitLogs' },
           totalUrgeLogs: { $sum: '$totalUrgeLogs' },
           totalEmotionalLogs: { $sum: '$totalEmotionalLogs' },
           totalToolUsage: { $sum: '$totalToolUsage' },
           totalJournalEntries: { $sum: '$totalJournalEntries' },
-          totalAIMessages: { $sum: '$aiLifetimeCount' }
+          totalAIMessages: { $sum: '$aiLifetimeCount' },
+          totalWetDreams: { $sum: '$totalWetDreams' }
         }
       }
     ]);
@@ -172,7 +177,8 @@ router.get('/engagement', adminCheck, async (req, res) => {
         journal: { users: s.journalUsers || 0, totalEntries: s.totalJournalEntries || 0 },
         goals: { users: s.goalUsers || 0 },
         leaderboard: { users: s.leaderboardUsers || 0 },
-        aiGuide: { users: s.aiUsers || 0, totalMessages: s.totalAIMessages || 0 }
+        oracle: { users: s.aiUsers || 0, totalMessages: s.totalAIMessages || 0 },
+        wetDreams: { users: s.wetDreamUsers || 0, totalLogged: s.totalWetDreams || 0 }
       },
       totalUsers: s.totalUsers || 0,
       recentLoggers
@@ -186,13 +192,38 @@ router.get('/engagement', adminCheck, async (req, res) => {
 // GET /api/analytics/streaks
 router.get('/streaks', adminCheck, async (req, res) => {
   try {
-    const streakDistribution = await User.aggregate([
-      { $bucket: { groupBy: '$currentStreak', boundaries: [0,1,8,15,31,61,91,181,366,10000], default: 'other', output: { count: { $sum: 1 } } } }
-    ]);
-    const labels = { 0:'Day 0', 1:'1-7', 8:'8-14', 15:'15-30', 31:'31-60', 61:'61-90', 91:'91-180', 181:'181-365', 366:'365+' };
-    const distribution = streakDistribution.map(b => ({ range: labels[b._id] || `${b._id}+`, count: b.count }));
+    // FIXED: Compute real streaks from startDate (not stale currentStreak field)
+    const allUsers = await User.find(
+      { ...adminFilter, startDate: { $exists: true, $ne: null } },
+      'username startDate currentStreak longestStreak'
+    ).lean();
 
-    const avgStreak = await User.aggregate([{ $group: { _id: null, avg: { $avg: '$currentStreak' } } }]);
+    const realStreaks = allUsers.map(u => ({
+      username: u.username,
+      current: calcStreak(u.startDate),
+      longest: Math.max(u.longestStreak || 0, calcStreak(u.startDate))
+    }));
+
+    const buckets = { 'Day 0': 0, '1-7': 0, '8-14': 0, '15-30': 0, '31-60': 0, '61-90': 0, '91-180': 0, '181-365': 0, '365+': 0 };
+    realStreaks.forEach(u => {
+      const d = u.current;
+      if (d <= 0) buckets['Day 0']++;
+      else if (d <= 7) buckets['1-7']++;
+      else if (d <= 14) buckets['8-14']++;
+      else if (d <= 30) buckets['15-30']++;
+      else if (d <= 60) buckets['31-60']++;
+      else if (d <= 90) buckets['61-90']++;
+      else if (d <= 180) buckets['91-180']++;
+      else if (d <= 365) buckets['181-365']++;
+      else buckets['365+']++;
+    });
+    const distribution = Object.entries(buckets).map(([range, count]) => ({ range, count }));
+
+    const avgStreakVal = realStreaks.length > 0
+      ? Math.round(realStreaks.reduce((sum, u) => sum + u.current, 0) / realStreaks.length)
+      : 0;
+
+    const topStreaks = [...realStreaks].sort((a, b) => b.longest - a.longest).slice(0, 10);
 
     const relapseData = await User.aggregate([
       { $unwind: '$streakHistory' },
@@ -210,15 +241,13 @@ router.get('/streaks', adminCheck, async (req, res) => {
       failureDays[b] = (failureDays[b] || 0) + 1;
     });
 
-    const topStreaks = await User.find({}, 'username currentStreak longestStreak').sort({ longestStreak: -1 }).limit(10).lean();
-
     res.json({
       distribution,
-      averageStreak: Math.round(avgStreak[0]?.avg || 0),
+      averageStreak: avgStreakVal,
       totalRelapses: relapseData[0]?.totalRelapses || 0,
       avgStreakBeforeRelapse: Math.round(relapseData[0]?.avgStreakBeforeRelapse || 0),
       topTriggers, failureDays,
-      topStreaks: topStreaks.map(u => ({ username: u.username, current: u.currentStreak, longest: u.longestStreak }))
+      topStreaks: topStreaks.map(u => ({ username: u.username, current: u.current, longest: u.longest }))
     });
   } catch (error) {
     console.error('Analytics streaks error:', error);
