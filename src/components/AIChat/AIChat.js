@@ -576,6 +576,38 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     return () => document.body.classList.remove('modal-open');
   }, [isOpen]);
 
+  // iOS PWA keyboard fix — continuously adjust panel via visualViewport
+  useEffect(() => {
+    if (!isOpen || !window.visualViewport) return;
+    const vv = window.visualViewport;
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    const adjust = () => {
+      const offset = window.innerHeight - vv.height - vv.offsetTop;
+      if (offset > 50) {
+        // Keyboard is open
+        panel.style.height = `${vv.height}px`;
+        panel.style.transform = 'translateY(0)';
+      } else {
+        // Keyboard closed — reset
+        panel.style.height = '';
+        panel.style.transform = '';
+      }
+    };
+
+    vv.addEventListener('resize', adjust);
+    vv.addEventListener('scroll', adjust);
+    return () => {
+      vv.removeEventListener('resize', adjust);
+      vv.removeEventListener('scroll', adjust);
+      if (panel) {
+        panel.style.height = '';
+        panel.style.transform = '';
+      }
+    };
+  }, [isOpen]);
+
   // Track when limit is reached
   useEffect(() => {
     if (usage.messagesRemaining === 0 && usage.messagesLimit > 0) {
@@ -967,26 +999,12 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                   }}
                   onKeyDown={handleKeyDown}
                   onFocus={() => {
-                    // iOS Safari keyboard fix
+                    // Scroll input into view after iOS keyboard settles
                     setTimeout(() => {
-                      const modal = document.querySelector('.ai-chat-modal');
-                      if (modal && window.visualViewport) {
-                        const keyboardHeight = window.innerHeight - window.visualViewport.height;
-                        if (keyboardHeight > 0) {
-                          modal.style.height = `${window.visualViewport.height}px`;
-                          modal.style.bottom = `${keyboardHeight}px`;
-                        }
-                      }
-                    }, 100);
+                      inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 350);
                   }}
-                  onBlur={() => {
-                    // Reset modal position when keyboard closes
-                    const modal = document.querySelector('.ai-chat-modal');
-                    if (modal) {
-                      modal.style.height = '';
-                      modal.style.bottom = '';
-                    }
-                  }}
+                  onBlur={() => {}}
                   disabled={isLoading}
                   rows={1}
                 />
@@ -1012,11 +1030,6 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                     : 'Weekly limit reached · Resets Monday'
                   }
                 </span>
-                {usage.isGrandfathered && openPlanModal && (
-                  <button className="ai-chat-upgrade-btn" onClick={() => { onClose(); openPlanModal(); }}>
-                    Unlock More Oracle Access
-                  </button>
-                )}
                 {!usage.isPremium && !usage.isGrandfathered && openPlanModal && (
                   <button className="ai-chat-upgrade-btn" onClick={() => { onClose(); openPlanModal(); }}>
                     Upgrade to Premium

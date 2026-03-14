@@ -487,6 +487,7 @@
   padding: 16px 20px;
   background: transparent;
   flex-shrink: 0;
+  border-top: 1px solid var(--border-subtle);
 }
 
 .ai-chat-input {
@@ -498,7 +499,7 @@
   font-size: 0.9375rem;
   color: var(--text);
   font-family: inherit;
-  transition: border-color 150ms ease, background-color 150ms ease;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
   resize: none;
   min-height: 44px;
   max-height: 120px;
@@ -509,7 +510,11 @@
 .ai-chat-input:focus {
   outline: none;
   border-color: var(--border-prominent);
-  background-color: var(--surface-raised);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="light"] .ai-chat-input:focus {
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
 }
 
 .ai-chat-input::placeholder {
