@@ -1620,6 +1620,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       { username: req.user.username },
       { 
         $set: { 
+          'timezone': userTimezone,
           'aiUsage.date': userLocalDate,
           'aiUsage.count': currentCount + 1,
           'aiUsage.lifetimeCount': currentLifetime + 1,

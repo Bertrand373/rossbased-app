@@ -58,13 +58,49 @@ const PULSE_COOLDOWN_DAYS = 3;
 // Map<userMessageId, oracleReplyMessage>
 const REPLY_MAP = new Map();
 
-// Get today's date string in Eastern Time (resets at midnight ET, not UTC)
+// Get today's date string in Eastern Time (used for admin/internal operations)
 function getTodayET() {
   return new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' }); // 'en-CA' gives YYYY-MM-DD
 }
 
+// Get today's date string in a user's timezone (falls back to UTC)
+function getUserToday(timezone) {
+  const tz = (timezone && timezone !== 'UTC') ? timezone : 'UTC';
+  try {
+    return new Date().toLocaleDateString('en-CA', { timeZone: tz });
+  } catch {
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'UTC' });
+  }
+}
+
+// Get week start (Monday) in a specific timezone
+function getWeekStart(timezone) {
+  const tz = (timezone && timezone !== 'UTC') ? timezone : 'UTC';
+  try {
+    const now = new Date(new Date().toLocaleString('en-US', { timeZone: tz }));
+    const day = now.getDay();
+    const diff = day === 0 ? 6 : day - 1;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - diff);
+    return monday.toISOString().split('T')[0];
+  } catch {
+    const now = new Date();
+    const day = now.getDay();
+    const diff = day === 0 ? 6 : day - 1;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - diff);
+    return monday.toISOString().split('T')[0];
+  }
+}
+
+// Get a linked user's timezone from their stored data (set by the app on each Oracle use)
+function getUserTimezone(linkedUser) {
+  return linkedUser?.timezone || linkedUser?.notificationPreferences?.timezone || 'UTC';
+}
+
 // Timezone-safe streak calculation — handles "yyyy-MM-dd" strings AND legacy Date objects
-function calcStreakFromStartDate(startDate) {
+// Now accepts optional timezone to match user's local day boundary
+function calcStreakFromStartDate(startDate, timezone) {
   if (!startDate) return 0;
   let y, m, d;
   if (typeof startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
@@ -73,9 +109,24 @@ function calcStreakFromStartDate(startDate) {
     const dt = new Date(startDate);
     y = dt.getUTCFullYear(); m = dt.getUTCMonth() + 1; d = dt.getUTCDate();
   }
-  const startMid = new Date(y, m - 1, d);
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  return Math.max(1, Math.floor((today - startMid) / (1000 * 60 * 60 * 24)) + 1);
+  const startMs = new Date(y, m - 1, d).getTime();
+  
+  let todayMs;
+  if (timezone && timezone !== 'UTC') {
+    try {
+      const now = new Date();
+      const userNow = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+      userNow.setHours(0, 0, 0, 0);
+      todayMs = userNow.getTime();
+    } catch {
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      todayMs = today.getTime();
+    }
+  } else {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    todayMs = today.getTime();
+  }
+  return Math.max(1, Math.floor((todayMs - startMs) / (1000 * 60 * 60 * 24)) + 1);
 }
 
 // Conversation memory — persisted in MongoDB via DiscordMemory model
@@ -310,7 +361,7 @@ Premium retention tracking app. 6-metric benefit tracking, AI insights, spermato
 Redirect smoothly. Never say "I can't help with that." Never reference documentation. Just steer it back naturally.
 
 ## YOUR SYSTEM (answer accurately when asked)
-Access to Oracle on Discord requires a linked TitanTrack account. Link at titantrack.app. Message limits depend on your plan: OG lifetime members get 1 message per day, Premium subscribers get 3 per day, free members get 3 per week. These limits are shared across Discord and the app — they are one combined pool, not separate. There is a 10-second cooldown between messages. The limit resets at midnight Eastern Time (daily limits) or Monday midnight (weekly limits). If someone asks about it, be straightforward. The limit exists by design to encourage quality over quantity.
+Access to Oracle on Discord requires a linked TitanTrack account. Link at titantrack.app. Message limits depend on your plan: OG lifetime members get 1 message per day, Premium subscribers get 3 per day, free members get 3 per week. These limits are shared across Discord and the app — they are one combined pool, not separate. There is a 10-second cooldown between messages. The limit resets at midnight in the user's local timezone (daily limits) or Monday midnight (weekly limits). If someone asks about it, be straightforward. The limit exists by design to encourage quality over quantity.
 
 ## LOW-EFFORT MESSAGES
 If someone sends a vague or surface-level message (single words, "hey", "what's up", "is this normal", "how long", questions they could answer themselves), still answer, but gently nudge them toward getting more out of their messages. You're not punishing them. You're helping them use their time with you wisely.
@@ -737,7 +788,8 @@ const isRateLimited = async (userId, username) => {
     return { limited: true, reason: 'unlinked' };
   }
 
-  const today = getTodayET();
+  const userTz = getUserTimezone(linkedUser);
+  const today = getUserToday(userTz);
 
   try {
     const usage = await OracleUsage.findOne({ discordUserId: userId, date: today });
@@ -776,15 +828,7 @@ const isRateLimited = async (userId, username) => {
 
     // Free linked: 3/week shared pool across Discord + App
     // App's aiUsage.weeklyCount is the source of truth — Discord usage also increments it
-    const getWeekStartET = () => {
-      const etNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
-      const day = etNow.getDay();
-      const diff = day === 0 ? 6 : day - 1;
-      const monday = new Date(etNow);
-      monday.setDate(etNow.getDate() - diff);
-      return monday.toISOString().split('T')[0];
-    };
-    const currentWeekStart = getWeekStartET();
+    const currentWeekStart = getWeekStart(userTz);
     const storedWeekStart = linkedUser.aiUsage?.weekStart || '';
     const isNewWeek = storedWeekStart !== currentWeekStart;
     const weeklyCount = isNewWeek ? 0 : (linkedUser.aiUsage?.weeklyCount || 0);
@@ -801,11 +845,11 @@ const isRateLimited = async (userId, username) => {
   return { limited: false };
 };
 
-// Record usage (persisted to MongoDB)
-const recordUsage = async (userId) => {
+// Record usage (persisted to MongoDB) — timezone-aware
+const recordUsage = async (userId, timezone) => {
   USER_COOLDOWNS.set(userId, Date.now());
   
-  const today = getTodayET();
+  const today = getUserToday(timezone);
   try {
     await OracleUsage.findOneAndUpdate(
       { discordUserId: userId, date: today },
@@ -2300,15 +2344,17 @@ client.on('messageCreate', async (message) => {
     // Check if this Discord user has a linked TitanTrack account
     let linkedUser = null;
     let personalContext = '';
+    let userTz = 'UTC';
     try {
       linkedUser = await User.findOne({ discordId: message.author.id });
       if (linkedUser && linkedUser.discordOracleSync !== false) {
+        userTz = getUserTimezone(linkedUser);
         const lines = [];
         
         // Streak info
         let currentStreak = linkedUser.currentStreak || 0;
         if (linkedUser.startDate) {
-          currentStreak = calcStreakFromStartDate(linkedUser.startDate);
+          currentStreak = calcStreakFromStartDate(linkedUser.startDate, userTz);
         }
         lines.push(`This user has a linked TitanTrack account. Current streak: Day ${currentStreak}.`);
         
@@ -2367,7 +2413,8 @@ client.on('messageCreate', async (message) => {
     }
     
     // Inject current date and calendar awareness so Oracle has temporal context
-    const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'America/New_York' });
+    const dateTimezone = linkedUser ? userTz : 'America/New_York';
+    const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: dateTimezone });
     const dateContext = `\n\n## CURRENT DATE & CALENDAR AWARENESS
 Today is ${currentDate}. You know exactly what day it is. Never guess dates.
 
@@ -2408,7 +2455,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
     const chunks = splitResponse(reply);
     
     // Record Discord usage
-    await recordUsage(message.author.id);
+    await recordUsage(message.author.id, userTz);
 
     // For free linked users: also increment app weekly count (shared pool source of truth)
     if (linkedUser) {
@@ -2416,15 +2463,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       const isGrandfathered = linkedUser.subscription?.status === 'grandfathered';
       if (!isGrandfathered && !userHasPremium) {
         try {
-          const getWeekStartET = () => {
-            const etNow = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
-            const day = etNow.getDay();
-            const diff = day === 0 ? 6 : day - 1;
-            const monday = new Date(etNow);
-            monday.setDate(etNow.getDate() - diff);
-            return monday.toISOString().split('T')[0];
-          };
-          const currentWeekStart = getWeekStartET();
+          const currentWeekStart = getWeekStart(userTz);
           const storedWeekStart = linkedUser.aiUsage?.weekStart || '';
           const isNewWeek = storedWeekStart !== currentWeekStart;
           await User.findOneAndUpdate(
@@ -2441,7 +2480,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
     }
 
     // Get remaining count for footer (tier-aware)
-    const todayStr = getTodayET();
+    const todayStr = getUserToday(userTz);
     let remaining = 0;
     let discordUserTier = 'free';
     try {
@@ -2530,7 +2569,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
           if (note.length > 10 && note.length < 300) {
             let currentStreak = linkedUser.currentStreak || 0;
             if (linkedUser.startDate) {
-              currentStreak = calcStreakFromStartDate(linkedUser.startDate);
+              currentStreak = calcStreakFromStartDate(linkedUser.startDate, userTz);
             }
             
             await User.findOneAndUpdate(
@@ -2562,7 +2601,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       try {
         let streakDay = null;
         if (linkedUser && linkedUser.startDate) {
-          streakDay = calcStreakFromStartDate(linkedUser.startDate);
+          streakDay = calcStreakFromStartDate(linkedUser.startDate, userTz);
         } else if (linkedUser) {
           streakDay = linkedUser.currentStreak || null;
         }
