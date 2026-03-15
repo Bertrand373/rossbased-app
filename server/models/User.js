@@ -110,6 +110,13 @@ const userSchema = new mongoose.Schema({
   // Streak display preference — Oracle's Gold color (premium/OG only)
   streakColorGold: { type: Boolean, default: false },
   
+  // Oracle Pulse — cached daily observation on Tracker
+  oraclePulse: {
+    text: String,
+    date: String,           // "yyyy-MM-dd" cache key
+    generatedAt: Date
+  },
+  
   // Theme preference
   theme: { type: String, enum: ['dark', 'light'], default: 'dark' },
   

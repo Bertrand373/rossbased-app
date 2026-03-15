@@ -1,0 +1,142 @@
+/* src/components/OraclePulse/OraclePulse.css */
+/* Oracle's daily observation — lives below Log button on Tracker */
+
+.oracle-pulse {
+  max-width: 280px;
+  text-align: center;
+  margin-top: 24px;
+  opacity: 0;
+  animation: pulseIn 600ms ease 200ms forwards;
+}
+
+.oracle-pulse.revealed .oracle-pulse-time {
+  animation: pulseIn 400ms ease forwards;
+}
+
+/* Label: ORACLE OBSERVES / ORACLE OBSERVES YOU */
+.oracle-pulse-label {
+  display: block;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: 8px;
+}
+
+.oracle-pulse-label.gold {
+  color: rgba(212, 175, 55, 0.45);
+}
+
+[data-theme="light"] .oracle-pulse-label.gold {
+  color: rgba(160, 130, 0, 0.4);
+}
+
+/* Observation text */
+.oracle-pulse-text {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  line-height: 1.6;
+  margin: 0 0 6px 0;
+  letter-spacing: 0.01em;
+  min-height: 1.6em;
+}
+
+/* Oracle Gold — premium text color */
+.oracle-pulse-text.oracle-gold {
+  color: rgba(212, 175, 55, 0.7);
+}
+
+[data-theme="light"] .oracle-pulse-text.oracle-gold {
+  color: rgba(160, 130, 0, 0.65);
+}
+
+/* Typing cursor */
+.oracle-pulse-cursor {
+  display: inline-block;
+  width: 1px;
+  height: 0.85em;
+  background: var(--text-muted);
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  animation: cursorBlink 800ms step-end infinite;
+}
+
+.oracle-pulse-text.oracle-gold .oracle-pulse-cursor {
+  background: rgba(212, 175, 55, 0.5);
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Timestamp */
+.oracle-pulse-time {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+  opacity: 0;
+}
+
+@keyframes pulseIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 374px) {
+  .oracle-pulse {
+    max-width: 240px;
+    margin-top: 20px;
+  }
+  .oracle-pulse-text {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-height: 700px) {
+  .oracle-pulse {
+    margin-top: 16px;
+  }
+}
+
+/* Very short screens — hide to prioritize core elements */
+@media (max-height: 600px) {
+  .oracle-pulse {
+    display: none;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .oracle-pulse {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oracle-pulse {
+    animation: none;
+    opacity: 1;
+  }
+  .oracle-pulse-cursor {
+    animation: none;
+    opacity: 1;
+  }
+  .oracle-pulse.revealed .oracle-pulse-time {
+    animation: none;
+    opacity: 1;
+  }
+}

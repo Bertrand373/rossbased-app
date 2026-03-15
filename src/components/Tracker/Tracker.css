@@ -161,16 +161,28 @@
   color: var(--text);
 }
 
-.streak-gold-toggle-dot {
-  width: 16px;
-  height: 2px;
-  border-radius: 1px;
-  background: rgba(212, 175, 55, 0.5);
+.streak-gold-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1.5px solid rgba(212, 175, 55, 0.3);
+  background: transparent;
   flex-shrink: 0;
+  transition: background-color 200ms ease, border-color 200ms ease;
 }
 
-[data-theme="light"] .streak-gold-toggle-dot {
-  background: rgba(160, 130, 0, 0.35);
+.streak-gold-swatch.active {
+  background: #d4af37;
+  border-color: #d4af37;
+}
+
+[data-theme="light"] .streak-gold-swatch {
+  border-color: rgba(160, 130, 0, 0.25);
+}
+
+[data-theme="light"] .streak-gold-swatch.active {
+  background: #a08200;
+  border-color: #a08200;
 }
 
 /* Override .sheet button inherited styles on toggle switch */

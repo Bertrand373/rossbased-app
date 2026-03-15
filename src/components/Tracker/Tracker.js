@@ -14,7 +14,7 @@ import DatePicker from '../Shared/DatePicker';
 import PatternInsightCard from '../PatternInsight/PatternInsightCard';
 import EnergyAlmanac from '../EnergyAlmanac/EnergyAlmanac';
 import OnboardingGuide from '../OnboardingGuide/OnboardingGuide';
-import DailyQuote from '../DailyQuote/DailyQuote';
+import OraclePulse from '../OraclePulse/OraclePulse';
 import { getLunarData } from '../../utils/lunarData';
 
 // NEW: Import InterventionService for ML feedback loop
@@ -1364,7 +1364,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                     <div className="streak-gold-toggle">
                       <div className="streak-gold-toggle-text">
                         <span className="streak-gold-toggle-label">Oracle's Gold</span>
-                        <span className="streak-gold-toggle-dot" />
+                        <span className={`streak-gold-swatch${userData.streakColorGold ? ' active' : ''}`} />
                       </div>
                       <button 
                         className={`streak-gold-switch${userData.streakColorGold ? ' active' : ''}`}
@@ -1623,8 +1623,8 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         </button>
       </footer>
 
-      {/* Daily Quote - visual floor */}
-      <DailyQuote />
+      {/* Oracle Pulse — daily AI observation */}
+      <OraclePulse isPremium={isPremium} isGold={userData.streakColorGold} />
       
     </div>
   );
