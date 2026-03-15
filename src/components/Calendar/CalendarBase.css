@@ -1408,13 +1408,13 @@ body:has(.week-view-grid) {
   width: auto;
   height: 18px;
   object-fit: contain;
-  opacity: 0.35;
+  opacity: 0.45;
   pointer-events: none;
 }
 
 [data-theme="light"] .day-oracle-pin {
   filter: brightness(0.7);
-  opacity: 0.3;
+  opacity: 0.35;
 }
 
 /* Week view — inline with other indicators */
@@ -1422,21 +1422,22 @@ body:has(.week-view-grid) {
   height: 14px;
   width: auto;
   object-fit: contain;
-  opacity: 0.4;
+  opacity: 0.5;
   margin-left: 6px;
 }
 
 [data-theme="light"] .week-oracle-pin {
   filter: brightness(0.7);
-  opacity: 0.35;
+  opacity: 0.4;
 }
 
 @media (max-width: 480px) {
   .day-oracle-pin {
-    height: 15px;
+    height: 19px;
+    opacity: 0.45;
   }
   .week-oracle-pin {
-    height: 12px;
+    height: 13px;
   }
 }
 

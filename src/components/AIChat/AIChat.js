@@ -467,6 +467,18 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
       .catch(() => { /* offline — silent */ });
   }, [isLoggedIn]);
 
+  // Sync pin state when Calendar removes a pin
+  useEffect(() => {
+    const handler = (e) => {
+      const ts = e.detail?.removedTimestamp;
+      if (ts) {
+        setPinnedMessages(prev => { const next = new Map(prev); next.delete(ts); return next; });
+      }
+    };
+    window.addEventListener('oracle-pins-changed', handler);
+    return () => window.removeEventListener('oracle-pins-changed', handler);
+  }, []);
+
   // Fetch unread transmissions when chat opens
   useEffect(() => {
     if (isOpen && isLoggedIn) {
@@ -866,6 +878,9 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   // Get Oracle loading icon
   const getLoadingIcon = () => '/The_Oracle.png';
 
+  // Gold dash icon for pin toasts (matches app toast system)
+  const goldDash = <span style={{ display: 'inline-block', width: 16, height: 3, borderRadius: 2, background: '#d4af37', flexShrink: 0 }} />;
+
   // Pin/Unpin an Oracle message (toggle)
   const handlePinMessage = async (content, timestamp) => {
     const token = localStorage.getItem('token');
@@ -882,10 +897,9 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
         });
         if (res.ok) {
           setPinnedMessages(prev => { const next = new Map(prev); next.delete(timestamp); return next; });
-          toast('Unpinned', {
-            icon: '—',
-            style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' }
-          });
+          toast('Unpinned', { icon: goldDash });
+          // Notify Calendar to refresh indicators
+          window.dispatchEvent(new CustomEvent('oracle-pins-changed'));
         }
       } catch (err) { console.error('Unpin failed:', err); }
       return;
@@ -924,10 +938,9 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
 
       const data = await res.json();
       setPinnedMessages(prev => new Map(prev).set(timestamp, data.pin._id));
-      toast('Pinned to journey', {
-        icon: '—',
-        style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' }
-      });
+      toast('Pinned to journey', { icon: goldDash });
+      // Notify Calendar to refresh indicators
+      window.dispatchEvent(new CustomEvent('oracle-pins-changed'));
     } catch (err) {
       console.error('Pin failed:', err);
     }
@@ -996,26 +1009,28 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                         {renderMarkdown(msg.content)}
                       </div>
                     </div>
-                    <button
-                      className="ai-chat-share-btn"
-                      onClick={() => handleShareMessage(msg.content, msg.isTransmission)}
-                      aria-label="Share message"
-                    >
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                        <polyline points="16 6 12 2 8 6" />
-                        <line x1="12" y1="2" x2="12" y2="15" />
-                      </svg>
-                      Share
-                    </button>
-                    <button
-                      className={`ai-chat-pin-btn${pinnedMessages.has(msg.timestamp) ? ' pinned' : ''}`}
-                      onClick={() => handlePinMessage(msg.content, msg.timestamp)}
-                      aria-label="Pin to journey"
-                    >
-                      <img src="/oracle-pin.png" alt="" className="ai-chat-pin-icon" />
-                      {pinnedMessages.has(msg.timestamp) ? 'Pinned' : 'Pin'}
-                    </button>
+                    <div className="ai-chat-actions">
+                      <button
+                        className="ai-chat-share-btn"
+                        onClick={() => handleShareMessage(msg.content, msg.isTransmission)}
+                        aria-label="Share message"
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                          <polyline points="16 6 12 2 8 6" />
+                          <line x1="12" y1="2" x2="12" y2="15" />
+                        </svg>
+                        Share
+                      </button>
+                      <button
+                        className={`ai-chat-pin-btn${pinnedMessages.has(msg.timestamp) ? ' pinned' : ''}`}
+                        onClick={() => handlePinMessage(msg.content, msg.timestamp)}
+                        aria-label="Pin to journey"
+                      >
+                        <img src="/oracle-pin.png" alt="" className="ai-chat-pin-icon" />
+                        {pinnedMessages.has(msg.timestamp) ? 'Pinned' : 'Pin'}
+                      </button>
+                    </div>
                   </>
                 ) : (
                   <div className="ai-chat-message-content">

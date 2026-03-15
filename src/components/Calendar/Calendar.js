@@ -1129,9 +1129,14 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   }, []);
 
   // Remove a pin
+  // Gold dash icon for pin toasts (matches app toast system)
+  const goldDash = <span style={{ display: 'inline-block', width: 16, height: 3, borderRadius: 2, background: '#d4af37', flexShrink: 0 }} />;
+
   const removePin = async (pinId) => {
     const token = localStorage.getItem('token');
     if (!token) return;
+    // Grab the pin's messageTimestamp before deletion (for AIChat sync)
+    const pin = dayPins.find(p => p._id === pinId);
     try {
       const res = await fetch(`${API_URL}/api/oracle/pins/${pinId}`, {
         method: 'DELETE',
@@ -1141,10 +1146,11 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         setDayPins(prev => prev.filter(p => p._id !== pinId));
         // Refresh month indicators
         fetchPinsForMonth(currentDate.getFullYear(), currentDate.getMonth());
-        toast('Pin removed', {
-          icon: '—',
-          style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' }
-        });
+        toast('Pin removed', { icon: goldDash });
+        // Notify AIChat so "Pinned" toggles back to "Pin"
+        window.dispatchEvent(new CustomEvent('oracle-pins-changed', {
+          detail: { removedTimestamp: pin?.messageTimestamp }
+        }));
       }
     } catch (err) { console.error('Remove pin failed:', err); }
   };
@@ -1216,6 +1222,13 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       fetchPinsForMonth(currentDate.getFullYear(), currentDate.getMonth());
     }
   }, [currentDate, fetchPinsForMonth, userData]);
+
+  // Refresh pin indicators when AIChat pins/unpins a message
+  useEffect(() => {
+    const handler = () => fetchPinsForMonth(currentDate.getFullYear(), currentDate.getMonth());
+    window.addEventListener('oracle-pins-changed', handler);
+    return () => window.removeEventListener('oracle-pins-changed', handler);
+  }, [currentDate, fetchPinsForMonth]);
 
   // Render helper for journal section (used in both sticky and non-sticky layouts)
   const renderJournalSection = () => (
