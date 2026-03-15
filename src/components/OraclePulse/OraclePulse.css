@@ -32,6 +32,7 @@
 .oracle-pulse-text {
   font-size: 0.8125rem;
   font-weight: 400;
+  font-style: italic;
   color: var(--text-tertiary);
   line-height: 1.6;
   margin: 0 0 6px 0;
