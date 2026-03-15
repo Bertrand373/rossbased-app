@@ -77,17 +77,16 @@
   top: 0;
   z-index: 10;
   background: var(--background);
-  background: color-mix(in srgb, var(--background) 88%, transparent);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-subtle);
 }
 
 .stats-header-row {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  margin-bottom: 0;
   padding: 10px 8px;
 }
 
@@ -564,23 +563,10 @@
   margin-top: 2px;
   background: var(--cal-cell-bg);
   border-radius: 10px;
-  padding: 11px 14px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  cursor: pointer;
-  transition: background 120ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.oracle-insight-card:active {
-  background: var(--surface-overlay);
-}
-
-.oracle-insight-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  gap: 4px;
 }
 
 .oracle-insight-title {
@@ -589,27 +575,10 @@
   color: var(--text-secondary);
 }
 
-.oracle-insight-badge {
-  font-size: 0.5rem;
-  font-weight: 600;
-  color: var(--accent-gold-text);
-  background: var(--accent-gold-bg-hover);
-  padding: 2px 6px;
-  border-radius: 3px;
-  letter-spacing: 0.05em;
-  border: 1px solid var(--accent-gold-border);
-}
-
 .oracle-insight-body {
   font-size: 0.6875rem;
   color: var(--text-muted);
   line-height: 1.4;
-}
-
-.oracle-insight-action {
-  font-size: 0.625rem;
-  color: var(--text-tertiary);
-  font-weight: 500;
 }
 
 /* =============================================================================
@@ -773,31 +742,6 @@
   color: var(--accent-gold-text);
 }
 
-/* =============================================================================
-   INSIGHTS SHEET — scrollable full analytics
-   ============================================================================= */
-
-.insights-sheet {
-  max-height: 85vh;
-  max-height: 85dvh;
-}
-
-.insights-sheet-content {
-  padding: 0 4px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  max-height: calc(85vh - 60px);
-}
-
-.insights-sheet-content .analytics-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  margin: 0;
-  padding: 0;
-  border: none;
-}
-
 /* Reset all link in reset sheet */
 .reset-all-link {
   background: none;
@@ -822,6 +766,11 @@
   padding: 0 20px 20px;
   padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
   text-align: center;
+}
+
+/* Ensure sheet backdrop covers everything including nav */
+.stats-page .sheet-backdrop {
+  z-index: 10000;
 }
 
 .stats-sheet > * {

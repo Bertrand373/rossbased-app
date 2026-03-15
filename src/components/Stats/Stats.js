@@ -13,12 +13,11 @@ import toast from 'react-hot-toast';
 // Import extracted components
 import { StatCardModal } from './StatsComponents';
 import EmotionalTimeline from '../EmotionalTimeline/EmotionalTimeline';
-import {
+import { 
   YourNumbers,
   YourPatterns,
   AIInsights,
-  RelapseAnalytics,
-  PhaseContext
+  RelapseAnalytics
 } from './StatsInsights';
 
 // Import ShareCard component
@@ -62,7 +61,6 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [showStatModal, setShowStatModal] = useState(false);
   const [selectedStatCard, setSelectedStatCard] = useState(null);
   const [showMilestonesSheet, setShowMilestonesSheet] = useState(false);
-  const [showInsightsSheet, setShowInsightsSheet] = useState(false);
 
   // Theme detection
   const [isDarkTheme, setIsDarkTheme] = useState(() => {
@@ -84,7 +82,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [sheetReady, setSheetReady] = useState(false);
   const sheetPanelRef = useRef(null);
 
-  const sheetVisible = showMilestoneModal || showResetStreakModal || showResetAllModal || showMilestonesSheet || showInsightsSheet;
+  const sheetVisible = showMilestoneModal || showResetStreakModal || showResetAllModal || showMilestonesSheet;
   useEffect(() => {
     if (sheetVisible) {
       requestAnimationFrame(() => requestAnimationFrame(() => setSheetReady(true)));
@@ -103,7 +101,6 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setShowResetStreakModal(false);
     setShowResetAllModal(false);
     setShowMilestonesSheet(false);
-    setShowInsightsSheet(false);
     setSelectedMilestone(null);
   }, []);
   useSheetSwipe(sheetPanelRef, sheetVisible, () => closeSheet(handleSwipeDismiss));
@@ -579,10 +576,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           {/* ---- ORACLE INSIGHT — contextual single card ---- */}
           {isPremium && oracleInsight && (
             <div className="oracle-insight-card">
-              <div className="oracle-insight-header">
-                <span className="oracle-insight-title">{oracleInsight.title}</span>
-                <span className="oracle-insight-badge">Oracle</span>
-              </div>
+              <span className="oracle-insight-title">{oracleInsight.title}</span>
               <span className="oracle-insight-body">{oracleInsight.body}</span>
             </div>
           )}
@@ -625,11 +619,6 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                 isLoading={loadingStates.relapse}
               />
             </div>
-            <PhaseContext
-              currentStreak={safeUserData.currentStreak}
-              phaseInfo={memoizedInsights.phaseInfo}
-              onNavigateToTimeline={() => setActiveView('timeline')}
-            />
           </div>
         )}
 
