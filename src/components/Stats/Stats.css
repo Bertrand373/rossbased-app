@@ -5,15 +5,35 @@
    ============================================================================= */
 
 /* =============================================================================
-   PARENT WRAPPER — padding stripped, scrollable
+   PARENT WRAPPER — height-locked like Calendar, stats-page scrolls internally
    ============================================================================= */
 
 .main-content-wrapper:has(.stats-page) {
   padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--header-height-mobile) - var(--nav-height-mobile) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - var(--header-height-mobile) - var(--nav-height-mobile) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+}
+
+.app-content:has(.stats-page) {
+  overflow: hidden;
+  padding-bottom: 0 !important;
+}
+
+@media (min-width: 1025px) {
+  .main-content-wrapper:has(.stats-page) {
+    display: flex;
+    flex-direction: column;
+    max-width: none;
+    height: calc(100dvh - var(--header-height));
+    max-height: calc(100dvh - var(--header-height));
+  }
 }
 
 /* =============================================================================
-   PAGE CONTAINER — scrollable column, dense top section
+   PAGE CONTAINER — scroll container, header sticks inside it
    ============================================================================= */
 
 .stats-page {
@@ -22,8 +42,10 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Subtle ambient gradient — matches Calendar */
@@ -55,6 +77,9 @@
   top: 0;
   z-index: 10;
   background: var(--background);
+  background: color-mix(in srgb, var(--background) 88%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -132,7 +157,7 @@
 .stats-analytics {
   display: flex;
   flex-direction: column;
-  padding: 0 4px 100px;
+  padding: 0 4px;
   position: relative;
   z-index: 1;
 }
@@ -592,7 +617,7 @@
    ============================================================================= */
 
 .stats-premium-stack {
-  padding: 0 4px;
+  padding: 0 4px 40px;
   margin-top: 24px;
   padding-top: 24px;
   border-top: 1px solid var(--border-subtle);

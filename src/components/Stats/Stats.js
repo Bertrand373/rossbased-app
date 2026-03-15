@@ -308,7 +308,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         pointHoverRadius: 6,
         pointHoverBackgroundColor: lineColor,
         pointHoverBorderColor: pointBorderColor,
-        spanGaps: false,
+        spanGaps: true,
       }]
     };
   }, [safeUserData, selectedMetric, timeRange, isDarkTheme]);
@@ -539,11 +539,12 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                     <div key={metric} className={`num-cell ${getNumberTintClass(metric)}`}>
                       <span className="num-cell-value">{val ? val.toFixed(1) : '—'}</span>
                       <span className="num-cell-label">{metricDisplayName[metric]}</span>
-                      {daysTracked >= 14 && trend && (
+                      {trend && (
                         <span className={`num-cell-delta ${trend.direction === 'up' ? 'delta-up' : trend.direction === 'down' ? 'delta-down' : 'delta-flat'}`}>
                           {trend.direction === 'up' ? '+' : ''}{trend.delta}
                         </span>
                       )}
+                      {!trend && <span className="num-cell-delta delta-flat">—</span>}
                     </div>
                   );
                 })}
@@ -603,13 +604,6 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         {isPremium && (
           <div className="stats-premium-stack">
             <div className="analytics-stack">
-              <YourNumbers
-                metricAverages={memoizedInsights.metricAverages}
-                metricTrends={memoizedInsights.metricTrends}
-                metricExtremes={memoizedInsights.metricExtremes}
-                daysTracked={daysTracked}
-                isLoading={loadingStates.numbers}
-              />
               <YourPatterns
                 streakPhaseAverages={memoizedInsights.streakPhaseAverages}
                 metricCorrelations={memoizedInsights.metricCorrelations}
