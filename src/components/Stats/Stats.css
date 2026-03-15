@@ -5,26 +5,31 @@
    ============================================================================= */
 
 /* =============================================================================
-   PARENT WRAPPER — strip padding, let page scroll naturally
-   No overflow:hidden — sheets need to escape to viewport via position:fixed
+   PARENT WRAPPER — strip padding, ensure no overflow trap
+   Stats uses natural page scroll (unlike Calendar which locks viewport)
+   This lets position:fixed sheets escape AND position:sticky header work
    ============================================================================= */
 
 .main-content-wrapper:has(.stats-page) {
   padding: 0;
+  overflow: visible !important;
+}
+
+.app-content:has(.stats-page) {
+  overflow: visible !important;
 }
 
 /* =============================================================================
-   PAGE CONTAINER — natural scroll, header sticks inside
+   PAGE CONTAINER — natural document flow
    ============================================================================= */
 
 .stats-page {
-  min-height: 100vh;
-  min-height: 100dvh;
   background-color: var(--background);
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow-x: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* Subtle ambient gradient — matches Calendar */
@@ -48,10 +53,11 @@
 
 /* =============================================================================
    STICKY HEADER — mirrors Calendar header exactly
+   Calendar: .calendar-container padding 12px 6px + .calendar-header-minimal padding 10px 8px
+   Result: text starts ~14px from edge, total header height matches
    ============================================================================= */
 
 .stats-header-sticky {
-  flex-shrink: 0;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -66,7 +72,13 @@
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 0;
-  padding: 10px 8px;
+  padding: 10px 14px;
+}
+
+@media (max-width: 480px) {
+  .stats-header-row {
+    padding: 10px 12px;
+  }
 }
 
 .stats-header-title {
@@ -539,7 +551,7 @@
 
 .oracle-insight-card {
   flex-shrink: 0;
-  margin-top: 2px;
+  margin: 2px 4px 0;
   background: var(--cal-cell-bg);
   border-radius: 10px;
   padding: 12px 14px;
@@ -565,10 +577,24 @@
    ============================================================================= */
 
 .stats-premium-stack {
-  padding: 0 4px 120px;
+  padding: 0 16px 120px;
   margin-top: 24px;
   padding-top: 24px;
   border-top: 1px solid var(--border-subtle);
+}
+
+@media (max-width: 480px) {
+  .stats-premium-stack {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .stats-premium-stack {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
 }
 
 .stats-premium-stack .analytics-stack {
@@ -1000,15 +1026,6 @@
    ============================================================================= */
 
 @media (max-width: 480px) {
-  .stats-header-row {
-    gap: 8px;
-    padding: 8px 6px;
-  }
-  
-  .stats-header-title {
-    font-size: 1rem;
-  }
-
   .streak-hero-num {
     font-size: 1.75rem;
   }
