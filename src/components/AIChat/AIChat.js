@@ -538,6 +538,16 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     return () => { if (chatSyncTimer.current) clearTimeout(chatSyncTimer.current); };
   }, [messages]);
 
+  // Scroll to bottom when chat opens (land at latest message instantly)
+  useEffect(() => {
+    if (isOpen && messages.length > 0) {
+      // Instant — don't make users watch old messages scroll by
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+      }, 50);
+    }
+  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Scroll to bottom when user sends a message or transmission arrives
   useEffect(() => {
     if (!isOpen) return;
