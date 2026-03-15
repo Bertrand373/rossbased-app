@@ -383,6 +383,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   });
   const [error, setError] = useState(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [pinnedTimestamps, setPinnedTimestamps] = useState(new Set());
   
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -840,6 +841,59 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   // Get Oracle loading icon
   const getLoadingIcon = () => '/The_Oracle.png';
 
+  // Pin an Oracle message to the user's journey calendar
+  const handlePinMessage = async (content, timestamp) => {
+    // Premium gate — admins (unlimited) + premium + grandfathered can pin
+    const canPin = usage.isPremium || usage.isGrandfathered || usage.messagesRemaining >= 999;
+    if (!canPin) {
+      openPlanModal && openPlanModal();
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const res = await fetch(`${API_URL}/api/oracle/pins`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: content, messageTimestamp: timestamp })
+      });
+
+      if (res.status === 409) {
+        toast('Already pinned', {
+          icon: '📌',
+          style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' }
+        });
+        // Still mark it in local state
+        setPinnedTimestamps(prev => new Set(prev).add(timestamp));
+        return;
+      }
+
+      if (res.status === 403) {
+        openPlanModal && openPlanModal();
+        return;
+      }
+
+      if (!res.ok) throw new Error('Failed to pin');
+
+      setPinnedTimestamps(prev => new Set(prev).add(timestamp));
+      toast('Pinned to journey', {
+        icon: '⚡',
+        style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' }
+      });
+    } catch (err) {
+      console.error('Pin failed:', err);
+      toast('Failed to pin', {
+        icon: '⚠️',
+        style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' }
+      });
+    }
+  };
+
   // Don't render if not logged in
   if (!isLoggedIn) return null;
 
@@ -914,6 +968,14 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                         <line x1="12" y1="2" x2="12" y2="15" />
                       </svg>
                       Share
+                    </button>
+                    <button
+                      className={`ai-chat-pin-btn${pinnedTimestamps.has(msg.timestamp) ? ' pinned' : ''}`}
+                      onClick={() => handlePinMessage(msg.content, msg.timestamp)}
+                      aria-label="Pin to journey"
+                    >
+                      <img src="/oracle-pin.png" alt="" className="ai-chat-pin-icon" />
+                      {pinnedTimestamps.has(msg.timestamp) ? 'Pinned' : 'Pin'}
                     </button>
                   </>
                 ) : (

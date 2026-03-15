@@ -1397,6 +1397,59 @@ body:has(.week-view-grid) {
 }
 
 /* =============================================================================
+   ORACLE PIN INDICATOR — centered watermark in day cells
+   ============================================================================= */
+
+.day-oracle-pin {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+  height: 18px;
+  object-fit: contain;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+[data-theme="light"] .day-oracle-pin {
+  filter: brightness(0.7);
+  opacity: 0.3;
+}
+
+/* Week view — inline with other indicators */
+.week-oracle-pin {
+  height: 14px;
+  width: auto;
+  object-fit: contain;
+  opacity: 0.4;
+  margin-left: 6px;
+}
+
+[data-theme="light"] .week-oracle-pin {
+  filter: brightness(0.7);
+  opacity: 0.35;
+}
+
+@media (max-width: 480px) {
+  .day-oracle-pin {
+    height: 15px;
+  }
+  .week-oracle-pin {
+    height: 12px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .day-oracle-pin {
+    height: 20px;
+  }
+  .week-oracle-pin {
+    height: 16px;
+  }
+}
+
+/* =============================================================================
    MOBILE BROWSER — browser chrome eats viewport, adjust grid clearance
    PWA standalone is fine — these overrides only hit in-browser
    ============================================================================= */

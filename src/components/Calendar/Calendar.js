@@ -18,7 +18,7 @@ import interventionService from '../../services/InterventionService';
 import { getAllTriggers, getTriggerLabel } from '../../constants/triggerConstants';
 import { getLunarData } from '../../utils/lunarData';
 
-
+const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
 // Moon tint system — silver baseline, event overrides
 // Blood moon: deep copper-red + atmospheric glow (matches NASA reference imagery)
@@ -159,6 +159,11 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   // Journal states
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [noteText, setNoteText] = useState('');
+
+  // Oracle Pin states
+  const [pinnedDates, setPinnedDates] = useState(new Set());
+  const [dayPins, setDayPins] = useState([]);
+  const [pinsExpanded, setPinsExpanded] = useState(false);
 
   // Swipe navigation state
   const [swipeAnim, setSwipeAnim] = useState(null); // 'left' | 'right' | null
@@ -657,6 +662,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setEditingExistingTrigger(false);
     setSelectedTrigger('');
     setDayInfoModal(true);
+    fetchDayPins(dayStr);
   };
 
   const closeDayInfo = () => {
@@ -1083,6 +1089,133 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       </div>
     );
   };
+
+  // ============================================================
+  // ORACLE PINS — fetch, remove, render
+  // ============================================================
+  
+  // Fetch pinned dates for the visible month (calendar indicators)
+  const fetchPinsForMonth = useCallback(async (year, month) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    const from = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    const to = `${year}-${String(month + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+    try {
+      const res = await fetch(`${API_URL}/api/oracle/pins?from=${from}&to=${to}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPinnedDates(new Set(data.pins.map(p => p.date)));
+      }
+    } catch { /* offline — silent */ }
+  }, []);
+
+  // Fetch pins for a specific day (day detail sheet)
+  const fetchDayPins = useCallback(async (dateStr) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_URL}/api/oracle/pins/${dateStr}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setDayPins(data.pins || []);
+        setPinsExpanded(false);
+      }
+    } catch { setDayPins([]); }
+  }, []);
+
+  // Remove a pin
+  const removePin = async (pinId) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_URL}/api/oracle/pins/${pinId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setDayPins(prev => prev.filter(p => p._id !== pinId));
+        // Refresh month indicators
+        fetchPinsForMonth(currentDate.getFullYear(), currentDate.getMonth());
+        toast('Pin removed', {
+          icon: '⚡',
+          style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' }
+        });
+      }
+    } catch (err) { console.error('Remove pin failed:', err); }
+  };
+
+  // Lightweight markdown for pinned messages (**bold**, *italic*)
+  const renderPinMarkdown = (text) => {
+    if (!text) return text;
+    const parts = [];
+    const regex = /\*\*(.+?)\*\*|\*(.+?)\*/gs;
+    let lastIndex = 0;
+    let match;
+    let key = 0;
+    while ((match = regex.exec(text)) !== null) {
+      if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index));
+      if (match[1]) parts.push(<strong key={`b${key++}`}>{match[1]}</strong>);
+      else if (match[2]) parts.push(<em key={`i${key++}`}>{match[2]}</em>);
+      lastIndex = regex.lastIndex;
+    }
+    if (lastIndex < text.length) parts.push(text.slice(lastIndex));
+    return parts.length > 0 ? parts : text;
+  };
+
+  // Render Oracle Insights section for day detail sheet
+  const renderOraclePinsSection = () => {
+    if (dayPins.length === 0) return null;
+    const COLLAPSE_THRESHOLD = 2;
+    const visiblePins = pinsExpanded ? dayPins : dayPins.slice(0, COLLAPSE_THRESHOLD);
+    const hiddenCount = dayPins.length - COLLAPSE_THRESHOLD;
+
+    return (
+      <div className="calendar-oracle-pins">
+        <h4>
+          <img src="/oracle-pin.png" alt="" className="oracle-pins-heading-icon" />
+          Oracle Insights
+          {dayPins.length > 1 && <span className="oracle-pins-count">{dayPins.length}</span>}
+        </h4>
+        {visiblePins.map(pin => (
+          <div key={pin._id} className="oracle-pin-card">
+            <div className="oracle-pin-message">
+              {renderPinMarkdown(pin.message)}
+            </div>
+            <div className="oracle-pin-meta">
+              <span className="oracle-pin-time">
+                {new Date(pin.pinnedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+              </span>
+              <button className="oracle-pin-remove" onClick={() => removePin(pin._id)}>
+                Remove
+              </button>
+            </div>
+          </div>
+        ))}
+        {!pinsExpanded && hiddenCount > 0 && (
+          <button className="oracle-pins-expand" onClick={() => setPinsExpanded(true)}>
+            Show {hiddenCount} more insight{hiddenCount > 1 ? 's' : ''}
+          </button>
+        )}
+        {pinsExpanded && dayPins.length > COLLAPSE_THRESHOLD && (
+          <button className="oracle-pins-expand" onClick={() => setPinsExpanded(false)}>
+            Show less
+          </button>
+        )}
+      </div>
+    );
+  };
+
+  // Fetch pins when month changes
+  useEffect(() => {
+    if (userData) {
+      fetchPinsForMonth(currentDate.getFullYear(), currentDate.getMonth());
+    }
+  }, [currentDate, fetchPinsForMonth, userData]);
 
   // Render helper for journal section (used in both sticky and non-sticky layouts)
   const renderJournalSection = () => (
@@ -1626,6 +1759,10 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                 <MoonIcon phase={lunar.phase} emoji={lunar.emoji} size={9} eventType={lunar.specialEvent?.type} />
               </span>
             )}
+            {/* Oracle pin indicator — centered watermark */}
+            {isCurrentMonth && pinnedDates.has(format(currentDay, 'yyyy-MM-dd')) && (
+              <img src="/oracle-pin.png" alt="" className="day-oracle-pin" />
+            )}
           </div>
         );
         day = addDays(day, 1);
@@ -1711,6 +1848,9 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                 <span className="week-workout-glyph" onClick={(e) => { e.stopPropagation(); openWorkoutDirect(day); }}>
                   <DumbbellGlyph size={10} />
                 </span>
+              )}
+              {pinnedDates.has(format(day, 'yyyy-MM-dd')) && (
+                <img src="/oracle-pin.png" alt="" className="week-oracle-pin" />
               )}
             </div>
           </div>
@@ -1887,6 +2027,9 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                           </div>
                         )}
                         
+                        {/* Oracle Insights — pinned messages for this day */}
+                        {!isFuture && renderOraclePinsSection()}
+
                         {/* Journal section (if not future) */}
                         {!isFuture && renderJournalSection()}
                       </div>
