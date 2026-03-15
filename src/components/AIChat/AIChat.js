@@ -383,7 +383,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   });
   const [error, setError] = useState(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const [pinnedTimestamps, setPinnedTimestamps] = useState(new Set());
+  const [pinnedMessages, setPinnedMessages] = useState(new Map()); // timestamp → pinId
   
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -440,6 +440,31 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
       fetchUsage();
       fetchUnreadTransmissions();
     }
+  }, [isLoggedIn]);
+
+  // Load existing pin state — so "Pinned" persists across reloads
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    // Fetch pins for a wide range (last 2 years) to catch all pinned messages
+    const now = new Date();
+    const from = `${now.getFullYear() - 2}-01-01`;
+    const to = `${now.getFullYear() + 1}-12-31`;
+    fetch(`${API_URL}/api/oracle/pins?from=${from}&to=${to}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.pins?.length) {
+          const map = new Map();
+          for (const pin of data.pins) {
+            map.set(pin.messageTimestamp, pin._id);
+          }
+          setPinnedMessages(map);
+        }
+      })
+      .catch(() => { /* offline — silent */ });
   }, [isLoggedIn]);
 
   // Fetch unread transmissions when chat opens
@@ -841,17 +866,38 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   // Get Oracle loading icon
   const getLoadingIcon = () => '/The_Oracle.png';
 
-  // Pin an Oracle message to the user's journey calendar
+  // Pin/Unpin an Oracle message (toggle)
   const handlePinMessage = async (content, timestamp) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    const existingPinId = pinnedMessages.get(timestamp);
+
+    // ---- UNPIN (already pinned → remove it) ----
+    if (existingPinId) {
+      try {
+        const res = await fetch(`${API_URL}/api/oracle/pins/${existingPinId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          setPinnedMessages(prev => { const next = new Map(prev); next.delete(timestamp); return next; });
+          toast('Unpinned', {
+            icon: '—',
+            style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' }
+          });
+        }
+      } catch (err) { console.error('Unpin failed:', err); }
+      return;
+    }
+
+    // ---- PIN (not yet pinned → create it) ----
     // Premium gate — admins (unlimited) + premium + grandfathered can pin
     const canPin = usage.isPremium || usage.isGrandfathered || usage.messagesRemaining >= 999;
     if (!canPin) {
       openPlanModal && openPlanModal();
       return;
     }
-
-    const token = localStorage.getItem('token');
-    if (!token) return;
 
     try {
       const res = await fetch(`${API_URL}/api/oracle/pins`, {
@@ -864,12 +910,8 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
       });
 
       if (res.status === 409) {
-        toast('Already pinned', {
-          icon: '📌',
-          style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' }
-        });
-        // Still mark it in local state
-        setPinnedTimestamps(prev => new Set(prev).add(timestamp));
+        // Already pinned server-side — sync local state
+        setPinnedMessages(prev => new Map(prev).set(timestamp, 'existing'));
         return;
       }
 
@@ -880,17 +922,14 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
 
       if (!res.ok) throw new Error('Failed to pin');
 
-      setPinnedTimestamps(prev => new Set(prev).add(timestamp));
+      const data = await res.json();
+      setPinnedMessages(prev => new Map(prev).set(timestamp, data.pin._id));
       toast('Pinned to journey', {
-        icon: '⚡',
+        icon: '—',
         style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' }
       });
     } catch (err) {
       console.error('Pin failed:', err);
-      toast('Failed to pin', {
-        icon: '⚠️',
-        style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' }
-      });
     }
   };
 
@@ -970,12 +1009,12 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                       Share
                     </button>
                     <button
-                      className={`ai-chat-pin-btn${pinnedTimestamps.has(msg.timestamp) ? ' pinned' : ''}`}
+                      className={`ai-chat-pin-btn${pinnedMessages.has(msg.timestamp) ? ' pinned' : ''}`}
                       onClick={() => handlePinMessage(msg.content, msg.timestamp)}
                       aria-label="Pin to journey"
                     >
                       <img src="/oracle-pin.png" alt="" className="ai-chat-pin-icon" />
-                      {pinnedTimestamps.has(msg.timestamp) ? 'Pinned' : 'Pin'}
+                      {pinnedMessages.has(msg.timestamp) ? 'Pinned' : 'Pin'}
                     </button>
                   </>
                 ) : (

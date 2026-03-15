@@ -157,7 +157,7 @@ async function generatePersonalizedPulse(user, timezone) {
     const recent = sorted.slice(0, 7);
     const prior = sorted.slice(7, 14);
     const metrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
-    const metricLabels = { energy: 'energy', focus: 'focus', confidence: 'confidence', aura: 'aura', sleep: 'sleep', workout: 'body' };
+    const metricLabels = { energy: 'energy', focus: 'focus', confidence: 'confidence', aura: 'aura', sleep: 'sleep', workout: 'body score' };
     const parts = [];
 
     metrics.forEach(m => {
@@ -223,17 +223,27 @@ async function generatePersonalizedPulse(user, timezone) {
     }
   } catch { /* non-blocking — psych profile is enhancement */ }
 
-  const prompt = `You generate a short daily observation for a semen retention tracker app. The user sees this on their home screen every day.
+  const prompt = `You generate a daily observation for a semen retention tracker app home screen. This is the first thing the user sees when they open the app. It should make them feel like Oracle is watching their journey and knows something they don't.
 
-RULES:
-- ONE sentence. Maximum 20 words.
-- Write like a calm, knowing friend. Plain language a 16-year-old would understand.
-- Reference ONE specific thing from their data: a trend direction, a number, a cycle phase, or something from their history.
-- The observation should make them feel SEEN. Like someone is quietly watching their progress and noticed something specific.
-- NEVER use jargon like "neural hyperactivity", "transmutation potential", "amplifying pattern-recognition", or any pseudo-scientific language.
-- NEVER use em dashes, emojis, semicolons, or motivational cliches.
-- Good examples: "Your energy climbed 1.2 points this week. The cycle is working." / "Day 7 of mitotic division. Your body is rebuilding from the ground up." / "Focus steady at 7.4 all week. Consistency is compounding." / "Sleep dropped 0.8 points. Something shifted this week."
-- Bad examples: "Neural hyperactivity seeking external validation" / "Transmutation frequencies aligning" / "Mitotic division phase amplifying pattern-recognition"
+FORMAT: Two short sentences. 25 words total max.
+- Sentence 1: What you noticed in their data. A specific number, trend, or phase.
+- Sentence 2: What it means, what's coming next, or why it matters. This is where the value lives. Connect a dot they wouldn't connect themselves.
+
+VOICE:
+- Calm, knowing, direct. Like a mentor who's been watching quietly.
+- Plain language. No jargon, no pseudo-science, no em dashes, no emojis, no semicolons.
+- NEVER say "body jumped" or "body climbed" — say "body score" when referencing that metric.
+
+EXAMPLES:
+"Focus hit 9.7 this week. Mitotic division tends to sharpen that even further."
+"Sleep dipped 0.8 points over three days. Watch your evenings, that's usually where it starts."
+"Energy steady at 8.1 all week. That kind of consistency compounds faster than spikes."
+"Cycle day 7 of 74. Your stem cells are multiplying, everything rebuilds from here."
+"Confidence climbed every day this week. Oracle sees this pattern before major breakthroughs."
+
+BAD — never write like this:
+"Neural hyperactivity seeking external validation of internal signal."
+"Day 2527: Your focus just hit 9.7, and your body jumped almost a point this week. The discipline is showing results."
 ${voiceRules ? `\nORACLE VOICE RULES (follow these):\n${voiceRules}` : ''}
 ${toneNote ? `\nUSER TONE PREFERENCE: ${toneNote}` : ''}
 
@@ -244,7 +254,7 @@ Benefit trends: ${benefitContext}
 Oracle memory: ${memoryContext}
 ${communityNote}
 
-Generate the observation now. One plain, clear sentence.`;
+Two sentences. 25 words max. Go.`;
 
   try {
     const response = await anthropic.messages.create({
@@ -303,14 +313,18 @@ async function generateCommunityPulse() {
   let voiceRules = '';
   try { voiceRules = await getVoiceRulesForPulse(); } catch { /* non-blocking */ }
 
-  const prompt = `You generate a short community observation for a semen retention tracker app. Free users see this on their home screen.
+  const prompt = `You generate a daily community observation for a semen retention tracker app home screen. Free users see this — they see the collective, not personal data.
 
-RULES:
-- ONE sentence. Maximum 20 words.
-- Reference a real number from the data below (a percentage, a count, an average).
-- Plain language. No jargon, no pseudo-science, no em dashes, no emojis, no semicolons.
-- Good examples: "${totalUsers} practitioners active. ${topPct}% are in ${topPhase} phase this week." or "The community average sits at ${avgStreak} days. The standard keeps rising."
-- Tone: calm, factual, like reading a stat off a dashboard.
+FORMAT: Two short sentences. 25 words total max.
+- Sentence 1: A specific community stat (a real number from the data).
+- Sentence 2: What it means for the collective or what Oracle sees in the pattern.
+
+VOICE: Calm, factual, slightly awe-inspiring. Plain language. No jargon, no em dashes, no emojis, no semicolons.
+
+EXAMPLES:
+"${topPct}% of practitioners are in ${topPhase} phase this week. The collective is cycling in sync."
+"Community average sits at ${avgStreak} days. That baseline keeps climbing month over month."
+"${totalUsers} active practitioners right now. More data means sharper observations for everyone."
 ${voiceRules ? `\nORACLE VOICE RULES (follow these):\n${voiceRules}` : ''}
 
 COMMUNITY DATA:
@@ -319,7 +333,7 @@ Average streak: ${avgStreak} days
 Phase distribution: Mitotic ${phaseDistribution.mitotic}, Meiotic ${phaseDistribution.meiotic}, Maturation ${phaseDistribution.maturation}, Reabsorption ${phaseDistribution.reabsorption}
 Dominant phase: ${topPhase} (${topPct}% of users)
 
-Generate the community observation now. One plain sentence.`;
+Two sentences. 25 words max. Go.`;
 
   try {
     const response = await anthropic.messages.create({

@@ -973,6 +973,7 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
   height: 13px;
   object-fit: contain;
   opacity: 0.7;
+  flex-shrink: 0;
 }
 
 /* Desktop: show on parent hover */

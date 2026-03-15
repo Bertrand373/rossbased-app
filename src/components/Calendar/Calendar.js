@@ -1142,7 +1142,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         // Refresh month indicators
         fetchPinsForMonth(currentDate.getFullYear(), currentDate.getMonth());
         toast('Pin removed', {
-          icon: '⚡',
+          icon: '—',
           style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' }
         });
       }
