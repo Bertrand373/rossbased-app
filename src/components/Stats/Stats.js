@@ -1,6 +1,5 @@
 // Stats.js - TITANTRACK
-// Matches Landing/Tracker minimalist aesthetic
-// UPDATED: Your Patterns now shows streak-phase proof instead of day-of-week patterns
+// V2: Calendar-DNA viewport-filling layout — no scroll, gap-based grids
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { format } from 'date-fns';
 import { Line } from 'react-chartjs-2';
@@ -14,7 +13,7 @@ import toast from 'react-hot-toast';
 // Import extracted components
 import { StatCardModal } from './StatsComponents';
 import EmotionalTimeline from '../EmotionalTimeline/EmotionalTimeline';
-import { 
+import {
   YourNumbers,
   YourPatterns,
   AIInsights,
@@ -35,7 +34,7 @@ import {
   validateUserData
 } from './StatsUtils';
 
-// Import analytics functions - UPDATED: Added calculateStreakPhaseAverages
+// Import analytics functions
 import {
   getPhaseInfo,
   calculateMetricAverages,
@@ -62,21 +61,20 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [resetConfirmText, setResetConfirmText] = useState('');
   const [showStatModal, setShowStatModal] = useState(false);
   const [selectedStatCard, setSelectedStatCard] = useState(null);
-  
-  // Theme detection for chart colors
+  const [showMilestonesSheet, setShowMilestonesSheet] = useState(false);
+  const [showInsightsSheet, setShowInsightsSheet] = useState(false);
+
+  // Theme detection
   const [isDarkTheme, setIsDarkTheme] = useState(() => {
     return document.documentElement.getAttribute('data-theme') !== 'light';
   });
-  
+
   // ML pattern state
   const [mlPatterns, setMLPatterns] = useState(null);
   const [mlOptimization, setMLOptimization] = useState(null);
-  
+
   const [loadingStates, setLoadingStates] = useState({
-    numbers: true,
-    patterns: true,
-    ai: true,
-    relapse: true
+    numbers: true, patterns: true, ai: true, relapse: true
   });
 
   const chartRef = useRef(null);
@@ -86,8 +84,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [sheetReady, setSheetReady] = useState(false);
   const sheetPanelRef = useRef(null);
 
-  // Sheet open animation
-  const sheetVisible = showMilestoneModal || showResetStreakModal || showResetAllModal;
+  const sheetVisible = showMilestoneModal || showResetStreakModal || showResetAllModal || showMilestonesSheet || showInsightsSheet;
   useEffect(() => {
     if (sheetVisible) {
       requestAnimationFrame(() => requestAnimationFrame(() => setSheetReady(true)));
@@ -101,44 +98,30 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setTimeout(cb, 300);
   }, []);
 
-  // Swipe-to-dismiss — non-passive native listeners so iOS respects preventDefault
   const handleSwipeDismiss = useCallback(() => {
     setShowMilestoneModal(false);
     setShowResetStreakModal(false);
     setShowResetAllModal(false);
+    setShowMilestonesSheet(false);
+    setShowInsightsSheet(false);
     setSelectedMilestone(null);
   }, []);
   useSheetSwipe(sheetPanelRef, sheetVisible, () => closeSheet(handleSwipeDismiss));
   useBodyScrollLock(sheetVisible);
-  
-  // Detect theme changes for chart colors
+
+  // Theme observer
   useEffect(() => {
     const checkTheme = () => {
       setIsDarkTheme(document.documentElement.getAttribute('data-theme') !== 'light');
     };
-    
-    // Check on mount
     checkTheme();
-    
-    // Watch for theme changes
     const observer = new MutationObserver(checkTheme);
-    observer.observe(document.documentElement, { 
-      attributes: true, 
-      attributeFilter: ['data-theme'] 
-    });
-    
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     return () => observer.disconnect();
   }, []);
-  
-  // Get days tracked for unlock logic
-  const daysTracked = useMemo(() => {
-    return safeUserData.benefitTracking?.length || 0;
-  }, [safeUserData.benefitTracking]);
-  
-  // Get relapse count for AI unlock logic
-  const relapseCount = useMemo(() => {
-    return (safeUserData.streakHistory || []).filter(s => s.reason === 'relapse').length;
-  }, [safeUserData.streakHistory]);
+
+  const daysTracked = useMemo(() => safeUserData.benefitTracking?.length || 0, [safeUserData.benefitTracking]);
+  const relapseCount = useMemo(() => (safeUserData.streakHistory || []).filter(s => s.reason === 'relapse').length, [safeUserData.streakHistory]);
 
   useEffect(() => {
     if (isPremium) {
@@ -152,90 +135,65 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     }
   }, [isPremium, selectedMetric]);
 
-  // Load ML patterns when premium user has enough data
+  // ML patterns
   useEffect(() => {
     const loadMLPatterns = async () => {
-      if (!isPremium || daysTracked < 20) {
-        setMLPatterns(null);
-        setMLOptimization(null);
-        return;
-      }
-      
+      if (!isPremium || daysTracked < 20) { setMLPatterns(null); setMLOptimization(null); return; }
       try {
         const patterns = await discoverMLPatterns(safeUserData);
         setMLPatterns(patterns);
-        
         const optimization = await generateMLOptimization(safeUserData);
         setMLOptimization(optimization);
       } catch (error) {
         console.warn('ML patterns loading error:', error);
-        setMLPatterns(null);
-        setMLOptimization(null);
+        setMLPatterns(null); setMLOptimization(null);
       }
     };
-    
     loadMLPatterns();
   }, [safeUserData, isPremium, daysTracked]);
 
-  // UPDATED: Memoized analytics - now includes streak-phase averages
+  // Memoized analytics
   const memoizedInsights = useMemo(() => {
     if (!isPremium) return {};
     return {
-      // Your Numbers data
       metricAverages: calculateMetricAverages(safeUserData, 7),
       metricTrends: calculateMetricTrends(safeUserData, 7, 7),
       metricExtremes: identifyMetricExtremes(safeUserData, 7),
-      
-      // Your Progress data (renamed from Patterns)
       streakPhaseAverages: calculateStreakPhaseAverages(safeUserData),
       metricCorrelations: calculateMetricCorrelations(safeUserData),
       growthRates: calculateGrowthRates(safeUserData, 30),
-      
-      // Relapse data
       relapsePatterns: generateRelapsePatternAnalysis(safeUserData),
       daysSinceLastRelapse: calculateDaysSinceLastRelapse(safeUserData),
-      
-      // Phase info (aligned with Emotional Timeline)
       phaseInfo: getPhaseInfo(safeUserData.currentStreak || 0)
     };
   }, [safeUserData, selectedMetric, isPremium]);
 
-  // Milestones - with fallback date calculation for legacy accounts
+  // Milestones
   const milestones = useMemo(() => {
     const maxStreak = Math.max(safeUserData.currentStreak || 0, safeUserData.longestStreak || 0);
     const badges = safeUserData.badges || [];
     const streakHistory = safeUserData.streakHistory || [];
     const startDate = safeUserData.startDate;
-    
-    // Helper to calculate milestone date if badge entry is missing
     const getMilestoneDate = (badgeName, milestoneDays) => {
-      // First, try to get date from badge
       const badge = badges.find(b => b.name === badgeName);
       if (badge?.date) return badge.date;
-      
-      // If no badge date but milestone was earned, calculate it
       if (maxStreak >= milestoneDays) {
-        // Check if current streak reached this milestone
         const currentStreak = safeUserData.currentStreak || 0;
         if (currentStreak >= milestoneDays && startDate) {
-          const milestoneDate = new Date(startDate);
-          milestoneDate.setDate(milestoneDate.getDate() + milestoneDays);
-          return milestoneDate;
+          const d = new Date(startDate);
+          d.setDate(d.getDate() + milestoneDays);
+          return d;
         }
-        
-        // Check streak history for the first streak that reached this milestone
         for (const streak of streakHistory) {
           if (streak.days >= milestoneDays && streak.start) {
-            const milestoneDate = new Date(streak.start);
-            milestoneDate.setDate(milestoneDate.getDate() + milestoneDays);
-            return milestoneDate;
+            const d = new Date(streak.start);
+            d.setDate(d.getDate() + milestoneDays);
+            return d;
           }
         }
       }
-      
       return null;
     };
-    
     return [
       { days: 7, label: '1 week', earned: maxStreak >= 7, date: getMilestoneDate('7-Day Warrior', 7) },
       { days: 14, label: '2 weeks', earned: maxStreak >= 14, date: getMilestoneDate('14-Day Monk', 14) },
@@ -246,109 +204,75 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     ];
   }, [safeUserData]);
 
-  // Chart configuration - Clean trend line, endpoints only
-  // Theme-aware colors for light/dark mode
+  // Sparkline-style chart options — stripped down, no Y axis, no grid
   const chartOptions = useMemo(() => {
-    const tickColor = isDarkTheme ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.25)';
-    const gridColor = isDarkTheme ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.06)';
     const tooltipBg = isDarkTheme ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.95)';
     const tooltipTitleColor = isDarkTheme ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.5)';
     const tooltipBodyColor = isDarkTheme ? '#ffffff' : '#000000';
     const tooltipBorderColor = isDarkTheme ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.1)';
-    
-    return {
-    responsive: true,
-    maintainAspectRatio: false,
-    layout: {
-      padding: { top: 20, right: 8, bottom: 0, left: 0 }
-    },
-    scales: {
-      y: {
-        min: 0,
-        max: 10.5,
-        ticks: { 
-          stepSize: 5, 
-          color: tickColor, 
-          font: { size: 10, weight: '400' },
-          padding: 8,
-          callback: (value) => value <= 10 ? value : ''
-        },
-        grid: { 
-          color: gridColor, 
-          drawBorder: false
-        },
-        border: { display: false }
-      },
-      x: {
-        ticks: { 
-          color: tickColor, 
-          font: { size: 9, weight: '400' }, 
-          maxRotation: 0, 
-          maxTicksLimit: timeRange === 'quarter' ? 5 : (timeRange === 'month' ? 6 : 7),
-          padding: 4
-        },
-        grid: { display: false },
-        border: { display: false }
-      }
-    },
-    elements: {
-      line: {
-        tension: 0.4,
-        borderWidth: 2.5,
-        borderCapStyle: 'round',
-        borderJoinStyle: 'round'
-      },
-      point: {
-        radius: 0,
-        hoverRadius: 6,
-        hoverBorderWidth: 2,
-        hitRadius: 30
-      }
-    },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        enabled: true,
-        backgroundColor: tooltipBg,
-        titleColor: tooltipTitleColor,
-        titleFont: { size: 10, weight: '400' },
-        bodyColor: tooltipBodyColor,
-        bodyFont: { size: 16, weight: '600' },
-        borderColor: tooltipBorderColor,
-        borderWidth: 1,
-        cornerRadius: 8,
-        padding: { top: 8, right: 12, bottom: 8, left: 12 },
-        displayColors: false,
-        caretSize: 0,
-        caretPadding: 10,
-        callbacks: { 
-          title: (items) => items.length ? items[0].label : '',
-          label: (ctx) => ctx.parsed.y === null ? '' : `${ctx.parsed.y}`
-        }
-      }
-    },
-    interaction: { 
-      mode: 'index', 
-      intersect: false,
-      axis: 'x'
-    },
-    animation: {
-      duration: 400,
-      easing: 'easeOutQuart'
-    }
-  }; }, [timeRange, isDarkTheme]);
 
-  // Generate chart data with gradient fill and endpoint dots
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      layout: { padding: { top: 12, right: 4, bottom: 0, left: 4 } },
+      scales: {
+        y: {
+          display: false,
+          min: 0,
+          max: 10.5
+        },
+        x: {
+          display: true,
+          ticks: {
+            color: isDarkTheme ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.2)',
+            font: { size: 9, weight: '400' },
+            maxRotation: 0,
+            maxTicksLimit: timeRange === 'quarter' ? 5 : (timeRange === 'month' ? 5 : 7),
+            padding: 4
+          },
+          grid: { display: false },
+          border: { display: false }
+        }
+      },
+      elements: {
+        line: { tension: 0.4, borderWidth: 2.5, borderCapStyle: 'round', borderJoinStyle: 'round' },
+        point: { radius: 0, hoverRadius: 6, hoverBorderWidth: 2, hitRadius: 30 }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          enabled: true,
+          backgroundColor: tooltipBg,
+          titleColor: tooltipTitleColor,
+          titleFont: { size: 10, weight: '400' },
+          bodyColor: tooltipBodyColor,
+          bodyFont: { size: 16, weight: '600' },
+          borderColor: tooltipBorderColor,
+          borderWidth: 1,
+          cornerRadius: 8,
+          padding: { top: 8, right: 12, bottom: 8, left: 12 },
+          displayColors: false,
+          caretSize: 0,
+          caretPadding: 10,
+          callbacks: {
+            title: (items) => items.length ? items[0].label : '',
+            label: (ctx) => ctx.parsed.y === null ? '' : `${ctx.parsed.y}`
+          }
+        }
+      },
+      interaction: { mode: 'index', intersect: false, axis: 'x' },
+      animation: { duration: 400, easing: 'easeOutQuart' }
+    };
+  }, [timeRange, isDarkTheme]);
+
+  // Chart data generator — white line, area fill
   const getChartData = useCallback(() => {
     const rawData = generateChartData(safeUserData, selectedMetric, timeRange);
     const chart = chartRef.current;
-    
-    // Theme-aware colors
     const lineColor = isDarkTheme ? '#ffffff' : '#000000';
     const pointBorderColor = isDarkTheme ? '#000000' : '#ffffff';
-    
+
     let gradient = isDarkTheme ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
-    
     if (chart?.ctx && chart?.chartArea) {
       gradient = chart.ctx.createLinearGradient(0, chart.chartArea.top, 0, chart.chartArea.bottom);
       if (isDarkTheme) {
@@ -361,15 +285,14 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         gradient.addColorStop(1, 'rgba(0,0,0,0)');
       }
     }
-    
-    // Find first and last valid data points for endpoint dots
+
     const data = rawData.datasets[0].data;
     const pointRadii = data.map((value) => {
       if (value === null) return 0;
-      if (timeRange === 'week') return 4;  // Dots visible for week view
-      return 0;  // Month & quarter: smooth line only, tap to reveal values
+      if (timeRange === 'week') return 4;
+      return 0;
     });
-    
+
     return {
       ...rawData,
       datasets: [{
@@ -390,286 +313,296 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     };
   }, [safeUserData, selectedMetric, timeRange, isDarkTheme]);
 
-  const handleStatCardClick = (statType) => {
-    setSelectedStatCard(statType);
-    setShowStatModal(true);
-  };
-
-  const handleMilestoneClick = (milestone) => {
-    if (milestone.earned) {
-      setSelectedMilestone(milestone);
-      setShowMilestoneModal(true);
-    }
-  };
+  // Handlers
+  const handleStatCardClick = (statType) => { setSelectedStatCard(statType); setShowStatModal(true); };
+  const handleMilestoneClick = (milestone) => { if (milestone.earned) { setSelectedMilestone(milestone); setShowMilestoneModal(true); } };
 
   const confirmResetStreak = async () => {
     try {
       const todayStr = format(new Date(), 'yyyy-MM-dd');
       const history = [...(safeUserData.streakHistory || [])];
-      
-      // Close out the active streak (reason: 'reset', NOT 'relapse')
       const activeIdx = history.findIndex(s => s.start && !s.end);
       if (activeIdx !== -1) {
-        history[activeIdx] = { 
-          ...history[activeIdx], 
-          end: todayStr, 
-          days: safeUserData.currentStreak || 0, 
-          reason: 'reset' 
-        };
+        history[activeIdx] = { ...history[activeIdx], end: todayStr, days: safeUserData.currentStreak || 0, reason: 'reset' };
       }
-      
-      // Start a fresh streak
       history.push({ start: todayStr, end: null, days: 0 });
-      
-      await updateUserData({
-        currentStreak: 0,
-        startDate: todayStr,
-        streakHistory: history
-      });
+      await updateUserData({ currentStreak: 0, startDate: todayStr, streakHistory: history });
       setShowResetStreakModal(false);
       toast.success('Streak reset');
-    } catch (error) {
-      toast.error('Failed to reset streak');
-    }
+    } catch (error) { toast.error('Failed to reset streak'); }
   };
 
   const confirmResetAll = async () => {
     try {
       await updateUserData({
-        currentStreak: 0,
-        longestStreak: 0,
-        wetDreamCount: 0,
-        relapseCount: 0,
-        benefitTracking: [],
-        relapseHistory: [],
-        streakHistory: [],
+        currentStreak: 0, longestStreak: 0, wetDreamCount: 0, relapseCount: 0,
+        benefitTracking: [], relapseHistory: [], streakHistory: [],
         badges: safeUserData.badges?.map(b => ({ ...b, earned: false, date: null })) || [],
         startDate: format(new Date(), 'yyyy-MM-dd')
       });
-      setShowResetAllModal(false);
-      setResetConfirmText('');
+      setShowResetAllModal(false); setResetConfirmText('');
       toast.success('All data reset');
-    } catch (error) {
-      toast.error('Failed to reset data');
-    }
+    } catch (error) { toast.error('Failed to reset data'); }
   };
 
-  // Metric toggle items
+  // Metric display names
+  const metricDisplayName = { energy: 'Energy', focus: 'Focus', confidence: 'Confidence', aura: 'Aura', sleep: 'Sleep', workout: 'Body' };
+
+  // Get average + trend for header display
+  const currentAvg = useMemo(() => calculateAverage(safeUserData, selectedMetric, timeRange, isPremium), [safeUserData, selectedMetric, timeRange, isPremium]);
+
+  const currentTrend = useMemo(() => {
+    if (!isPremium || !memoizedInsights.metricTrends?.[selectedMetric]) return null;
+    return memoizedInsights.metricTrends[selectedMetric];
+  }, [isPremium, memoizedInsights.metricTrends, selectedMetric]);
+
+  // Numbers grid helper — get directional tint class
+  const getNumberTintClass = (metric) => {
+    if (!memoizedInsights.metricTrends?.[metric]) return '';
+    const { direction } = memoizedInsights.metricTrends[metric];
+    if (direction === 'up') return 'num-cell-up';
+    if (direction === 'down') return 'num-cell-down';
+    return '';
+  };
+
+  // Phase info for progress bar
+  const phaseInfo = memoizedInsights.phaseInfo || getPhaseInfo(safeUserData.currentStreak || 0);
+
+  // Oracle insight — contextual, reacts to weakest metric
+  const oracleInsight = useMemo(() => {
+    if (!isPremium || !memoizedInsights.metricExtremes?.growthArea) return null;
+    const weak = memoizedInsights.metricExtremes.growthArea;
+    const trend = memoizedInsights.metricTrends?.[weak.metric];
+    const delta = trend?.delta || 0;
+    const name = metricDisplayName[weak.metric] || weak.metric;
+    if (delta < 0) {
+      return { title: `${name} dropped ${Math.abs(delta)} this week`, body: `Common during ${phaseInfo.name.toLowerCase()} phase. Your other metrics are climbing — this typically corrects within 7-10 days.` };
+    }
+    return { title: `${name} is your growth area`, body: `Currently averaging ${weak.value?.toFixed(1) || '—'}/10. Focus transmutation practices here to bring it in line with your stronger metrics.` };
+  }, [isPremium, memoizedInsights, phaseInfo]);
+
+  // Time range options
   const timeRanges = [
     { key: 'week', label: 'Week' },
     { key: 'month', label: 'Month' },
-    { key: 'quarter', label: '90 Days' }
+    { key: 'quarter', label: '90d' }
   ];
+
+  // Metric options
+  const metricOptions = [
+    { key: 'energy', label: 'Energy' },
+    { key: 'focus', label: 'Focus' },
+    { key: 'confidence', label: 'Conf' },
+    { key: 'aura', label: 'Aura' },
+    { key: 'sleep', label: 'Sleep' },
+    { key: 'workout', label: 'Body' }
+  ];
+
+  // Next milestone for progress bar
+  const nextMilestone = milestones.find(m => !m.earned);
+  const prevMilestone = milestones.filter(m => m.earned).pop();
+  const progressPct = nextMilestone
+    ? Math.min(((safeUserData.currentStreak || 0) - (prevMilestone?.days || 0)) / (nextMilestone.days - (prevMilestone?.days || 0)) * 100, 100)
+    : 100;
 
   return (
     <div className="stats-page">
-      {/* Sub-tab navigation — Analytics | Timeline */}
-      <nav className="stats-tabs">
-        <button
-          className={`stats-tab ${activeView === 'analytics' ? 'active' : ''}`}
-          onClick={() => setActiveView('analytics')}
-        >
-          Analytics
-        </button>
-        <div className="stats-tab-divider" />
-        <button
-          className={`stats-tab ${activeView === 'timeline' ? 'active' : ''}`}
-          onClick={() => setActiveView('timeline')}
-        >
-          Timeline
-        </button>
-      </nav>
+      {/* ====== STICKY HEADER — mirrors Calendar header exactly ====== */}
+      <div className="stats-header-sticky">
+        <div className="stats-header-row">
+          <span className="stats-header-title">Your Stats</span>
+          <div className="stats-view-toggle">
+            <button
+              className={`stats-vt-btn ${activeView === 'analytics' ? 'active' : ''}`}
+              onClick={() => setActiveView('analytics')}
+            >Analytics</button>
+            <span className="stats-vt-div" />
+            <button
+              className={`stats-vt-btn ${activeView === 'timeline' ? 'active' : ''}`}
+              onClick={() => setActiveView('timeline')}
+            >Timeline</button>
+          </div>
+        </div>
+      </div>
 
-      {/* Timeline view — EmotionalTimeline component */}
+      {/* ====== TIMELINE VIEW ====== */}
       {activeView === 'timeline' && (
-        <EmotionalTimeline 
-          userData={userData} 
-          isPremium={isPremium} 
-          updateUserData={updateUserData} 
-          openPlanModal={openPlanModal} 
-        />
+        <div className="stats-timeline-wrap">
+          <EmotionalTimeline
+            userData={userData}
+            isPremium={isPremium}
+            updateUserData={updateUserData}
+            openPlanModal={openPlanModal}
+          />
+        </div>
       )}
 
-      {/* Analytics view — existing Stats content */}
+      {/* ====== ANALYTICS VIEW ====== */}
       {activeView === 'analytics' && (
       <>
-      {/* Hero Streak */}
-      <div className="stat-hero">
-        <div className="stat-hero-glow" />
-        <button className="stat-hero-num" onClick={() => handleStatCardClick('currentStreak')}>
-          {safeUserData.currentStreak || 0}
-        </button>
-        <span className="stat-hero-label">DAYS RETAINED</span>
-      </div>
+        <div className="stats-analytics">
 
-      {/* Next Milestone Progress */}
-      {(() => {
-        const nextM = milestones.find(m => !m.earned);
-        if (!nextM) return null;
-        const prevM = milestones.filter(m => m.earned).pop();
-        const prevDays = prevM ? prevM.days : 0;
-        const current = safeUserData.currentStreak || 0;
-        const pct = Math.min(((current - prevDays) / (nextM.days - prevDays)) * 100, 100);
-        const remaining = nextM.days - current;
-        return (
-          <div className="stat-progress">
-            <div className="stat-progress-meta">
-              <span className="stat-progress-text">{remaining} days to {nextM.days.toLocaleString()}</span>
+          {/* ---- STREAK STRIP: 4-col grid ---- */}
+          <div className="streak-strip">
+            <button className="streak-cell streak-current" onClick={() => handleStatCardClick('currentStreak')}>
+              <span className="streak-hero-num">{safeUserData.currentStreak || 0}</span>
+              <span className="streak-cell-label-upper">Streak</span>
+            </button>
+            <button className="streak-cell" onClick={() => handleStatCardClick('longestStreak')}>
+              <span className="streak-cell-num">{safeUserData.longestStreak || 0}</span>
+              <span className="streak-cell-label">Longest</span>
+            </button>
+            <button className="streak-cell" onClick={() => handleStatCardClick('wetDreams')}>
+              <span className="streak-cell-num">{safeUserData.wetDreamCount || 0}</span>
+              <span className="streak-cell-label">Wet Dreams</span>
+            </button>
+            <button className="streak-cell" onClick={() => handleStatCardClick('relapses')}>
+              <span className="streak-cell-num">{safeUserData.relapseCount || 0}</span>
+              <span className="streak-cell-label">Relapses</span>
+            </button>
+          </div>
+
+          {/* ---- PROGRESS BAR — attached to streak strip ---- */}
+          <div className="stats-progress-bar">
+            <div className="stats-progress-meta">
+              <span className="stats-progress-text">
+                {nextMilestone
+                  ? `${safeUserData.currentStreak || 0} / ${nextMilestone.days} · ${phaseInfo.name}`
+                  : `${safeUserData.currentStreak || 0} days · ${phaseInfo.name}`}
+              </span>
             </div>
-            <div className="stat-progress-track">
-              <div className="stat-progress-fill" style={{ width: `${pct}%` }} />
+            <div className="stats-progress-track">
+              <div className="stats-progress-fill" style={{ width: `${progressPct}%` }} />
             </div>
           </div>
-        );
-      })()}
 
-      {/* Supporting Stats */}
-      <div className="stat-supporting">
-        <button className="stat-supporting-card" onClick={() => handleStatCardClick('longestStreak')}>
-          <span className="stat-supporting-num">{safeUserData.longestStreak || 0}</span>
-          <span className="stat-supporting-label">Longest</span>
-        </button>
-        <div className="stat-supporting-divider" />
-        <button className="stat-supporting-card" onClick={() => handleStatCardClick('wetDreams')}>
-          <span className="stat-supporting-num">{safeUserData.wetDreamCount || 0}</span>
-          <span className="stat-supporting-label">Wet Dreams</span>
-        </button>
-        <div className="stat-supporting-divider" />
-        <button className="stat-supporting-card" onClick={() => handleStatCardClick('relapses')}>
-          <span className="stat-supporting-num">{safeUserData.relapseCount || 0}</span>
-          <span className="stat-supporting-label">Relapses</span>
-        </button>
-      </div>
+          {/* ---- CHART HEADER: metric label + value + delta | time range ---- */}
+          <div className="chart-header">
+            <div className="chart-header-left">
+              <span className="chart-metric-label">{metricDisplayName[selectedMetric]}</span>
+              <span className="chart-metric-value">{currentAvg !== 'N/A' ? currentAvg : '—'}</span>
+              {currentTrend && (
+                <span className={`chart-metric-delta ${currentTrend.direction === 'up' ? 'delta-up' : currentTrend.direction === 'down' ? 'delta-down' : 'delta-flat'}`}>
+                  {currentTrend.direction === 'up' ? '+' : ''}{currentTrend.delta}
+                </span>
+              )}
+            </div>
+            <div className="chart-time-toggle">
+              {timeRanges.map((r, i) => (
+                <React.Fragment key={r.key}>
+                  <button
+                    className={`chart-tt-btn ${timeRange === r.key ? 'active' : ''}`}
+                    onClick={() => setTimeRange(r.key)}
+                  >{r.label}</button>
+                  {i < timeRanges.length - 1 && <span className="chart-tt-div" />}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
 
-      <StatCardModal
-        showModal={showStatModal}
-        selectedStatCard={selectedStatCard}
-        onClose={() => setShowStatModal(false)}
-        userData={safeUserData}
-      />
-
-      {/* Milestones */}
-      <section className="stats-section">
-        <h2>Milestones</h2>
-        <div className="milestone-grid">
-          {milestones.map((m, i) => {
-            const nextIdx = milestones.findIndex(ms => !ms.earned);
-            const mostRecentIdx = nextIdx > 0 ? nextIdx - 1 : nextIdx === -1 ? milestones.length - 1 : -1;
-            const isMostRecent = i === mostRecentIdx;
-            const isNext = i === nextIdx;
-            const cardClass = `milestone-card ${m.earned ? 'earned' : ''} ${isMostRecent ? 'most-recent' : ''} ${isNext ? 'next-target' : ''}`;
-            return (
-              <button
-                key={m.days}
-                className={cardClass}
-                onClick={() => handleMilestoneClick(m)}
-                disabled={!m.earned}
-              >
-                <span className="milestone-num">{m.days}</span>
-                <span className="milestone-label">{m.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Share Progress Card - Premium only */}
-      {isPremium && <ShareCard userData={safeUserData} isVisible={true} />}
-
-      {/* Benefit Tracker */}
-      <section className="stats-section benefit-section">
-        <h2>Benefits</h2>
-        
-        {/* Header: label left, time range right (mirrors Calendar) */}
-        <div className="benefit-header">
-          <h2>Benefits</h2>
-          <div className="time-toggle-compact">
-            {timeRanges.map((r, index) => (
-              <React.Fragment key={r.key}>
+          {/* ---- METRIC SELECTOR — pipe dividers ---- */}
+          <div className="metric-selector-row">
+            {metricOptions.map((m, i) => (
+              <React.Fragment key={m.key}>
                 <button
-                  className={`tt-btn ${timeRange === r.key ? 'active' : ''}`}
-                  onClick={() => setTimeRange(r.key)}
-                >
-                  {r.label}
-                </button>
-                {index < timeRanges.length - 1 && <div className="tt-div" />}
+                  className={`metric-sel-btn ${selectedMetric === m.key ? 'active' : ''}`}
+                  onClick={() => setSelectedMetric(m.key)}
+                >{m.label}</button>
+                {i < metricOptions.length - 1 && <span className="metric-sel-div" />}
               </React.Fragment>
             ))}
           </div>
-        </div>
 
-        {/* Metric toggles — pipe-divider style matching app toggle DNA */}
-        <div className="toggle-row benefits-row">
-          {[
-            { key: 'energy', label: 'Energy' },
-            { key: 'focus', label: 'Focus' },
-            { key: 'confidence', label: 'Confidence' },
-            { key: 'aura', label: 'Aura' },
-            { key: 'sleep', label: 'Sleep' },
-            { key: 'workout', label: 'Body' }
-          ].map(({ key: metric, label }, index) => (
-            <React.Fragment key={metric}>
-              <button
-                className={`toggle-btn ${selectedMetric === metric ? 'active' : ''}`}
-                onClick={() => setSelectedMetric(metric)}
-              >
-                {label}
-              </button>
-              {index < 5 && <div className="toggle-divider" />}
-            </React.Fragment>
-          ))}
-        </div>
-
-        {/* Average display - Hero number like Tracker */}
-        {(() => {
-          const avg = calculateAverage(safeUserData, selectedMetric, timeRange, isPremium);
-          const hasValue = avg !== 'N/A';
-          return (
-            <>
-              <div className="average-block">
-                <span className="average-num">{hasValue ? avg : '—'}</span>
-                {hasValue && <span className="average-suffix">/10</span>}
-              </div>
-              <p className="average-label">{selectedMetric} {getTimeRangeDisplayText(timeRange)}</p>
-            </>
-          );
-        })()}
-
-        {/* Chart */}
-        <div className="chart-box">
-          {(() => {
-            const chartData = getChartData();
-            const hasData = chartData.datasets[0].data.some(v => v !== null);
-            if (!hasData) return (
-              <div className="chart-empty">
-                <img src="/icon-192.png" alt="" className="chart-empty-icon" />
-                <span className="chart-empty-title">No data yet</span>
-                <span className="chart-empty-sub">Check in daily to see your trends</span>
-              </div>
-            );
-            return <Line ref={chartRef} data={chartData} options={chartOptions} />;
-          })()}
-        </div>
-
-        {/* Free User */}
-        {!isPremium && (
-          <div className="free-section">
-            <div className="free-card">
-              <h3>Phase Context</h3>
-              <p>Day {safeUserData.currentStreak || 0} · {memoizedInsights.phaseInfo?.name || 'Initial Adaptation'}</p>
-            </div>
-            <div className="upgrade-card">
-              <p>Unlock detailed analytics and personalized optimization</p>
-              <button className="btn-primary" onClick={openPlanModal}>Upgrade to Premium</button>
-            </div>
+          {/* ---- SPARKLINE CHART — flex-expands to fill space ---- */}
+          <div className="chart-spark-area">
+            {(() => {
+              const chartData = getChartData();
+              const hasData = chartData.datasets[0].data.some(v => v !== null);
+              if (!hasData) return (
+                <div className="chart-empty-state">
+                  <span className="chart-empty-title">No data yet</span>
+                  <span className="chart-empty-sub">Check in daily to see trends</span>
+                </div>
+              );
+              return <Line ref={chartRef} data={chartData} options={chartOptions} />;
+            })()}
           </div>
-        )}
 
-        {/* Premium Analytics - Pure data components */}
+          {/* ---- NUMBERS GRID: 3×2 with directional tints ---- */}
+          {isPremium && memoizedInsights.metricAverages && (
+            <div className="numbers-grid-v2">
+              <div className="numbers-grid-top">
+                {['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'].map(metric => {
+                  const val = memoizedInsights.metricAverages?.averages?.[metric]?.value;
+                  const trend = memoizedInsights.metricTrends?.[metric];
+                  return (
+                    <div key={metric} className={`num-cell ${getNumberTintClass(metric)}`}>
+                      <span className="num-cell-value">{val ? val.toFixed(1) : '—'}</span>
+                      <span className="num-cell-label">{metricDisplayName[metric]}</span>
+                      {daysTracked >= 14 && trend && (
+                        <span className={`num-cell-delta ${trend.direction === 'up' ? 'delta-up' : trend.direction === 'down' ? 'delta-down' : 'delta-flat'}`}>
+                          {trend.direction === 'up' ? '+' : ''}{trend.delta}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              {memoizedInsights.metricExtremes?.strongest && memoizedInsights.metricExtremes?.growthArea && (
+                <div className="numbers-grid-extremes">
+                  <div className="num-extreme-cell">
+                    <span className="num-extreme-label">Strongest</span>
+                    <span className="num-extreme-value">{metricDisplayName[memoizedInsights.metricExtremes.strongest.metric]}</span>
+                  </div>
+                  <div className="num-extreme-cell">
+                    <span className="num-extreme-label">Growth Area</span>
+                    <span className="num-extreme-value">{metricDisplayName[memoizedInsights.metricExtremes.growthArea.metric]}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Free user — simple phase + upgrade */}
+          {!isPremium && (
+            <div className="numbers-grid-v2">
+              <div className="numbers-grid-top" style={{ gridTemplateColumns: '1fr' }}>
+                <div className="num-cell" style={{ padding: '16px' }}>
+                  <span className="num-cell-label" style={{ marginBottom: '4px' }}>Day {safeUserData.currentStreak || 0} · {phaseInfo.name}</span>
+                  <button className="stats-upgrade-btn" onClick={openPlanModal}>Unlock detailed analytics</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ---- ORACLE INSIGHT — contextual single card ---- */}
+          {isPremium && oracleInsight && (
+            <div className="oracle-insight-card">
+              <div className="oracle-insight-header">
+                <span className="oracle-insight-title">{oracleInsight.title}</span>
+                <span className="oracle-insight-badge">Oracle</span>
+              </div>
+              <span className="oracle-insight-body">{oracleInsight.body}</span>
+            </div>
+          )}
+
+          {/* ---- FOOTER ACTIONS: milestones + reset ---- */}
+          <div className="stats-footer-row">
+            <button className="stats-footer-btn" onClick={() => setShowMilestonesSheet(true)}>
+              Milestones
+            </button>
+            <span className="stats-footer-div" />
+            <button className="stats-footer-btn" onClick={() => setShowResetStreakModal(true)}>
+              Reset
+            </button>
+          </div>
+
+        </div>
+
+        {/* ====== PREMIUM ANALYTICS — below the fold, scrollable ====== */}
         {isPremium && (
-          <>
+          <div className="stats-premium-stack">
             <div className="analytics-stack">
-              {/* Section 1: Your Numbers - Always visible */}
               <YourNumbers
                 metricAverages={memoizedInsights.metricAverages}
                 metricTrends={memoizedInsights.metricTrends}
@@ -677,8 +610,6 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                 daysTracked={daysTracked}
                 isLoading={loadingStates.numbers}
               />
-              
-              {/* Section 2: Your Progress - Streak-phase proof + correlations */}
               <YourPatterns
                 streakPhaseAverages={memoizedInsights.streakPhaseAverages}
                 metricCorrelations={memoizedInsights.metricCorrelations}
@@ -687,8 +618,6 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                 daysTracked={daysTracked}
                 isLoading={loadingStates.patterns}
               />
-              
-              {/* Section 3: AI Insights - Unlocks at 20+ days AND 2+ relapses */}
               <AIInsights
                 mlPatterns={mlPatterns}
                 mlOptimization={mlOptimization}
@@ -696,38 +625,72 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                 relapseCount={relapseCount}
                 isLoading={loadingStates.ai}
               />
-              
-              {/* Section 4: Relapse Analytics - Only shows if has relapse data */}
               <RelapseAnalytics
                 relapsePatterns={memoizedInsights.relapsePatterns}
                 daysSinceLastRelapse={memoizedInsights.daysSinceLastRelapse}
                 isLoading={loadingStates.relapse}
               />
             </div>
-            
-            {/* Section 5: Phase Context - Styled like ET/Urge headers */}
             <PhaseContext
               currentStreak={safeUserData.currentStreak}
               phaseInfo={memoizedInsights.phaseInfo}
               onNavigateToTimeline={() => setActiveView('timeline')}
             />
-          </>
+          </div>
         )}
-      </section>
 
-      {/* Reset Menu - Text-only with dividers */}
-      <div className="reset-menu">
-        <span className="reset-label">Reset:</span>
-        <button className="reset-btn" onClick={() => setShowResetStreakModal(true)}>
-          Streak
-        </button>
-        <div className="reset-divider" />
-        <button className="reset-btn danger" onClick={() => setShowResetAllModal(true)}>
-          All Data
-        </button>
-      </div>
+        {/* Free user upgrade nudge */}
+        {!isPremium && (
+          <div className="stats-premium-stack" style={{ textAlign: 'center', padding: '32px 16px 100px' }}>
+            <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '16px' }}>Unlock detailed analytics and personalized optimization</p>
+            <button className="btn-primary" onClick={openPlanModal}>Upgrade to Premium</button>
+          </div>
+        )}
+      </>
+      )}
 
-      {/* Milestone Modal - Transparent floating */}
+      {/* ====== STAT CARD MODAL ====== */}
+      <StatCardModal
+        showModal={showStatModal}
+        selectedStatCard={selectedStatCard}
+        onClose={() => setShowStatModal(false)}
+        userData={safeUserData}
+      />
+
+      {/* ====== MILESTONES SHEET ====== */}
+      {showMilestonesSheet && (
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowMilestonesSheet(false))}>
+          <div ref={sheetPanelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" />
+            <div className="milestones-sheet-content">
+              <h2 className="sheet-section-title">Milestones</h2>
+              <div className="milestone-grid">
+                {milestones.map((m, i) => {
+                  const nextIdx = milestones.findIndex(ms => !ms.earned);
+                  const mostRecentIdx = nextIdx > 0 ? nextIdx - 1 : nextIdx === -1 ? milestones.length - 1 : -1;
+                  const isMostRecent = i === mostRecentIdx;
+                  const isNext = i === nextIdx;
+                  return (
+                    <button
+                      key={m.days}
+                      className={`milestone-card ${m.earned ? 'earned' : ''} ${isMostRecent ? 'most-recent' : ''} ${isNext ? 'next-target' : ''}`}
+                      onClick={() => { if (m.earned) { setShowMilestonesSheet(false); handleMilestoneClick(m); } }}
+                      disabled={!m.earned}
+                    >
+                      <span className="milestone-num">{m.days}</span>
+                      <span className="milestone-label">{m.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              {isPremium && <ShareCard userData={safeUserData} isVisible={true} />}
+              <button className="btn-ghost" onClick={() => closeSheet(() => setShowMilestonesSheet(false))}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ====== MILESTONE DETAIL MODAL ====== */}
       {showMilestoneModal && selectedMilestone && (
         <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => { setShowMilestoneModal(false); setSelectedMilestone(null); })}>
           <div ref={sheetPanelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
@@ -765,7 +728,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         </div>
       )}
 
-      {/* Reset Streak Sheet */}
+      {/* ====== RESET STREAK SHEET ====== */}
       {showResetStreakModal && (
         <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowResetStreakModal(false))}>
           <div ref={sheetPanelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
@@ -777,12 +740,17 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                 <button className="btn-danger" onClick={confirmResetStreak}>Reset Streak</button>
                 <button className="btn-ghost" onClick={() => closeSheet(() => setShowResetStreakModal(false))}>Cancel</button>
               </div>
+              <div style={{ marginTop: '12px' }}>
+                <button className="reset-all-link" onClick={() => { setShowResetStreakModal(false); setShowResetAllModal(true); }}>
+                  Reset all data
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Reset All Sheet — type-to-confirm */}
+      {/* ====== RESET ALL SHEET ====== */}
       {showResetAllModal && (
         <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => { setShowResetAllModal(false); setResetConfirmText(''); })}>
           <div ref={sheetPanelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
@@ -808,8 +776,6 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
             </div>
           </div>
         </div>
-      )}
-      </>
       )}
     </div>
   );

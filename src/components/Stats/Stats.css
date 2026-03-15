@@ -1,26 +1,32 @@
 /* =============================================================================
-   STATS.CSS - TITANTRACK
-   Theme-aware version - uses CSS variables from index.css
+   STATS.CSS - TITANTRACK V2
+   Calendar-DNA: viewport-filling, gap-based grids, zero scroll
+   Same hand that built the Calendar built this.
    ============================================================================= */
 
 /* =============================================================================
-   PAGE CONTAINER
+   PARENT WRAPPER — padding stripped, scrollable
+   ============================================================================= */
+
+.main-content-wrapper:has(.stats-page) {
+  padding: 0;
+}
+
+/* =============================================================================
+   PAGE CONTAINER — scrollable column, dense top section
    ============================================================================= */
 
 .stats-page {
-  min-height: 100vh;
-  min-height: 100dvh;
+  flex: 1;
+  background-color: var(--background);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 48px 24px 120px;
-  background-color: var(--background);
   position: relative;
   overflow-x: hidden;
-  --grid-breakout: 16px; /* grids extend beyond page padding to ~8px from screen edge */
+  overscroll-behavior: contain;
 }
 
-/* Subtle ambient gradient - dark mode only */
+/* Subtle ambient gradient — matches Calendar */
 .stats-page::before {
   content: '';
   position: absolute;
@@ -35,307 +41,640 @@
   pointer-events: none;
 }
 
-/* Hide gradient in light mode - prevents visible edge */
 [data-theme="light"] .stats-page::before {
   display: none;
 }
 
-.stats-page > *:not(.sheet-backdrop) {
-  width: 100%;
-  max-width: 480px;
-  position: relative;
-  z-index: 1;
-}
-
-.stats-page > .overlay {
-  max-width: none;
-  width: 100%;
-  position: fixed;
-}
-
-/* Timeline container — escapes 480px cap, stats-page provides horizontal padding */
-.stats-page > .et-container {
-  max-width: none;
-  padding-left: 0;
-  padding-right: 0;
-}
-
-@media (min-width: 1025px) {
-  .stats-page { padding: 56px 24px 80px; }
-  .stats-page > *:not(.sheet-backdrop) { max-width: 700px; }
-  .stats-page > .overlay { max-width: none; }
-}
-
 /* =============================================================================
-   GRID BREAKOUT — grids extend beyond page padding to match Calendar width
-   Calendar uses 6px from screen edge; Stats grids use negative margins to match
+   STICKY HEADER — mirrors Calendar header exactly
    ============================================================================= */
 
-.stat-supporting,
-.milestone-grid,
-.chart-box,
-.numbers-container,
-.share-card-section {
-  margin-left: calc(-1 * var(--grid-breakout));
-  margin-right: calc(-1 * var(--grid-breakout));
+.stats-header-sticky {
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--background);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
-/* Direct flex children need explicit width to break out (negative margins alone don't resize flex items).
-   Grandchildren like milestone-grid break out naturally in block flow. These must match. */
-.stats-page > .stat-supporting,
-.stats-page > .share-card-section {
-  max-width: none;
-  width: calc(100% + 2 * var(--grid-breakout));
-}
-
-/* Desktop: re-cap to match grandchild breakout width (700px + 2 × breakout) */
-@media (min-width: 1025px) {
-  .stats-page > .stat-supporting,
-  .stats-page > .share-card-section {
-    max-width: calc(700px + 2 * var(--grid-breakout));
-  }
-}
-
-/* =============================================================================
-   SUB-TAB NAVIGATION — Analytics | Timeline
-   ============================================================================= */
-
-.stats-tabs {
+.stats-header-row {
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: 0;
-  margin-bottom: 24px;
-  animation: fadeInUp 500ms ease forwards;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 8px;
 }
 
-.stats-tab {
-  padding: 8px 16px;
+.stats-header-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+/* View toggle — identical to Calendar Month|Week */
+.stats-view-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.stats-vt-btn {
   background: transparent;
   border: none;
-  color: var(--text-tertiary);
-  font-size: 0.875rem;
+  padding: 8px 12px;
+  font-size: 0.8125rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
+  color: var(--text-tertiary);
   transition: color 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.stats-tab:hover:not(.active) {
+.stats-vt-btn:hover:not(.active) {
   color: var(--text-secondary);
 }
 
-.stats-tab.active {
+.stats-vt-btn.active {
   color: var(--text);
   font-weight: 600;
 }
 
-.stats-tab-divider {
+.stats-vt-div {
   width: 1px;
-  height: 16px;
-  background-color: var(--border-prominent);
+  height: 14px;
+  background: var(--border-prominent);
+  flex-shrink: 0;
 }
 
-/* EmotionalTimeline embedded — remove its own page padding when inside Stats */
-.stats-page .et-container {
+/* =============================================================================
+   TIMELINE WRAP — scrollable when timeline is active
+   ============================================================================= */
+
+.stats-timeline-wrap {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.stats-timeline-wrap .et-container {
   padding-top: 0;
   padding-bottom: 0;
   min-height: auto;
 }
 
 /* =============================================================================
-   HERO STREAK — The one number
+   ANALYTICS VIEW — viewport-filling flex column
    ============================================================================= */
 
-.stat-hero {
-  position: relative;
+.stats-analytics {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-bottom: 8px;
-  padding: 16px 0 20px;
-  animation: fadeInUp 500ms ease forwards;
-}
-
-.stat-hero-glow {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 300px;
-  height: 180px;
-  background: radial-gradient(ellipse at center, rgba(201, 169, 100, 0.045) 0%, rgba(201, 169, 100, 0.015) 45%, transparent 72%);
-  pointer-events: none;
-  filter: blur(8px);
-}
-
-.stat-hero-num {
-  font-family: 'Outfit', var(--font-base);
-  font-size: 5rem;
-  font-weight: 200;
-  color: var(--text);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  font-feature-settings: 'tnum' 1;
-  position: relative;
-  z-index: 1;
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  padding: 8px 24px;
-  -webkit-tap-highlight-color: transparent;
-  transition: opacity 150ms ease;
-}
-
-.stat-hero-num:hover { opacity: 0.7; }
-.stat-hero-num:active { opacity: 0.5; }
-
-.stat-hero-label {
-  font-size: 0.5625rem;
-  font-weight: 500;
-  color: var(--text-muted);
-  letter-spacing: 0.2em;
-  margin-top: 14px;
-  text-transform: uppercase;
+  padding: 0 4px 100px;
   position: relative;
   z-index: 1;
 }
 
 /* =============================================================================
-   NEXT MILESTONE PROGRESS
+   STREAK STRIP — 4-column gap-based grid, Calendar cell treatment
    ============================================================================= */
 
-.stat-progress {
-  width: 100%;
-  margin-bottom: 32px;
-  padding: 0 4px;
+.streak-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  background: var(--cal-grid-bg);
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
-.stat-progress-meta {
+.streak-cell {
+  background: var(--cal-cell-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 4px;
+  padding: 14px 6px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.streak-cell:active {
+  transform: scale(0.97);
+}
+
+/* Current streak — green tint like Calendar current-streak days */
+.streak-cell.streak-current {
+  background: var(--cal-tint-current);
+}
+
+.streak-hero-num {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  font-size: 2rem;
+  font-weight: 200;
+  color: var(--status-current);
+  line-height: 1;
+  font-feature-settings: 'tnum' 1;
+}
+
+.streak-cell-num {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1;
+  font-feature-settings: 'tnum' 1;
+}
+
+.streak-cell-label-upper {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.streak-cell-label {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  letter-spacing: 0.02em;
+}
+
+/* =============================================================================
+   PROGRESS BAR — attached to bottom of streak strip
+   ============================================================================= */
+
+.stats-progress-bar {
+  flex-shrink: 0;
+  background: var(--cal-cell-bg);
+  border-radius: 0 0 10px 10px;
+  padding: 8px 12px;
+}
+
+.stats-progress-meta {
   display: flex;
   justify-content: center;
-  margin-bottom: 10px;
+  padding: 0 0 5px;
 }
 
-.stat-progress-text {
-  font-size: 0.625rem;
-  font-weight: 400;
+.stats-progress-text {
+  font-size: 0.5625rem;
   color: var(--text-tertiary);
   letter-spacing: 0.03em;
   font-feature-settings: 'tnum' 1;
 }
 
-.stat-progress-track {
-  width: 100%;
+.stats-progress-track {
   height: 2px;
   background: var(--border-prominent);
   border-radius: 1px;
   overflow: hidden;
 }
 
-.stat-progress-fill {
+.stats-progress-fill {
   height: 100%;
-  background-color: var(--text);
+  background: var(--text);
   border-radius: 1px;
   transition: width 1200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* =============================================================================
-   SUPPORTING STATS — Rounded grid container with interior dividers
+   CHART HEADER — metric label + value + delta | time range toggle
    ============================================================================= */
 
-.stat-supporting {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  width: 100%;
-  margin-bottom: 24px;
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.stat-supporting-card {
+.chart-header {
+  flex-shrink: 0;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 7px;
-  background: transparent;
-  border: none;
-  border-right: 1px solid var(--border-subtle);
-  padding: 20px 8px;
-  cursor: pointer;
-  transition: opacity 150ms ease;
-  -webkit-tap-highlight-color: transparent;
+  justify-content: space-between;
+  padding: 12px 4px 4px;
 }
 
-.stat-supporting-card:last-of-type {
-  border-right: none;
+.chart-header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
 }
 
-.stat-supporting-card:hover { opacity: 0.7; }
-.stat-supporting-card:active { opacity: 0.5; }
-
-.stat-supporting-num {
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  line-height: 1;
-  letter-spacing: -0.01em;
-  font-feature-settings: 'tnum' 1;
-}
-
-.stat-supporting-label {
-  font-size: 0.5625rem;
-  font-weight: 400;
-  color: var(--text-tertiary);
-  letter-spacing: 0.02em;
-}
-
-/* Hide legacy divider elements — grid cell borders replace them */
-.stat-supporting-divider {
-  display: none;
-}
-
-@media (min-width: 768px) {
-  .stat-hero-num { font-size: 5.5rem; }
-  .stat-supporting-num { font-size: 1.5rem; }
-}
-
-/* =============================================================================
-   SECTIONS
-   ============================================================================= */
-
-.stats-section { margin-bottom: 24px; }
-
-.stats-section h2 {
+.chart-metric-label {
   font-size: 0.6875rem;
   font-weight: 600;
   color: var(--text-muted);
-  margin: 0 0 20px 0;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  text-align: center;
+}
+
+.chart-metric-value {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text);
+  font-feature-settings: 'tnum' 1;
+}
+
+.chart-metric-delta {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  font-feature-settings: 'tnum' 1;
+}
+
+.delta-up { color: var(--trend-up); }
+.delta-down { color: var(--trend-down); }
+.delta-flat { color: var(--text-tertiary); }
+
+/* Time range toggle — mirrors Calendar toggle DNA */
+.chart-time-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.chart-tt-btn {
+  background: transparent;
+  border: none;
+  padding: 4px 10px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+}
+
+.chart-tt-btn:hover:not(.active) {
+  color: var(--text-secondary);
+}
+
+.chart-tt-btn.active {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.chart-tt-div {
+  width: 1px;
+  height: 14px;
+  background: var(--border-prominent);
+  flex-shrink: 0;
 }
 
 /* =============================================================================
-   MILESTONES — Rounded grid container, interior dividers
+   METRIC SELECTOR — pipe-divider row
    ============================================================================= */
+
+.metric-selector-row {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  padding: 2px 0 6px;
+}
+
+.metric-sel-btn {
+  background: transparent;
+  border: none;
+  padding: 4px 7px;
+  font-size: 0.625rem;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.metric-sel-btn:hover:not(.active) {
+  color: var(--text-secondary);
+}
+
+.metric-sel-btn.active {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.metric-sel-div {
+  width: 1px;
+  height: 10px;
+  background: var(--border-prominent);
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* =============================================================================
+   SPARKLINE CHART — flex-expands to fill available space
+   ============================================================================= */
+
+.chart-spark-area {
+  height: 180px;
+  position: relative;
+}
+
+.chart-spark-area canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.chart-empty-state {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.chart-empty-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.chart-empty-sub {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+/* =============================================================================
+   NUMBERS GRID — 3×2 gap-based cells with directional tints
+   ============================================================================= */
+
+.numbers-grid-v2 {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.numbers-grid-top {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: var(--cal-grid-bg);
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
+}
+
+.num-cell {
+  background: var(--cal-cell-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 4px;
+  padding: 12px 6px;
+  border-radius: 6px;
+}
+
+/* Directional tints — same color language as Calendar streak tints */
+.num-cell.num-cell-up {
+  background: rgba(52, 211, 153, 0.04);
+}
+
+[data-theme="light"] .num-cell.num-cell-up {
+  background: rgba(5, 150, 105, 0.04);
+}
+
+.num-cell.num-cell-down {
+  background: rgba(248, 113, 113, 0.04);
+}
+
+[data-theme="light"] .num-cell.num-cell-down {
+  background: rgba(220, 38, 38, 0.04);
+}
+
+.num-cell-value {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1;
+  font-feature-settings: 'tnum' 1;
+}
+
+.num-cell-label {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  letter-spacing: 0.02em;
+  text-transform: capitalize;
+}
+
+.num-cell-delta {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* Extremes row — attached to bottom of numbers grid */
+.numbers-grid-extremes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: var(--cal-grid-bg);
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
+}
+
+.num-extreme-cell {
+  background: var(--cal-cell-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 12px 0;
+  border-radius: 6px;
+}
+
+.num-extreme-label {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.num-extreme-value {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+/* Free user upgrade button */
+.stats-upgrade-btn {
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  color: var(--text);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: border-color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  margin-top: 8px;
+}
+
+.stats-upgrade-btn:hover {
+  border-color: var(--border-prominent);
+}
+
+/* =============================================================================
+   ORACLE INSIGHT CARD — contextual, sits at bottom
+   ============================================================================= */
+
+.oracle-insight-card {
+  flex-shrink: 0;
+  margin-top: 2px;
+  background: var(--cal-cell-bg);
+  border-radius: 10px;
+  padding: 11px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  cursor: pointer;
+  transition: background 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.oracle-insight-card:active {
+  background: var(--surface-overlay);
+}
+
+.oracle-insight-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.oracle-insight-title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.oracle-insight-badge {
+  font-size: 0.5rem;
+  font-weight: 600;
+  color: var(--accent-gold-text);
+  background: var(--accent-gold-bg-hover);
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--accent-gold-border);
+}
+
+.oracle-insight-body {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.oracle-insight-action {
+  font-size: 0.625rem;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+/* =============================================================================
+   PREMIUM ANALYTICS STACK — below the fold, visible for paying users
+   ============================================================================= */
+
+.stats-premium-stack {
+  padding: 0 4px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.stats-premium-stack .analytics-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+/* =============================================================================
+   FOOTER ROW — milestones + reset access
+   ============================================================================= */
+
+.stats-footer-row {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0 6px;
+}
+
+.stats-footer-btn {
+  background: transparent;
+  border: none;
+  padding: 4px 14px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.stats-footer-btn:hover {
+  color: var(--text-secondary);
+}
+
+.stats-footer-div {
+  width: 1px;
+  height: 12px;
+  background: var(--border-prominent);
+  flex-shrink: 0;
+}
+
+/* =============================================================================
+   MILESTONES — in bottom sheet, same grid as before
+   ============================================================================= */
+
+.milestones-sheet-content {
+  padding: 0 4px;
+}
+
+.sheet-section-title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-align: center;
+  margin: 0 0 16px 0;
+}
 
 .milestone-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
+  gap: 2px;
+  background: var(--cal-grid-bg);
+  border-radius: 10px;
   overflow: hidden;
+  margin-bottom: 20px;
 }
 
 .milestone-card {
-  background: transparent;
+  background: var(--cal-cell-bg);
   border: none;
-  border-bottom: 1px solid var(--border-subtle);
-  border-right: 1px solid var(--border-subtle);
-  border-radius: 0;
+  border-radius: 6px;
   padding: 24px 8px;
   text-align: center;
   cursor: pointer;
@@ -344,29 +683,17 @@
   position: relative;
 }
 
-.milestone-card:nth-child(3n) { border-right: none; }
-.milestone-card:nth-last-child(-n+3) { border-bottom: none; }
-
 .milestone-card:disabled {
   cursor: default;
-  opacity: 0.5;
-}
-
-.milestone-card:not(:disabled):hover {
-  background-color: var(--surface-overlay);
+  opacity: 0.4;
 }
 
 .milestone-card:not(:disabled):active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
-/* Past earned — gold background fill */
 .milestone-card.earned {
   background: var(--accent-gold-bg);
-}
-
-.milestone-card.earned:hover {
-  background: var(--accent-gold-bg-hover);
 }
 
 .milestone-card.earned::after {
@@ -379,40 +706,27 @@
   font-weight: 600;
 }
 
-/* Most recent earned — "you are here" highlight */
 .milestone-card.most-recent {
-  background: var(--accent-gold-bg-hover);
-}
-
-.milestone-card.most-recent:hover {
   background: var(--accent-gold-bg-hover);
 }
 
 .milestone-card.most-recent .milestone-num { color: var(--text); }
 .milestone-card.most-recent .milestone-label { color: var(--accent-gold-text); }
 
-/* Next target — subtle ring indicator */
-.milestone-card.next-target {
-  background: transparent;
-  opacity: 1;
-}
-
 .milestone-card.next-target::after {
   content: '';
   position: absolute;
-  top: 10px;
-  right: 11px;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
+  inset: 1px;
+  border-radius: 5px;
   border: 1px solid var(--border-prominent);
-  background: transparent;
+  pointer-events: none;
 }
 
 .milestone-num {
   display: block;
+  font-family: 'Outfit', -apple-system, sans-serif;
   font-size: 1.5rem;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--text-tertiary);
   line-height: 1;
   font-feature-settings: 'tnum' 1;
@@ -435,402 +749,69 @@
 }
 
 /* =============================================================================
-   BENEFIT TRACKER — Header row + Metric grid + Compact time toggle
+   INSIGHTS SHEET — scrollable full analytics
    ============================================================================= */
 
-/* Benefit section — override default stats-section h2 */
-.benefit-section > h2 {
-  display: none;
+.insights-sheet {
+  max-height: 85vh;
+  max-height: 85dvh;
 }
 
-/* Header: label left, time toggle right (mirrors Calendar header) */
-.benefit-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.benefit-header h2 {
-  display: block !important;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin: 0 !important;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  text-align: left;
-}
-
-/* Compact time toggle — mirrors Calendar Month|Week */
-.time-toggle-compact {
-  display: flex;
-  align-items: center;
-  gap: 0;
-}
-
-.time-toggle-compact .tt-btn {
-  background: transparent;
-  border: none;
-  padding: 4px 10px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  color: var(--text-tertiary);
-  transition: color 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-  white-space: nowrap;
-}
-
-.time-toggle-compact .tt-btn:hover:not(.active) {
-  color: var(--text-secondary);
-}
-
-.time-toggle-compact .tt-btn.active {
-  color: var(--text);
-  font-weight: 600;
-}
-
-.time-toggle-compact .tt-div {
-  width: 1px;
-  height: 14px;
-  background: var(--border-prominent);
-  flex-shrink: 0;
-}
-
-/* Toggle-row — pipe-divider style for metric selection */
-.stats-page .toggle-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0;
-  width: 100%;
-  margin: 0 0 12px 0;
-  padding: 0;
-  border-bottom: none;
-}
-
-.stats-page .toggle-row.benefits-row { margin-bottom: 12px; }
-.stats-page .toggle-row.time-range { margin-top: 0; margin-bottom: 12px; }
-
-.stats-page .toggle-btn {
-  background: transparent;
-  border: none;
-  padding: 8px 16px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: color 150ms ease;
-  color: var(--text-tertiary);
-  -webkit-tap-highlight-color: transparent;
-  white-space: nowrap;
-}
-
-.stats-page .toggle-btn:hover:not(.active) { color: var(--text-secondary); }
-.stats-page .toggle-btn.active { color: var(--text); font-weight: 600; }
-
-.stats-page .toggle-divider {
-  width: 1px;
-  height: 16px;
-  background-color: var(--border-prominent);
-  flex-shrink: 0;
-}
-
-/* Average Display */
-.average-block {
-  text-align: center;
-  margin: 32px 0 8px 0;
-  line-height: 1;
-}
-
-.average-num {
-  font-size: 6rem;
-  font-weight: 500;
-  color: var(--text);
-  letter-spacing: -0.04em;
-  font-feature-settings: 'tnum' 1;
-}
-
-.average-suffix {
-  font-size: 1.25rem;
-  color: var(--text-tertiary);
-  font-weight: 400;
-  margin-left: 2px;
-}
-
-.average-label {
-  font-size: 0.75rem;
-  color: var(--text-tertiary);
-  margin: 8px 0 32px 0;
-  text-align: center;
-  letter-spacing: 0.02em;
-}
-
-/* =============================================================================
-   CHART — Rounded container
-   ============================================================================= */
-
-.chart-box {
-  position: relative;
-  background: var(--surface-overlay);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  padding: 28px 12px 12px 8px;
-  margin-bottom: 32px;
-  height: 180px;
-}
-
-.chart-box canvas {
-  width: 100% !important;
-  height: 100% !important;
-}
-
-/* Chart Empty State */
-.chart-empty {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.chart-empty-icon {
-  width: 40px;
-  height: 40px;
-  opacity: 0.08;
-  margin-bottom: 4px;
-  user-select: none;
-  pointer-events: none;
-}
-
-[data-theme="light"] .chart-empty-icon {
-  filter: invert(1);
-}
-
-.chart-empty-title {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-muted);
-}
-
-.chart-empty-sub {
-  font-size: 0.75rem;
-  color: var(--text-tertiary);
-}
-
-/* =============================================================================
-   FREE USER SECTION
-   ============================================================================= */
-
-.free-section {
-  margin-bottom: 40px;
-  animation: fadeInUp 500ms ease 200ms forwards;
-  opacity: 0;
-}
-
-.free-card {
-  text-align: center;
-  padding: 24px 20px;
-  margin-bottom: 16px;
-  background: var(--surface-overlay);
-  border: 1px solid var(--border-subtle);
-  border-radius: 16px;
-}
-
-.free-card h3 {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin: 0 0 8px 0;
-}
-
-.free-card p {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin: 0;
-  letter-spacing: -0.01em;
-}
-
-.upgrade-card {
-  text-align: center;
-  padding: 28px 24px;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-}
-
-.upgrade-card p {
-  font-size: 0.8125rem;
-  color: var(--text-muted);
-  margin: 0 0 20px 0;
-  line-height: 1.5;
-}
-
-/* =============================================================================
-   SHARE CARD
-   ============================================================================= */
-
-.share-card-section {
-  margin-bottom: 32px;
-}
-
-.share-card-header {
-  text-align: center;
-  margin-bottom: 16px;
-}
-
-.share-card-header h3 {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin: 0;
-}
-
-/* =============================================================================
-   INSIGHTS SECTION
-   ============================================================================= */
-
-.insights-section {
-  margin-top: 48px;
-  padding-top: 48px;
-  border-top: 1px solid var(--border-subtle);
-}
-
-/* =============================================================================
-   RESET MENU
-   ============================================================================= */
-
-.reset-menu {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0;
-  margin-top: 48px;
-  padding-top: 32px;
-  border-top: 1px solid var(--border-subtle);
-}
-
-.reset-btn {
-  background: transparent;
-  border: none;
-  padding: 8px 16px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: color 150ms ease;
-  color: var(--text-tertiary);
-  -webkit-tap-highlight-color: transparent;
-}
-
-.reset-btn:hover { color: var(--text-secondary); }
-.reset-btn.danger:hover { color: var(--status-relapse); }
-
-.reset-divider {
-  width: 1px;
-  height: 12px;
-  background-color: var(--border-prominent);
-  flex-shrink: 0;
-}
-
-/* =============================================================================
-   BUTTONS
-   ============================================================================= */
-
-.stats-page .btn-primary {
-  width: 100%;
-  padding: 16px 24px;
-  background: var(--surface-overlay);
-  border: 1px solid var(--border);
-  border-radius: 9999px;
-  color: var(--text);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: border-color 150ms ease, transform 150ms ease;
-}
-
-.stats-page .btn-primary:hover { border-color: rgba(255, 255, 255, 0.25); }
-.stats-page .btn-primary:active { transform: scale(0.98); }
-
-.stats-page .btn-ghost {
-  width: 100%;
-  padding: 16px 24px;
-  background: transparent;
-  border: none;
-  border-radius: 9999px;
-  color: var(--text-secondary);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: color 150ms ease;
-}
-
-.stats-page .btn-ghost:hover { color: var(--text); }
-
-.stats-page .btn-danger {
-  width: 100%;
-  padding: 16px 24px;
-  background: var(--status-relapse-bg);
-  border: none;
-  border-radius: 9999px;
-  color: var(--status-relapse);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background-color 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.stats-page .btn-danger:hover { background: var(--status-relapse-bg-hover); }
-.stats-page .btn-danger:active { transform: scale(0.98); }
-
-/* =============================================================================
-   OVERLAY & MODAL
-   ============================================================================= */
-
-.stats-page .overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--overlay-bg);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 300;
-  padding: 24px;
+.insights-sheet-content {
+  padding: 0 4px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  animation: overlayIn 200ms ease;
+  max-height: calc(85vh - 60px);
 }
 
-.stats-page .overlay::before,
-.stats-page .overlay::after {
-  content: '';
-  flex: 1;
-  min-height: 40px;
+.insights-sheet-content .analytics-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
 }
 
-@keyframes overlayIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* Reset all link in reset sheet */
+.reset-all-link {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 8px;
+  -webkit-tap-highlight-color: transparent;
 }
+
+.reset-all-link:hover {
+  color: var(--status-relapse);
+}
+
+/* =============================================================================
+   BOTTOM SHEET — content overrides
+   ============================================================================= */
+
+.stats-sheet {
+  padding: 0 20px 20px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  text-align: center;
+}
+
+.stats-sheet > * {
+  width: 100%;
+}
+
+.sheet-panel.stats-sheet .modal {
+  animation: none !important;
+  width: 100%;
+  max-width: none;
+}
+
+/* =============================================================================
+   MODAL STYLES — kept from original
+   ============================================================================= */
 
 .stats-page .modal {
   width: 100%;
@@ -838,17 +819,13 @@
   background: transparent;
   padding: 0;
   flex-shrink: 0;
-  animation: modalIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
   text-align: center;
-}
-
-@keyframes modalIn {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
+  margin: 0 auto;
 }
 
 .modal-num {
   display: block;
+  font-family: 'Outfit', -apple-system, sans-serif;
   font-size: 5rem;
   font-weight: 500;
   color: var(--text);
@@ -900,12 +877,6 @@
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: border-color 150ms ease, color 150ms ease;
-}
-
-.modal-buttons .btn-ghost:hover {
-  border-color: var(--border);
-  color: var(--text);
 }
 
 .modal-buttons .btn-danger {
@@ -919,7 +890,12 @@
   cursor: pointer;
 }
 
-/* Reset confirm — type-to-confirm input */
+.modal-buttons .btn-danger:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Reset confirm input */
 .reset-confirm-input {
   margin: -12px 0 20px;
   text-align: left;
@@ -949,7 +925,6 @@
   font-weight: 500;
   letter-spacing: 0.1em;
   text-align: center;
-  transition: border-color 150ms ease, background 150ms ease;
 }
 
 .reset-confirm-input input:focus {
@@ -961,11 +936,6 @@
 .reset-confirm-input input::placeholder {
   color: var(--text-tertiary);
   letter-spacing: 0.15em;
-}
-
-.modal-buttons .btn-danger:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
 }
 
 /* Stat detail breakdown */
@@ -995,140 +965,193 @@
 }
 
 /* =============================================================================
+   BUTTONS
+   ============================================================================= */
+
+.stats-page .btn-primary {
+  width: 100%;
+  padding: 16px 24px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  color: var(--text);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.stats-page .btn-ghost {
+  width: 100%;
+  padding: 16px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 9999px;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.stats-page .btn-ghost:hover { color: var(--text); }
+
+.stats-page .btn-danger {
+  width: 100%;
+  padding: 16px 24px;
+  background: var(--status-relapse-bg);
+  border: none;
+  border-radius: 9999px;
+  color: var(--status-relapse);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* =============================================================================
    ANIMATIONS
    ============================================================================= */
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.stat-hero { animation: fadeInUp 500ms ease forwards; }
+.streak-strip {
+  animation: fadeInUp 400ms ease forwards;
+}
 
-.stat-progress {
-  animation: fadeInUp 500ms ease 30ms forwards;
+.stats-progress-bar {
+  animation: fadeInUp 400ms ease 50ms forwards;
   opacity: 0;
 }
 
-.stat-supporting {
-  animation: fadeInUp 500ms ease 60ms forwards;
+.chart-header {
+  animation: fadeInUp 400ms ease 100ms forwards;
   opacity: 0;
 }
 
-.stats-section:nth-of-type(1) {
-  animation: fadeInUp 500ms ease 90ms forwards;
+.chart-spark-area {
+  animation: fadeInUp 400ms ease 150ms forwards;
   opacity: 0;
 }
 
-.stats-section:nth-of-type(2) {
-  animation: fadeInUp 500ms ease 120ms forwards;
+.numbers-grid-v2 {
+  animation: fadeInUp 400ms ease 200ms forwards;
   opacity: 0;
 }
 
-.reset-menu {
-  animation: fadeInUp 500ms ease 150ms forwards;
+.oracle-insight-card {
+  animation: fadeInUp 400ms ease 250ms forwards;
   opacity: 0;
-}
-
-/* =============================================================================
-   BOTTOM SHEET — content overrides (positioning via BottomSheet.css)
-   ============================================================================= */
-
-.stats-sheet {
-  padding: 0 20px 20px;
-  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-  text-align: center;
-}
-
-.stats-sheet > * {
-  width: 100%;
-}
-
-.sheet-panel.stats-sheet .modal {
-  animation: none !important;
-  width: 100%;
-  max-width: none;
 }
 
 /* =============================================================================
    RESPONSIVE
    ============================================================================= */
 
-@media (max-width: 768px) {
-  .stats-page { padding: 40px 20px 120px; --grid-breakout: 12px; }
-  .average-num { font-size: 5rem; }
-  .modal-num { font-size: 4rem; }
-  .stats-page .modal h2 { font-size: 1.375rem; }
-}
-
-@media (max-width: 520px) {
-  .stats-page .toggle-row.benefits-row {
-    flex-wrap: wrap;
-    justify-content: center;
-    row-gap: 12px;
-    max-width: 320px;
-    margin-left: auto;
-    margin-right: auto;
+@media (max-width: 480px) {
+  .stats-header-row {
+    gap: 8px;
+    padding: 8px 6px;
   }
   
-  .stats-page .toggle-row.benefits-row .toggle-divider:nth-of-type(4) {
-    display: none;
+  .stats-header-title {
+    font-size: 1rem;
   }
-}
 
-@media (max-width: 480px) {
-  .stats-page { padding: 32px 16px 100px; --grid-breakout: 10px; }
-  .stat-hero-num { font-size: 4rem; }
-  .stat-supporting-num { font-size: 1.125rem; }
-  .stats-section h2 { font-size: 0.625rem; }
-  .milestone-card { padding: 18px 6px; }
-  .milestone-num { font-size: 1.25rem; }
-  .milestone-label { font-size: 0.5rem; }
-  .stats-page .toggle-btn { font-size: 0.8125rem; padding: 8px 12px; }
-  .stats-page .toggle-divider { height: 14px; }
-  .time-toggle-compact .tt-btn { font-size: 0.75rem; padding: 4px 8px; }
-  .average-num { font-size: 4rem; }
-  .average-suffix { font-size: 1rem; }
-  .average-label { font-size: 0.6875rem; }
-  .chart-box { height: 150px; padding: 16px 8px 8px 4px; }
-  .stats-page .modal { max-width: 300px; }
-  .modal-num { font-size: 3.5rem; }
-  .stats-page .modal h2 { font-size: 1.25rem; }
-  .modal-text { font-size: 0.875rem; margin-bottom: 32px; }
-  .modal-buttons .btn-danger, .modal-buttons .btn-ghost { padding: 12px 16px; font-size: 0.875rem; }
-  .stats-page .btn-primary, .stats-page .btn-ghost, .stats-page .btn-danger { padding: 14px 20px; font-size: 0.875rem; border-radius: 9999px; }
-}
+  .streak-hero-num {
+    font-size: 1.75rem;
+  }
 
-@media (max-width: 374px) {
-  .stats-page .toggle-btn { font-size: 0.75rem; padding: 8px 10px; }
-  .time-toggle-compact .tt-btn { font-size: 0.6875rem; padding: 4px 6px; }
+  .streak-cell-num {
+    font-size: 1.125rem;
+  }
+  
+  .streak-cell {
+    padding: 12px 4px;
+  }
+
+  .chart-metric-value {
+    font-size: 1.125rem;
+  }
+
+  .num-cell-value {
+    font-size: 1.125rem;
+  }
+
+  .num-cell {
+    padding: 10px 4px;
+  }
+
+  .chart-spark-area {
+    height: 150px;
+  }
+
+  .oracle-insight-card {
+    padding: 10px 12px;
+  }
+
+  .modal-num {
+    font-size: 3.5rem;
+  }
 }
 
 @media (max-width: 360px) {
-  .stats-page { padding: 28px 12px 90px; --grid-breakout: 6px; }
-  .stat-hero-num { font-size: 3.5rem; }
-  .stat-supporting-num { font-size: 1rem; }
-  .milestone-card { padding: 16px 4px; }
-  .milestone-num { font-size: 1.125rem; }
-  .average-num { font-size: 3.5rem; }
+  .stats-analytics {
+    padding: 0 3px;
+  }
+
+  .streak-hero-num {
+    font-size: 1.5rem;
+  }
+
+  .streak-cell-num {
+    font-size: 1rem;
+  }
+
+  .streak-cell {
+    padding: 10px 3px;
+  }
+
+  .metric-sel-btn {
+    padding: 4px 5px;
+    font-size: 0.5625rem;
+  }
+
+  .num-cell-value {
+    font-size: 1rem;
+  }
 }
 
-@media (min-width: 768px) {
-  .stats-section h2 { text-align: center; }
-}
+@media (min-width: 1025px) {
+  .stats-analytics {
+    max-width: 1200px;
+    align-self: center;
+    width: 100%;
+  }
 
-@media (min-width: 1024px) {
-  .stat-hero-num { font-size: 6rem; }
-  .stat-supporting-num { font-size: 1.5rem; }
-  .milestone-card { padding: 28px 12px; }
-  .milestone-num { font-size: 1.75rem; }
-  .milestone-label { font-size: 0.625rem; }
-  .average-num { font-size: 7rem; }
-  .average-suffix { font-size: 1.5rem; }
-  .chart-box { height: 280px; padding: 24px 24px 16px 24px; }
-  .stats-page .modal { max-width: 360px; }
-  .modal-num { font-size: 6rem; }
-  .stats-page .modal h2 { font-size: 1.625rem; }
+  .streak-hero-num {
+    font-size: 2.5rem;
+  }
+
+  .streak-cell-num {
+    font-size: 1.5rem;
+  }
+
+  .num-cell-value {
+    font-size: 1.5rem;
+  }
+
+  .chart-metric-value {
+    font-size: 1.5rem;
+  }
+
+  /* Desktop: 6 numbers in one row */
+  .numbers-grid-top {
+    grid-template-columns: repeat(6, 1fr);
+  }
 }
 
 /* =============================================================================
@@ -1136,12 +1159,19 @@
    ============================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .stat-hero, .stat-progress, .stat-supporting, .stats-section, .reset-menu, .stats-page .overlay, .stats-page .modal, .insight-loading-spinner {
+  .streak-strip,
+  .stats-progress-bar,
+  .chart-header,
+  .chart-spark-area,
+  .numbers-grid-v2,
+  .oracle-insight-card {
     animation: none;
     opacity: 1;
   }
   
-  .stats-page .toggle-btn, .milestone-card, .stat-hero-num, .stat-supporting-card, .reset-btn, .tt-btn {
+  .streak-cell,
+  .milestone-card,
+  .oracle-insight-card {
     transition: none;
   }
 }
