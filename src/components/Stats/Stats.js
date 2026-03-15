@@ -624,7 +624,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
         {/* Free user upgrade nudge */}
         {!isPremium && (
-          <div className="stats-premium-stack" style={{ textAlign: 'center', padding: '32px 16px 100px' }}>
+          <div className="stats-premium-stack" style={{ textAlign: 'center' }}>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '16px' }}>Unlock detailed analytics and personalized optimization</p>
             <button className="btn-primary" onClick={openPlanModal}>Upgrade to Premium</button>
           </div>

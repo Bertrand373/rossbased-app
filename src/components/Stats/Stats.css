@@ -5,47 +5,26 @@
    ============================================================================= */
 
 /* =============================================================================
-   PARENT WRAPPER — height-locked like Calendar, stats-page scrolls internally
+   PARENT WRAPPER — strip padding, let page scroll naturally
+   No overflow:hidden — sheets need to escape to viewport via position:fixed
    ============================================================================= */
 
 .main-content-wrapper:has(.stats-page) {
   padding: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  height: calc(100dvh - var(--header-height-mobile) - var(--nav-height-mobile) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-  max-height: calc(100dvh - var(--header-height-mobile) - var(--nav-height-mobile) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-}
-
-.app-content:has(.stats-page) {
-  overflow: hidden;
-  padding-bottom: 0 !important;
-}
-
-@media (min-width: 1025px) {
-  .main-content-wrapper:has(.stats-page) {
-    display: flex;
-    flex-direction: column;
-    max-width: none;
-    height: calc(100dvh - var(--header-height));
-    max-height: calc(100dvh - var(--header-height));
-  }
 }
 
 /* =============================================================================
-   PAGE CONTAINER — scroll container, header sticks inside it
+   PAGE CONTAINER — natural scroll, header sticks inside
    ============================================================================= */
 
 .stats-page {
-  flex: 1;
+  min-height: 100vh;
+  min-height: 100dvh;
   background-color: var(--background);
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow-y: auto;
   overflow-x: hidden;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
 }
 
 /* Subtle ambient gradient — matches Calendar */
@@ -586,7 +565,7 @@
    ============================================================================= */
 
 .stats-premium-stack {
-  padding: 0 4px 40px;
+  padding: 0 4px 120px;
   margin-top: 24px;
   padding-top: 24px;
   border-top: 1px solid var(--border-subtle);
@@ -766,11 +745,6 @@
   padding: 0 20px 20px;
   padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
   text-align: center;
-}
-
-/* Ensure sheet backdrop covers everything including nav */
-.stats-page .sheet-backdrop {
-  z-index: 10000;
 }
 
 .stats-sheet > * {
