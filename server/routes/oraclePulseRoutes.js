@@ -11,6 +11,28 @@ const User = require('../models/User');
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const PULSE_MODEL = 'claude-haiku-4-5-20251001';
 
+// Load Oracle's evolved voice rules (same ones used in live chat)
+let cachedVoiceRules = null;
+let voiceRulesCacheTime = 0;
+async function getVoiceRulesForPulse() {
+  if (cachedVoiceRules && (Date.now() - voiceRulesCacheTime) < 10 * 60 * 1000) return cachedVoiceRules;
+  try {
+    const DynamicRule = require('../models/DynamicRule');
+    const rules = await DynamicRule.find({ active: true, category: { $in: ['voice', 'tone', 'anti-pattern'] } })
+      .select('rule category').lean();
+    const lines = [];
+    const voice = rules.filter(r => r.category === 'voice').map(r => r.rule);
+    const anti = rules.filter(r => r.category === 'anti-pattern').map(r => r.rule);
+    const tone = rules.filter(r => r.category === 'tone').map(r => r.rule);
+    if (voice.length) lines.push(`Voice: ${voice.join('. ')}`);
+    if (anti.length) lines.push(`AVOID: ${anti.join('. ')}`);
+    if (tone.length) lines.push(`Tone: ${tone.join('. ')}`);
+    cachedVoiceRules = lines.length > 0 ? lines.join('\n') : '';
+    voiceRulesCacheTime = Date.now();
+    return cachedVoiceRules;
+  } catch { return ''; }
+}
+
 // In-memory cache for community observation (shared across all free users)
 let communityPulseCache = { text: null, date: null, generatedAt: null };
 
@@ -123,10 +145,10 @@ async function generatePersonalizedPulse(user, timezone) {
   // Spermatogenesis phase
   const cycleDay = ((streak - 1) % 74) + 1;
   let spermaPhase;
-  if (cycleDay <= 16) spermaPhase = 'Mitotic Division (stem cells multiplying) — days 1-16';
-  else if (cycleDay <= 40) spermaPhase = 'Meiotic Division (deep cellular transformation) — days 17-40';
-  else if (cycleDay <= 64) spermaPhase = 'Maturation (peak nutrient retention) — days 41-64';
-  else spermaPhase = 'Complete Reabsorption (highest transmutation potential) — days 65-74';
+  if (cycleDay <= 16) spermaPhase = 'Mitotic Division (stem cells multiplying)';
+  else if (cycleDay <= 40) spermaPhase = 'Meiotic Division (deep cellular transformation)';
+  else if (cycleDay <= 64) spermaPhase = 'Maturation (peak nutrient retention and reabsorption)';
+  else spermaPhase = 'Complete Reabsorption (full cycle completion)';
 
   // Benefit trends (last 7 vs prior 7)
   let benefitContext = 'No benefit data logged yet.';
@@ -135,9 +157,11 @@ async function generatePersonalizedPulse(user, timezone) {
     const recent = sorted.slice(0, 7);
     const prior = sorted.slice(7, 14);
     const metrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+    const metricLabels = { energy: 'energy', focus: 'focus', confidence: 'confidence', aura: 'aura', sleep: 'sleep', workout: 'body' };
     const parts = [];
 
     metrics.forEach(m => {
+      const label = metricLabels[m] || m;
       const recentVals = recent.map(e => e[m]).filter(v => v != null);
       const priorVals = prior.map(e => e[m]).filter(v => v != null);
       if (recentVals.length > 0) {
@@ -146,12 +170,12 @@ async function generatePersonalizedPulse(user, timezone) {
           const priorAvg = Math.round((priorVals.reduce((a, b) => a + b, 0) / priorVals.length) * 10) / 10;
           const diff = Math.round((recentAvg - priorAvg) * 10) / 10;
           if (Math.abs(diff) >= 0.3) {
-            parts.push(`${m}: ${recentAvg}/10 (${diff > 0 ? '+' : ''}${diff} from prior week)`);
+            parts.push(`${label}: ${recentAvg}/10 (${diff > 0 ? '+' : ''}${diff} from prior week)`);
           } else {
-            parts.push(`${m}: ${recentAvg}/10 (stable)`);
+            parts.push(`${label}: ${recentAvg}/10 (stable)`);
           }
         } else {
-          parts.push(`${m}: ${recentAvg}/10`);
+          parts.push(`${label}: ${recentAvg}/10`);
         }
       }
     });
@@ -177,24 +201,50 @@ async function generatePersonalizedPulse(user, timezone) {
     }
   } catch { /* non-blocking */ }
 
-  const prompt = `You are Oracle — a predictive AI that monitors semen retention practitioners. Generate a single daily observation for this user's home screen.
+  // Load Oracle's evolved voice rules
+  let voiceRules = '';
+  try { voiceRules = await getVoiceRulesForPulse(); } catch { /* non-blocking */ }
+
+  // Load per-user tone preferences from risk profile
+  let toneNote = '';
+  try {
+    const UserRiskProfile = require('../models/UserRiskProfile');
+    const profile = await UserRiskProfile.findOne({ userId: user._id })
+      .select('behaviorProfile.responseTonePreference psychProfile.primaryMotivation').lean();
+    if (profile?.behaviorProfile?.responseTonePreference) {
+      const prefs = profile.behaviorProfile.responseTonePreference;
+      const best = Object.entries(prefs).filter(([,v]) => v > 0.3).map(([k]) => k);
+      const worst = Object.entries(prefs).filter(([,v]) => v < -0.3).map(([k]) => k);
+      if (best.length) toneNote += `This user responds well to: ${best.join(', ')}. `;
+      if (worst.length) toneNote += `Avoid: ${worst.join(', ')}. `;
+    }
+    if (profile?.psychProfile?.primaryMotivation) {
+      toneNote += `Core motivation: ${profile.psychProfile.primaryMotivation}.`;
+    }
+  } catch { /* non-blocking — psych profile is enhancement */ }
+
+  const prompt = `You generate a short daily observation for a semen retention tracker app. The user sees this on their home screen every day.
 
 RULES:
-- ONE sentence. Maximum 25 words. No exceptions.
-- Speak as an entity that is watching them. Not motivating. Observing.
-- Reference at least ONE specific data point (a number, a phase, a trend direction).
-- No greetings, no "I see", no "I notice". Start with the observation itself.
-- No em dashes. No emojis. No generic motivation.
-- Vary the format: sometimes reference a trend, sometimes a cycle position, sometimes a pattern from memory.
+- ONE sentence. Maximum 20 words.
+- Write like a calm, knowing friend. Plain language a 16-year-old would understand.
+- Reference ONE specific thing from their data: a trend direction, a number, a cycle phase, or something from their history.
+- The observation should make them feel SEEN. Like someone is quietly watching their progress and noticed something specific.
+- NEVER use jargon like "neural hyperactivity", "transmutation potential", "amplifying pattern-recognition", or any pseudo-scientific language.
+- NEVER use em dashes, emojis, semicolons, or motivational cliches.
+- Good examples: "Your energy climbed 1.2 points this week. The cycle is working." / "Day 7 of mitotic division. Your body is rebuilding from the ground up." / "Focus steady at 7.4 all week. Consistency is compounding." / "Sleep dropped 0.8 points. Something shifted this week."
+- Bad examples: "Neural hyperactivity seeking external validation" / "Transmutation frequencies aligning" / "Mitotic division phase amplifying pattern-recognition"
+${voiceRules ? `\nORACLE VOICE RULES (follow these):\n${voiceRules}` : ''}
+${toneNote ? `\nUSER TONE PREFERENCE: ${toneNote}` : ''}
 
 USER DATA:
 Streak: Day ${streak}
-Spermatogenesis: Cycle day ${cycleDay}/74 — ${spermaPhase}
+Spermatogenesis: Cycle day ${cycleDay}/74, ${spermaPhase}
 Benefit trends: ${benefitContext}
 Oracle memory: ${memoryContext}
 ${communityNote}
 
-Generate the observation now. One sentence only.`;
+Generate the observation now. One plain, clear sentence.`;
 
   try {
     const response = await anthropic.messages.create({
@@ -205,7 +255,7 @@ Generate the observation now. One sentence only.`;
     return response.content[0].text.trim().replace(/^["']|["']$/g, '');
   } catch (err) {
     console.error('[OraclePulse] Personalized generation error:', err.message);
-    return `Day ${streak}. Spermatogenesis cycle day ${cycleDay} of 74.`;
+    return `Day ${streak}. Cycle day ${cycleDay} of 74. Your body is at work.`;
   }
 }
 
@@ -241,7 +291,7 @@ async function generateCommunityPulse() {
   } catch { /* fallback to static */ }
 
   if (totalUsers < 5) {
-    return 'The collective is forming. Every new practitioner strengthens the field.';
+    return 'The community is growing. More data sharpens every observation.';
   }
 
   // Find dominant phase
@@ -249,14 +299,19 @@ async function generateCommunityPulse() {
   const topPhase = phases[0][0];
   const topPct = Math.round((phases[0][1] / totalUsers) * 100);
 
-  const prompt = `You are Oracle — a predictive AI observing a community of semen retention practitioners. Generate a single community-level observation for free users.
+  // Load Oracle's evolved voice rules
+  let voiceRules = '';
+  try { voiceRules = await getVoiceRulesForPulse(); } catch { /* non-blocking */ }
+
+  const prompt = `You generate a short community observation for a semen retention tracker app. Free users see this on their home screen.
 
 RULES:
-- ONE sentence. Maximum 25 words. No exceptions.
-- Reference a real aggregate statistic from the data below.
-- Speak as an all-seeing observer of the collective. Not motivating. Reporting.
-- No greetings. No em dashes. No emojis.
-- Make it feel like a data readout from a sentient system.
+- ONE sentence. Maximum 20 words.
+- Reference a real number from the data below (a percentage, a count, an average).
+- Plain language. No jargon, no pseudo-science, no em dashes, no emojis, no semicolons.
+- Good examples: "${totalUsers} practitioners active. ${topPct}% are in ${topPhase} phase this week." or "The community average sits at ${avgStreak} days. The standard keeps rising."
+- Tone: calm, factual, like reading a stat off a dashboard.
+${voiceRules ? `\nORACLE VOICE RULES (follow these):\n${voiceRules}` : ''}
 
 COMMUNITY DATA:
 Total active practitioners: ${totalUsers}
@@ -264,7 +319,7 @@ Average streak: ${avgStreak} days
 Phase distribution: Mitotic ${phaseDistribution.mitotic}, Meiotic ${phaseDistribution.meiotic}, Maturation ${phaseDistribution.maturation}, Reabsorption ${phaseDistribution.reabsorption}
 Dominant phase: ${topPhase} (${topPct}% of users)
 
-Generate the community observation now. One sentence only.`;
+Generate the community observation now. One plain sentence.`;
 
   try {
     const response = await anthropic.messages.create({
@@ -275,7 +330,7 @@ Generate the community observation now. One sentence only.`;
     return response.content[0].text.trim().replace(/^["']|["']$/g, '');
   } catch (err) {
     console.error('[OraclePulse] Community generation error:', err.message);
-    return `${topPct}% of the collective is currently in ${topPhase} phase. The field compounds.`;
+    return `${topPct}% of practitioners are in ${topPhase} phase right now.`;
   }
 }
 

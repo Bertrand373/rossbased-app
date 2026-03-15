@@ -9,10 +9,6 @@
   animation: pulseIn 600ms ease 200ms forwards;
 }
 
-.oracle-pulse.revealed .oracle-pulse-time {
-  animation: pulseIn 400ms ease forwards;
-}
-
 /* Label: ORACLE OBSERVES / ORACLE OBSERVES YOU */
 .oracle-pulse-label {
   display: block;
@@ -52,24 +48,14 @@
   color: rgba(160, 130, 0, 0.65);
 }
 
-/* Typing cursor */
-.oracle-pulse-cursor {
-  display: inline-block;
-  width: 1px;
-  height: 0.85em;
-  background: var(--text-muted);
-  margin-left: 1px;
-  vertical-align: text-bottom;
-  animation: cursorBlink 800ms step-end infinite;
+/* Word-by-word fade — each word starts invisible, fades in */
+.oracle-pulse-word {
+  opacity: 0;
+  transition: opacity 320ms ease;
 }
 
-.oracle-pulse-text.oracle-gold .oracle-pulse-cursor {
-  background: rgba(212, 175, 55, 0.5);
-}
-
-@keyframes cursorBlink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+.oracle-pulse-word.visible {
+  opacity: 1;
 }
 
 /* Timestamp */
@@ -80,6 +66,7 @@
   color: var(--text-muted);
   letter-spacing: 0.02em;
   opacity: 0;
+  animation: pulseIn 400ms ease forwards;
 }
 
 @keyframes pulseIn {
@@ -131,11 +118,11 @@
     animation: none;
     opacity: 1;
   }
-  .oracle-pulse-cursor {
-    animation: none;
+  .oracle-pulse-word {
     opacity: 1;
+    transition: none;
   }
-  .oracle-pulse.revealed .oracle-pulse-time {
+  .oracle-pulse-time {
     animation: none;
     opacity: 1;
   }

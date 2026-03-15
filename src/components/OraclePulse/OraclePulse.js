@@ -1,7 +1,7 @@
 // src/components/OraclePulse/OraclePulse.js
 // Oracle's daily observation on the Tracker — replaces static DailyQuote
 // Free users: community-level observation (static render)
-// Premium/OG: personalized observation with type-in effect + Oracle Gold support
+// Premium/OG: personalized observation with word-by-word fade + Oracle Gold support
 import React, { useState, useEffect, useRef } from 'react';
 import './OraclePulse.css';
 
@@ -12,15 +12,18 @@ const OraclePulse = ({ isPremium, isGold }) => {
   const [generatedAt, setGeneratedAt] = useState(null);
   const [tier, setTier] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [displayedText, setDisplayedText] = useState('');
-  const [typingComplete, setTypingComplete] = useState(false);
+  const [revealCount, setRevealCount] = useState(0);
+  const [animating, setAnimating] = useState(false);
+  const [complete, setComplete] = useState(false);
 
   const mountedRef = useRef(true);
-  const typingTimeoutRef = useRef(null);
+  const intervalRef = useRef(null);
 
-  // Cleanup mounted ref
   useEffect(() => {
-    return () => { mountedRef.current = false; };
+    return () => { 
+      mountedRef.current = false;
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, []);
 
   // Fetch observation from backend
@@ -29,7 +32,6 @@ const OraclePulse = ({ isPremium, isGold }) => {
       const token = localStorage.getItem('token');
       if (!token) { setLoading(false); return; }
 
-      // Check localStorage cache (one per day)
       const today = new Date().toISOString().split('T')[0];
       const cacheKey = `oracle_pulse_${today}`;
       const cached = localStorage.getItem(cacheKey);
@@ -54,7 +56,6 @@ const OraclePulse = ({ isPremium, isGold }) => {
           setObservation(data.observation);
           setGeneratedAt(data.generatedAt);
           setTier(data.tier);
-          // Clear old cache keys, store today's
           Object.keys(localStorage).forEach(k => {
             if (k.startsWith('oracle_pulse_') && k !== cacheKey) localStorage.removeItem(k);
           });
@@ -69,7 +70,7 @@ const OraclePulse = ({ isPremium, isGold }) => {
     fetchPulse();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Typing effect — premium only, first view per day
+  // Word-by-word reveal — premium only, first view per day
   useEffect(() => {
     if (!observation || loading) return;
 
@@ -79,8 +80,8 @@ const OraclePulse = ({ isPremium, isGold }) => {
 
     // Static render for: free users, already-seen today, or community tier
     if (alreadySeen || tier !== 'personalized') {
-      setDisplayedText(observation);
-      setTypingComplete(true);
+      setRevealCount(observation.split(' ').length);
+      setComplete(true);
       return;
     }
 
@@ -89,61 +90,68 @@ const OraclePulse = ({ isPremium, isGold }) => {
       if (k.startsWith('oracle_pulse_seen_') && k !== seenKey) localStorage.removeItem(k);
     });
 
-    // Type-in effect
-    let index = 0;
+    // Word-by-word reveal
+    const words = observation.split(' ');
+    setAnimating(true);
+    let count = 0;
 
-    const typeNext = () => {
+    // Initial pause before first word
+    const startTimeout = setTimeout(() => {
       if (!mountedRef.current) return;
-      if (index >= observation.length) {
-        setTypingComplete(true);
-        localStorage.setItem(seenKey, 'true');
-        return;
-      }
 
-      index++;
-      setDisplayedText(observation.substring(0, index));
+      intervalRef.current = setInterval(() => {
+        if (!mountedRef.current) { clearInterval(intervalRef.current); return; }
+        count++;
+        setRevealCount(count);
 
-      const char = observation[index - 1];
-      let delay = 30;
-      if (char === '.' && index < observation.length) delay = 220;
-      else if (char === ',') delay = 110;
-      else if (char === ':') delay = 140;
-
-      typingTimeoutRef.current = setTimeout(typeNext, delay);
-    };
-
-    // Initial delay before typing begins
-    typingTimeoutRef.current = setTimeout(typeNext, 500);
+        if (count >= words.length) {
+          clearInterval(intervalRef.current);
+          setTimeout(() => {
+            if (!mountedRef.current) return;
+            setAnimating(false);
+            setComplete(true);
+            localStorage.setItem(seenKey, 'true');
+          }, 400);
+        }
+      }, 160);
+    }, 600);
 
     return () => {
-      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      clearTimeout(startTimeout);
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [observation, loading, tier]);
 
-  // Don't render until we have something
   if (loading || !observation) return null;
 
   const label = tier === 'personalized' ? 'ORACLE OBSERVES YOU' : 'ORACLE OBSERVES';
   const isPersonalGold = isGold && tier === 'personalized';
+  const words = observation.split(' ');
 
-  // Format the generation timestamp
+  // Format timestamp
   let timeStr = '';
   if (generatedAt) {
     try {
       timeStr = new Date(generatedAt).toLocaleTimeString('en-US', { 
         hour: 'numeric', minute: '2-digit', hour12: true 
       });
-    } catch { /* fallback: no time shown */ }
+    } catch { /* no time shown */ }
   }
 
   return (
-    <div className={`oracle-pulse${typingComplete ? ' revealed' : ''}`}>
+    <div className={`oracle-pulse${complete ? ' revealed' : ''}`}>
       <span className={`oracle-pulse-label${isPersonalGold ? ' gold' : ''}`}>{label}</span>
-      <p className={`oracle-pulse-text${isPersonalGold ? ' oracle-gold' : ''}${!typingComplete ? ' typing' : ''}`}>
-        {displayedText}
-        {!typingComplete && <span className="oracle-pulse-cursor" />}
+      <p className={`oracle-pulse-text${isPersonalGold ? ' oracle-gold' : ''}`}>
+        {words.map((word, i) => (
+          <span 
+            key={i} 
+            className={`oracle-pulse-word${i < revealCount ? ' visible' : ''}`}
+          >
+            {word}{i < words.length - 1 ? ' ' : ''}
+          </span>
+        ))}
       </p>
-      {typingComplete && timeStr && (
+      {complete && timeStr && (
         <span className="oracle-pulse-time">Today · {timeStr}</span>
       )}
     </div>
