@@ -85,7 +85,7 @@
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 0;
-  padding: 10px 8px;
+  padding: 10px 14px;
 }
 
 .stats-header-title {
@@ -99,7 +99,7 @@
 @media (max-width: 480px) {
   .stats-header-row {
     gap: 8px;
-    padding: 0 4px;
+    padding: 0 8px;
   }
   
   .stats-header-title {
@@ -727,6 +727,35 @@
   animation: none !important;
   width: 100%;
   max-width: none;
+}
+
+/* Solo ghost buttons in stats sheets — borderless (matches Calendar pattern) */
+/* .modal-buttons .btn-ghost overrides this when paired with danger/primary */
+.stats-sheet .btn-ghost {
+  width: 100%;
+  padding: 16px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 9999px;
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.stats-sheet .btn-ghost:hover {
+  color: var(--text-secondary);
+}
+
+/* Sheet content morph — smooth transitions between views */
+.sheet-morph-wrap {
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.sheet-morph-wrap.morphing {
+  opacity: 0;
+  transform: scale(0.98);
 }
 
 /* =============================================================================

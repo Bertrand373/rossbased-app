@@ -37,7 +37,6 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [activeView, setActiveView] = useState('analytics');
   const [selectedMetric, setSelectedMetric] = useState('energy');
   const [timeRange, setTimeRange] = useState('week');
-  const [showMilestoneModal, setShowMilestoneModal] = useState(false);
   const [selectedMilestone, setSelectedMilestone] = useState(null);
   const [showResetStreakModal, setShowResetStreakModal] = useState(false);
   const [showResetAllModal, setShowResetAllModal] = useState(false);
@@ -45,6 +44,8 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [showStatModal, setShowStatModal] = useState(false);
   const [selectedStatCard, setSelectedStatCard] = useState(null);
   const [showMilestonesSheet, setShowMilestonesSheet] = useState(false);
+  const [milestonesView, setMilestonesView] = useState('list'); // 'list' | 'detail'
+  const [morphing, setMorphing] = useState(false);
 
   // Theme detection
   const [isDarkTheme, setIsDarkTheme] = useState(() => {
@@ -58,7 +59,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [sheetReady, setSheetReady] = useState(false);
   const sheetPanelRef = useRef(null);
 
-  const sheetVisible = showMilestoneModal || showResetStreakModal || showResetAllModal || showMilestonesSheet;
+  const sheetVisible = showResetStreakModal || showResetAllModal || showMilestonesSheet;
   useEffect(() => {
     if (sheetVisible) {
       requestAnimationFrame(() => requestAnimationFrame(() => setSheetReady(true)));
@@ -72,12 +73,24 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setTimeout(cb, 300);
   }, []);
 
+  // Smooth morph between views inside a sheet
+  const switchMilestonesView = useCallback((newView, milestone = null) => {
+    setMorphing(true);
+    setTimeout(() => {
+      setMilestonesView(newView);
+      if (milestone) setSelectedMilestone(milestone);
+      else if (newView === 'list') setSelectedMilestone(null);
+      setMorphing(false);
+    }, 150);
+  }, []);
+
   const handleSwipeDismiss = useCallback(() => {
-    setShowMilestoneModal(false);
     setShowResetStreakModal(false);
     setShowResetAllModal(false);
     setShowMilestonesSheet(false);
+    setMilestonesView('list');
     setSelectedMilestone(null);
+    setMorphing(false);
   }, []);
   useSheetSwipe(sheetPanelRef, sheetVisible, () => closeSheet(handleSwipeDismiss));
   useBodyScrollLock(sheetVisible);
@@ -253,7 +266,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
   // Handlers
   const handleStatCardClick = (statType) => { setSelectedStatCard(statType); setShowStatModal(true); };
-  const handleMilestoneClick = (milestone) => { if (milestone.earned) { setSelectedMilestone(milestone); setShowMilestoneModal(true); } };
+  const handleMilestoneClick = (milestone) => { if (milestone.earned) switchMilestonesView('detail', milestone); };
 
   const confirmResetStreak = async () => {
     try {
@@ -509,6 +522,10 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
             <button className="stats-footer-btn" onClick={() => setShowResetStreakModal(true)}>
               Reset
             </button>
+            <span className="stats-footer-div" />
+            <button className="stats-footer-btn" onClick={() => setShowResetAllModal(true)}>
+              Reset All
+            </button>
           </div>
 
         </div>
@@ -526,72 +543,68 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       userData={safeUserData}
     />
 
-    {/* MILESTONES SHEET */}
+    {/* MILESTONES SHEET — morphs between list and detail views */}
     {showMilestonesSheet && (
-        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowMilestonesSheet(false))}>
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => { setShowMilestonesSheet(false); setMilestonesView('list'); setSelectedMilestone(null); setMorphing(false); })}>
           <div ref={sheetPanelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div className="sheet-header" />
-            <div className="milestones-sheet-content">
-              <h2 className="sheet-section-title">Milestones</h2>
-              <div className="milestone-grid">
-                {milestones.map((m, i) => {
-                  const nextIdx = milestones.findIndex(ms => !ms.earned);
-                  const mostRecentIdx = nextIdx > 0 ? nextIdx - 1 : nextIdx === -1 ? milestones.length - 1 : -1;
-                  const isMostRecent = i === mostRecentIdx;
-                  const isNext = i === nextIdx;
-                  return (
-                    <button
-                      key={m.days}
-                      className={`milestone-card ${m.earned ? 'earned' : ''} ${isMostRecent ? 'most-recent' : ''} ${isNext ? 'next-target' : ''}`}
-                      onClick={() => { if (m.earned) { setShowMilestonesSheet(false); handleMilestoneClick(m); } }}
-                      disabled={!m.earned}
-                    >
-                      <span className="milestone-num">{m.days}</span>
-                      <span className="milestone-label">{m.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-              {isPremium && <ShareCard userData={safeUserData} isVisible={true} />}
-              <button className="btn-ghost" onClick={() => closeSheet(() => setShowMilestonesSheet(false))}>Close</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ====== MILESTONE DETAIL MODAL ====== */}
-      {showMilestoneModal && selectedMilestone && (
-        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => { setShowMilestoneModal(false); setSelectedMilestone(null); })}>
-          <div ref={sheetPanelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
-            <div className="sheet-header" />
-            <div className="modal" style={{ animation: 'none' }}>
-              <span className="modal-num">{selectedMilestone.days}</span>
-              <h2>{selectedMilestone.label}</h2>
-              {selectedMilestone.date && (
-                <p className="modal-date">Reached {format(new Date(selectedMilestone.date), 'MMMM d, yyyy')}</p>
+            <div className={`sheet-morph-wrap${morphing ? ' morphing' : ''}`}>
+              {milestonesView === 'list' ? (
+                <div className="milestones-sheet-content">
+                  <h2 className="sheet-section-title">Milestones</h2>
+                  <div className="milestone-grid">
+                    {milestones.map((m, i) => {
+                      const nextIdx = milestones.findIndex(ms => !ms.earned);
+                      const mostRecentIdx = nextIdx > 0 ? nextIdx - 1 : nextIdx === -1 ? milestones.length - 1 : -1;
+                      const isMostRecent = i === mostRecentIdx;
+                      const isNext = i === nextIdx;
+                      return (
+                        <button
+                          key={m.days}
+                          className={`milestone-card ${m.earned ? 'earned' : ''} ${isMostRecent ? 'most-recent' : ''} ${isNext ? 'next-target' : ''}`}
+                          onClick={() => handleMilestoneClick(m)}
+                          disabled={!m.earned}
+                        >
+                          <span className="milestone-num">{m.days}</span>
+                          <span className="milestone-label">{m.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {isPremium && <ShareCard userData={safeUserData} isVisible={true} />}
+                  <button className="btn-ghost" onClick={() => closeSheet(() => { setShowMilestonesSheet(false); setMilestonesView('list'); setSelectedMilestone(null); })}>Close</button>
+                </div>
+              ) : (
+                <div className="modal" style={{ animation: 'none' }}>
+                  <span className="modal-num">{selectedMilestone?.days}</span>
+                  <h2>{selectedMilestone?.label}</h2>
+                  {selectedMilestone?.date && (
+                    <p className="modal-date">Reached {format(new Date(selectedMilestone.date), 'MMMM d, yyyy')}</p>
+                  )}
+                  <p className="modal-text">
+                    {selectedMilestone && (safeUserData.currentStreak || 0) >= selectedMilestone.days ? (
+                      <>
+                        {selectedMilestone.days === 7 && "Foundation set. Energy stabilizing, clarity emerging."}
+                        {selectedMilestone.days === 14 && "Two weeks in. Focus and physical energy improving."}
+                        {selectedMilestone.days === 30 && "One month. Habits formed, transformation underway."}
+                        {selectedMilestone.days === 90 && "Ninety days. Neurological rewiring complete."}
+                        {selectedMilestone.days === 180 && "Six months. Baseline permanently elevated."}
+                        {selectedMilestone.days === 365 && "One year. This is now who you are."}
+                      </>
+                    ) : (
+                      <>
+                        {selectedMilestone?.days === 7 && "You've built the foundation before. Build it again."}
+                        {selectedMilestone?.days === 14 && "Two weeks is in your wheelhouse. Reclaim it."}
+                        {selectedMilestone?.days === 30 && "You've proven you can do this. Now do it again."}
+                        {selectedMilestone?.days === 90 && "You've rewired once. The path is familiar."}
+                        {selectedMilestone?.days === 180 && "Six months was yours. Take it back."}
+                        {selectedMilestone?.days === 365 && "A year lives in you. Rise again."}
+                      </>
+                    )}
+                  </p>
+                  <button className="btn-ghost" onClick={() => switchMilestonesView('list')}>Back</button>
+                </div>
               )}
-              <p className="modal-text">
-                {(safeUserData.currentStreak || 0) >= selectedMilestone.days ? (
-                  <>
-                    {selectedMilestone.days === 7 && "Foundation set. Energy stabilizing, clarity emerging."}
-                    {selectedMilestone.days === 14 && "Two weeks in. Focus and physical energy improving."}
-                    {selectedMilestone.days === 30 && "One month. Habits formed, transformation underway."}
-                    {selectedMilestone.days === 90 && "Ninety days. Neurological rewiring complete."}
-                    {selectedMilestone.days === 180 && "Six months. Baseline permanently elevated."}
-                    {selectedMilestone.days === 365 && "One year. This is now who you are."}
-                  </>
-                ) : (
-                  <>
-                    {selectedMilestone.days === 7 && "You've built the foundation before. Build it again."}
-                    {selectedMilestone.days === 14 && "Two weeks is in your wheelhouse. Reclaim it."}
-                    {selectedMilestone.days === 30 && "You've proven you can do this. Now do it again."}
-                    {selectedMilestone.days === 90 && "You've rewired once. The path is familiar."}
-                    {selectedMilestone.days === 180 && "Six months was yours. Take it back."}
-                    {selectedMilestone.days === 365 && "A year lives in you. Rise again."}
-                  </>
-                )}
-              </p>
-              <button className="btn-ghost" onClick={() => closeSheet(() => { setShowMilestoneModal(false); setSelectedMilestone(null); })}>Close</button>
             </div>
           </div>
         </div>
@@ -608,11 +621,6 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
               <div className="modal-buttons">
                 <button className="btn-danger" onClick={confirmResetStreak}>Reset Streak</button>
                 <button className="btn-ghost" onClick={() => closeSheet(() => setShowResetStreakModal(false))}>Cancel</button>
-              </div>
-              <div style={{ marginTop: '12px' }}>
-                <button className="reset-all-link" onClick={() => { setShowResetStreakModal(false); setShowResetAllModal(true); }}>
-                  Reset all data
-                </button>
               </div>
             </div>
           </div>
