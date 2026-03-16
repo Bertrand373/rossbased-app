@@ -403,6 +403,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     : 100;
 
   return (
+    <>
     <div className="stats-page">
       {/* ====== STICKY HEADER — mirrors Calendar header exactly ====== */}
       <div className="stats-header-sticky">
@@ -533,15 +534,14 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                   const val = memoizedInsights.metricAverages?.averages?.[metric]?.value;
                   const trend = memoizedInsights.metricTrends?.[metric];
                   return (
-                    <div key={metric} className={`num-cell ${getNumberTintClass(metric)}`}>
+                    <div key={metric} className={`num-cell ${trend ? getNumberTintClass(metric) : ''}`}>
                       <span className="num-cell-value">{val ? val.toFixed(1) : '—'}</span>
                       <span className="num-cell-label">{metricDisplayName[metric]}</span>
-                      {trend && (
-                        <span className={`num-cell-delta ${trend.direction === 'up' ? 'delta-up' : trend.direction === 'down' ? 'delta-down' : 'delta-flat'}`}>
+                      {trend && trend.direction !== 'stable' && (
+                        <span className={`num-cell-delta ${trend.direction === 'up' ? 'delta-up' : 'delta-down'}`}>
                           {trend.direction === 'up' ? '+' : ''}{trend.delta}
                         </span>
                       )}
-                      {!trend && <span className="num-cell-delta delta-flat">—</span>}
                     </div>
                   );
                 })}
@@ -632,16 +632,19 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       </>
       )}
 
-      {/* ====== STAT CARD MODAL ====== */}
-      <StatCardModal
-        showModal={showStatModal}
-        selectedStatCard={selectedStatCard}
-        onClose={() => setShowStatModal(false)}
-        userData={safeUserData}
-      />
+    </div>
 
-      {/* ====== MILESTONES SHEET ====== */}
-      {showMilestonesSheet && (
+    {/* ====== ALL MODALS/SHEETS RENDER OUTSIDE stats-page so overflow:auto doesn't trap them ====== */}
+
+    <StatCardModal
+      showModal={showStatModal}
+      selectedStatCard={selectedStatCard}
+      onClose={() => setShowStatModal(false)}
+      userData={safeUserData}
+    />
+
+    {/* MILESTONES SHEET */}
+    {showMilestonesSheet && (
         <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowMilestonesSheet(false))}>
           <div ref={sheetPanelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div className="sheet-header" />
@@ -760,7 +763,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

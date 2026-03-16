@@ -5,31 +5,40 @@
    ============================================================================= */
 
 /* =============================================================================
-   PARENT WRAPPER — strip padding, ensure no overflow trap
-   Stats uses natural page scroll (unlike Calendar which locks viewport)
-   This lets position:fixed sheets escape AND position:sticky header work
+   PARENT WRAPPER — constrained height, stats-page scrolls inside
    ============================================================================= */
 
 .main-content-wrapper:has(.stats-page) {
   padding: 0;
-  overflow: visible !important;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - var(--header-height-mobile) - var(--nav-height-mobile) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - var(--header-height-mobile) - var(--nav-height-mobile) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
 }
 
-.app-content:has(.stats-page) {
-  overflow: visible !important;
+@media (min-width: 1025px) {
+  .main-content-wrapper:has(.stats-page) {
+    height: calc(100dvh - var(--header-height));
+    max-height: calc(100dvh - var(--header-height));
+  }
 }
 
 /* =============================================================================
-   PAGE CONTAINER — natural document flow
+   PAGE CONTAINER — scroll container, header sticks inside it
+   Sheets render OUTSIDE this div so position:fixed isn't trapped
    ============================================================================= */
 
 .stats-page {
+  flex: 1;
   background-color: var(--background);
   display: flex;
   flex-direction: column;
   position: relative;
-  min-height: 100vh;
-  min-height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Subtle ambient gradient — matches Calendar */
