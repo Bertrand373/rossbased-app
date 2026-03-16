@@ -1586,12 +1586,19 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         );
       })()}
 
-      {/* Energy Almanac ghost line — inside meta strip */}
+      {/* Energy Almanac — rendered outside strip to avoid sheet bleed */}
+      <EnergyAlmanac 
+        userData={userData}
+        isPatternAlertShowing={isPatternAlertShowing}
+      />
+
+      {/* Meta strip — phase left, date right */}
       <div className="tracker-meta-strip">
-        <EnergyAlmanac 
-          userData={userData}
-          isPatternAlertShowing={isPatternAlertShowing}
-        />
+        <span className="tracker-meta-phase">
+          {getCurrentPhaseName(streak)}
+          <span className="tracker-meta-dot">·</span>
+          Day {streak}
+        </span>
         <span className="tracker-meta-date">
           {format(currentTime, 'EEEE, MMMM d')}
           <span className="time-separator">·</span>
