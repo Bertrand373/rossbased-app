@@ -61,6 +61,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [showStatModal, setShowStatModal] = useState(false);
   const [selectedStatCard, setSelectedStatCard] = useState(null);
   const [showMilestonesSheet, setShowMilestonesSheet] = useState(false);
+  const [showInsightsSheet, setShowInsightsSheet] = useState(false);
 
   // Theme detection
   const [isDarkTheme, setIsDarkTheme] = useState(() => {
@@ -82,7 +83,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [sheetReady, setSheetReady] = useState(false);
   const sheetPanelRef = useRef(null);
 
-  const sheetVisible = showMilestoneModal || showResetStreakModal || showResetAllModal || showMilestonesSheet;
+  const sheetVisible = showMilestoneModal || showResetStreakModal || showResetAllModal || showMilestonesSheet || showInsightsSheet;
   useEffect(() => {
     if (sheetVisible) {
       requestAnimationFrame(() => requestAnimationFrame(() => setSheetReady(true)));
@@ -101,6 +102,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setShowResetStreakModal(false);
     setShowResetAllModal(false);
     setShowMilestonesSheet(false);
+    setShowInsightsSheet(false);
     setSelectedMilestone(null);
   }, []);
   useSheetSwipe(sheetPanelRef, sheetVisible, () => closeSheet(handleSwipeDismiss));
@@ -365,19 +367,6 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   // Phase info for progress bar
   const phaseInfo = memoizedInsights.phaseInfo || getPhaseInfo(safeUserData.currentStreak || 0);
 
-  // Oracle insight — contextual, reacts to weakest metric
-  const oracleInsight = useMemo(() => {
-    if (!isPremium || !memoizedInsights.metricExtremes?.growthArea) return null;
-    const weak = memoizedInsights.metricExtremes.growthArea;
-    const trend = memoizedInsights.metricTrends?.[weak.metric];
-    const delta = trend?.delta || 0;
-    const name = metricDisplayName[weak.metric] || weak.metric;
-    if (delta < 0) {
-      return { title: `${name} dropped ${Math.abs(delta)} this week`, body: `Common during ${phaseInfo.name.toLowerCase()} phase. Your other metrics are climbing — this typically corrects within 7-10 days.` };
-    }
-    return { title: `${name} is your growth area`, body: `Currently averaging ${weak.value?.toFixed(1) || '—'}/10. Focus transmutation practices here to bring it in line with your stronger metrics.` };
-  }, [isPremium, memoizedInsights, phaseInfo]);
-
   // Time range options
   const timeRanges = [
     { key: 'week', label: 'Week' },
@@ -404,7 +393,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
   return (
     <>
-    <div className={`stats-page ${activeView === 'timeline' ? 'stats-view-timeline' : 'stats-view-analytics'}`}>
+    <div className="stats-page">
       {/* ====== STICKY HEADER — mirrors Calendar header exactly ====== */}
       <div className="stats-header-sticky">
         <div className="stats-header-row">
@@ -573,62 +562,34 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
             </div>
           )}
 
-          {/* ---- ORACLE INSIGHT — contextual single card ---- */}
-          {isPremium && oracleInsight && (
-            <div className="oracle-insight-card">
-              <span className="oracle-insight-title">{oracleInsight.title}</span>
-              <span className="oracle-insight-body">{oracleInsight.body}</span>
-            </div>
-          )}
-
-          {/* ---- FOOTER ACTIONS: milestones + reset ---- */}
+          {/* ---- FOOTER ACTIONS: milestones + insights + reset ---- */}
           <div className="stats-footer-row">
             <button className="stats-footer-btn" onClick={() => setShowMilestonesSheet(true)}>
               Milestones
             </button>
             <span className="stats-footer-div" />
+            {isPremium && (
+              <>
+                <button className="stats-footer-btn" onClick={() => setShowInsightsSheet(true)}>
+                  Insights
+                </button>
+                <span className="stats-footer-div" />
+              </>
+            )}
+            {!isPremium && (
+              <>
+                <button className="stats-footer-btn" onClick={openPlanModal}>
+                  Upgrade
+                </button>
+                <span className="stats-footer-div" />
+              </>
+            )}
             <button className="stats-footer-btn" onClick={() => setShowResetStreakModal(true)}>
               Reset
             </button>
           </div>
 
         </div>
-
-        {/* ====== PREMIUM ANALYTICS — below the fold, scrollable ====== */}
-        {isPremium && (
-          <div className="stats-premium-stack">
-            <div className="analytics-stack">
-              <YourPatterns
-                streakPhaseAverages={memoizedInsights.streakPhaseAverages}
-                metricCorrelations={memoizedInsights.metricCorrelations}
-                growthRates={memoizedInsights.growthRates}
-                selectedMetric={selectedMetric}
-                daysTracked={daysTracked}
-                isLoading={loadingStates.patterns}
-              />
-              <AIInsights
-                mlPatterns={mlPatterns}
-                mlOptimization={mlOptimization}
-                daysTracked={daysTracked}
-                relapseCount={relapseCount}
-                isLoading={loadingStates.ai}
-              />
-              <RelapseAnalytics
-                relapsePatterns={memoizedInsights.relapsePatterns}
-                daysSinceLastRelapse={memoizedInsights.daysSinceLastRelapse}
-                isLoading={loadingStates.relapse}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Free user upgrade nudge */}
-        {!isPremium && (
-          <div className="stats-premium-stack" style={{ textAlign: 'center' }}>
-            <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: '16px' }}>Unlock detailed analytics and personalized optimization</p>
-            <button className="btn-primary" onClick={openPlanModal}>Upgrade to Premium</button>
-          </div>
-        )}
       </>
       )}
 
@@ -671,6 +632,46 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
               </div>
               {isPremium && <ShareCard userData={safeUserData} isVisible={true} />}
               <button className="btn-ghost" onClick={() => closeSheet(() => setShowMilestonesSheet(false))}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+    {/* INSIGHTS SHEET — premium analytics */}
+    {showInsightsSheet && isPremium && (
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowInsightsSheet(false))}>
+          <div ref={sheetPanelRef} className={`sheet-panel stats-sheet insights-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" />
+            <div className="insights-sheet-scroll" data-no-swipe>
+              <h2 className="sheet-section-title">Insights</h2>
+              <YourNumbers
+                metricAverages={memoizedInsights.metricAverages}
+                metricTrends={memoizedInsights.metricTrends}
+                metricExtremes={memoizedInsights.metricExtremes}
+                daysTracked={daysTracked}
+                isLoading={false}
+              />
+              <YourPatterns
+                streakPhaseAverages={memoizedInsights.streakPhaseAverages}
+                metricCorrelations={memoizedInsights.metricCorrelations}
+                growthRates={memoizedInsights.growthRates}
+                selectedMetric={selectedMetric}
+                daysTracked={daysTracked}
+                isLoading={false}
+              />
+              <AIInsights
+                mlPatterns={mlPatterns}
+                mlOptimization={mlOptimization}
+                daysTracked={daysTracked}
+                relapseCount={relapseCount}
+                isLoading={false}
+              />
+              <RelapseAnalytics
+                relapsePatterns={memoizedInsights.relapsePatterns}
+                daysSinceLastRelapse={memoizedInsights.daysSinceLastRelapse}
+                isLoading={false}
+              />
+              <button className="btn-ghost" onClick={() => closeSheet(() => setShowInsightsSheet(false))}>Close</button>
             </div>
           </div>
         </div>

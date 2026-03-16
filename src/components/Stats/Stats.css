@@ -5,7 +5,7 @@
    ============================================================================= */
 
 /* =============================================================================
-   PARENT WRAPPER — constrained height, stats-page scrolls inside
+   PARENT WRAPPER — viewport-locked, identical to Calendar
    ============================================================================= */
 
 .main-content-wrapper:has(.stats-page) {
@@ -17,6 +17,11 @@
   max-height: calc(100dvh - var(--header-height-mobile) - var(--nav-height-mobile) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
 }
 
+.app-content:has(.stats-page) {
+  overflow: hidden;
+  padding-bottom: 0 !important;
+}
+
 @media (min-width: 1025px) {
   .main-content-wrapper:has(.stats-page) {
     height: calc(100dvh - var(--header-height));
@@ -25,8 +30,7 @@
 }
 
 /* =============================================================================
-   PAGE CONTAINER — scroll container, header sticks inside it
-   Sheets render OUTSIDE this div so position:fixed isn't trapped
+   PAGE CONTAINER — no scroll, flex column fills viewport
    ============================================================================= */
 
 .stats-page {
@@ -35,25 +39,7 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow-x: hidden;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Analytics: stats-page is the scroll container */
-.stats-page.stats-view-analytics {
-  overflow-y: auto;
-}
-
-/* Timeline: no stacking context trap — main-content-wrapper scrolls instead */
-.stats-page.stats-view-timeline {
-  overflow: visible;
-  position: static;
-}
-
-.main-content-wrapper:has(.stats-view-timeline) {
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
 }
 
 /* Subtle ambient gradient — matches Calendar */
@@ -76,12 +62,11 @@
 }
 
 /* =============================================================================
-   STICKY HEADER — pixel-matched to .calendar-header-minimal
+   HEADER — fixed at top, mirrors .calendar-header-minimal exactly
    ============================================================================= */
 
 .stats-header-sticky {
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;
   z-index: 10;
   background: var(--background);
   border-bottom: 1px solid var(--border-subtle);
@@ -95,7 +80,7 @@
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 0;
-  padding: 10px 14px;
+  padding: 10px 8px;
 }
 
 .stats-header-title {
@@ -104,12 +89,6 @@
   color: var(--text);
   letter-spacing: -0.03em;
   line-height: 1.2;
-}
-
-@media (max-width: 480px) {
-  .stats-header-row {
-    padding: 10px 12px;
-  }
 }
 
 /* View toggle — identical to Calendar Month|Week */
@@ -160,6 +139,7 @@
 
 .stats-timeline-wrap {
   flex: 1;
+  height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -175,9 +155,12 @@
    ============================================================================= */
 
 .stats-analytics {
+  flex: 1;
+  height: 0;
   display: flex;
   flex-direction: column;
   padding: 0 4px;
+  overflow: hidden;
   position: relative;
   z-index: 1;
 }
@@ -413,7 +396,8 @@
    ============================================================================= */
 
 .chart-spark-area {
-  height: 180px;
+  flex: 1;
+  min-height: 0;
   position: relative;
 }
 
@@ -569,68 +553,7 @@
 }
 
 /* =============================================================================
-   ORACLE INSIGHT CARD — contextual, sits at bottom
-   ============================================================================= */
-
-.oracle-insight-card {
-  flex-shrink: 0;
-  margin: 2px 4px 0;
-  background: var(--cal-cell-bg);
-  border-radius: 10px;
-  padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.oracle-insight-title {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.oracle-insight-body {
-  font-size: 0.6875rem;
-  color: var(--text-muted);
-  line-height: 1.4;
-}
-
-/* =============================================================================
-   PREMIUM ANALYTICS STACK — below the fold, visible for paying users
-   ============================================================================= */
-
-.stats-premium-stack {
-  padding: 0 16px 120px;
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border-subtle);
-}
-
-@media (max-width: 480px) {
-  .stats-premium-stack {
-    padding-left: 14px;
-    padding-right: 14px;
-  }
-}
-
-@media (max-width: 360px) {
-  .stats-premium-stack {
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-}
-
-.stats-premium-stack .analytics-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  margin: 0;
-  padding: 0;
-  border: none;
-}
-
-/* =============================================================================
-   FOOTER ROW — milestones + reset access
+   FOOTER ROW — milestones + insights + reset
    ============================================================================= */
 
 .stats-footer-row {
@@ -663,6 +586,31 @@
   height: 12px;
   background: var(--border-prominent);
   flex-shrink: 0;
+}
+
+/* =============================================================================
+   INSIGHTS SHEET — scrollable premium analytics
+   ============================================================================= */
+
+.insights-sheet {
+  max-height: 85vh;
+  max-height: 85dvh;
+}
+
+.insights-sheet-scroll {
+  padding: 0 4px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: calc(85dvh - 60px);
+  touch-action: pan-y;
+  scrollbar-width: none;
+}
+
+.insights-sheet-scroll::-webkit-scrollbar { display: none; }
+
+.insights-sheet-scroll .insight-card {
+  padding-bottom: 24px;
+  margin-bottom: 24px;
 }
 
 /* =============================================================================
@@ -1035,11 +983,6 @@
   opacity: 0;
 }
 
-.oracle-insight-card {
-  animation: fadeInUp 400ms ease 250ms forwards;
-  opacity: 0;
-}
-
 /* =============================================================================
    TAP FEEDBACK — scale(0.97) on active, matches Calendar day-cell
    ============================================================================= */
@@ -1047,7 +990,6 @@
 .streak-cell:active,
 .num-cell:active,
 .num-extreme-cell:active,
-.oracle-insight-card:active,
 .milestone-card:not(:disabled):active,
 .stats-footer-btn:active {
   transform: scale(0.97);
@@ -1062,7 +1004,6 @@
 .streak-cell,
 .num-cell,
 .num-extreme-cell,
-.oracle-insight-card,
 .milestone-card,
 .stats-footer-btn,
 .chart-tt-btn,
@@ -1098,14 +1039,6 @@
 
   .num-cell {
     padding: 10px 4px;
-  }
-
-  .chart-spark-area {
-    height: 150px;
-  }
-
-  .oracle-insight-card {
-    padding: 10px 12px;
   }
 
   .modal-num {
@@ -1178,15 +1111,13 @@
   .stats-progress-bar,
   .chart-header,
   .chart-spark-area,
-  .numbers-grid-v2,
-  .oracle-insight-card {
+  .numbers-grid-v2 {
     animation: none;
     opacity: 1;
   }
   
   .streak-cell,
-  .milestone-card,
-  .oracle-insight-card {
+  .milestone-card {
     transition: none;
   }
 }
