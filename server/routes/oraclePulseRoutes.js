@@ -182,6 +182,66 @@ async function generatePersonalizedPulse(user, timezone) {
     if (parts.length > 0) benefitContext = parts.join(', ');
   }
 
+  // Historical cycle comparison — what happened at this same cycle position in prior cycles
+  let cycleHistory = '';
+  if (user.benefitTracking && user.benefitTracking.length >= 14 && user.startDate && streak > 74) {
+    try {
+      const parse = (s) => {
+        if (typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s)) {
+          const [y, m, d] = s.split('-').map(Number);
+          return new Date(y, m - 1, d);
+        }
+        const d = new Date(s); d.setHours(0, 0, 0, 0); return d;
+      };
+      const startDate = parse(user.startDate);
+      const currentCycleStart = streak - cycleDay + 1; // streak day when current cycle began
+
+      const matchWindow = 3; // ±3 days around current cycle position
+      const priorCycleEntries = [];
+
+      user.benefitTracking.forEach(entry => {
+        if (!entry.date) return;
+        const entryDate = parse(entry.date);
+        const entryStreak = Math.max(1, Math.floor((entryDate - startDate) / (1000 * 60 * 60 * 24)) + 1);
+        // Skip entries from current cycle
+        if (entryStreak >= currentCycleStart) return;
+        const entryCycleDay = ((entryStreak - 1) % 74) + 1;
+        if (Math.abs(entryCycleDay - cycleDay) <= matchWindow) {
+          priorCycleEntries.push(entry);
+        }
+      });
+
+      if (priorCycleEntries.length >= 3) {
+        const metrics = ['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'];
+        const metricLabels = { energy: 'energy', focus: 'focus', confidence: 'confidence', aura: 'aura', sleep: 'sleep', workout: 'body score' };
+        const diffs = [];
+
+        metrics.forEach(m => {
+          const label = metricLabels[m] || m;
+          const histVals = priorCycleEntries.map(e => e[m]).filter(v => v != null);
+          if (histVals.length < 2) return;
+          const histAvg = Math.round((histVals.reduce((a, b) => a + b, 0) / histVals.length) * 10) / 10;
+
+          // Get current value from recent entries
+          const sorted = [...user.benefitTracking].sort((a, b) => new Date(b.date) - new Date(a.date));
+          const currentVal = sorted.find(e => e[m] != null)?.[m];
+          if (currentVal != null) {
+            const diff = Math.round((currentVal - histAvg) * 10) / 10;
+            if (Math.abs(diff) >= 0.5) {
+              diffs.push(`${label}: currently ${currentVal}, was ${histAvg} at this cycle position before (${diff > 0 ? '+' : ''}${diff})`);
+            }
+          }
+        });
+
+        if (diffs.length > 0) {
+          cycleHistory = diffs.slice(0, 3).join('; ');
+        } else {
+          cycleHistory = `Scores at this cycle position are tracking close to prior cycles (no major deviation).`;
+        }
+      }
+    } catch { /* non-blocking */ }
+  }
+
   // Oracle's recent memory notes
   let memoryContext = 'No prior observations recorded.';
   if (user.oracleNotes && user.oracleNotes.length > 0) {
@@ -223,34 +283,43 @@ async function generatePersonalizedPulse(user, timezone) {
     }
   } catch { /* non-blocking — psych profile is enhancement */ }
 
-  const prompt = `You generate a daily observation for a semen retention tracker app home screen. This is the first thing the user sees when they open the app. It should make them feel like Oracle is watching their journey and knows something they don't.
+  const prompt = `You generate a daily observation for a semen retention tracker app home screen. This is the first thing the user sees when they open the app.
+
+YOUR JOB: If you have cycle history data, make a prediction about what's coming based on their past patterns. If you don't, observe what's happening now and connect a dot they wouldn't connect themselves.
 
 FORMAT: Two short sentences. 25 words total max.
-- Sentence 1: What you noticed in their data. A specific number, trend, or phase.
-- Sentence 2: What it means, what's coming next, or why it matters. This is where the value lives. Connect a dot they wouldn't connect themselves.
+- Sentence 1: What you see or what happened before at this point.
+- Sentence 2: What's likely coming next, or why it matters.
 
 VOICE:
-- Calm, knowing, direct. Like a mentor who's been watching quietly.
+- Calm, knowing, direct. Like a mentor who's seen this before.
 - Plain language. No jargon, no pseudo-science, no em dashes, no emojis, no semicolons.
 - NEVER say "body jumped" or "body climbed" — say "body score" when referencing that metric.
+- NEVER start with or reference the streak day number (e.g. "Day 2527"). The streak is already displayed on screen.
 
-EXAMPLES:
+PREDICTION EXAMPLES (when cycle history is available):
+"Last time you hit this cycle position, sleep dropped for 3 days. Watch your evenings."
+"Your energy was 7.2 here last cycle. It's 8.5 now. You're building stronger each round."
+"Confidence dipped here in your last cycle. This time it's climbing. Something shifted."
+"Sleep tends to soften around this cycle point for you. Protect it tonight."
+
+OBSERVATION EXAMPLES (when no cycle history):
 "Focus hit 9.7 this week. Mitotic division tends to sharpen that even further."
-"Sleep dipped 0.8 points over three days. Watch your evenings, that's usually where it starts."
 "Energy steady at 8.1 all week. That kind of consistency compounds faster than spikes."
-"Cycle day 7 of 74. Your stem cells are multiplying, everything rebuilds from here."
-"Confidence climbed every day this week. Oracle sees this pattern before major breakthroughs."
+"Cycle day 7 of 74. Stem cells multiplying, everything rebuilds from here."
 
 BAD — never write like this:
 "Neural hyperactivity seeking external validation of internal signal."
-"Day 2527: Your focus just hit 9.7, and your body jumped almost a point this week. The discipline is showing results."
+"Day 2527: Your focus just hit 9.7, and your body jumped almost a point this week."
+"Oracle predicts great things ahead for you." (vague, no data)
 ${voiceRules ? `\nORACLE VOICE RULES (follow these):\n${voiceRules}` : ''}
 ${toneNote ? `\nUSER TONE PREFERENCE: ${toneNote}` : ''}
 
 USER DATA:
-Streak: Day ${streak}
+Streak length: ${streak} days
 Spermatogenesis: Cycle day ${cycleDay}/74, ${spermaPhase}
-Benefit trends: ${benefitContext}
+Benefit trends (this week vs last): ${benefitContext}
+${cycleHistory ? `Cycle history (same position in prior cycles): ${cycleHistory}` : 'No prior cycle data yet (first cycle or insufficient history).'}
 Oracle memory: ${memoryContext}
 ${communityNote}
 
@@ -265,7 +334,7 @@ Two sentences. 25 words max. Go.`;
     return response.content[0].text.trim().replace(/^["']|["']$/g, '');
   } catch (err) {
     console.error('[OraclePulse] Personalized generation error:', err.message);
-    return `Day ${streak}. Cycle day ${cycleDay} of 74. Your body is at work.`;
+    return `Cycle day ${cycleDay} of 74, ${spermaPhase.split(' (')[0].toLowerCase()}. Your body is at work.`;
   }
 }
 
