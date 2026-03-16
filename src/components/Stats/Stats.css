@@ -62,7 +62,12 @@
 }
 
 /* =============================================================================
-   HEADER — fixed at top, mirrors .calendar-header-minimal exactly
+   HEADER — pixel-matched to .calendar-header-minimal
+   Calendar structure: container padding + header padding = total spacing
+   Stats has no container, so header carries all spacing
+   
+   Default: Calendar = container 12px 6px + header 10px 8px
+   480px:   Calendar = container 8px 4px + header 0 4px
    ============================================================================= */
 
 .stats-header-sticky {
@@ -70,6 +75,7 @@
   z-index: 10;
   background: var(--background);
   border-bottom: 1px solid var(--border-subtle);
+  padding-top: 12px;
   animation: fadeInUp 500ms ease forwards;
 }
 
@@ -80,15 +86,31 @@
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 0;
-  padding: 10px 8px;
+  padding: 10px 14px;
 }
 
 .stats-header-title {
-  font-size: 1rem;
+  font-size: 1.125rem;
   font-weight: 600;
   color: var(--text);
   letter-spacing: -0.03em;
   line-height: 1.2;
+}
+
+@media (max-width: 480px) {
+  .stats-header-sticky {
+    padding-top: 8px;
+  }
+  
+  .stats-header-row {
+    gap: 8px;
+    margin-bottom: 2px;
+    padding: 0 8px;
+  }
+  
+  .stats-header-title {
+    font-size: 1rem;
+  }
 }
 
 /* View toggle — identical to Calendar Month|Week */
@@ -928,14 +950,14 @@
   background: transparent;
   border: none;
   border-radius: 9999px;
-  color: var(--text-secondary);
-  font-size: 0.9375rem;
-  font-weight: 600;
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
+  font-weight: 500;
   font-family: inherit;
   cursor: pointer;
 }
 
-.stats-page .btn-ghost:hover { color: var(--text); }
+.stats-page .btn-ghost:hover { color: var(--text-secondary); }
 
 .stats-page .btn-danger {
   width: 100%;
