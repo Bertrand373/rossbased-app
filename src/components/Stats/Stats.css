@@ -35,9 +35,24 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Analytics: stats-page is the scroll container */
+.stats-page.stats-view-analytics {
+  overflow-y: auto;
+}
+
+/* Timeline: no stacking context trap — main-content-wrapper scrolls instead */
+.stats-page.stats-view-timeline {
+  overflow: visible;
+  position: static;
+}
+
+.main-content-wrapper:has(.stats-view-timeline) {
+  overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -70,6 +85,7 @@
   z-index: 10;
   background: var(--background);
   border-bottom: 1px solid var(--border-subtle);
+  animation: fadeInUp 500ms ease forwards;
 }
 
 .stats-header-row {
@@ -79,7 +95,7 @@
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 0;
-  padding: 10px 8px;
+  padding: 10px 14px;
 }
 
 .stats-header-title {
@@ -92,8 +108,7 @@
 
 @media (max-width: 480px) {
   .stats-header-row {
-    padding: 0 4px;
-    gap: 8px;
+    padding: 10px 12px;
   }
 }
 
@@ -107,7 +122,7 @@
   background: transparent;
   border: none;
   padding: 8px 12px;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
@@ -123,6 +138,13 @@
 .stats-vt-btn.active {
   color: var(--text);
   font-weight: 600;
+}
+
+@media (max-width: 480px) {
+  .stats-vt-btn {
+    font-size: 0.8125rem;
+    padding: 8px 12px;
+  }
 }
 
 .stats-vt-div {
@@ -146,17 +168,6 @@
   padding-top: 0;
   padding-bottom: 0;
   min-height: auto;
-}
-
-/* Force any sheets/overlays inside stats-page above everything */
-.stats-page .sheet-backdrop,
-.stats-page .calendar-overlay,
-.stats-page [class*="overlay"] {
-  z-index: 10000 !important;
-}
-
-.stats-page .sheet-panel {
-  z-index: 10001 !important;
 }
 
 /* =============================================================================
@@ -201,10 +212,6 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.streak-cell:active {
-  transform: scale(0.97);
-}
-
 /* Current streak — green tint like Calendar current-streak days */
 .streak-cell.streak-current {
   background: var(--cal-tint-current);
@@ -220,9 +227,8 @@
 }
 
 .streak-cell-num {
-  font-family: 'Outfit', -apple-system, sans-serif;
   font-size: 1.25rem;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--text-secondary);
   line-height: 1;
   font-feature-settings: 'tnum' 1;
@@ -308,9 +314,8 @@
 }
 
 .chart-metric-value {
-  font-family: 'Outfit', -apple-system, sans-serif;
   font-size: 1.25rem;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--text);
   font-feature-settings: 'tnum' 1;
 }
@@ -486,9 +491,8 @@
 }
 
 .num-cell-value {
-  font-family: 'Outfit', -apple-system, sans-serif;
   font-size: 1.25rem;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--text);
   line-height: 1;
   font-feature-settings: 'tnum' 1;
@@ -704,10 +708,6 @@
 .milestone-card:disabled {
   cursor: default;
   opacity: 0.4;
-}
-
-.milestone-card:not(:disabled):active {
-  transform: scale(0.97);
 }
 
 .milestone-card.earned {
@@ -1038,6 +1038,37 @@
 .oracle-insight-card {
   animation: fadeInUp 400ms ease 250ms forwards;
   opacity: 0;
+}
+
+/* =============================================================================
+   TAP FEEDBACK — scale(0.97) on active, matches Calendar day-cell
+   ============================================================================= */
+
+.streak-cell:active,
+.num-cell:active,
+.num-extreme-cell:active,
+.oracle-insight-card:active,
+.milestone-card:not(:disabled):active,
+.stats-footer-btn:active {
+  transform: scale(0.97);
+}
+
+.chart-tt-btn:active,
+.metric-sel-btn:active,
+.stats-vt-btn:active {
+  transform: scale(0.95);
+}
+
+.streak-cell,
+.num-cell,
+.num-extreme-cell,
+.oracle-insight-card,
+.milestone-card,
+.stats-footer-btn,
+.chart-tt-btn,
+.metric-sel-btn,
+.stats-vt-btn {
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* =============================================================================

@@ -404,7 +404,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
   return (
     <>
-    <div className="stats-page">
+    <div className={`stats-page ${activeView === 'timeline' ? 'stats-view-timeline' : 'stats-view-analytics'}`}>
       {/* ====== STICKY HEADER — mirrors Calendar header exactly ====== */}
       <div className="stats-header-sticky">
         <div className="stats-header-row">
