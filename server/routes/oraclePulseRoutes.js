@@ -11,6 +11,23 @@ const User = require('../models/User');
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const PULSE_MODEL = 'claude-haiku-4-5-20251001';
 
+// Hard cleanup — enforce word limit and strip banned characters no matter what Haiku returns
+function cleanPulseOutput(text) {
+  let cleaned = text.trim().replace(/^["']|["']$/g, '');
+  // Strip em dashes and replace with commas
+  cleaned = cleaned.replace(/—/g, ',').replace(/–/g, ',');
+  // Strip semicolons
+  cleaned = cleaned.replace(/;/g, ',');
+  // Hard cap at 25 words
+  const words = cleaned.split(/\s+/);
+  if (words.length > 25) {
+    cleaned = words.slice(0, 25).join(' ');
+    // End cleanly — add period if missing
+    if (!/[.!?]$/.test(cleaned)) cleaned += '.';
+  }
+  return cleaned;
+}
+
 // Load Oracle's evolved voice rules (same ones used in live chat)
 let cachedVoiceRules = null;
 let voiceRulesCacheTime = 0;
@@ -331,7 +348,7 @@ Two sentences. 25 words max. Go.`;
       max_tokens: 80,
       messages: [{ role: 'user', content: prompt }]
     });
-    return response.content[0].text.trim().replace(/^["']|["']$/g, '');
+    return cleanPulseOutput(response.content[0].text);
   } catch (err) {
     console.error('[OraclePulse] Personalized generation error:', err.message);
     return `Cycle day ${cycleDay} of 74, ${spermaPhase.split(' (')[0].toLowerCase()}. Your body is at work.`;
@@ -410,7 +427,7 @@ Two sentences. 25 words max. Go.`;
       max_tokens: 80,
       messages: [{ role: 'user', content: prompt }]
     });
-    return response.content[0].text.trim().replace(/^["']|["']$/g, '');
+    return cleanPulseOutput(response.content[0].text);
   } catch (err) {
     console.error('[OraclePulse] Community generation error:', err.message);
     return `${topPct}% of practitioners are in ${topPhase} phase right now.`;
