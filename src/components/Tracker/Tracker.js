@@ -1592,12 +1592,21 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         isPatternAlertShowing={isPatternAlertShowing}
       />
 
-      {/* Meta strip — phase left (tappable → opens almanac), date right */}
+      {/* Meta strip — sperma cycle left (tappable → opens almanac), date right */}
       <div className="tracker-meta-strip" onClick={() => document.dispatchEvent(new CustomEvent('openAlmanac'))}>
         <span className="tracker-meta-phase">
-          {getCurrentPhaseName(streak)}
+          {(() => {
+            const cycleLen = 72;
+            const pos = streak % cycleLen;
+            let phase;
+            if (pos <= 16) phase = 'Mitotic Division';
+            else if (pos <= 40) phase = 'Meiotic Division';
+            else if (pos <= 64) phase = 'Maturation';
+            else phase = 'Complete Reabsorption';
+            return `${phase}`;
+          })()}
           <span className="tracker-meta-dot">·</span>
-          Day {streak}
+          Day {streak % 72} of 72
         </span>
         <span className="tracker-meta-date">
           {format(currentTime, 'EEEE, MMMM d')}

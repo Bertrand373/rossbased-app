@@ -1171,7 +1171,7 @@
 /* Meta strip responsive */
 @media (max-width: 480px) {
   .tracker-meta-strip {
-    padding: 0 8px;
+    padding: 8px 8px;
   }
   
   .tracker-meta-phase {
