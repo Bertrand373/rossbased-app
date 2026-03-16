@@ -61,9 +61,7 @@
 }
 
 /* =============================================================================
-   STICKY HEADER — mirrors Calendar header exactly
-   Calendar: .calendar-container padding 12px 6px + .calendar-header-minimal padding 10px 8px
-   Result: text starts ~14px from edge, total header height matches
+   STICKY HEADER — pixel-matched to .calendar-header-minimal
    ============================================================================= */
 
 .stats-header-sticky {
@@ -81,21 +79,22 @@
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 0;
-  padding: 10px 14px;
-}
-
-@media (max-width: 480px) {
-  .stats-header-row {
-    padding: 10px 12px;
-  }
+  padding: 10px 8px;
 }
 
 .stats-header-title {
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text);
   letter-spacing: -0.03em;
   line-height: 1.2;
+}
+
+@media (max-width: 480px) {
+  .stats-header-row {
+    padding: 0 4px;
+    gap: 8px;
+  }
 }
 
 /* View toggle — identical to Calendar Month|Week */
@@ -147,6 +146,17 @@
   padding-top: 0;
   padding-bottom: 0;
   min-height: auto;
+}
+
+/* Force any sheets/overlays inside stats-page above everything */
+.stats-page .sheet-backdrop,
+.stats-page .calendar-overlay,
+.stats-page [class*="overlay"] {
+  z-index: 10000 !important;
+}
+
+.stats-page .sheet-panel {
+  z-index: 10001 !important;
 }
 
 /* =============================================================================
