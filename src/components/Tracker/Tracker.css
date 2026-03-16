@@ -7,9 +7,47 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 0 24px;
+  padding: 0;
   background-color: var(--background);
+  overflow: hidden;
+}
+
+/* ============================================================
+   META STRIP — phase + date, matches Calendar header proportions
+   ============================================================ */
+
+.tracker-meta-strip {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--background);
+  z-index: 2;
+  animation: fadeInUp 400ms ease forwards;
+}
+
+.tracker-meta-date {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  font-feature-settings: 'tnum' 1;
+  flex-shrink: 0;
+}
+
+.tracker-meta-date .time-separator {
+  margin: 0 5px;
+  opacity: 0.4;
+}
+
+/* Almanac ghost — restyle for inline strip placement */
+.tracker-meta-strip .almanac-ghost {
+  margin: 0;
+  animation: none;
+  opacity: 1;
+  font-size: 0.8125rem;
 }
 
 /* ============================================================
@@ -17,29 +55,16 @@
    ============================================================ */
 
 .tracker-main {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
+  padding: 0 24px;
+  min-height: 0;
   animation: fadeInUp 500ms ease 50ms forwards;
   opacity: 0;
-}
-
-.date {
-  font-size: 0.8125rem;
-  font-weight: 400;
-  color: var(--text-muted);
-  margin: 0 0 12px 0;
-}
-
-.time-separator {
-  margin: 0 6px;
-  opacity: 0.5;
-}
-
-.time {
-  font-feature-settings: 'tnum' 1;
-  letter-spacing: 0.01em;
 }
 
 /* Streak - tappable, no visible hover/active states */
@@ -254,13 +279,58 @@
    ============================================================ */
 
 .tracker-footer {
-  margin-top: 28px;
-  padding: 0;
+  padding: 0 24px 8px;
   max-width: 340px;
   width: 100%;
   animation: fadeInUp 500ms ease 100ms forwards;
   opacity: 0;
   flex-shrink: 0;
+}
+
+/* ============================================================
+   ORACLE BAR — pinned bottom, matches Calendar moon bar
+   ============================================================ */
+
+.tracker-oracle-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 8px 16px;
+  border-top: 1px solid var(--border-subtle);
+  background: var(--background);
+  z-index: 2;
+}
+
+/* Override OraclePulse styles when inside oracle bar */
+.tracker-oracle-bar .oracle-pulse {
+  max-width: none;
+  width: 100%;
+  margin-top: 0;
+  animation: none;
+  opacity: 1;
+}
+
+.tracker-oracle-bar .oracle-pulse-label {
+  font-size: 0.5rem;
+  margin-bottom: 4px;
+}
+
+.tracker-oracle-bar .oracle-pulse-text {
+  font-size: 0.6875rem;
+  margin-bottom: 3px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tracker-oracle-bar .oracle-pulse-time {
+  font-size: 0.5625rem;
+  animation: none;
+  opacity: 1;
 }
 
 .tracker .btn-primary {
@@ -1067,6 +1137,7 @@
   .modal,
   .sheet,
   .overlay,
+  .tracker-meta-strip,
   .tracker-main,
   .tracker-footer,
   .benefits-modal,
@@ -1076,6 +1147,29 @@
   .tracker .btn-primary.benefits-trigger {
     animation: none;
     opacity: 1;
+  }
+}
+
+/* Meta strip responsive */
+@media (max-width: 480px) {
+  .tracker-meta-strip {
+    padding: 0 8px;
+  }
+  
+  .tracker-meta-date {
+    font-size: 0.75rem;
+  }
+  
+  .tracker-meta-strip .almanac-ghost {
+    font-size: 0.75rem;
+  }
+  
+  .tracker-oracle-bar {
+    padding: 6px 12px;
+  }
+  
+  .tracker-oracle-bar .oracle-pulse-text {
+    font-size: 0.625rem;
   }
 }
 

@@ -1586,19 +1586,21 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         );
       })()}
 
-      {/* Energy Almanac ghost line */}
-      <EnergyAlmanac 
-        userData={userData}
-        isPatternAlertShowing={isPatternAlertShowing}
-      />
+      {/* Energy Almanac ghost line — inside meta strip */}
+      <div className="tracker-meta-strip">
+        <EnergyAlmanac 
+          userData={userData}
+          isPatternAlertShowing={isPatternAlertShowing}
+        />
+        <span className="tracker-meta-date">
+          {format(currentTime, 'EEEE, MMMM d')}
+          <span className="time-separator">·</span>
+          {format(currentTime, 'h:mm a')}
+        </span>
+      </div>
 
       {/* Main content group */}
       <main className="tracker-main">
-        <p className="date">
-          {format(currentTime, 'EEEE, MMMM d')}
-          <span className="time-separator">·</span>
-          <span className="time">{format(currentTime, 'h:mm a')}</span>
-        </p>
         
         {/* ONBOARDING TARGET: streak-counter */}
         <button className="streak streak-counter" onClick={() => setShowStreakOptions(true)}>
@@ -1623,8 +1625,10 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         </button>
       </footer>
 
-      {/* Oracle Pulse — daily AI observation */}
-      <OraclePulse isPremium={isPremium} isGold={userData.streakColorGold} />
+      {/* Oracle bar — pinned bottom, matches Calendar moon bar */}
+      <div className="tracker-oracle-bar">
+        <OraclePulse isPremium={isPremium} isGold={userData.streakColorGold} />
+      </div>
       
     </div>
   );
