@@ -315,7 +315,7 @@ export const calculateMetricTrends = (userData, currentPeriod = 7, comparePeriod
     const safeData = validateUserData(userData);
     const allData = safeData.benefitTracking || [];
     
-    if (allData.length < currentPeriod + comparePeriod) {
+    if (allData.length < 2) {
       return null;
     }
     
@@ -338,7 +338,7 @@ export const calculateMetricTrends = (userData, currentPeriod = 7, comparePeriod
       return !isNaN(itemDate.getTime()) && itemDate >= previousCutoff && itemDate < currentCutoff;
     });
     
-    if (currentData.length < 3 || previousData.length < 3) {
+    if (currentData.length < 1 || previousData.length < 1) {
       return null;
     }
     

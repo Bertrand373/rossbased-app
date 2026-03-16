@@ -13,23 +13,13 @@ import toast from 'react-hot-toast';
 // Import extracted components
 import { StatCardModal } from './StatsComponents';
 import EmotionalTimeline from '../EmotionalTimeline/EmotionalTimeline';
-import { 
-  YourNumbers,
-  YourPatterns,
-  AIInsights,
-  RelapseAnalytics
-} from './StatsInsights';
-
 // Import ShareCard component
 import ShareCard from '../ShareCard/ShareCard';
 
 // Import utility functions
 import {
-  getTimeRangeDisplayText,
   generateChartData,
   calculateAverage,
-  calculateDataQuality,
-  calculateDaysSinceLastRelapse,
   validateUserData
 } from './StatsUtils';
 
@@ -38,13 +28,7 @@ import {
   getPhaseInfo,
   calculateMetricAverages,
   calculateMetricTrends,
-  identifyMetricExtremes,
-  calculateStreakPhaseAverages,
-  calculateMetricCorrelations,
-  calculateGrowthRates,
-  generateRelapsePatternAnalysis,
-  discoverMLPatterns,
-  generateMLOptimization
+  identifyMetricExtremes
 } from './StatsAnalyticsUtils';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
@@ -61,19 +45,10 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [showStatModal, setShowStatModal] = useState(false);
   const [selectedStatCard, setSelectedStatCard] = useState(null);
   const [showMilestonesSheet, setShowMilestonesSheet] = useState(false);
-  const [showInsightsSheet, setShowInsightsSheet] = useState(false);
 
   // Theme detection
   const [isDarkTheme, setIsDarkTheme] = useState(() => {
     return document.documentElement.getAttribute('data-theme') !== 'light';
-  });
-
-  // ML pattern state
-  const [mlPatterns, setMLPatterns] = useState(null);
-  const [mlOptimization, setMLOptimization] = useState(null);
-
-  const [loadingStates, setLoadingStates] = useState({
-    numbers: true, patterns: true, ai: true, relapse: true
   });
 
   const chartRef = useRef(null);
@@ -83,7 +58,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [sheetReady, setSheetReady] = useState(false);
   const sheetPanelRef = useRef(null);
 
-  const sheetVisible = showMilestoneModal || showResetStreakModal || showResetAllModal || showMilestonesSheet || showInsightsSheet;
+  const sheetVisible = showMilestoneModal || showResetStreakModal || showResetAllModal || showMilestonesSheet;
   useEffect(() => {
     if (sheetVisible) {
       requestAnimationFrame(() => requestAnimationFrame(() => setSheetReady(true)));
@@ -102,7 +77,6 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setShowResetStreakModal(false);
     setShowResetAllModal(false);
     setShowMilestonesSheet(false);
-    setShowInsightsSheet(false);
     setSelectedMilestone(null);
   }, []);
   useSheetSwipe(sheetPanelRef, sheetVisible, () => closeSheet(handleSwipeDismiss));
@@ -120,52 +94,17 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   }, []);
 
   const daysTracked = useMemo(() => safeUserData.benefitTracking?.length || 0, [safeUserData.benefitTracking]);
-  const relapseCount = useMemo(() => (safeUserData.streakHistory || []).filter(s => s.reason === 'relapse').length, [safeUserData.streakHistory]);
 
-  useEffect(() => {
-    if (isPremium) {
-      const timers = [
-        setTimeout(() => setLoadingStates(prev => ({ ...prev, numbers: false })), 300),
-        setTimeout(() => setLoadingStates(prev => ({ ...prev, patterns: false })), 500),
-        setTimeout(() => setLoadingStates(prev => ({ ...prev, ai: false })), 700),
-        setTimeout(() => setLoadingStates(prev => ({ ...prev, relapse: false })), 400)
-      ];
-      return () => timers.forEach(clearTimeout);
-    }
-  }, [isPremium, selectedMetric]);
-
-  // ML patterns
-  useEffect(() => {
-    const loadMLPatterns = async () => {
-      if (!isPremium || daysTracked < 20) { setMLPatterns(null); setMLOptimization(null); return; }
-      try {
-        const patterns = await discoverMLPatterns(safeUserData);
-        setMLPatterns(patterns);
-        const optimization = await generateMLOptimization(safeUserData);
-        setMLOptimization(optimization);
-      } catch (error) {
-        console.warn('ML patterns loading error:', error);
-        setMLPatterns(null); setMLOptimization(null);
-      }
-    };
-    loadMLPatterns();
-  }, [safeUserData, isPremium, daysTracked]);
-
-  // Memoized analytics
+  // Memoized analytics — only what the main view needs
   const memoizedInsights = useMemo(() => {
     if (!isPremium) return {};
     return {
       metricAverages: calculateMetricAverages(safeUserData, 7),
       metricTrends: calculateMetricTrends(safeUserData, 7, 7),
       metricExtremes: identifyMetricExtremes(safeUserData, 7),
-      streakPhaseAverages: calculateStreakPhaseAverages(safeUserData),
-      metricCorrelations: calculateMetricCorrelations(safeUserData),
-      growthRates: calculateGrowthRates(safeUserData, 30),
-      relapsePatterns: generateRelapsePatternAnalysis(safeUserData),
-      daysSinceLastRelapse: calculateDaysSinceLastRelapse(safeUserData),
       phaseInfo: getPhaseInfo(safeUserData.currentStreak || 0)
     };
-  }, [safeUserData, selectedMetric, isPremium]);
+  }, [safeUserData, isPremium]);
 
   // Milestones
   const milestones = useMemo(() => {
@@ -355,15 +294,6 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     return memoizedInsights.metricTrends[selectedMetric];
   }, [isPremium, memoizedInsights.metricTrends, selectedMetric]);
 
-  // Numbers grid helper — get directional tint class
-  const getNumberTintClass = (metric) => {
-    if (!memoizedInsights.metricTrends?.[metric]) return '';
-    const { direction } = memoizedInsights.metricTrends[metric];
-    if (direction === 'up') return 'num-cell-up';
-    if (direction === 'down') return 'num-cell-down';
-    return '';
-  };
-
   // Phase info for progress bar
   const phaseInfo = memoizedInsights.phaseInfo || getPhaseInfo(safeUserData.currentStreak || 0);
 
@@ -515,7 +445,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
             })()}
           </div>
 
-          {/* ---- NUMBERS GRID: 3×2 with directional tints ---- */}
+          {/* ---- NUMBERS GRID: 3×2 ---- */}
           {isPremium && memoizedInsights.metricAverages && (
             <div className="numbers-grid-v2">
               <div className="numbers-grid-top">
@@ -523,7 +453,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                   const val = memoizedInsights.metricAverages?.averages?.[metric]?.value;
                   const trend = memoizedInsights.metricTrends?.[metric];
                   return (
-                    <div key={metric} className={`num-cell ${trend ? getNumberTintClass(metric) : ''}`}>
+                    <div key={metric} className="num-cell">
                       <span className="num-cell-value">{val ? val.toFixed(1) : '—'}</span>
                       <span className="num-cell-label">{metricDisplayName[metric]}</span>
                       {trend && trend.direction !== 'stable' && (
@@ -562,20 +492,12 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
             </div>
           )}
 
-          {/* ---- FOOTER ACTIONS: milestones + insights + reset ---- */}
+          {/* ---- FOOTER: milestones + reset ---- */}
           <div className="stats-footer-row">
             <button className="stats-footer-btn" onClick={() => setShowMilestonesSheet(true)}>
               Milestones
             </button>
             <span className="stats-footer-div" />
-            {isPremium && (
-              <>
-                <button className="stats-footer-btn" onClick={() => setShowInsightsSheet(true)}>
-                  Insights
-                </button>
-                <span className="stats-footer-div" />
-              </>
-            )}
             {!isPremium && (
               <>
                 <button className="stats-footer-btn" onClick={openPlanModal}>
@@ -632,46 +554,6 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
               </div>
               {isPremium && <ShareCard userData={safeUserData} isVisible={true} />}
               <button className="btn-ghost" onClick={() => closeSheet(() => setShowMilestonesSheet(false))}>Close</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-    {/* INSIGHTS SHEET — premium analytics */}
-    {showInsightsSheet && isPremium && (
-        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowInsightsSheet(false))}>
-          <div ref={sheetPanelRef} className={`sheet-panel stats-sheet insights-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
-            <div className="sheet-header" />
-            <div className="insights-sheet-scroll" data-no-swipe>
-              <h2 className="sheet-section-title">Insights</h2>
-              <YourNumbers
-                metricAverages={memoizedInsights.metricAverages}
-                metricTrends={memoizedInsights.metricTrends}
-                metricExtremes={memoizedInsights.metricExtremes}
-                daysTracked={daysTracked}
-                isLoading={false}
-              />
-              <YourPatterns
-                streakPhaseAverages={memoizedInsights.streakPhaseAverages}
-                metricCorrelations={memoizedInsights.metricCorrelations}
-                growthRates={memoizedInsights.growthRates}
-                selectedMetric={selectedMetric}
-                daysTracked={daysTracked}
-                isLoading={false}
-              />
-              <AIInsights
-                mlPatterns={mlPatterns}
-                mlOptimization={mlOptimization}
-                daysTracked={daysTracked}
-                relapseCount={relapseCount}
-                isLoading={false}
-              />
-              <RelapseAnalytics
-                relapsePatterns={memoizedInsights.relapsePatterns}
-                daysSinceLastRelapse={memoizedInsights.daysSinceLastRelapse}
-                isLoading={false}
-              />
-              <button className="btn-ghost" onClick={() => closeSheet(() => setShowInsightsSheet(false))}>Close</button>
             </div>
           </div>
         </div>

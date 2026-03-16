@@ -479,23 +479,6 @@
   border-radius: 6px;
 }
 
-/* Directional tints — same color language as Calendar streak tints */
-.num-cell.num-cell-up {
-  background: rgba(52, 211, 153, 0.04);
-}
-
-[data-theme="light"] .num-cell.num-cell-up {
-  background: rgba(5, 150, 105, 0.04);
-}
-
-.num-cell.num-cell-down {
-  background: rgba(248, 113, 113, 0.04);
-}
-
-[data-theme="light"] .num-cell.num-cell-down {
-  background: rgba(220, 38, 38, 0.04);
-}
-
 .num-cell-value {
   font-size: 1.25rem;
   font-weight: 500;
@@ -608,31 +591,6 @@
   height: 12px;
   background: var(--border-prominent);
   flex-shrink: 0;
-}
-
-/* =============================================================================
-   INSIGHTS SHEET — scrollable premium analytics
-   ============================================================================= */
-
-.insights-sheet {
-  max-height: 85vh;
-  max-height: 85dvh;
-}
-
-.insights-sheet-scroll {
-  padding: 0 4px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  max-height: calc(85dvh - 60px);
-  touch-action: pan-y;
-  scrollbar-width: none;
-}
-
-.insights-sheet-scroll::-webkit-scrollbar { display: none; }
-
-.insights-sheet-scroll .insight-card {
-  padding-bottom: 24px;
-  margin-bottom: 24px;
 }
 
 /* =============================================================================
