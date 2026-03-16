@@ -1,12 +1,10 @@
-// EmotionalTimeline.js - TITANTRACK MINIMAL
-// Matches Landing/Tracker/Stats aesthetic
-// UPDATED: Analysis tab focused on ONE powerful insight - emotional trajectory
-import React, { useState, useRef, useCallback } from 'react';
+// EmotionalTimeline.js - TITANTRACK
+// V2: Calendar-DNA viewport-filling layout — spine + gap cells, zero scroll
+// Same hand that built the Calendar and Stats built this.
+import React, { useState, useRef, useMemo } from 'react';
 import './EmotionalTimeline.css';
 import '../../styles/BottomSheet.css';
 import { FaCheck, FaExclamationTriangle } from 'react-icons/fa';
-
-// Body scroll lock for modals
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 import useSheetSwipe from '../../hooks/useSheetSwipe';
 
@@ -14,20 +12,20 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-
-  // Swipe-to-dismiss refs
   const sheetPanelRef = useRef(null);
 
-  // Lock body scroll when modal is open
   useBodyScrollLock(showModal);
 
   const currentDay = userData?.currentStreak || 0;
 
-  // Phase definitions with enhanced content
+  // ============================================================
+  // PHASE DEFINITIONS — full content for detail sheets
+  // ============================================================
   const phases = [
     {
       id: 1,
       name: "Initial Adaptation",
+      shortName: "Adapt",
       days: "1-14",
       start: 1,
       end: 14,
@@ -63,6 +61,7 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
     {
       id: 2,
       name: "Emotional Processing",
+      shortName: "Process",
       days: "15-45",
       start: 15,
       end: 45,
@@ -104,6 +103,7 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
     {
       id: 3,
       name: "Mental Expansion",
+      shortName: "Expand",
       days: "46-90",
       start: 46,
       end: 90,
@@ -139,6 +139,7 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
     {
       id: 4,
       name: "Integration",
+      shortName: "Integrate",
       days: "91-180",
       start: 91,
       end: 180,
@@ -174,6 +175,7 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
     {
       id: 5,
       name: "Mastery",
+      shortName: "Master",
       days: "181+",
       start: 181,
       end: 999999,
@@ -208,7 +210,9 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
     }
   ];
 
-  // Get current phase
+  // ============================================================
+  // PHASE UTILITIES
+  // ============================================================
   const getCurrentPhase = () => {
     if (currentDay <= 0) return phases[0];
     for (const phase of phases) {
@@ -221,58 +225,40 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
 
   const currentPhase = getCurrentPhase();
 
-  // Get phase status
   const getPhaseStatus = (phase) => {
     if (currentDay < phase.start) return 'upcoming';
     if (currentDay > phase.end && phase.end !== 999999) return 'completed';
     return 'current';
   };
 
-  // Get progress in current phase
   const getProgress = () => {
     if (!currentPhase || currentDay <= 0) return { percent: 0, text: '' };
-    
     if (currentPhase.end === 999999) {
       const daysIn = currentDay - currentPhase.start + 1;
       return { percent: 100, text: `Day ${daysIn} of mastery` };
     }
-    
     const daysIn = currentDay - currentPhase.start + 1;
     const totalDays = currentPhase.end - currentPhase.start + 1;
     const remaining = currentPhase.end - currentDay;
     const percent = Math.min(100, (daysIn / totalDays) * 100);
-    
-    return { 
-      percent, 
-      text: `Day ${daysIn} of ${totalDays} (${remaining} remaining)` 
-    };
+    return { percent, text: `Day ${daysIn} of ${totalDays} · ${remaining} remaining` };
   };
 
   const progress = getProgress();
 
   // ============================================================
-  // ANALYSIS - Focused trajectory calculation
+  // TRAJECTORY CALCULATION
   // ============================================================
-  const calculateTrajectory = () => {
-    // Read emotional data from benefit tracking entries
+  const analysis = useMemo(() => {
     const allBenefits = userData?.benefitTracking || [];
     const log = allBenefits.filter(b => typeof b.anxiety === 'number');
-    
-    // Need at least 7 entries with emotional data
+
     if (log.length < 7) {
-      return { 
-        hasData: false, 
-        checkIns: log.length,
-        needed: 7 
-      };
+      return { hasData: false, checkIns: log.length, needed: 7 };
     }
 
-    // Sort by date to ensure correct order
     const sortedLog = [...log].sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    // Early = first 7 check-ins
     const early = sortedLog.slice(0, 7);
-    // Now = last 7 check-ins
     const now = sortedLog.slice(-7);
 
     const avg = (arr, key) => {
@@ -282,69 +268,49 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
     };
 
     const metrics = [
-      { 
-        key: 'anxiety', 
-        label: 'Calm',
-        invert: false // After migration: high = calm = good
-      },
-      { 
-        key: 'mood', 
-        label: 'Mood',
-        invert: false // Higher is better
-      },
-      { 
-        key: 'clarity', 
-        label: 'Drive',
-        invert: false
-      }
+      { key: 'anxiety', label: 'Calm', invert: false },
+      { key: 'mood', label: 'Mood', invert: false },
+      { key: 'clarity', label: 'Drive', invert: false }
     ];
 
     const trajectory = metrics.map(metric => {
       const earlyAvg = avg(early, metric.key);
       const nowAvg = avg(now, metric.key);
-      
       if (earlyAvg === null || nowAvg === null) {
         return { ...metric, early: null, now: null, delta: null, improved: null };
       }
-
       const delta = nowAvg - earlyAvg;
-      // For anxiety, improvement means going DOWN (negative delta)
-      // For others, improvement means going UP (positive delta)
       const improved = metric.invert ? delta < -0.3 : delta > 0.3;
       const declined = metric.invert ? delta > 0.3 : delta < -0.3;
-
       return {
         ...metric,
         early: earlyAvg.toFixed(1),
         now: nowAvg.toFixed(1),
         delta: Math.abs(delta).toFixed(1),
-        direction: metric.invert 
-          ? (delta < 0 ? 'down' : delta > 0 ? 'up' : 'stable')
-          : (delta > 0 ? 'up' : delta < 0 ? 'down' : 'stable'),
         improved,
         declined,
         stable: !improved && !declined
       };
     });
 
-    // Count improvements
-    const improvements = trajectory.filter(t => t.improved).length;
-    const declines = trajectory.filter(t => t.declined).length;
+    return { hasData: true, checkIns: log.length, trajectory };
+  }, [userData?.benefitTracking]);
 
+  // Trajectory extremes
+  const extremes = useMemo(() => {
+    if (!analysis.hasData) return null;
+    const valid = analysis.trajectory.filter(m => m.now !== null);
+    if (valid.length < 2) return null;
+    const sorted = [...valid].sort((a, b) => parseFloat(b.now) - parseFloat(a.now));
     return {
-      hasData: true,
-      checkIns: log.length,
-      trajectory,
-      improvements,
-      declines,
-      overallTrend: improvements > declines ? 'positive' : 
-                    declines > improvements ? 'concerning' : 'stable'
+      strongest: sorted[0],
+      growthArea: sorted[sorted.length - 1]
     };
-  };
+  }, [analysis]);
 
-  const analysis = calculateTrajectory();
-
-  // Open phase modal - free users can only view current phase
+  // ============================================================
+  // MODAL HANDLERS
+  // ============================================================
   const openPhase = (phase) => {
     setSelectedPhase(phase);
     setShowModal(true);
@@ -363,108 +329,117 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
 
   useSheetSwipe(sheetPanelRef, modalOpen, closeModal);
 
+  // Phase progress label
+  const phaseProgressLabel = `${currentDay} days · ${currentPhase?.name}`;
+
+  // ============================================================
+  // RENDER
+  // ============================================================
   return (
     <>
-    <div className="et-container">
+      <div className="et-container">
 
-      {/* Current Phase — Hero card */}
-      <div className="et-current" onClick={() => openPhase(currentPhase)}>
-        <div className="et-current-header">
-          <span className="et-current-num">
-            {String(phases.findIndex(p => p.id === currentPhase?.id) + 1).padStart(2, '0')}
-          </span>
-          <div className="et-current-info">
-            <h2 className="et-current-name">{currentPhase?.name}</h2>
-            <p className="et-current-days">Days {currentPhase?.days}</p>
+        {/* ---- PHASE STRIP: 5-cell gap grid ---- */}
+        <div className="et-phase-strip">
+          {phases.map((phase, i) => {
+            const status = getPhaseStatus(phase);
+            return (
+              <button
+                key={phase.id}
+                className={`et-strip-cell ${status}`}
+                onClick={() => openPhase(phase)}
+              >
+                {status === 'completed' && <span className="et-strip-check">✓</span>}
+                <span className="et-strip-num">{String(i + 1).padStart(2, '0')}</span>
+                <span className="et-strip-label">{phase.shortName}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ---- PROGRESS BAR — attached to phase strip ---- */}
+        <div className="et-prog-bar">
+          <div className="et-prog-meta">
+            <span className="et-prog-text">{phaseProgressLabel}</span>
+          </div>
+          <div className="et-prog-track">
+            <div className="et-prog-fill" style={{ width: `${progress.percent}%` }} />
           </div>
         </div>
-        
-        <div className="et-progress">
-          <div className="et-progress-bar">
-            <div 
-              className="et-progress-fill" 
-              style={{ width: `${progress.percent}%` }} 
-            />
-          </div>
-          <span className="et-progress-text">{progress.text}</span>
+
+        {/* ---- JOURNEY SPINE — flex-fills viewport ---- */}
+        <div className="et-spine">
+          {phases.map((phase, i) => {
+            const status = getPhaseStatus(phase);
+            const isLast = i === phases.length - 1;
+            return (
+              <div
+                key={phase.id}
+                className={`et-node ${status}`}
+                onClick={() => openPhase(phase)}
+              >
+                <div className="et-rail">
+                  <div className={`et-dot ${status}`} />
+                  {!isLast && <div className={`et-line ${status}`} />}
+                </div>
+                <div className="et-node-content">
+                  <span className="et-node-name">{phase.name}</span>
+                  <span className="et-node-days">Days {phase.days}</span>
+                  {status === 'current' && (
+                    <>
+                      <span className="et-node-expect">{phase.expectation}</span>
+                      <span className="et-node-progress">{progress.text}</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
-      </div>
 
-      {/* Phase List — Open, no container */}
-      <div className="et-phases">
-        {phases.map((phase, index) => {
-          const status = getPhaseStatus(phase);
-          return (
-            <div 
-              key={phase.id}
-              className={`et-phase ${status}`}
-              onClick={() => openPhase(phase)}
-            >
-              <div className="et-phase-num">
-                {String(index + 1).padStart(2, '0')}
-              </div>
-              <div className="et-phase-info">
-                <h3>{phase.name}</h3>
-                <p>Days {phase.days}</p>
-              </div>
-              <div className="et-phase-status">
-                {status === 'completed' && <FaCheck />}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Trajectory — Open section below phase list */}
-      <div className="et-trajectory">
-          <div className="et-trajectory-header">
-            <span>Your Progress</span>
-          </div>
-          <div className="et-trajectory-content">
-            {!analysis.hasData ? (
-              <div className="et-trajectory-empty">
-                <p className="empty-message">{analysis.checkIns}/{analysis.needed} logs</p>
-                <p className="empty-context">
-                  Log how you feel in the Tracker to build your emotional trajectory
-                </p>
-              </div>
-            ) : (
-              <div className="trajectory-list">
-                {analysis.trajectory.map((metric) => (
-                  <div key={metric.key} className="trajectory-row">
-                    <span className="trajectory-label">{metric.label}</span>
-                    <div className="trajectory-values">
-                      <span className="trajectory-early">{metric.early}</span>
-                      <span className="trajectory-arrow">→</span>
-                      <span className="trajectory-now">{metric.now}</span>
-                    </div>
-                    <span className={`trajectory-delta ${
-                      metric.improved ? 'improved' : 
-                      metric.declined ? 'declined' : 'stable'
-                    }`}>
-                      {metric.improved ? (metric.invert ? '↓' : '↑') : 
-                       metric.declined ? (metric.invert ? '↑' : '↓') : '→'} {metric.delta}
-                    </span>
+        {/* ---- TRAJECTORY GRID ---- */}
+        <div className="et-traj">
+          {analysis.hasData ? (
+            <>
+              <div className="et-traj-grid">
+                {analysis.trajectory.map(m => (
+                  <div key={m.key} className="et-traj-cell">
+                    <span className="et-traj-value">{m.now || '—'}</span>
+                    <span className="et-traj-label">{m.label}</span>
+                    {m.delta && (
+                      <span className={`et-traj-delta ${m.improved ? 'delta-up' : m.declined ? 'delta-down' : 'delta-flat'}`}>
+                        {m.improved ? '↑' : m.declined ? '↓' : '→'} {m.delta}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
-            )}
-          </div>
-
-          {/* Phase Context — below trajectory when data exists */}
-          {analysis.hasData && (
-            <div className="phase-context">
-              <div className="phase-context-inner">
-                <span className="phase-context-phase">{currentPhase?.name}</span>
-                <span className="phase-context-expectation">{currentPhase?.expectation}</span>
+              {extremes && (
+                <div className="et-traj-extremes">
+                  <div className="et-traj-extreme">
+                    <span className="et-traj-extreme-label">Strongest</span>
+                    <span className="et-traj-extreme-value">{extremes.strongest.label}</span>
+                  </div>
+                  <div className="et-traj-extreme">
+                    <span className="et-traj-extreme-label">Growth Area</span>
+                    <span className="et-traj-extreme-value">{extremes.growthArea.label}</span>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="et-traj-empty">
+              <div className="et-traj-empty-inner">
+                <span className="et-traj-empty-count">{analysis.checkIns}/{analysis.needed} emotional logs</span>
+                <span className="et-traj-empty-sub">Track how you feel to see trajectory</span>
               </div>
             </div>
           )}
-      </div>
+        </div>
 
       </div>
 
-      {/* Phase Modal - Bottom sheet on mobile, centered card on desktop */}
+      {/* ====== PHASE DETAIL SHEET ====== */}
       {showModal && selectedPhase && (
         <div className={`sheet-backdrop${modalOpen ? ' open' : ''}`} onClick={closeModal}>
           <div ref={sheetPanelRef} className={`sheet-panel et-sheet${modalOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
@@ -480,16 +455,14 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
               </div>
             </div>
 
-            <div className="et-sheet-scroll">
+            <div className="et-sheet-scroll" data-no-swipe>
               <div className="et-sheet-body">
-                {/* Duration estimate */}
                 {selectedPhase.duration && (
                   <div className="et-modal-section et-duration">
                     <p>{selectedPhase.duration}</p>
                   </div>
                 )}
 
-                {/* What's Happening - plain language */}
                 {selectedPhase.whatsHappening && (
                   <div className="et-modal-section">
                     <h4>What's Happening</h4>
@@ -497,7 +470,6 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
                   </div>
                 )}
 
-                {/* Trauma Timeline - Phase 2 only */}
                 {selectedPhase.traumaTimeline && (
                   <div className="et-modal-section">
                     <h4>What Surfaces When</h4>
@@ -507,7 +479,6 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
                   </div>
                 )}
 
-                {/* Social Shift - Phase 3 only */}
                 {selectedPhase.socialShift && (
                   <div className="et-modal-section">
                     <h4>What Others Will Notice</h4>
@@ -515,7 +486,6 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
                   </div>
                 )}
 
-                {/* Relationship Shift - Phase 4 only */}
                 {selectedPhase.relationshipShift && (
                   <div className="et-modal-section">
                     <h4>What Shifts</h4>
@@ -523,7 +493,6 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
                   </div>
                 )}
 
-                {/* Responsibility Shift - Phase 5 only */}
                 {selectedPhase.responsibilityShift && (
                   <div className="et-modal-section">
                     <h4>What Shifts</h4>
@@ -531,7 +500,6 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
                   </div>
                 )}
 
-                {/* Critical Rule - highlighted for Phase 2 */}
                 {selectedPhase.criticalRule && (
                   <div className={`et-modal-section ${selectedPhase.criticalRuleHighlight ? 'et-critical' : 'et-rule'}`}>
                     <h4>{selectedPhase.criticalRuleHighlight ? 'Critical' : 'Remember'}</h4>
@@ -539,7 +507,6 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
                   </div>
                 )}
 
-                {/* What to Expect */}
                 <div className="et-modal-section">
                   <h4>What to Expect</h4>
                   <ul>
@@ -547,7 +514,6 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
                   </ul>
                 </div>
 
-                {/* Warning Signs */}
                 <div className="et-modal-section et-warning">
                   <h4><FaExclamationTriangle /> Warning Signs</h4>
                   <ul>
@@ -555,7 +521,6 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
                   </ul>
                 </div>
 
-                {/* Techniques */}
                 <div className="et-modal-section">
                   <h4>Techniques</h4>
                   <ul>
@@ -563,7 +528,6 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
                   </ul>
                 </div>
 
-                {/* What's Next */}
                 {selectedPhase.whatsNext && (
                   <div className="et-modal-section et-next">
                     <h4>What's Next</h4>
@@ -572,7 +536,7 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
                 )}
               </div>
             </div>
-            
+
             <button className="btn-ghost" onClick={closeModal}>
               Close
             </button>

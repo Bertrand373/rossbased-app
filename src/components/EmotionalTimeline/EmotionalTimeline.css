@@ -1,542 +1,421 @@
 /* =============================================================================
-   EMOTIONALTIMELINE.CSS - TITANTRACK MINIMAL
-   Theme-aware version - uses CSS variables from index.css
+   EMOTIONALTIMELINE.CSS - TITANTRACK V2
+   Calendar-DNA: viewport-filling, gap-based grids, spine layout, zero scroll
+   Same hand that built the Calendar and Stats built this.
    ============================================================================= */
 
 /* =============================================================================
-   CONTAINER
+   CONTAINER — viewport-locked flex column, identical to .stats-analytics
    ============================================================================= */
 
 .et-container {
-  min-height: calc(100dvh - 56px - 80px);
+  flex: 1;
+  height: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 48px 24px 120px;
-  background-color: var(--background);
-  width: 100%;
-  --grid-breakout: 16px;
-}
-
-/* Grid breakout — content extends beyond page padding to match Calendar width */
-.et-current,
-.et-phases,
-.et-trajectory {
-  margin-left: calc(-1 * var(--grid-breakout));
-  margin-right: calc(-1 * var(--grid-breakout));
-}
-
-@media (min-width: 1025px) {
-  .et-container {
-    min-height: calc(100dvh - 64px);
-    padding: 56px 24px 80px;
-  }
-  
-  .et-container > * { max-width: 480px; }
+  padding: 0 4px;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 /* =============================================================================
-   CURRENT PHASE CARD
+   PHASE STRIP — 5-cell gap-based grid, Calendar cell treatment
    ============================================================================= */
 
-.et-current {
-  width: 100%;
-  text-align: center;
-  padding: 28px 24px 32px;
-  cursor: pointer;
-  transition: opacity 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  border-bottom: 1px solid var(--border-subtle);
-  margin-bottom: 0;
-  animation: fadeInUp 500ms ease forwards;
-  opacity: 0;
-}
-
-.et-current:hover { opacity: 0.8; }
-.et-current:active { opacity: 0.6; }
-
-.et-current-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 32px;
-}
-
-.et-current-num {
-  font-size: 1.5rem;
-  font-weight: 300;
-  font-feature-settings: 'tnum' 1;
+.et-phase-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  background: var(--cal-grid-bg);
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
   flex-shrink: 0;
-  color: var(--text-muted);
 }
 
-.et-current-info {
+.et-strip-cell {
+  background: var(--cal-cell-bg);
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  text-align: left;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 3px;
+  padding: 12px 4px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
 }
 
-.et-current-name {
-  font-size: 0.9375rem;
+.et-strip-cell.current {
+  background: var(--cal-tint-current);
+}
+
+.et-strip-cell.completed {
+  background: var(--accent-gold-bg);
+}
+
+.et-strip-cell.upcoming {
+  opacity: 0.35;
+}
+
+.et-strip-num {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1;
+  font-feature-settings: 'tnum' 1;
+}
+
+.et-strip-cell.current .et-strip-num {
+  color: var(--status-current);
   font-weight: 600;
-  color: var(--text);
-  margin: 0;
-  letter-spacing: -0.01em;
 }
 
-.et-current-days {
-  font-size: 0.75rem;
+.et-strip-cell.completed .et-strip-num {
+  color: var(--text-secondary);
+}
+
+.et-strip-label {
+  font-size: 0.5rem;
+  font-weight: 600;
   color: var(--text-muted);
-  margin: 0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-/* Progress */
-.et-progress {
-  width: 100%;
-  padding: 0 4px;
+.et-strip-cell.current .et-strip-label {
+  color: var(--text);
 }
 
-.et-progress-bar {
+.et-strip-check {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  font-size: 0.4375rem;
+  color: var(--accent-gold-text);
+  font-weight: 600;
+}
+
+/* =============================================================================
+   PROGRESS BAR — attached to bottom of phase strip
+   ============================================================================= */
+
+.et-prog-bar {
+  flex-shrink: 0;
+  background: var(--cal-cell-bg);
+  border-radius: 0 0 10px 10px;
+  padding: 8px 12px;
+}
+
+.et-prog-meta {
+  display: flex;
+  justify-content: center;
+  padding: 0 0 5px;
+}
+
+.et-prog-text {
+  font-size: 0.5625rem;
+  color: var(--text-tertiary);
+  letter-spacing: 0.03em;
+  font-feature-settings: 'tnum' 1;
+}
+
+.et-prog-track {
   height: 2px;
-  background: var(--border);
+  background: var(--border-prominent);
   border-radius: 1px;
   overflow: hidden;
-  margin-bottom: 12px;
 }
 
-.et-progress-fill {
+.et-prog-fill {
   height: 100%;
   background: var(--text);
   border-radius: 1px;
-  transition: width 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width 1200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.et-progress-text {
-  font-size: 0.6875rem;
-  color: var(--text-muted);
-}
+/* =============================================================================
+   JOURNEY SPINE — flex-fills viewport, vertical rail with branching nodes
+   ============================================================================= */
 
-/* Phase List */
-.et-phases {
+.et-spine {
+  flex: 1;
+  height: 0;
   display: flex;
   flex-direction: column;
-  gap: 0;
-  padding: 0;
-  width: 100%;
-  animation: fadeInUp 500ms ease 100ms forwards;
-  opacity: 0;
+  padding: 6px 0 0;
+  overflow: hidden;
 }
 
-.et-phase {
+.et-node {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 18px 0;
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid var(--border-subtle);
+  gap: 14px;
+  flex: 1;
+  min-height: 0;
   cursor: pointer;
   transition: opacity 150ms ease;
   -webkit-tap-highlight-color: transparent;
+  padding: 0 4px;
 }
 
-.et-phase:last-child { border-bottom: none; }
-.et-phase:hover { opacity: 0.7; }
-.et-phase:active { opacity: 0.5; }
-
-.et-phase-num {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-tertiary);
-  font-feature-settings: 'tnum' 1;
-  min-width: 24px;
+.et-node.current {
+  flex: 3;
 }
 
-.et-phase.completed .et-phase-num { color: var(--text-muted); }
-.et-phase.current .et-phase-num { color: var(--text); }
+.et-node:hover { opacity: 0.75; }
+.et-node:active { opacity: 0.55; }
 
-.et-phase-info { flex: 1; }
-
-.et-phase-info h3 {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: var(--text);
-  margin: 0 0 4px 0;
-  letter-spacing: -0.01em;
-}
-
-.et-phase.upcoming .et-phase-info h3 { color: var(--text-muted); }
-
-.et-phase-info p {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  margin: 0;
-}
-
-.et-phase-status {
-  font-size: 0.6875rem;
-  color: var(--text-tertiary);
+/* Rail — vertical line + dots */
+.et-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 20px;
-  display: flex;
-  justify-content: center;
+  flex-shrink: 0;
+  padding-top: 4px;
 }
 
-.et-phase.completed .et-phase-status { color: var(--text-muted); }
-
-/* =============================================================================
-   CHECK-IN TAB
-   ============================================================================= */
-
-.et-checkin {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 360px;
-  animation: fadeInUp 500ms ease 50ms forwards;
-  opacity: 0;
-}
-
-.et-checkin-header {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.et-sliders {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  margin-bottom: 48px;
-  text-align: left;
-}
-
-.et-slider-group {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.et-slider-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
-
-.et-slider-label {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.et-slider-value {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  font-feature-settings: 'tnum' 1;
-}
-
-.et-slider-wrap {
-  position: relative;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-}
-
-.et-slider-wrap::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background-color: var(--border-prominent);
-  border-radius: 1px;
-  pointer-events: none;
-}
-
-.et-slider-fill {
-  position: absolute;
-  left: 0;
-  height: 2px;
-  background-color: var(--text);
-  border-radius: 1px;
-  pointer-events: none;
-  transition: width 50ms ease-out;
-}
-
-.et-slider {
-  position: relative;
-  width: 100%;
-  height: 20px;
-  margin: 0;
-  padding: 0;
-  background: transparent !important;
-  border: none !important;
-  border-radius: 0;
-  outline: none !important;
-  box-shadow: none !important;
-  cursor: pointer;
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.et-slider::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 2px;
-  background: transparent !important;
-  border: none !important;
-  cursor: pointer;
-}
-
-.et-slider::-moz-range-track {
-  width: 100%;
-  height: 2px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
-
-.et-slider::-webkit-slider-thumb {
-  -webkit-appearance: none !important;
-  width: 18px;
-  height: 18px;
-  background: var(--text);
-  border: none !important;
+.et-dot {
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  cursor: pointer;
-  margin-top: -8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  transition: transform 150ms ease, box-shadow 150ms ease;
+  background: var(--text-tertiary);
+  flex-shrink: 0;
+  transition: all 200ms ease;
 }
 
-.et-slider::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  background: var(--text);
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  transition: transform 150ms ease, box-shadow 150ms ease;
+.et-dot.completed {
+  background: var(--text-muted);
 }
 
-.et-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
-.et-slider::-moz-range-thumb:hover { transform: scale(1.15); }
-.et-slider:active::-webkit-slider-thumb { transform: scale(1.1); }
-.et-slider:active::-moz-range-thumb { transform: scale(1.1); }
-
-.et-slider:focus {
-  outline: none !important;
-  border: none !important;
-  box-shadow: none !important;
+.et-dot.current {
+  width: 8px;
+  height: 8px;
+  background: var(--status-current);
+  box-shadow: 0 0 0 3px var(--cal-tint-current);
 }
 
-/* View mode - logged state */
-.et-slider-group.view-mode .et-slider {
-  cursor: default;
-  pointer-events: none;
+.et-dot.upcoming {
+  background: var(--border-prominent);
 }
 
-.et-slider-group.view-mode .et-slider::-webkit-slider-thumb {
-  opacity: 0;
-  width: 0;
-  height: 0;
+.et-line {
+  flex: 1;
+  width: 1px;
+  background: var(--border-subtle);
+  margin: 4px 0 0;
 }
 
-.et-slider-group.view-mode .et-slider::-moz-range-thumb {
-  opacity: 0;
-  width: 0;
-  height: 0;
+.et-line.completed {
+  background: var(--text-tertiary);
+  opacity: 0.5;
 }
 
-.et-slider-desc {
-  font-size: 0.75rem;
-  color: var(--text-tertiary);
-  margin-top: -4px;
+.et-line.current {
+  background: linear-gradient(
+    to bottom,
+    var(--text-tertiary) 0%,
+    var(--border-subtle) 100%
+  );
 }
 
-/* Save button */
-.et-save-btn {
-  width: 100%;
-  padding: 16px 24px;
-  background: var(--surface-overlay);
-  border: 1px solid var(--border);
-  border-radius: 9999px;
-  color: var(--text);
-  font-size: 1rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 150ms ease;
-  -webkit-tap-highlight-color: transparent;
+.et-line.upcoming {
+  background: var(--border-subtle);
+  opacity: 0.4;
 }
 
-.et-save-btn:hover:not(.logged) { border-color: rgba(255, 255, 255, 0.25); }
-.et-save-btn:active:not(.logged) { transform: scale(0.98); }
-
-.et-save-btn.logged {
-  background: var(--surface-overlay);
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  cursor: pointer;
-}
-
-.et-save-btn.logged:hover {
-  background: var(--border);
-  color: var(--text);
-}
-
-/* =============================================================================
-   TRAJECTORY SECTION (open, no container - matches Stats rhythm)
-   ============================================================================= */
-
-.et-trajectory {
-  width: 100%;
-  padding-top: 32px;
-  margin-top: 8px;
-  border-top: 1px solid var(--border-subtle);
-  animation: fadeInUp 500ms ease 200ms forwards;
-  opacity: 0;
-}
-
-.et-trajectory-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.et-trajectory-header span {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.et-trajectory-empty {
-  padding: 20px 0;
-  text-align: center;
-}
-
-.et-trajectory-empty .empty-message {
-  font-size: 0.875rem;
-  color: var(--text-muted);
-  margin: 0 0 6px 0;
-  font-weight: 500;
-}
-
-.et-trajectory-empty .empty-context {
-  font-size: 0.75rem;
-  color: var(--text-tertiary);
-  margin: 0;
-}
-
-/* Trajectory List */
-.trajectory-list {
+/* Node content — right side of rail */
+.et-node-content {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0;
-}
-
-.trajectory-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 0;
+  justify-content: flex-start;
+  padding: 0 0 8px;
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.trajectory-row:last-child {
+.et-node:last-child .et-node-content {
   border-bottom: none;
-  padding-bottom: 0;
 }
 
-.trajectory-label {
-  font-size: 0.9375rem;
+.et-node-name {
+  font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--text-secondary);
-  min-width: 90px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
-.trajectory-values {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.trajectory-early {
-  font-size: 0.9375rem;
-  font-weight: 500;
+.et-node-days {
+  font-size: 0.625rem;
   color: var(--text-muted);
   font-feature-settings: 'tnum' 1;
-  min-width: 28px;
-  text-align: right;
+  margin-top: 2px;
 }
 
-.trajectory-arrow {
-  font-size: 0.75rem;
+/* Upcoming — ghosted */
+.et-node.upcoming .et-node-name {
   color: var(--text-tertiary);
 }
 
-.trajectory-now {
-  font-size: 0.9375rem;
+.et-node.upcoming .et-node-days {
+  color: var(--text-tertiary);
+  opacity: 0.6;
+}
+
+/* Current — expanded with summary */
+.et-node.current .et-node-name {
+  font-size: 0.875rem;
   font-weight: 600;
-  color: var(--text);
+}
+
+.et-node.current .et-node-days {
+  font-size: 0.6875rem;
+}
+
+.et-node-expect {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+.et-node-progress {
+  font-size: 0.5625rem;
+  color: var(--text-tertiary);
   font-feature-settings: 'tnum' 1;
-  min-width: 28px;
+  margin-top: auto;
+  padding-top: 6px;
 }
 
-.trajectory-delta {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  font-feature-settings: 'tnum' 1;
-  min-width: 48px;
-  text-align: right;
-}
+/* =============================================================================
+   TRAJECTORY GRID — gap-based cells matching Stats numbers grid
+   ============================================================================= */
 
-.trajectory-delta.improved { color: var(--trend-up); }
-.trajectory-delta.declined { color: var(--trend-down); }
-.trajectory-delta.stable { color: var(--text-muted); }
-
-/* Phase Context */
-.phase-context {
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border-subtle);
-}
-
-.phase-context-inner {
+.et-traj {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  text-align: center;
+  gap: 2px;
+  margin-top: 2px;
 }
 
-.phase-context-phase {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-muted);
+.et-traj-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: var(--cal-grid-bg);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.et-traj-cell {
+  background: var(--cal-cell-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 4px;
+  padding: 12px 6px;
+  border-radius: 6px;
+}
+
+.et-traj-value {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1;
+  font-feature-settings: 'tnum' 1;
+}
+
+.et-traj-label {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  letter-spacing: 0.02em;
+  text-transform: capitalize;
+}
+
+.et-traj-delta {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  font-feature-settings: 'tnum' 1;
+}
+
+.et-traj-delta.delta-up { color: var(--trend-up); }
+.et-traj-delta.delta-down { color: var(--trend-down); }
+.et-traj-delta.delta-flat { color: var(--text-tertiary); }
+
+/* Extremes row — attached to bottom of trajectory grid */
+.et-traj-extremes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: var(--cal-grid-bg);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.et-traj-extreme {
+  background: var(--cal-cell-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 12px 0;
+  border-radius: 6px;
+}
+
+.et-traj-extreme-label {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-.phase-context-expectation {
-  font-size: 0.875rem;
+.et-traj-extreme-value {
+  font-size: 0.8125rem;
+  font-weight: 500;
   color: var(--text-secondary);
-  line-height: 1.5;
+  text-transform: capitalize;
+}
+
+/* Empty trajectory state — compact single row */
+.et-traj-empty {
+  background: var(--cal-grid-bg);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.et-traj-empty-inner {
+  background: var(--cal-cell-bg);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 12px;
+  text-align: center;
+}
+
+.et-traj-empty-count {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  font-feature-settings: 'tnum' 1;
+}
+
+.et-traj-empty-sub {
+  font-size: 0.625rem;
+  color: var(--text-tertiary);
 }
 
 /* =============================================================================
@@ -596,6 +475,9 @@
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 12px, black calc(100% - 12px), transparent 100%);
 }
 
+.et-sheet-scroll * { scrollbar-width: none; }
+.et-sheet-scroll::-webkit-scrollbar { display: none; }
+
 .et-sheet-body {
   display: flex;
   flex-direction: column;
@@ -609,8 +491,8 @@
   background: transparent;
   border: none;
   border-radius: 9999px;
-  color: var(--text-secondary);
-  font-size: 0.9375rem;
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
@@ -618,8 +500,9 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.et-sheet .btn-ghost:hover { color: var(--text); }
+.et-sheet .btn-ghost:hover { color: var(--text-secondary); }
 
+/* Section content */
 .et-modal-section { padding: 0; }
 
 .et-modal-section h4 {
@@ -653,6 +536,7 @@
   line-height: 1.6;
 }
 
+/* Section variants */
 .et-warning {
   background: transparent;
   border: none;
@@ -705,12 +589,45 @@
 .et-next p { color: var(--text-muted) !important; }
 
 /* =============================================================================
-   ANIMATIONS
+   ANIMATIONS — same stagger pattern as Calendar/Stats
    ============================================================================= */
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.et-phase-strip {
+  animation: fadeInUp 400ms ease forwards;
+}
+
+.et-prog-bar {
+  animation: fadeInUp 400ms ease 50ms forwards;
+  opacity: 0;
+}
+
+.et-spine {
+  animation: fadeInUp 400ms ease 100ms forwards;
+  opacity: 0;
+}
+
+.et-traj {
+  animation: fadeInUp 400ms ease 150ms forwards;
+  opacity: 0;
+}
+
+/* =============================================================================
+   TAP FEEDBACK — scale(0.97) on active, matches Calendar day-cell
+   ============================================================================= */
+
+.et-strip-cell:active,
+.et-node:active {
+  transform: scale(0.97);
+}
+
+.et-strip-cell,
+.et-node {
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* =============================================================================
@@ -718,41 +635,110 @@
    ============================================================================= */
 
 @media (max-width: 480px) {
-  .et-container { padding: 32px 16px 100px; --grid-breakout: 10px; }
-  .et-current-header { gap: 10px; margin-bottom: 28px; }
-  .et-current-num { font-size: 1.375rem; }
-  .et-current-name { font-size: 0.875rem; }
-  .et-phase { padding: 16px 0; gap: 12px; }
-  .et-phase-info h3 { font-size: 0.875rem; }
-  .et-sliders { gap: 28px; }
-  .et-slider-label, .et-slider-value { font-size: 0.875rem; }
-  .et-slider-desc { font-size: 0.6875rem; }
-  .et-save-btn { padding: 16px 20px; font-size: 0.9375rem; }
-  .trajectory-row { padding: 14px 0; }
-  .trajectory-label { font-size: 0.875rem; min-width: 80px; }
-  .trajectory-early, .trajectory-now { font-size: 0.875rem; }
-  .trajectory-delta { font-size: 0.75rem; min-width: 44px; }
-  .phase-context-expectation { font-size: 0.8125rem; }
+  .et-strip-cell {
+    padding: 10px 3px;
+  }
+
+  .et-strip-num {
+    font-size: 0.9375rem;
+  }
+
+  .et-strip-label {
+    font-size: 0.4375rem;
+  }
+
+  .et-node {
+    gap: 12px;
+  }
+
+  .et-node-name {
+    font-size: 0.75rem;
+  }
+
+  .et-node.current .et-node-name {
+    font-size: 0.8125rem;
+  }
+
+  .et-node-days {
+    font-size: 0.5625rem;
+  }
+
+  .et-node-expect {
+    font-size: 0.625rem;
+    margin-top: 6px;
+  }
+
+  .et-traj-value {
+    font-size: 1.125rem;
+  }
+
+  .et-traj-cell {
+    padding: 10px 4px;
+  }
+
+  .et-traj-extreme {
+    padding: 10px 0;
+  }
+
   .et-sheet-header { gap: 12px; padding-bottom: 16px; }
   .et-sheet-body { gap: 28px; }
   .et-modal-section p, .et-modal-section li { font-size: 0.875rem; }
 }
 
 @media (max-width: 360px) {
-  .et-container { padding: 28px 12px 90px; --grid-breakout: 6px; }
-  .trajectory-values { gap: 6px; }
-  .trajectory-label { min-width: 70px; font-size: 0.8125rem; }
-  .trajectory-early, .trajectory-now { font-size: 0.8125rem; min-width: 24px; }
-  .trajectory-delta { min-width: 40px; }
+  .et-container {
+    padding: 0 3px;
+  }
+
+  .et-strip-cell {
+    padding: 8px 2px;
+    gap: 2px;
+  }
+
+  .et-strip-num {
+    font-size: 0.875rem;
+  }
+
+  .et-node {
+    gap: 10px;
+  }
+
+  .et-rail {
+    width: 16px;
+  }
+
+  .et-traj-value {
+    font-size: 1rem;
+  }
 }
 
-@media (min-width: 768px) {
-  .et-current-num { font-size: 1.75rem; }
-  .et-current-name { font-size: 1rem; }
-  .trajectory-row { padding: 18px 0; }
-  .trajectory-label { font-size: 1rem; }
-  .trajectory-early, .trajectory-now { font-size: 1rem; }
-  .trajectory-delta { font-size: 0.875rem; }
+/* Desktop */
+@media (min-width: 1025px) {
+  .et-container {
+    max-width: 1200px;
+    align-self: center;
+    width: 100%;
+  }
+
+  .et-strip-num {
+    font-size: 1.125rem;
+  }
+
+  .et-node-name {
+    font-size: 0.875rem;
+  }
+
+  .et-node.current .et-node-name {
+    font-size: 1rem;
+  }
+
+  .et-traj-value {
+    font-size: 1.5rem;
+  }
+
+  .et-traj-cell {
+    padding: 14px 8px;
+  }
 }
 
 /* =============================================================================
@@ -760,13 +746,20 @@
    ============================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .et-container, .et-current, .et-phases, .et-trajectory {
+  .et-phase-strip,
+  .et-prog-bar,
+  .et-spine,
+  .et-traj {
     animation: none;
     opacity: 1;
   }
-  
-  .et-progress-fill, .et-slider::-webkit-slider-thumb, .et-slider-fill {
-    animation: none;
+
+  .et-prog-fill {
+    transition: none;
+  }
+
+  .et-strip-cell,
+  .et-node {
     transition: none;
   }
 }

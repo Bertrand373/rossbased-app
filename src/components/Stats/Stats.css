@@ -150,20 +150,15 @@
 }
 
 /* =============================================================================
-   TIMELINE WRAP — scrollable when timeline is active
+   TIMELINE WRAP — viewport-filling when timeline is active
    ============================================================================= */
 
 .stats-timeline-wrap {
   flex: 1;
   height: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.stats-timeline-wrap .et-container {
-  padding-top: 0;
-  padding-bottom: 0;
-  min-height: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* =============================================================================
