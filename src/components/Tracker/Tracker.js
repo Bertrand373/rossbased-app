@@ -1621,12 +1621,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         {/* ONBOARDING TARGET: streak-counter */}
         <button className="streak streak-counter" onClick={() => setShowStreakOptions(true)}>
           <span className={`streak-num${userData.streakColorGold ? ' oracle-gold' : ''}`}>{streak}</span>
-          <span className={`streak-unit${userData.streakColorGold ? ' oracle-gold' : ''}`}>days</span>
         </button>
-        
-        {milestone && (
-          <p className="milestone">{milestone}</p>
-        )}
 
         {/* ONBOARDING TARGET: benefits-trigger — grouped with hero */}
         <div className="tracker-log-wrap">
