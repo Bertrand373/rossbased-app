@@ -1586,14 +1586,14 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         );
       })()}
 
-      {/* Energy Almanac — rendered outside strip to avoid sheet bleed */}
+      {/* Energy Almanac — rendered outside strip, opens via custom event */}
       <EnergyAlmanac 
         userData={userData}
         isPatternAlertShowing={isPatternAlertShowing}
       />
 
-      {/* Meta strip — phase left, date right */}
-      <div className="tracker-meta-strip">
+      {/* Meta strip — phase left (tappable → opens almanac), date right */}
+      <div className="tracker-meta-strip" onClick={() => document.dispatchEvent(new CustomEvent('openAlmanac'))}>
         <span className="tracker-meta-phase">
           {getCurrentPhaseName(streak)}
           <span className="tracker-meta-dot">·</span>
@@ -1606,7 +1606,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         </span>
       </div>
 
-      {/* Main content group */}
+      {/* Main content group — hero + log grouped as one object */}
       <main className="tracker-main">
         
         {/* ONBOARDING TARGET: streak-counter */}
@@ -1618,19 +1618,18 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         {milestone && (
           <p className="milestone">{milestone}</p>
         )}
+
+        {/* ONBOARDING TARGET: benefits-trigger — grouped with hero */}
+        <div className="tracker-log-wrap">
+          <button 
+            className={`${todayLogged ? 'btn-logged' : 'btn-primary'} benefits-trigger`}
+            onClick={() => canLogBenefits ? setShowBenefits(true) : setShowLogLock(true)}
+          >
+            {todayLogged ? `${todayScore} ✓` : 'Log Today'}
+          </button>
+        </div>
         
       </main>
-
-      {/* Footer */}
-      <footer className="tracker-footer">
-        {/* ONBOARDING TARGET: benefits-trigger */}
-        <button 
-          className={`${todayLogged ? 'btn-logged' : 'btn-primary'} benefits-trigger`}
-          onClick={() => canLogBenefits ? setShowBenefits(true) : setShowLogLock(true)}
-        >
-          {todayLogged ? `${todayScore} ✓` : 'Log Today'}
-        </button>
-      </footer>
 
       {/* Oracle bar — pinned bottom, matches Calendar moon bar */}
       <div className="tracker-oracle-bar">

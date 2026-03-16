@@ -312,6 +312,13 @@ const EnergyAlmanac = ({ userData, isPatternAlertShowing }) => {
 
   // Swipe-to-dismiss — non-passive native listeners so iOS respects preventDefault
   useSheetSwipe(sheetPanelRef, isExpanded, () => closeSheet(() => setIsExpanded(false)));
+
+  // Listen for Tracker strip tap to open almanac
+  useEffect(() => {
+    const handler = () => setIsExpanded(true);
+    document.addEventListener('openAlmanac', handler);
+    return () => document.removeEventListener('openAlmanac', handler);
+  }, []);
   
   const calculations = useMemo(() => {
     const today = new Date();
