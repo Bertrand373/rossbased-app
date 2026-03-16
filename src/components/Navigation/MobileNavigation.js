@@ -1,8 +1,40 @@
 // MobileNavigation.js - TITANTRACK
-// 3-group layout: left tabs | Oracle center | right tabs + sliding dash
+// Icons + labels nav: left tabs | Oracle center | right tabs + sliding dash
 import React, { useRef, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import './MobileNavigation.css';
+
+/* ── Inline SVG icons — thin-line, 20×20, stroke = currentColor ── */
+const TrackIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 20V10" />
+    <path d="M18 20V4" />
+    <path d="M6 20v-4" />
+  </svg>
+);
+
+const CalendarIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="4" width="18" height="18" rx="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="10" x2="21" y2="10" />
+  </svg>
+);
+
+const StatsIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+  </svg>
+);
+
+const UrgesIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <line x1="12" y1="8" x2="12" y2="12" />
+    <line x1="12" y1="16" x2="12.01" y2="16" />
+  </svg>
+);
 
 const MobileNavigation = ({ onOracleClick, isOracleActive, oracleHasUnread }) => {
   const location = useLocation();
@@ -61,7 +93,6 @@ const MobileNavigation = ({ onOracleClick, isOracleActive, oracleHasUnread }) =>
       dashRef.current.style.transition = '';
     };
 
-    // On orientation/visibility change: hide immediately, recalc after layout settles
     const hideAndRecalc = () => {
       if (dashRef.current) {
         dashRef.current.style.transition = 'none';
@@ -74,7 +105,6 @@ const MobileNavigation = ({ onOracleClick, isOracleActive, oracleHasUnread }) =>
     window.addEventListener('resize', hideAndRecalc);
     window.addEventListener('orientationchange', hideAndRecalc);
 
-    // matchMedia is more reliable than orientationchange on modern devices
     const mql = window.matchMedia('(orientation: portrait)');
     const onOrientationMedia = () => hideAndRecalc();
     mql.addEventListener('change', onOrientationMedia);
@@ -98,13 +128,14 @@ const MobileNavigation = ({ onOracleClick, isOracleActive, oracleHasUnread }) =>
             to="/"
             className={({ isActive }) => `mobile-nav-item ${isActive ? 'active' : ''}`}
           >
+            <TrackIcon />
             <span className="mobile-nav-label">Track</span>
           </NavLink>
-          <span className="mobile-nav-divider" />
           <NavLink 
             to="/calendar"
             className={({ isActive }) => `mobile-nav-item ${isActive ? 'active' : ''}`}
           >
+            <CalendarIcon />
             <span className="mobile-nav-label">Calendar</span>
           </NavLink>
         </div>
@@ -125,13 +156,14 @@ const MobileNavigation = ({ onOracleClick, isOracleActive, oracleHasUnread }) =>
             to="/stats"
             className={({ isActive }) => `mobile-nav-item ${isActive ? 'active' : ''}`}
           >
+            <StatsIcon />
             <span className="mobile-nav-label">Stats</span>
           </NavLink>
-          <span className="mobile-nav-divider" />
           <NavLink 
             to="/urge-toolkit"
             className={({ isActive }) => `mobile-nav-item ${isActive ? 'active' : ''}`}
           >
+            <UrgesIcon />
             <span className="mobile-nav-label">Urges</span>
           </NavLink>
         </div>
