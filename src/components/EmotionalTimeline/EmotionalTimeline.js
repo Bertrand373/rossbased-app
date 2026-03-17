@@ -317,6 +317,30 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => setModalOpen(true));
     });
+
+    // Track phase detail views for admin feature adoption metrics
+    // Dedup: only one view per phase per day
+    if (updateUserData) {
+      const today = new Date().toISOString().split('T')[0];
+      const existing = (userData.emotionalTracking || []);
+      const alreadyViewed = existing.some(e => {
+        const entryDate = new Date(e.date).toISOString().split('T')[0];
+        return entryDate === today && e.phase === phase.id;
+      });
+      if (!alreadyViewed) {
+        updateUserData({
+          emotionalTracking: [...existing, {
+            date: new Date(),
+            day: currentDay,
+            phase: phase.id,
+            anxiety: 0,
+            moodStability: 0,
+            mentalClarity: 0,
+            emotionalProcessing: 0
+          }]
+        });
+      }
+    }
   };
 
   const closeModal = () => {

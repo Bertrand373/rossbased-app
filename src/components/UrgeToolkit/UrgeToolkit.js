@@ -565,7 +565,16 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
         experienceLevel,
         sessionDuration: totalActiveTime
       };
-      updateUserData({ urgeLog: [...(userData.urgeLog || []), urgeLog] });
+      // Track tool usage for admin feature adoption metrics
+      const toolEntry = {
+        date: new Date(),
+        tool: activeProtocol || 'unknown',
+        effective: true
+      };
+      updateUserData({ 
+        urgeLog: [...(userData.urgeLog || []), urgeLog],
+        urgeToolUsage: [...(userData.urgeToolUsage || []), toolEntry]
+      });
       toast.success('Session logged - stay strong');
     }
   };
