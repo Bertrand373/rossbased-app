@@ -259,8 +259,85 @@ async function processProposal(evolutionId) {
       }
     }
 
+    // Process pattern discovery correlations
+    const correlations = evolution.findings?.correlations || [];
+    for (const corr of correlations) {
+      if (!corr.description || corr.actionable === false) continue;
+
+      const ruleText = corr.oracleAction
+        ? `${corr.description} → Oracle action: ${corr.oracleAction}`
+        : corr.description;
+
+      const verification = await opusVerify(
+        ruleText,
+        `Pattern discovered with strength ${corr.strength || 'unknown'}, mechanism: ${corr.mechanism || 'data-driven correlation'}`,
+        corr.sampleSize || evolution.dataWindow?.outcomesAnalyzed || 0,
+        'discovery'
+      );
+
+      if (verification.approved) {
+        const rule = await DynamicRule.create({
+          rule: verification.suggestedEdit || ruleText,
+          category: 'discovery',
+          source: 'opus-verified',
+          proposalId: evolution._id,
+          opusVerified: true,
+          opusAssessment: verification.reasoning,
+          opusConfidence: verification.confidence,
+          activatedBy: 'opus-auto'
+        });
+        rulesCreated.push(rule);
+      } else {
+        allApproved = false;
+        flaggedItems.push({ change: ruleText, reason: verification.reasoning });
+      }
+    }
+
+    // Process response strategy findings — only top performers worth codifying
+    const stratFindings = evolution.findings?.strategies || [];
+    const topStrategies = stratFindings
+      .filter(s => s.sampleSize >= 10 && s.successRate >= 70)
+      .slice(0, 3);
+
+    for (const strat of topStrategies) {
+      const ruleText = strat.context && strat.context !== 'overall'
+        ? `In ${strat.context} phase, prefer "${strat.approach}" strategy (${strat.successRate}% success, n=${strat.sampleSize})`
+        : `Prefer "${strat.approach}" strategy when applicable (${strat.successRate}% success, n=${strat.sampleSize})`;
+
+      const verification = await opusVerify(
+        ruleText,
+        `Response strategy analysis: ${strat.approach} showed ${strat.successRate}% streak maintenance across ${strat.sampleSize} measured outcomes`,
+        strat.sampleSize,
+        'context-rule'
+      );
+
+      if (verification.approved) {
+        const rule = await DynamicRule.create({
+          rule: verification.suggestedEdit || ruleText,
+          category: 'context-rule',
+          source: 'opus-verified',
+          proposalId: evolution._id,
+          opusVerified: true,
+          opusAssessment: verification.reasoning,
+          opusConfidence: verification.confidence,
+          activatedBy: 'opus-auto'
+        });
+        rulesCreated.push(rule);
+      } else {
+        allApproved = false;
+        flaggedItems.push({ change: ruleText, reason: verification.reasoning });
+      }
+    }
+
+    // Handle records with no processable content
+    const hadAnythingToProcess = changes.length > 0 || antiPatterns.length > 0 || correlations.length > 0 || topStrategies.length > 0;
+
     // Update evolution status
-    if (rulesCreated.length > 0 && flaggedItems.length === 0) {
+    if (!hadAnythingToProcess) {
+      // Analytics-only record — no actionable rules to extract
+      evolution.status = 'approved';
+      evolution.reviewNotes = 'Analytics record — no actionable rules to extract. Auto-archived.';
+    } else if (rulesCreated.length > 0 && flaggedItems.length === 0) {
       evolution.status = 'approved';
       evolution.reviewNotes = `Opus auto-approved ${rulesCreated.length} rule(s).`;
     } else if (rulesCreated.length > 0 && flaggedItems.length > 0) {

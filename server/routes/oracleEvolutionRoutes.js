@@ -382,29 +382,9 @@ function startScheduledJobs() {
   setInterval(async () => {
     try {
       console.log('[OracleEvolution] Running scheduled evolution pipeline...');
+      // runEvolutionPipeline now handles ALL steps: voice, psych, response analysis,
+      // pattern discovery, AND Opus sweep of all pending proposals
       await runEvolutionPipeline();
-      
-      // Also run response effectiveness analysis
-      await analyzeResponseEffectiveness();
-      
-      // Run pattern discovery if we have enough data
-      await discoverPatterns();
-      
-      // Auto-process pending proposals through Opus verification gate
-      try {
-        const { processProposal } = require('../services/dynamicRules');
-        const OracleEvolution = require('../models/OracleEvolution');
-        const pending = await OracleEvolution.find({ status: 'pending' }).select('_id').lean();
-        if (pending.length > 0) {
-          console.log(`[OracleEvolution] Processing ${pending.length} pending proposal(s) through Opus...`);
-          for (const p of pending) {
-            await processProposal(p._id);
-          }
-        }
-      } catch (opusErr) {
-        console.error('[OracleEvolution] Opus processing error:', opusErr.message);
-      }
-
       console.log('[OracleEvolution] Scheduled evolution complete');
     } catch (err) {
       console.error('[OracleEvolution] Scheduled evolution error:', err.message);
@@ -412,6 +392,7 @@ function startScheduledJobs() {
   }, 7 * 24 * 60 * 60 * 1000); // Every 7 days
 
   // Run initial risk scan 5 minutes after boot (let everything else initialize first)
+  // Also check if the evolution pipeline is stale (7+ days since last run)
   setTimeout(async () => {
     try {
       const UserRiskProfile = require('../models/UserRiskProfile');
@@ -419,6 +400,23 @@ function startScheduledJobs() {
       if (profileCount === 0) {
         console.log('[OracleEvolution] No risk profiles exist — running initial build...');
         await dailyRiskScan();
+      }
+
+      // Check if evolution pipeline needs to run (server restarts reset setInterval)
+      const lastEvolution = await OracleEvolution.findOne()
+        .sort({ createdAt: -1 })
+        .select('createdAt')
+        .lean();
+
+      const daysSinceLastRun = lastEvolution
+        ? (Date.now() - new Date(lastEvolution.createdAt).getTime()) / (24 * 60 * 60 * 1000)
+        : 999;
+
+      if (daysSinceLastRun >= 7) {
+        console.log(`[OracleEvolution] Pipeline stale (${Math.floor(daysSinceLastRun)} days since last run) — triggering full pipeline...`);
+        await runEvolutionPipeline();
+      } else {
+        console.log(`[OracleEvolution] Pipeline fresh (${Math.floor(daysSinceLastRun)} days ago) — skipping auto-run`);
       }
     } catch (err) {
       console.error('[OracleEvolution] Initial scan error:', err.message);

@@ -193,10 +193,35 @@ async function analyzeResponseEffectiveness() {
         .map(([level, s]) => ({ level: parseInt(level), rate: Math.round((s.maintained / s.total) * 100), n: s.total }))
     };
 
+    // Dedup: skip if a response-strategy record already exists from the last 24 hours
+    const recentDupe = await OracleEvolution.findOne({
+      type: 'response-strategy',
+      createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
+    }).select('_id').lean();
+
+    if (recentDupe) {
+      console.log('[ResponseScoring] Skipping — response-strategy record already exists from last 24h');
+      return report;
+    }
+
+    // Build human-readable summary for admin display
+    const summaryParts = [`Analyzed ${outcomes.length} scored outcomes.`];
+    if (strategies.length > 0) {
+      summaryParts.push(`Top strategies: ${strategies.slice(0, 3).map(s => `${s.approach} (${s.successRate}%, n=${s.sampleSize})`).join(', ')}.`);
+    }
+    const sortedTones = report.toneEffectiveness.sort((a, b) => b.rate - a.rate);
+    if (sortedTones.length > 0) {
+      summaryParts.push(`Most effective tone: "${sortedTones[0].tone}" at ${sortedTones[0].rate}% (n=${sortedTones[0].n}).`);
+    }
+    const sortedChallenge = report.challengeEffectiveness.sort((a, b) => b.rate - a.rate);
+    if (sortedChallenge.length > 0) {
+      summaryParts.push(`Best challenge level: ${sortedChallenge[0].level} at ${sortedChallenge[0].rate}% (n=${sortedChallenge[0].n}).`);
+    }
+
     // Save as evolution record
     await OracleEvolution.create({
       type: 'response-strategy',
-      content: JSON.stringify(report, null, 2),
+      content: summaryParts.join(' '),
       findings: { strategies: [...strategies, ...contextStrategies.slice(0, 10)] },
       dataWindow: {
         from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),

@@ -277,6 +277,17 @@ Respond ONLY with valid JSON:
 
     const patterns = (parsed.patterns || []).filter(p => p.sampleSize >= 5);
 
+    // Dedup: skip if a pattern-discovery record already exists from the last 24 hours
+    const recentDupe = await OracleEvolution.findOne({
+      type: 'pattern-discovery',
+      createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
+    }).select('_id').lean();
+
+    if (recentDupe) {
+      console.log('[PatternDiscovery] Skipping save — pattern-discovery record already exists from last 24h');
+      return { patterns, metaInsight: parsed.metaInsight, dataPackage };
+    }
+
     // Save as evolution record
     await OracleEvolution.create({
       type: 'pattern-discovery',
@@ -287,7 +298,9 @@ Respond ONLY with valid JSON:
           variables: p.variables || [],
           strength: p.strength || 0.5,
           sampleSize: p.sampleSize || 0,
-          actionable: p.actionable !== false
+          actionable: p.actionable !== false,
+          oracleAction: p.oracleAction || null,
+          mechanism: p.mechanism || null
         }))
       },
       dataWindow: {

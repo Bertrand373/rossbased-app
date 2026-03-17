@@ -128,6 +128,17 @@ Respond ONLY with valid JSON:
     const parsed = safeParseJSON(raw, 'voice-assessment');
     if (!parsed) return null;
 
+    // Dedup: skip if a voice-assessment record already exists from the last 24 hours
+    const recentDupe = await OracleEvolution.findOne({
+      type: 'voice-assessment',
+      createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
+    }).select('_id').lean();
+
+    if (recentDupe) {
+      console.log('[OracleEvolution] Skipping — voice-assessment record already exists from last 24h');
+      return parsed;
+    }
+
     // Save evolution record
     await OracleEvolution.create({
       type: 'voice-assessment',
@@ -398,6 +409,13 @@ Respond ONLY with valid JSON:
 /**
  * Run the full Oracle Evolution pipeline
  * Called by scheduled job (weekly) or admin command
+ * 
+ * Runs ALL steps in order:
+ * 1. Voice self-assessment (what worked / what didn't)
+ * 2. Psych profiles for active users
+ * 3. Response strategy analysis (which approaches are most effective)
+ * 4. Pattern discovery (cross-dimensional correlations)
+ * 5. Opus sweep (process ALL pending proposals through verification gate)
  */
 async function runEvolutionPipeline() {
   console.log('[OracleEvolution] ====== EVOLUTION PIPELINE START ======');
@@ -427,10 +445,51 @@ async function runEvolutionPipeline() {
   }
   console.log(`[OracleEvolution] Psych profiles: ${profilesBuilt} updated`);
 
+  // Step 3: Response strategy analysis
+  let responseReport = null;
+  try {
+    const { analyzeResponseEffectiveness } = require('./responseScoring');
+    responseReport = await analyzeResponseEffectiveness();
+    console.log(`[OracleEvolution] Response analysis: ${responseReport ? 'complete' : 'skipped (insufficient data)'}`);
+  } catch (rsErr) {
+    console.error('[OracleEvolution] Response analysis error:', rsErr.message);
+  }
+
+  // Step 4: Pattern discovery
+  let patterns = null;
+  try {
+    const { discoverPatterns } = require('./patternDiscovery');
+    patterns = await discoverPatterns();
+    console.log(`[OracleEvolution] Pattern discovery: ${patterns ? `${patterns.patterns?.length || 0} patterns found` : 'skipped (insufficient data)'}`);
+  } catch (pdErr) {
+    console.error('[OracleEvolution] Pattern discovery error:', pdErr.message);
+  }
+
+  // Step 5: Process ALL pending proposals through Opus verification gate
+  let opusResults = { processed: 0, approved: 0, flagged: 0 };
+  try {
+    const { processProposal } = require('./dynamicRules');
+    const pending = await OracleEvolution.find({ status: 'pending' }).select('_id type').lean();
+    if (pending.length > 0) {
+      console.log(`[OracleEvolution] Processing ${pending.length} pending proposal(s) through Opus...`);
+      for (const p of pending) {
+        const result = await processProposal(p._id);
+        opusResults.processed++;
+        if (result.rulesCreated > 0) opusResults.approved += result.rulesCreated;
+        if (result.flagged > 0) opusResults.flagged += result.flagged;
+      }
+      console.log(`[OracleEvolution] Opus sweep: ${opusResults.approved} rules approved, ${opusResults.flagged} flagged`);
+    } else {
+      console.log('[OracleEvolution] No pending proposals to process');
+    }
+  } catch (opusErr) {
+    console.error('[OracleEvolution] Opus processing error:', opusErr.message);
+  }
+
   const elapsed = ((Date.now() - start) / 1000).toFixed(1);
   console.log(`[OracleEvolution] ====== PIPELINE COMPLETE (${elapsed}s) ======`);
 
-  return { voice: !!voice, profilesBuilt, elapsed };
+  return { voice: !!voice, profilesBuilt, responseAnalysis: !!responseReport, patternsFound: patterns?.patterns?.length || 0, opus: opusResults, elapsed };
 }
 
 module.exports = { 
