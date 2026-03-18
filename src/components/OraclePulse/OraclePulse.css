@@ -2,9 +2,10 @@
 /* Oracle's daily observation — lives below Log button on Tracker */
 
 .oracle-pulse {
-  max-width: 280px;
+  max-width: 340px;
   text-align: center;
   margin-top: 24px;
+  padding-bottom: 16px;
   opacity: 0;
   animation: pulseIn 600ms ease 200ms forwards;
 }
@@ -87,7 +88,7 @@
 
 @media (max-width: 374px) {
   .oracle-pulse {
-    max-width: 240px;
+    max-width: 290px;
     margin-top: 20px;
   }
   .oracle-pulse-text {

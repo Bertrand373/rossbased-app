@@ -125,7 +125,7 @@ const OraclePulse = ({ isPremium, isGold }) => {
   if (loading || !observation) return null;
 
   const label = tier === 'personalized' ? 'ORACLE PULSE' : 'ORACLE';
-  const isPersonalGold = isGold && tier === 'personalized';
+  const isPersonalGold = isGold;
   const words = observation.split(' ');
 
   // Format timestamp

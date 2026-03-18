@@ -80,7 +80,7 @@ router.get('/', async (req, res) => {
 
     // Determine premium status
     const sub = user.subscription || {};
-    const hasPremium = user.isPremium || sub.status === 'active' || sub.status === 'grandfathered' || sub.status === 'trialing';
+    const hasPremium = user.isPremium || sub.status === 'active' || sub.status === 'grandfathered' || sub.status === 'trialing' || sub.status === 'trial' || sub.status === 'canceled';
 
     // ── PERSONALIZED (premium/OG) ──
     if (hasPremium) {
