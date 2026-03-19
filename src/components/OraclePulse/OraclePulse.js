@@ -4,11 +4,26 @@
 // Tap to open sheet with Oracle's full observation (body)
 // Word-by-word fade animation plays once per unique pulse
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 import useSheetSwipe from '../../hooks/useSheetSwipe';
 import '../../styles/BottomSheet.css';
 import './OraclePulse.css';
 
 const API = process.env.REACT_APP_API || process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
+
+/**
+ * Split body text into readable paragraphs (2-3 sentences each)
+ */
+const formatBody = (text) => {
+  if (!text) return [];
+  // Split on sentence endings (. ! ?) followed by a space
+  const sentences = text.split(/(?<=[.!?])\s+/);
+  const paragraphs = [];
+  for (let i = 0; i < sentences.length; i += 3) {
+    paragraphs.push(sentences.slice(i, i + 3).join(' '));
+  }
+  return paragraphs;
+};
 
 const OraclePulse = () => {
   const [observation, setObservation] = useState(null);
@@ -186,8 +201,8 @@ const OraclePulse = () => {
         </p>
       </div>
 
-      {/* Full observation sheet */}
-      {showSheet && (
+      {/* Full observation sheet — portal to body so it renders above mobile nav */}
+      {showSheet && ReactDOM.createPortal(
         <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowSheet(false))}>
           <div
             ref={sheetPanelRef}
@@ -197,13 +212,16 @@ const OraclePulse = () => {
             <div className="sheet-header" />
             <span className="oracle-pulse-label oracle-pulse-sheet-label">ORACLE OBSERVES</span>
             <div className="oracle-pulse-sheet-scroll" data-no-swipe>
-              <p className="oracle-pulse-body">{body}</p>
+              {formatBody(body).map((para, i) => (
+                <p key={i} className="oracle-pulse-body">{para}</p>
+              ))}
             </div>
             <div className="oracle-pulse-footer">
               <button className="oracle-pulse-close" onClick={() => closeSheet(() => setShowSheet(false))}>Done</button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

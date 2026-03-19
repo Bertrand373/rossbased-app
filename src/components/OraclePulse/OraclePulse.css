@@ -124,7 +124,7 @@
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  text-align: center;
+  text-align: left;
   padding: 0 4px;
   mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
@@ -136,8 +136,12 @@
   font-style: italic;
   color: var(--text-secondary);
   line-height: 1.7;
-  margin: 0;
+  margin: 0 0 20px 0;
   letter-spacing: 0.01em;
+}
+
+.oracle-pulse-body:last-child {
+  margin-bottom: 0;
 }
 
 /* Footer — matches almanac-modal-footer + almanac-btn-ghost */
