@@ -15,6 +15,7 @@ import PatternInsightCard from '../PatternInsight/PatternInsightCard';
 import EnergyAlmanac from '../EnergyAlmanac/EnergyAlmanac';
 import OnboardingGuide from '../OnboardingGuide/OnboardingGuide';
 import OraclePulse from '../OraclePulse/OraclePulse';
+import GoldenSmoke from '../GoldenSmoke/GoldenSmoke';
 import { getLunarData } from '../../utils/lunarData';
 
 // NEW: Import InterventionService for ML feedback loop
@@ -1204,6 +1205,9 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   return (
     <div className="tracker">
       
+      {/* Atmospheric background — golden smoke */}
+      <GoldenSmoke />
+
       {/* Onboarding Guide - First time only */}
       {showOnboarding && (
         <OnboardingGuide 
