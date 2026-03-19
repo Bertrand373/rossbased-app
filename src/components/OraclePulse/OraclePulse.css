@@ -101,17 +101,28 @@
    ============================================================ */
 
 .oracle-pulse-sheet {
-  padding: 0 24px 24px;
-  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  max-height: 85dvh;
+  display: flex;
+  flex-direction: column;
 }
 
-.oracle-pulse-sheet-content {
+/* Sticky label inside sheet — sized to match other sheet titles */
+.oracle-pulse-sheet-label {
+  flex-shrink: 0;
+  margin-bottom: 12px;
+  text-align: center;
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+}
+
+/* Scrollable body */
+.oracle-pulse-sheet-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   text-align: center;
   padding: 0 4px;
-}
-
-.oracle-pulse-sheet-content .oracle-pulse-label {
-  margin-bottom: 16px;
 }
 
 .oracle-pulse-body {
@@ -124,12 +135,26 @@
   letter-spacing: 0.01em;
 }
 
-.oracle-pulse-body.oracle-gold {
-  color: rgba(212, 175, 55, 0.75);
+/* Close button */
+.oracle-pulse-close {
+  flex-shrink: 0;
+  margin-top: 16px;
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 9999px;
+  transition: border-color 150ms ease, color 150ms ease;
 }
 
-[data-theme="light"] .oracle-pulse-body.oracle-gold {
-  color: rgba(160, 130, 0, 0.7);
+.oracle-pulse-close:hover {
+  border-color: var(--border);
+  color: var(--text);
 }
 
 /* ============================================================

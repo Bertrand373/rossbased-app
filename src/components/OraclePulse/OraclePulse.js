@@ -195,10 +195,11 @@ const OraclePulse = () => {
             onClick={e => e.stopPropagation()}
           >
             <div className="sheet-header" />
-            <div className="oracle-pulse-sheet-content">
-              <span className="oracle-pulse-label">ORACLE OBSERVES</span>
+            <span className="oracle-pulse-label oracle-pulse-sheet-label">ORACLE OBSERVES</span>
+            <div className="oracle-pulse-sheet-scroll" data-no-swipe>
               <p className="oracle-pulse-body">{body}</p>
             </div>
+            <button className="btn-ghost oracle-pulse-close" onClick={() => closeSheet(() => setShowSheet(false))}>Close</button>
           </div>
         </div>
       )}
