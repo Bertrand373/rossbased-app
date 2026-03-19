@@ -199,7 +199,9 @@ const OraclePulse = () => {
             <div className="oracle-pulse-sheet-scroll" data-no-swipe>
               <p className="oracle-pulse-body">{body}</p>
             </div>
-            <button className="btn-ghost oracle-pulse-close" onClick={() => closeSheet(() => setShowSheet(false))}>Close</button>
+            <div className="oracle-pulse-footer">
+              <button className="oracle-pulse-close" onClick={() => closeSheet(() => setShowSheet(false))}>Done</button>
+            </div>
           </div>
         </div>
       )}

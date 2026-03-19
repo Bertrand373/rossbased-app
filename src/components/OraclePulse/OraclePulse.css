@@ -106,16 +106,19 @@
   flex-direction: column;
 }
 
-/* Sticky label inside sheet — sized to match other sheet titles */
+/* Header — matches almanac-modal-header h2 */
 .oracle-pulse-sheet-label {
   flex-shrink: 0;
-  margin-bottom: 12px;
+  padding-bottom: 24px;
   text-align: center;
   font-size: 0.6875rem;
-  letter-spacing: 0.18em;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
-/* Scrollable body */
+/* Scrollable body — matches almanac-modal-scroll */
 .oracle-pulse-sheet-scroll {
   flex: 1;
   min-height: 0;
@@ -123,6 +126,8 @@
   -webkit-overflow-scrolling: touch;
   text-align: center;
   padding: 0 4px;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
 }
 
 .oracle-pulse-body {
@@ -135,25 +140,28 @@
   letter-spacing: 0.01em;
 }
 
-/* Close button */
-.oracle-pulse-close {
+/* Footer — matches almanac-modal-footer + almanac-btn-ghost */
+.oracle-pulse-footer {
   flex-shrink: 0;
-  margin-top: 16px;
+  padding-top: 24px;
+}
+
+.oracle-pulse-close {
   width: 100%;
-  padding: 14px;
+  padding: 16px 24px;
   background: transparent;
-  border: 1px solid var(--border-subtle);
+  border: none;
+  border-radius: 12px;
   color: var(--text-secondary);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  border-radius: 9999px;
-  transition: border-color 150ms ease, color 150ms ease;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .oracle-pulse-close:hover {
-  border-color: var(--border);
   color: var(--text);
 }
 
