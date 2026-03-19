@@ -379,7 +379,8 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     messagesRemaining: 5,
     isBetaPeriod: true,
     isPremium: false,
-    isGrandfathered: false
+    isGrandfathered: false,
+    needsOracleIntro: false
   });
   const [error, setError] = useState(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -485,6 +486,83 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
       fetchUnreadTransmissions();
     }
   }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Oracle First Contact — auto-stream intro on first open
+  useEffect(() => {
+    if (!isOpen || !isLoggedIn || !usage.needsOracleIntro) return;
+    if (messages.length > 0) return; // Already has chat history, skip
+
+    const fireIntro = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      setIsLoading(true);
+      setStreamingText('');
+
+      try {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const response = await fetch(`${API_URL}/api/oracle/intro/stream`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ timezone: tz })
+        });
+
+        if (!response.ok) return;
+
+        // Check if JSON skip response (already introduced / no start date)
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) return;
+
+        // SSE stream — same parsing as sendMessage
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let fullResponse = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);
+              if (data === '[DONE]') continue;
+              try {
+                const parsed = JSON.parse(data);
+                if (parsed.type === 'content') {
+                  fullResponse += parsed.text;
+                  setStreamingText(fullResponse);
+                }
+              } catch { /* incomplete chunk */ }
+            }
+          }
+        }
+
+        if (fullResponse) {
+          setMessages(prev => [...prev, {
+            role: 'assistant',
+            content: fullResponse,
+            timestamp: new Date().toISOString()
+          }]);
+          setUsage(prev => ({ ...prev, needsOracleIntro: false }));
+          window.__oracleUnreadCount = 0;
+          window.dispatchEvent(new CustomEvent('oracle-unread', { detail: 0 }));
+        }
+      } catch (err) {
+        console.error('Oracle intro error:', err);
+      } finally {
+        setIsLoading(false);
+        setStreamingText('');
+      }
+    };
+
+    fireIntro();
+  }, [isOpen, isLoggedIn, usage.needsOracleIntro]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Check for unread transmissions periodically (for nav badge)
   useEffect(() => {
@@ -683,6 +761,11 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
       if (response.ok) {
         const data = await response.json();
         setUsage(data);
+        // Show gold dot if Oracle intro is pending
+        if (data.needsOracleIntro) {
+          window.__oracleUnreadCount = 1;
+          window.dispatchEvent(new CustomEvent('oracle-unread', { detail: 1 }));
+        }
       }
     } catch (err) {
       console.error('Failed to fetch AI usage:', err);

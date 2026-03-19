@@ -47,6 +47,7 @@ const { apiRouter: oracleShareApi, pageRouter: oracleSharePage } = require('./ro
 const oraclePulseRoutes = require('./routes/oraclePulseRoutes');
 const oraclePinRoutes = require('./routes/oraclePinRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
+const oracleIntroRoutes = require('./routes/oracleIntroRoutes');
 const { expireStaleTrials, expireStaleCanceled, checkPremiumAccess, syncStripeSubscriptions } = require('./middleware/subscriptionMiddleware');
 const { checkAndSendOnboardingNotification } = require('./services/notificationService');
 
@@ -1981,7 +1982,8 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
       isBetaPeriod,
       isPremium: userHasPremium,
       isGrandfathered,
-      resetsAt
+      resetsAt,
+      needsOracleIntro: user.needsOracleIntro !== false && !!user.startDate
     });
   } catch (err) {
     console.error('Get AI usage error:', err);
@@ -2876,6 +2878,7 @@ app.use('/api/oracle/chat-history', authenticate, oracleChatRoutes);
 app.use('/api/oracle/share', authenticate, oracleShareApi);
 app.use('/api/oracle/pulse', authenticate, oraclePulseRoutes);
 app.use('/api/oracle/pins', authenticate, oraclePinRoutes);
+app.use('/api/oracle/intro', authenticate, oracleIntroRoutes);
 app.use('/o', oracleSharePage);
 announcementRoutes.init(authenticate);
 app.use('/api/announcements', announcementRoutes);

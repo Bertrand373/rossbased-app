@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema({
   relapseCount: { type: Number, default: 0 },
   isPremium: { type: Boolean, default: false },
   hasSeenOnboarding: { type: Boolean, default: false },
+  needsOracleIntro: { type: Boolean, default: true },
   badges: [{ id: Number, name: String, earned: Boolean, date: Date }],
   benefitTracking: [{ 
     date: Date, 

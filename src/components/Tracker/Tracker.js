@@ -306,6 +306,10 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       streakHistory: updatedStreakHistory
     });
     setShowDatePicker(false);
+
+    // Trigger Oracle intro gold dot
+    window.__oracleUnreadCount = 1;
+    window.dispatchEvent(new CustomEvent('oracle-unread', { detail: 1 }));
   };
 
   // Bottom sheet: animate close then run callback
@@ -810,7 +814,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       const phases = [
         { name: 'Formation', min: 1, max: 24 },
         { name: 'Development', min: 25, max: 48 },
-        { name: 'Maturation', min: 49, max: 72 }
+        { name: 'Maturation', min: 49, max: 74 }
       ];
       const phaseData = phases.map(p => {
         const workouts = workoutLog.filter(w => w.spermaDay >= p.min && w.spermaDay <= p.max);
@@ -1600,8 +1604,8 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       <div className="tracker-meta-strip" onClick={() => document.dispatchEvent(new CustomEvent('openAlmanac'))}>
         <span className="tracker-meta-phase">
           {(() => {
-            const cycleLen = 74;
-            const pos = streak % cycleLen;
+            const cycleDay = ((streak - 1) % 74) + 1;
+            const pos = cycleDay;
             let phase;
             if (pos <= 16) phase = 'Mitotic Division';
             else if (pos <= 40) phase = 'Meiotic Division';
@@ -1610,7 +1614,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
             return `${phase}`;
           })()}
           <span className="tracker-meta-dot">·</span>
-          Day {streak % 74} of 74
+          Day {((streak - 1) % 74) + 1} of 74
         </span>
         <span className="tracker-meta-date">
           {format(currentTime, 'EEEE, MMMM d')}
