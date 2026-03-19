@@ -29,11 +29,14 @@
 }
 
 /* Smoke bleeds through header and nav on Tracker tab */
+/* transition-duration: 0ms = instant on entering tracker */
+/* Base 400ms transition on .app-header/.mobile-nav handles smooth fade back on leaving */
 .app-container:has(.tracker) .app-header {
   background-color: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border-bottom-color: transparent;
+  transition-duration: 0ms;
 }
 
 .app-container:has(.tracker) .mobile-nav {
@@ -41,6 +44,7 @@
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border-top-color: transparent;
+  transition-duration: 0ms;
 }
 
 /* Almanac ghost hidden — phase info lives in meta strip now */
@@ -1241,6 +1245,15 @@
   .main-content-wrapper:has(.tracker) {
     max-width: none;
     padding: 0;
+  }
+
+  .tracker-meta-strip,
+  .tracker-oracle-bar {
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 32px;
+    padding-right: 32px;
   }
 }
 
