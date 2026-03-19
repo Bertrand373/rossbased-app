@@ -155,6 +155,7 @@
   line-height: 1;
   letter-spacing: -0.02em;
   font-feature-settings: 'tnum' 1;
+  display: inline-block;
   min-width: 1.5em;
   text-align: center;
   animation: counterBreathe 8s ease-in-out infinite;

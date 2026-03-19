@@ -1333,19 +1333,8 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     const discordUsageToday = isGrandfathered ? await getDiscordUsageForUser(user) : 0;
     const combinedCount = currentCount + discordUsageToday;
     
-    // --- ANTI-ABUSE: 24-hour account age gate (free users only) ---
-    const isAdminUser = ['rossbased', 'ross'].includes(user.username?.toLowerCase());
-    if (!isAdminUser && !userHasPremium && !isGrandfathered) {
-      const accountAgeHours = (Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60);
-      if (accountAgeHours < 24) {
-        return res.status(403).json({ 
-          error: 'Account too new',
-          message: 'Oracle becomes available 24 hours after your journey begins. Use this time to explore your tracker and log your first benefits.'
-        });
-      }
-    }
-
     // --- ANTI-ABUSE: IP-based multi-account detection (free users only) ---
+    const isAdminUser = ['rossbased', 'ross'].includes(user.username?.toLowerCase());
     // Aggregates Oracle usage across ALL free-tier accounts sharing this IP.
     // Uses lastUsed (not weekStart) to avoid timezone-mismatch bypasses.
     const clientIP = getClientIP(req);
