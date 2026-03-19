@@ -1,5 +1,5 @@
 /* MobileNavigation.css - TITANTRACK */
-/* Icon + label navigation with sliding dash */
+/* Text-only navigation with sliding dash */
 /* Theme-aware - uses CSS variables from index.css */
 
 .mobile-nav {
@@ -40,27 +40,22 @@
 }
 
 /* ============================================================
-   NAV ITEMS — Icon stacked above label
+   NAV ITEMS — Text only
    ============================================================ */
 
 .mobile-nav-item {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 3px;
-  padding: 6px 14px;
+  justify-content: center;
+  padding: 10px 14px;
   text-decoration: none;
   color: var(--text-muted);
   -webkit-tap-highlight-color: transparent;
   transition: color 200ms ease;
 }
 
-.mobile-nav-item svg {
-  flex-shrink: 0;
-}
-
 .mobile-nav-label {
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   font-weight: 500;
   letter-spacing: 0.04em;
   white-space: nowrap;
@@ -174,7 +169,7 @@
   }
   
   .mobile-nav-item {
-    padding: 6px 16px;
+    padding: 10px 16px;
   }
   
   .mobile-nav-label {
@@ -199,7 +194,7 @@
   }
   
   .mobile-nav-item {
-    padding: 6px 8px;
+    padding: 10px 8px;
   }
   
   .mobile-nav-label {
