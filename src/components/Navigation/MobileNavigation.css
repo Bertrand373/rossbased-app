@@ -18,6 +18,8 @@
   
   border-top: 1px solid var(--border-subtle);
   
+  transition: background-color 400ms ease, border-color 400ms ease;
+
   -webkit-transform: translate3d(0, 0, 0);
   transform: translate3d(0, 0, 0);
 }

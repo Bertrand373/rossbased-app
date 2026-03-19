@@ -126,6 +126,7 @@ h4 { font-size: 0.875rem; }
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border-bottom: 1px solid var(--border);
+  transition: background-color 400ms ease, border-color 400ms ease;
 }
 
 .logo-container {

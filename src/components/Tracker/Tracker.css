@@ -28,6 +28,21 @@
   z-index: 0;
 }
 
+/* Smoke bleeds through header and nav on Tracker tab */
+.app-container:has(.tracker) .app-header {
+  background-color: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom-color: transparent;
+}
+
+.app-container:has(.tracker) .mobile-nav {
+  background-color: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-top-color: transparent;
+}
+
 /* Almanac ghost hidden — phase info lives in meta strip now */
 .tracker > .almanac-ghost {
   display: none;
@@ -1215,6 +1230,17 @@
   
   .tracker-oracle-bar .oracle-pulse-text {
     font-size: 0.6875rem;
+  }
+}
+
+/* ============================================================
+   DESKTOP — Tracker breaks out of max-width wrapper
+   ============================================================ */
+
+@media (min-width: 1025px) {
+  .main-content-wrapper:has(.tracker) {
+    max-width: none;
+    padding: 0;
   }
 }
 
