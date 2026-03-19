@@ -1345,18 +1345,31 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     }
 
     // --- ANTI-ABUSE: IP-based multi-account detection (free users only) ---
+    // Aggregates Oracle usage across ALL free-tier accounts sharing this IP.
+    // Uses lastUsed (not weekStart) to avoid timezone-mismatch bypasses.
     const clientIP = getClientIP(req);
     if (clientIP && !isAdminUser && !userHasPremium && !isGrandfathered) {
       try {
-        const ipAbuser = await User.findOne({
+        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const ipAccounts = await User.find({
           'aiUsage.lastIP': clientIP,
           username: { $ne: user.username },
-          'aiUsage.weekStart': currentWeekStart,
-          'aiUsage.weeklyCount': { $gte: FREE_WEEKLY_LIMIT }
-        }).select('username').lean();
-        
-        if (ipAbuser) {
-          console.log(`🚫 IP abuse blocked: ${user.username} shares IP ${clientIP} with maxed-out ${ipAbuser.username}`);
+          'aiUsage.lastUsed': { $gte: sevenDaysAgo },
+          'aiUsage.weeklyCount': { $gt: 0 }
+        }).select('username aiUsage.weeklyCount subscription.status').lean();
+
+        // Only count truly free accounts — premium/OG on same IP are fine
+        const freeIPUsage = ipAccounts
+          .filter(u => {
+            const s = u.subscription?.status || 'none';
+            return s === 'none' || s === 'expired';
+          })
+          .reduce((sum, u) => sum + (u.aiUsage?.weeklyCount || 0), 0);
+
+        // Aggregate: other free accounts' usage + this user's own usage
+        if (freeIPUsage + currentWeeklyCount >= FREE_WEEKLY_LIMIT) {
+          const names = ipAccounts.filter(u => { const s = u.subscription?.status || 'none'; return s === 'none' || s === 'expired'; }).map(u => u.username);
+          console.log(`🚫 IP abuse blocked: ${user.username} on IP ${clientIP} — aggregate ${freeIPUsage + currentWeeklyCount}/${FREE_WEEKLY_LIMIT} (other accts: ${names.join(', ') || 'none'})`);
           return res.status(429).json({ 
             error: 'Access restricted',
             message: 'Oracle recognizes this energy has already been served. If you seek deeper access, the path is through commitment, not circumvention.'
