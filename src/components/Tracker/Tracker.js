@@ -1596,7 +1596,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       <div className="tracker-meta-strip" onClick={() => document.dispatchEvent(new CustomEvent('openAlmanac'))}>
         <span className="tracker-meta-phase">
           {(() => {
-            const cycleLen = 72;
+            const cycleLen = 74;
             const pos = streak % cycleLen;
             let phase;
             if (pos <= 16) phase = 'Mitotic Division';
@@ -1606,7 +1606,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
             return `${phase}`;
           })()}
           <span className="tracker-meta-dot">·</span>
-          Day {streak % 72} of 72
+          Day {streak % 74} of 74
         </span>
         <span className="tracker-meta-date">
           {format(currentTime, 'EEEE, MMMM d')}

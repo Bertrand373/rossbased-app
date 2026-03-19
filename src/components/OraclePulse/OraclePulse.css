@@ -125,7 +125,7 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   text-align: left;
-  padding: 0 4px;
+  padding: 20px 4px;
   mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
 }

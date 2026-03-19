@@ -33,6 +33,8 @@
   z-index: 2;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  opacity: 0;
+  animation: fadeInUp 400ms ease forwards;
 }
 
 .tracker-meta-strip:active {
@@ -97,12 +99,17 @@
   outline: none;
 }
 
-/* No visible hover or active states */
+/* No visible hover or focus states */
 .streak:hover,
-.streak:active,
 .streak:focus {
   background: transparent;
   outline: none;
+}
+
+/* Tap feedback — subtle shrink like calendar cells */
+.streak:active .streak-num {
+  transform: scale(0.96);
+  opacity: 0.7;
 }
 
 .streak-num {
@@ -114,6 +121,7 @@
   letter-spacing: -0.02em;
   font-feature-settings: 'tnum' 1;
   animation: counterBreathe 8s ease-in-out infinite;
+  transition: transform 100ms ease, opacity 100ms ease;
 }
 
 @keyframes counterBreathe {
@@ -319,6 +327,8 @@
   border-top: 1px solid var(--border-subtle);
   background: var(--background);
   z-index: 2;
+  opacity: 0;
+  animation: fadeInUp 400ms ease 200ms forwards;
 }
 
 /* Override OraclePulse styles when inside oracle bar */
@@ -1162,7 +1172,8 @@
   .confirm-modal,
   .streak-num,
   .streak-num.oracle-gold,
-  .tracker .btn-primary.benefits-trigger {
+  .tracker .btn-primary.benefits-trigger,
+  .tracker-oracle-bar {
     animation: none;
     opacity: 1;
   }
