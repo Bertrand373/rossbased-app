@@ -7,6 +7,8 @@ const { Client, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.j
 const Anthropic = require('@anthropic-ai/sdk');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 const { logIfRelevant, generateWeeklyInsight, generateObservations, detectAnomaly, generatePulseAlert, getPulseStats } = require('./services/oracleInsight');
+const { evaluateAndGenerate, onRelevantEvent } = require('./services/communityPulseEngine');
+const CommunityPulse = require('./models/CommunityPulse');
 const { getCommunityPulse } = require('./services/communityPulse');
 const { getOutcomePatterns } = require('./services/outcomeAggregation');
 const { buildLunarContext } = require('./utils/lunarData');
@@ -1993,7 +1995,28 @@ client.on('messageCreate', async (message) => {
   // Logs relevant messages for weekly pattern analysis
   // ============================================================
   
-  logIfRelevant(message).catch(() => {}); // Fire and forget, never block
+  // Fire and forget — log relevant message, then check if pulse should fire
+  logIfRelevant(message).then(wasRelevant => {
+    if (wasRelevant) {
+      onRelevantEvent().then(pulse => {
+        if (!pulse) return;
+        // Pulse triggered by event — post to Discord
+        const guild = client.guilds.cache.first();
+        if (!guild) return;
+        const targetChannel = guild.channels.cache.find(
+          ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
+        );
+        if (!targetChannel) return;
+        targetChannel.send({ embeds: [buildPulseEmbed(pulse.body)] }).then(discordMsg => {
+          CommunityPulse.updateOne(
+            { _id: pulse._id },
+            { $set: { postedToDiscord: true, discordMessageId: discordMsg.id } }
+          ).catch(() => {});
+        }).catch(() => {});
+        console.log(`🔮 Event-driven pulse posted to #${INSIGHT_CHANNEL} — trigger: ${pulse.trigger}`);
+      }).catch(() => {});
+    }
+  }).catch(() => {});
 
   // ============================================================
   // ADMIN COMMANDS (Ross only)
@@ -2122,6 +2145,64 @@ client.on('messageCreate', async (message) => {
       return;
     } catch (error) {
       await message.reply('Failed to post insight.').catch(() => {});
+      return;
+    }
+  }
+
+  // --- !community-pulse - Generate and preview a community pulse (admin only) ---
+  if (message.content === '!community-pulse' && ADMIN_DISCORD_USERS.includes(authorUsername)) {
+    try {
+      await message.reply('⏳ Generating community pulse (skipping cooldown)...');
+      
+      const pulse = await evaluateAndGenerate(true);
+      
+      if (!pulse) {
+        await message.channel.send('Generation failed — check server logs.');
+        return;
+      }
+      
+      // Store for drop command
+      client._pendingPulse = pulse;
+      
+      // Preview — show both headline and body so Ross can judge
+      await message.channel.send(`**App headline:**\n${pulse.headline}\n\n**Discord body:**\n${pulse.body}\n\n✅ Live in app now. Type \`!oracle-drop-pulse\` to also post to #${INSIGHT_CHANNEL}, or \`!community-pulse\` to regenerate.`);
+      return;
+    } catch (error) {
+      console.error('Community pulse generation error:', error);
+      await message.reply('Failed to generate pulse.').catch(() => {});
+      return;
+    }
+  }
+
+  // --- !oracle-drop-pulse - Post the pending community pulse to Discord (admin only) ---
+  if (message.content === '!oracle-drop-pulse' && ADMIN_DISCORD_USERS.includes(authorUsername)) {
+    try {
+      const pulse = client._pendingPulse;
+      if (!pulse) {
+        await message.reply('No pending pulse. Run `!community-pulse` first.');
+        return;
+      }
+      
+      const guild = message.guild;
+      const targetChannel = guild.channels.cache.find(
+        ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
+      );
+      
+      if (!targetChannel) {
+        await message.reply(`Could not find channel #${INSIGHT_CHANNEL}.`);
+        return;
+      }
+      
+      const discordMsg = await targetChannel.send({ embeds: [buildPulseEmbed(pulse.body)] });
+      await CommunityPulse.updateOne(
+        { _id: pulse._id },
+        { $set: { postedToDiscord: true, discordMessageId: discordMsg.id } }
+      );
+      client._pendingPulse = null;
+      await message.reply(`✓ Pulse posted to #${INSIGHT_CHANNEL}`);
+      return;
+    } catch (error) {
+      await message.reply('Failed to post pulse.').catch(() => {});
       return;
     }
   }
@@ -2810,38 +2891,24 @@ client.once('ready', () => {
   }, 60 * 60 * 1000); // Check every hour
   
   // ============================================================
-  // MID-WEEK PULSE CHECK
-  // Every 4 hours, check for anomalous topic spikes.
-  // Only posts if a topic hits 3x+ its normal daily rate.
-  // 3-day cooldown between pulse alerts to avoid noise.
+  // COMMUNITY PULSE ENGINE
+  // Every 4 hours, evaluate trigger signals across all data sources.
+  // If Oracle has something worth saying, generate and post to both
+  // Discord AND app (via shared CommunityPulse collection).
+  // Engine handles its own cooldown (48h minimum between pulses).
   // ============================================================
-  
-  let lastPulseDate = null;
   
   setInterval(async () => {
     try {
-      const today = getTodayET();
-      
-      // 3-day cooldown: don't fire if we posted a pulse alert recently
-      if (lastPulseDate) {
-        const daysSince = (Date.now() - new Date(lastPulseDate).getTime()) / (1000 * 60 * 60 * 24);
-        if (daysSince < PULSE_COOLDOWN_DAYS) return;
-      }
-      
       // Don't fire on the same day as the weekly insight
       const now = new Date();
       if (now.getUTCDay() === INSIGHT_DAY) return;
       
-      // Check for anomalies
-      const anomalies = await detectAnomaly();
-      if (!anomalies) return;
+      // Evaluate triggers and generate if warranted
+      const pulse = await evaluateAndGenerate();
+      if (!pulse) return;
       
-      console.log('[Pulse] Anomaly confirmed — generating alert...');
-      
-      const alert = await generatePulseAlert(anomalies);
-      if (!alert) return;
-      
-      // Find the target channel (same as weekly insight)
+      // Post to Discord
       const guild = client.guilds.cache.first();
       if (!guild) return;
       
@@ -2849,15 +2916,23 @@ client.once('ready', () => {
         ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
       );
       
-      if (!targetChannel) return;
+      if (!targetChannel) {
+        console.error(`[PulseEngine] Could not find channel #${INSIGHT_CHANNEL}`);
+        return;
+      }
       
-      await targetChannel.send({ embeds: [buildPulseEmbed(alert)] });
-      lastPulseDate = today;
+      const discordMsg = await targetChannel.send({ embeds: [buildPulseEmbed(pulse.body)] });
       
-      console.log(`🔮 Pulse alert posted to #${INSIGHT_CHANNEL} — topics: ${anomalies.map(a => a.topic).join(', ')}`);
+      // Mark as posted to Discord
+      await CommunityPulse.updateOne(
+        { _id: pulse._id },
+        { $set: { postedToDiscord: true, discordMessageId: discordMsg.id } }
+      );
+      
+      console.log(`🔮 Community pulse posted to #${INSIGHT_CHANNEL} — trigger: ${pulse.trigger}`);
       
     } catch (err) {
-      console.error('[Pulse] Check error:', err.message);
+      console.error('[PulseEngine] Check error:', err.message);
     }
   }, 4 * 60 * 60 * 1000); // Check every 4 hours
 

@@ -32,6 +32,7 @@ const { getOutcomePatterns } = require('./services/outcomeAggregation');
 const { runYouTubeFetch, getYouTubeStats } = require('./services/youtubeComments');
 const { runContentPipeline, getLatestReport } = require('./services/youtubeContentPipeline');
 const { classifyInteraction, backfillRelapseFlag } = require('./services/interactionClassifier');
+const { onRelevantEvent: onPulseEvent } = require('./services/communityPulseEngine');
 const OracleInteraction = require('./models/OracleInteraction');
 const OracleUsage = require('./models/OracleUsage');
 const stripeRoutes = require('./routes/stripeRoutes');
@@ -612,6 +613,8 @@ app.put('/api/user/:username', authenticate, async (req, res) => {
         // Only trigger if this relapse entry is fresh (within last 5 minutes)
         if (entryAge < 5 * 60 * 1000) {
           backfillRelapseFlag(user._id, new Date(latest.date)).catch(() => {});
+          // Event-driven pulse check — relapse is a high-signal event
+          onPulseEvent().catch(() => {});
         }
       }
     }

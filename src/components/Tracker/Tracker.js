@@ -1637,7 +1637,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
       {/* Oracle bar — pinned bottom, matches Calendar moon bar */}
       <div className="tracker-oracle-bar">
-        <OraclePulse isPremium={isPremium} isGold={userData.streakColorGold} />
+        <OraclePulse />
       </div>
       
     </div>

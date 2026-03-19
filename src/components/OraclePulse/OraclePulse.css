@@ -1,5 +1,5 @@
 /* src/components/OraclePulse/OraclePulse.css */
-/* Oracle's daily observation — lives below Log button on Tracker */
+/* Oracle's community observation — lives below Log button on Tracker */
 
 .oracle-pulse {
   max-width: 340px;
@@ -10,7 +10,7 @@
   animation: pulseIn 600ms ease 200ms forwards;
 }
 
-/* Label: ORACLE OBSERVES / ORACLE OBSERVES YOU */
+/* Label: ORACLE OBSERVES */
 .oracle-pulse-label {
   display: block;
   font-size: 0.5625rem;
@@ -80,6 +80,56 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ============================================================
+   TAPPABLE STATE — cursor + subtle hover hint
+   ============================================================ */
+
+.oracle-pulse.tappable {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.oracle-pulse.tappable:active .oracle-pulse-text {
+  opacity: 0.6;
+  transition: opacity 100ms ease;
+}
+
+/* ============================================================
+   SHEET — full observation body
+   ============================================================ */
+
+.oracle-pulse-sheet {
+  padding: 0 24px 24px;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+.oracle-pulse-sheet-content {
+  text-align: center;
+  padding: 0 4px;
+}
+
+.oracle-pulse-sheet-content .oracle-pulse-label {
+  margin-bottom: 16px;
+}
+
+.oracle-pulse-body {
+  font-size: 0.9375rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+.oracle-pulse-body.oracle-gold {
+  color: rgba(212, 175, 55, 0.75);
+}
+
+[data-theme="light"] .oracle-pulse-body.oracle-gold {
+  color: rgba(160, 130, 0, 0.7);
 }
 
 /* ============================================================
