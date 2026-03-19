@@ -85,10 +85,10 @@ const getMoonPhase = (date = new Date()) => {
 };
 
 /**
- * Calculate spermatogenesis cycle position (72-day cycle)
+ * Calculate spermatogenesis cycle position (74-day cycle)
  */
 const getSpermatogenesisPhase = (streakDays) => {
-  const cycleLength = 72;
+  const cycleLength = 74;
   const position = streakDays % cycleLength;
   
   let phase, description;
