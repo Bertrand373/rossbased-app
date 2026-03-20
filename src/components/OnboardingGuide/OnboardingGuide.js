@@ -46,11 +46,11 @@ const OnboardingGuide = ({ onComplete }) => {
   // Define the 4 onboarding steps
   const steps = [
     {
-      target: '.streak-counter',
+      target: '.streak-num',
       title: 'Set your start date',
       message: 'Tap the counter to set when your journey began.',
       position: 'bottom',
-      padding: 12,
+      padding: 24,
       radius: '20px'
     },
     {
