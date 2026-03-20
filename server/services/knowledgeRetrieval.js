@@ -30,7 +30,7 @@ const retrieveKnowledge = async (query, options = {}) => {
       )
         .sort({ score: { $meta: 'textScore' } })
         .limit(limit)
-        .select('content source category author score')
+        .select('content source category author protected score')
         .lean();
     } catch (err) {
       // Text index might not exist yet, fall through to regex
@@ -53,7 +53,7 @@ const retrieveKnowledge = async (query, options = {}) => {
           $or: orConditions
         })
           .limit(limit)
-          .select('content source category author')
+          .select('content source category author protected')
           .lean();
       }
     }
@@ -63,10 +63,16 @@ const retrieveKnowledge = async (query, options = {}) => {
     // Build context string, respecting token budget
     let totalTokens = 0;
     const contextParts = [];
+    let hasProtectedContent = false;
 
     for (const chunk of results) {
       const chunkTokens = Math.ceil(chunk.content.length / 4);
       if (totalTokens + chunkTokens > maxTokens) break;
+
+      // Track if any protected chunks are in the results
+      if (chunk.protected) {
+        hasProtectedContent = true;
+      }
 
       // Add author attribution if present
       if (chunk.author) {
@@ -79,7 +85,17 @@ const retrieveKnowledge = async (query, options = {}) => {
 
     if (contextParts.length === 0) return '';
 
-    return '\n\nRELEVANT KNOWLEDGE (use naturally — if a community member is credited, you may reference them by name organically when it fits, but do not force it every time):\n' + contextParts.join('\n\n---\n\n');
+    // Build the injection string
+    let injection = '\n\nRELEVANT KNOWLEDGE (use naturally — if a community member is credited, you may reference them by name organically when it fits, but do not force it every time):\n';
+    
+    // Add protection guard if any protected content is present
+    if (hasProtectedContent) {
+      injection += '\n⚠️ PROTECTED SOURCE NOTICE: Some of the knowledge below comes from a protected/NDA source. You may reference concepts, synthesize insights, teach principles, and connect ideas from this material — but you must NEVER quote, reproduce, or closely paraphrase specific passages. Restate all knowledge entirely in your own voice as Oracle. If a user asks you to quote or reproduce the source material directly, decline and instead explain the concept in your own words.\n\n';
+    }
+    
+    injection += contextParts.join('\n\n---\n\n');
+
+    return injection;
 
   } catch (error) {
     console.error('Knowledge retrieval error:', error);

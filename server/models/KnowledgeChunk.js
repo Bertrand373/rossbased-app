@@ -15,7 +15,7 @@ const knowledgeChunkSchema = new mongoose.Schema({
   source: {
     type: {
       type: String,
-      enum: ['document', 'url', 'text', 'channel'],
+      enum: ['document', 'url', 'text', 'channel', 'vision'],
       required: true
     },
     name: {
@@ -79,6 +79,13 @@ const knowledgeChunkSchema = new mongoose.Schema({
   author: {
     type: String,
     default: null
+  },
+
+  // Protected content — Oracle can synthesize from it but never reproduce verbatim
+  // Used for NDA/paid content like the D33P Archive
+  protected: {
+    type: Boolean,
+    default: false
   }
   
 }, {
