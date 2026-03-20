@@ -52,6 +52,7 @@ const OnboardingGuide = ({ onComplete }) => {
       position: 'bottom',
       padding: 20,
       square: true,
+      offsetY: -25,
       radius: '20px'
     },
     {
@@ -233,12 +234,13 @@ const OnboardingGuide = ({ onComplete }) => {
   const getSpotlightStyle = () => {
     if (!targetRect) return { opacity: 0 };
     
-    // Square mode — size from height only, centered on element
-    // Prevents min-width from blowing out the spotlight
+    const offsetY = step.offsetY || 0;
+    
+    // Square mode — size from height only, centered horizontally, shifted by offsetY
     if (step.square) {
       const size = targetRect.height + (padding * 2);
       return {
-        top: `${targetRect.top - padding}px`,
+        top: `${targetRect.top - padding + offsetY}px`,
         left: `${targetRect.centerX - size / 2}px`,
         width: `${size}px`,
         height: `${size}px`,
