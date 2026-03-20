@@ -5,7 +5,7 @@
 // Stores in CommunityPulse collection (serves both app UI and Discord posts)
 //
 // Cost: Pure DB queries for trigger evaluation ($0), one Sonnet call when triggered (~$0.01-0.03)
-// Expected frequency: 1-3 observations per week
+// App pulse: daily (fallback if no real triggers). Discord pulse: only when real triggers fire.
 
 const Anthropic = require('@anthropic-ai/sdk');
 const CommunityPulse = require('../models/CommunityPulse');
@@ -18,8 +18,11 @@ const { getLunarData } = require('../utils/lunarData');
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const GENERATION_MODEL = 'claude-sonnet-4-5-20250929';
 
-// Minimum hours between pulse generations (Oracle should be rare and meaningful)
-const MIN_HOURS_BETWEEN_PULSES = 48;
+// Minimum hours between pulse generations (trigger-based)
+const MIN_HOURS_BETWEEN_PULSES = 18;
+
+// Hours before a daily fallback fires (app-only, no Discord)
+const DAILY_FALLBACK_HOURS = 24;
 
 /**
  * Main entry point — evaluate all triggers, generate if something fires
@@ -53,8 +56,24 @@ async function evaluateAndGenerate(force = false) {
           summary: 'Manual generation requested — synthesize from all available community intelligence'
         });
       } else {
-        console.log('[PulseEngine] No triggers fired — Oracle stays quiet');
-        return null;
+        // Check if daily fallback should fire (app-only pulse, never goes to Discord)
+        const latest = await CommunityPulse.findOne().sort({ createdAt: -1 }).lean();
+        const hoursSinceLast = latest 
+          ? (Date.now() - new Date(latest.createdAt).getTime()) / (1000 * 60 * 60) 
+          : Infinity;
+
+        if (hoursSinceLast >= DAILY_FALLBACK_HOURS) {
+          console.log(`[PulseEngine] No triggers but ${Math.round(hoursSinceLast)}h since last pulse — firing daily fallback`);
+          triggers.push({
+            type: 'daily_fallback',
+            strength: 0.5,
+            data: { hoursSinceLast: Math.round(hoursSinceLast), reason: 'No triggers fired, daily fallback for app freshness' },
+            summary: 'Daily app-only observation using aggregate community data, lunar phase, and streak patterns'
+          });
+        } else {
+          console.log('[PulseEngine] No triggers fired — Oracle stays quiet');
+          return null;
+        }
       }
     }
 

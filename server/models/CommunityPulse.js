@@ -27,6 +27,7 @@ const communityPulseSchema = new mongoose.Schema({
       'topic_cluster',         // Multiple users independently asking Oracle same thing
       'benefit_shift',         // Community-wide benefit score shift
       'milestone',             // Community milestone (streak record, user count)
+      'daily_fallback',        // App-only daily pulse when no real triggers fire (never posted to Discord)
       'manual'                 // Admin-triggered via !pulse-generate
     ],
     required: true

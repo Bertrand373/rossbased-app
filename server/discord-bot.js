@@ -187,13 +187,15 @@ function buildInsightEmbed(text, daysBack = 7) {
  * Same visual language as weekly insight but with "Oracle Senses" label
  */
 function buildPulseEmbed(text) {
+  // Pad body text — add thin space around long sentences so they don't touch embed edges on mobile
   const desc = text.length > 4096 ? text.substring(0, 4093) + '...' : text;
   
   const embed = new EmbedBuilder()
     .setColor(ORACLE_COLOR)
     .setAuthor({ name: 'Oracle Senses' })
     .setDescription(desc)
-    .setFooter({ text: 'Oracle · titantrack.app · Anomaly detected', iconURL: 'https://titantrack.app/The_Oracle.png' })
+    .setThumbnail('https://titantrack.app/The_Oracle.png')
+    .setFooter({ text: 'Oracle · titantrack.app', iconURL: 'https://titantrack.app/The_Oracle.png' })
     .setTimestamp();
   
   if (client?.user) {
@@ -2000,7 +2002,9 @@ client.on('messageCreate', async (message) => {
     if (wasRelevant) {
       onRelevantEvent().then(pulse => {
         if (!pulse) return;
-        // Pulse triggered by event — post to Discord
+        // Daily fallbacks are app-only — don't post to Discord
+        if (pulse.trigger === 'daily_fallback') return;
+        // Real trigger — post to Discord
         const guild = client.guilds.cache.first();
         if (!guild) return;
         const targetChannel = guild.channels.cache.find(
@@ -2893,9 +2897,8 @@ client.once('ready', () => {
   // ============================================================
   // COMMUNITY PULSE ENGINE
   // Every 4 hours, evaluate trigger signals across all data sources.
-  // If Oracle has something worth saying, generate and post to both
-  // Discord AND app (via shared CommunityPulse collection).
-  // Engine handles its own cooldown (48h minimum between pulses).
+  // Generates observation for app (always). Posts to Discord only for real triggers.
+  // Daily fallbacks are app-only — keeps Discord rare and meaningful.
   // ============================================================
   
   setInterval(async () => {
@@ -2908,7 +2911,13 @@ client.once('ready', () => {
       const pulse = await evaluateAndGenerate();
       if (!pulse) return;
       
-      // Post to Discord
+      // Daily fallbacks are app-only — don't post to Discord
+      if (pulse.trigger === 'daily_fallback') {
+        console.log(`🔮 App-only pulse generated (daily fallback) — not posting to Discord`);
+        return;
+      }
+      
+      // Real trigger — post to Discord
       const guild = client.guilds.cache.first();
       if (!guild) return;
       
