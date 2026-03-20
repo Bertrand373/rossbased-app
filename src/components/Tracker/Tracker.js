@@ -256,6 +256,11 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     // Defer API call so it doesn't break React's state batching
     setTimeout(() => updateUserData({ hasSeenOnboarding: true }), 0);
     
+    // Force date picker open immediately — user must set start date before anything else
+    if (!userData.startDate) {
+      setTimeout(() => setShowDatePicker(true), 400);
+    }
+    
     // Fire deferred login toast now that onboarding overlay is gone
     const msg = sessionStorage.getItem('login_toast');
     if (msg) {
