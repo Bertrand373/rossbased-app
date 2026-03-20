@@ -245,20 +245,20 @@
 
 .onboarding-next {
   padding: 10px 24px;
-  background: #ffffff;
-  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 9999px;
-  color: #000000;
+  color: #ffffff;
   font-size: 0.8125rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: opacity 150ms ease, transform 100ms ease;
+  transition: border-color 150ms ease, transform 100ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .onboarding-next:hover {
-  opacity: 0.9;
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .onboarding-next:active {
