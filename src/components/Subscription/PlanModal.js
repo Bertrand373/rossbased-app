@@ -8,6 +8,7 @@ import './PlanModal.css';
 import '../../styles/BottomSheet.css';
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 import useSheetSwipe from '../../hooks/useSheetSwipe';
+import toast from 'react-hot-toast';
 
 const PlanModal = ({ 
   isOpen, 
@@ -97,6 +98,7 @@ const PlanModal = ({
       setTimeout(() => setIsProcessing(false), 10000);
     } catch (err) {
       setIsProcessing(false);
+      if (err.message) toast.error(err.message, { duration: 4000 });
     }
   };
 

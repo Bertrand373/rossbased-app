@@ -137,6 +137,77 @@ router.post('/create-checkout', authenticate, async (req, res) => {
       });
     }
     
+    // ══════════════════════════════════════════════
+    // DUPLICATE & UPGRADE GUARD
+    // If customer already has an active/trialing sub:
+    //   - Same price → block (true duplicate, prevent double-charge)
+    //   - Different price → update existing sub in-place (tier/plan change)
+    // Stripe handles proration automatically on updates.
+    // ══════════════════════════════════════════════
+    if (customerId) {
+      const existingActive = await stripe.subscriptions.list({
+        customer: customerId,
+        status: 'active',
+        limit: 1
+      });
+      const existingTrialing = await stripe.subscriptions.list({
+        customer: customerId,
+        status: 'trialing',
+        limit: 1
+      });
+      
+      const existingSub = existingActive.data[0] || existingTrialing.data[0];
+      
+      if (existingSub) {
+        const existingItem = existingSub.items.data[0];
+        const existingPriceId = existingItem?.price?.id;
+        
+        // Same price = true duplicate — block it
+        if (existingPriceId === priceId) {
+          console.log(`⚠️ Blocked duplicate checkout for ${user.username} — already has sub ${existingSub.id} with same price`);
+          return res.status(409).json({ 
+            error: 'You already have this plan. Manage it from your Profile.' 
+          });
+        }
+        
+        // Different price = tier/plan change — update existing sub in-place
+        try {
+          const updatedSub = await stripe.subscriptions.update(existingSub.id, {
+            items: [{
+              id: existingItem.id,
+              price: priceId
+            }],
+            proration_behavior: 'create_prorations',
+            metadata: {
+              titantrack_username: user.username,
+              tier: subTier
+            }
+          });
+          
+          // Update MongoDB with new tier/plan immediately
+          // (webhook will also fire, but this ensures instant UI update)
+          const newPlan = plan === 'yearly' ? 'yearly' : 'monthly';
+          await User.findByIdAndUpdate(user._id, {
+            'subscription.tier': subTier,
+            'subscription.plan': newPlan,
+            'subscription.currentPeriodStart': new Date(updatedSub.current_period_start * 1000),
+            'subscription.currentPeriodEnd': new Date(updatedSub.current_period_end * 1000)
+          });
+          
+          console.log(`🔄 Plan changed for ${user.username}: ${existingPriceId} → ${priceId} (${subTier} ${plan})`);
+          
+          // Return success with redirect to profile (no Stripe checkout needed)
+          return res.json({ 
+            url: `${CLIENT_URL}/profile?checkout=success`,
+            upgraded: true 
+          });
+        } catch (updateErr) {
+          console.error(`❌ Subscription update failed for ${user.username}:`, updateErr.message);
+          return res.status(500).json({ error: 'Failed to update your plan. Please try again.' });
+        }
+      }
+    }
+
     // Build checkout session config
     const sessionConfig = {
       customer: customerId,

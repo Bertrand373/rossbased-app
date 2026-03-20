@@ -460,6 +460,114 @@
   letter-spacing: 0.3px;
 }
 
+/* Subscription ID in drilldown rows */
+.rv-drilldown-subid {
+  font-size: 8px;
+  font-family: 'SF Mono', 'Menlo', monospace;
+  color: rgba(255,255,255,0.1);
+  letter-spacing: 0.2px;
+}
+
+/* ===== DUPLICATE SUBSCRIPTION ALERTS ===== */
+.rv-card-dupe {
+  border-color: rgba(234,179,8,0.2);
+  background: rgba(234,179,8,0.03);
+}
+
+.rv-dupe-count {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(234,179,8,0.9);
+  background: rgba(234,179,8,0.12);
+  border-radius: 10px;
+  padding: 2px 7px;
+}
+
+.rv-dupe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rv-dupe-row {
+  padding: 10px 12px;
+  background: rgba(234,179,8,0.04);
+  border: 1px solid rgba(234,179,8,0.1);
+  border-radius: 8px;
+}
+
+.rv-dupe-user {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.rv-dupe-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
+}
+
+.rv-dupe-email {
+  font-size: 10px;
+  color: rgba(255,255,255,0.25);
+}
+
+.rv-dupe-subs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.rv-dupe-sub-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 4px;
+}
+
+.rv-dupe-status {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+.rv-dupe-status.active {
+  color: rgba(34,197,94,0.9);
+  background: rgba(34,197,94,0.1);
+}
+
+.rv-dupe-status.trialing {
+  color: rgba(234,179,8,0.9);
+  background: rgba(234,179,8,0.1);
+}
+
+.rv-dupe-amount {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+}
+
+.rv-dupe-subid {
+  font-size: 9px;
+  font-family: 'SF Mono', 'Menlo', monospace;
+  color: rgba(255,255,255,0.15);
+  margin-left: auto;
+}
+
+.rv-dupe-warning {
+  font-size: 10px;
+  color: rgba(234,179,8,0.7);
+  margin: 0;
+  line-height: 1.4;
+}
+
 /* Mobile */
 @media (max-width: 640px) {
   .rv-stats-grid {
@@ -572,3 +680,24 @@
 [data-theme="light"] .rv-drilldown-email { color: rgba(0,0,0,0.3); }
 [data-theme="light"] .rv-drilldown-date { color: rgba(0,0,0,0.3); }
 [data-theme="light"] .rv-drilldown-plan { color: rgba(0,0,0,0.2); }
+
+/* Duplicate alerts light theme */
+[data-theme="light"] .rv-card-dupe {
+  border-color: rgba(184,134,11,0.2);
+  background: rgba(184,134,11,0.03);
+}
+[data-theme="light"] .rv-dupe-count {
+  color: rgba(184,134,11,0.9);
+  background: rgba(184,134,11,0.12);
+}
+[data-theme="light"] .rv-dupe-row {
+  background: rgba(184,134,11,0.04);
+  border-color: rgba(184,134,11,0.1);
+}
+[data-theme="light"] .rv-dupe-name { color: rgba(0,0,0,0.7); }
+[data-theme="light"] .rv-dupe-email { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .rv-dupe-sub-row { background: rgba(0,0,0,0.02); }
+[data-theme="light"] .rv-dupe-amount { color: rgba(0,0,0,0.5); }
+[data-theme="light"] .rv-dupe-subid { color: rgba(0,0,0,0.2); }
+[data-theme="light"] .rv-dupe-warning { color: rgba(184,134,11,0.7); }
+[data-theme="light"] .rv-drilldown-subid { color: rgba(0,0,0,0.15); }

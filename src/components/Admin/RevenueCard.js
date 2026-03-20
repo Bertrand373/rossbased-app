@@ -118,7 +118,7 @@ const RevenueCard = () => {
 
   if (!data) return null;
 
-  const { balance, mrr, subscribers, recentCharges, failedPayments } = data;
+  const { balance, mrr, subscribers, recentCharges, failedPayments, duplicateAlerts } = data;
 
   return (
     <div className="rv-container">
@@ -165,6 +165,36 @@ const RevenueCard = () => {
         </div>
       </div>
 
+      {/* Duplicate Subscription Alerts */}
+      {duplicateAlerts && duplicateAlerts.length > 0 && (
+        <div className="rv-card rv-card-dupe">
+          <div className="rv-card-head">
+            <h3>Duplicate Subscriptions</h3>
+            <span className="rv-dupe-count">{duplicateAlerts.length}</span>
+          </div>
+          <div className="rv-dupe-list">
+            {duplicateAlerts.map((d, i) => (
+              <div key={i} className="rv-dupe-row">
+                <div className="rv-dupe-user">
+                  <span className="rv-dupe-name">{d.username}</span>
+                  <span className="rv-dupe-email">{d.email}</span>
+                </div>
+                <div className="rv-dupe-subs">
+                  {d.subscriptions.map((s, j) => (
+                    <div key={j} className="rv-dupe-sub-row">
+                      <span className={`rv-dupe-status ${s.status}`}>{s.status.toUpperCase()}</span>
+                      <span className="rv-dupe-amount">{s.amount ? `$${(s.amount / 100).toFixed(0)}/${s.interval === 'year' ? 'yr' : 'mo'}` : '—'}</span>
+                      <span className="rv-dupe-subid" title={s.subId}>sub_...{s.subId.slice(-8)}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="rv-dupe-warning">⚠️ {d.count} subs — user may be double-charged. Check Stripe.</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Subscriber counts — tap to drill down */}
       <div className="rv-card">
         <div className="rv-card-head">
@@ -206,6 +236,7 @@ const RevenueCard = () => {
                       {s.periodEnd && !s.trialEnd && <span className="rv-drilldown-date">ends {fmtShortDate(s.periodEnd)}</span>}
                       {s.canceledAt && <span className="rv-drilldown-date">canceled {fmtShortDate(s.canceledAt)}</span>}
                       <span className="rv-drilldown-plan">{s.amount ? `$${(s.amount / 100).toFixed(0)}` : ''}{s.amount ? '/' : ''}{s.plan === 'monthly' ? 'mo' : s.plan === 'yearly' ? 'yr' : s.plan || '—'}</span>
+                      {s.subId && <span className="rv-drilldown-subid" title={s.subId}>sub_...{s.subId.slice(-8)}</span>}
                     </div>
                   </div>
                 ))}

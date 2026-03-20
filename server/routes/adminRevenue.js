@@ -105,6 +105,44 @@ router.get('/revenue', adminCheck, async (req, res) => {
       s => s.canceled_at && s.canceled_at >= thirtyDaysAgoTs
     );
 
+    // 6. Duplicate subscription detection
+    // Groups all active + trialing subs by Stripe customer ID.
+    // If any customer has >1 subscription, flag it so admin can investigate.
+    const allCurrentSubs = [...activeSubs, ...trialingSubs.data];
+    const customerSubMap = {};
+    allCurrentSubs.forEach(sub => {
+      const custId = sub.customer;
+      if (!customerSubMap[custId]) customerSubMap[custId] = [];
+      customerSubMap[custId].push({
+        subId: sub.id,
+        status: sub.status,
+        created: new Date(sub.created * 1000).toISOString(),
+        amount: sub.items?.data?.[0]?.price?.unit_amount || 0,
+        interval: sub.items?.data?.[0]?.price?.recurring?.interval || '—',
+        username: sub.metadata?.titantrack_username || null,
+        periodEnd: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
+        trialEnd: sub.trial_end ? new Date(sub.trial_end * 1000).toISOString() : null
+      });
+    });
+
+    const duplicateAlerts = [];
+    for (const [custId, subs] of Object.entries(customerSubMap)) {
+      if (subs.length > 1) {
+        let email = '?';
+        try {
+          const cust = await stripe.customers.retrieve(custId);
+          email = cust.email || '?';
+        } catch (e) { /* skip */ }
+        duplicateAlerts.push({
+          customerId: custId,
+          email,
+          username: subs[0].username || '—',
+          count: subs.length,
+          subscriptions: subs
+        });
+      }
+    }
+
     res.json({
       balance: {
         available: available,
@@ -119,6 +157,7 @@ router.get('/revenue', adminCheck, async (req, res) => {
       },
       recentCharges,
       failedPayments: failed,
+      duplicateAlerts,
       fetchedAt: new Date().toISOString(),
     });
 
