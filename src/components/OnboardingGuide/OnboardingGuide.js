@@ -50,7 +50,8 @@ const OnboardingGuide = ({ onComplete }) => {
       title: 'Set your start date',
       message: 'Tap the counter to set when your journey began.',
       position: 'bottom',
-      padding: 24,
+      padding: 20,
+      square: true,
       radius: '20px'
     },
     {
@@ -231,6 +232,19 @@ const OnboardingGuide = ({ onComplete }) => {
   // Spotlight style — unified, clamped to viewport
   const getSpotlightStyle = () => {
     if (!targetRect) return { opacity: 0 };
+    
+    // Square mode — size from height only, centered on element
+    // Prevents min-width from blowing out the spotlight
+    if (step.square) {
+      const size = targetRect.height + (padding * 2);
+      return {
+        top: `${targetRect.top - padding}px`,
+        left: `${targetRect.centerX - size / 2}px`,
+        width: `${size}px`,
+        height: `${size}px`,
+        borderRadius: step.radius
+      };
+    }
     
     let left = targetRect.left - padding;
     let width = targetRect.width + (padding * 2);
