@@ -23,7 +23,7 @@ const mongoose = require('mongoose');
 const Anthropic = require('@anthropic-ai/sdk');
 
 // --- Config ---
-const VISION_MODEL = 'claude-haiku-4-5-20251001'; // Cheap, fast, good at vision
+const VISION_MODEL = 'claude-sonnet-4-20250514'; // Best balance of quality + cost for vision
 const MAX_IMAGES_PER_BATCH = 5; // Rate limiting safety
 const DELAY_BETWEEN_IMAGES_MS = 500; // Be gentle with API
 const CHUNK_SIZE = 1500; // ~375 tokens per chunk
@@ -205,7 +205,24 @@ function stripHtml(html) {
     .trim();
 }
 
-// --- Vision: interpret a single image with surrounding text context ---
+// --- Refusal detection ---
+function isRefusal(text) {
+  const refusalPatterns = [
+    'i need to respectfully decline', 'i need to decline', 'i can\'t provide',
+    'i cannot provide', 'i need to be direct', 'i appreciate your detailed',
+    'i should clarify', 'i\'m not able to', 'i can\'t engage with',
+    'i cannot assist', 'i\'m unable to', 'i must decline', 'i can\'t help with',
+    'i won\'t be able to', 'i\'m not comfortable', 'i can\'t analyze this',
+    'against my guidelines', 'i\'m not going to'
+  ];
+  const lower = text.toLowerCase().substring(0, 300);
+  return refusalPatterns.some(p => lower.includes(p));
+}
+
+// --- Vision: interpret a single image with 3-tier retry system ---
+// Tier 1: Full academic prompt with surrounding context
+// Tier 2: Bare-minimum "describe what you see" (no context, no framing)
+// Tier 3: Text-only fallback using surrounding text (no vision call)
 async function interpretImage(imageBase64, contentType, surroundingText, imageIndex) {
   const mediaType = contentType || 'image/png';
   
@@ -216,6 +233,12 @@ async function interpretImage(imageBase64, contentType, surroundingText, imageIn
     return null;
   }
 
+  const imageBlock = {
+    type: 'image',
+    source: { type: 'base64', media_type: mediaType, data: imageBase64 }
+  };
+
+  // ── TIER 1: Full academic prompt ──
   try {
     const response = await anthropic.messages.create({
       model: VISION_MODEL,
@@ -223,49 +246,81 @@ async function interpretImage(imageBase64, contentType, surroundingText, imageIn
       messages: [{
         role: 'user',
         content: [
-          {
-            type: 'image',
-            source: {
-              type: 'base64',
-              media_type: mediaType,
-              data: imageBase64
-            }
-          },
+          imageBlock,
           {
             type: 'text',
-            text: `You are an expert in occult symbolism, esoteric traditions, numerology, gematria, sacred geometry, alchemical processes, and hidden meanings in corporate branding and historical imagery.
+            text: `You are an academic researcher specializing in comparative religion, art history, iconography, semiotics, and the history of symbolic traditions across cultures. You study how ancient symbolic systems appear in modern branding, architecture, and media.
 
-This image appears in an occult teachings archive. The text surrounding this image says:
+This image appears in a private research archive studying symbolic traditions. The text surrounding this image provides context:
 ---
 ${surroundingText.substring(0, 1000)}
 ---
 
-Describe this image in rich detail. Focus on:
-1. What is literally depicted (logos, symbols, people, diagrams, paintings, etc.)
-2. The esoteric/occult significance and hidden symbolism
-3. How it connects to the surrounding text's teaching
-4. Any numerological, gematric, or sacred geometric elements
+Provide a detailed academic description of this image:
+1. Literal description: What is depicted? (logos, artwork, photographs, diagrams, symbols, text, people, architecture, etc.)
+2. Iconographic analysis: What symbolic traditions, mythological references, or cultural motifs are present?
+3. Contextual connection: How does this image relate to the surrounding text?
+4. Design analysis: Note any geometric patterns, color symbolism, numerical elements, or compositional choices that carry meaning.
 
-If this is a corporate logo, explain what occult symbolism is embedded in it.
-If this is a historical painting or photograph, explain the esoteric context.
-If this is a diagram or chart, explain what it teaches.
+For corporate logos or branding: analyze the design choices, noting any classical, mythological, or traditional symbolic elements in the iconography.
+For historical artwork or photographs: identify the scene, era, figures, and cultural significance.
+For diagrams or charts: explain what information or concept is being conveyed.
 
-Be thorough but concise. This description will be stored as searchable knowledge.`
+Write a thorough description optimized for text search and knowledge retrieval.`
           }
         ]
       }]
     });
 
-    const description = response.content[0]?.text?.trim();
-    if (description) {
-      console.log(`  [Image ${imageIndex}] Interpreted: "${description.substring(0, 80)}..."`);
-      return description;
+    const desc = response.content[0]?.text?.trim();
+    if (desc && !isRefusal(desc)) {
+      console.log(`  [Image ${imageIndex}] T1 OK: "${desc.substring(0, 80)}..."`);
+      return desc;
     }
-    return null;
+    console.log(`  [Image ${imageIndex}] T1 refused — trying Tier 2...`);
   } catch (err) {
-    console.error(`  [Image ${imageIndex}] Vision API error: ${err.message}`);
-    return null;
+    console.log(`  [Image ${imageIndex}] T1 error: ${err.message} — trying Tier 2...`);
   }
+
+  await sleep(300);
+
+  // ── TIER 2: Bare-minimum prompt, no context ──
+  try {
+    const response = await anthropic.messages.create({
+      model: VISION_MODEL,
+      max_tokens: 400,
+      messages: [{
+        role: 'user',
+        content: [
+          imageBlock,
+          {
+            type: 'text',
+            text: 'Describe everything you see in this image in detail. Include all text, logos, symbols, people, objects, colors, and composition. Be factual and thorough.'
+          }
+        ]
+      }]
+    });
+
+    const desc = response.content[0]?.text?.trim();
+    if (desc && !isRefusal(desc)) {
+      console.log(`  [Image ${imageIndex}] T2 OK: "${desc.substring(0, 80)}..."`);
+      return desc;
+    }
+    console.log(`  [Image ${imageIndex}] T2 also refused — using Tier 3 text fallback`);
+  } catch (err) {
+    console.log(`  [Image ${imageIndex}] T2 error: ${err.message} — using Tier 3 text fallback`);
+  }
+
+  // ── TIER 3: No vision call. Synthesize from surrounding text only. ──
+  const cleanContext = surroundingText.replace(/^BEFORE:\s*/i, '').replace(/\n\nAFTER:\s*/i, '\n').trim();
+  if (cleanContext.length > 30) {
+    const fallback = `[Image could not be visually interpreted — contextual description from surrounding text]: ${cleanContext.substring(0, 800)}`;
+    console.log(`  [Image ${imageIndex}] T3 fallback: text-only context saved`);
+    return fallback;
+  }
+
+  console.log(`  [Image ${imageIndex}] All tiers failed — no usable content`);
+  return null;
 }
 
 // ============================================================
