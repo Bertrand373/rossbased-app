@@ -234,12 +234,11 @@ const OnboardingGuide = ({ onComplete }) => {
     if (!targetRect) return { opacity: 0 };
     
     // Square mode — size from height, centered horizontally
-    // Shifts up by 25% of element height to compensate for font descender space
-    // (the visible number sits in the upper ~75% of the em box)
+    // Shifts up by 20% of element height to compensate for font descender space
     // This scales with any font-size / screen size automatically
     if (step.square) {
       const size = targetRect.height + (padding * 2);
-      const descenderShift = targetRect.height * 0.25;
+      const descenderShift = targetRect.height * 0.20;
       return {
         top: `${targetRect.top - padding - descenderShift}px`,
         left: `${targetRect.centerX - size / 2}px`,
