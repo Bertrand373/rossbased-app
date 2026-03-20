@@ -52,7 +52,7 @@ const OnboardingGuide = ({ onComplete }) => {
       position: 'bottom',
       padding: 20,
       square: true,
-      offsetY: -25,
+      offsetY: -45,
       radius: '20px'
     },
     {
