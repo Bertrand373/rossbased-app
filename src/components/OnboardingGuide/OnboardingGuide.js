@@ -52,7 +52,6 @@ const OnboardingGuide = ({ onComplete }) => {
       position: 'bottom',
       padding: 20,
       square: true,
-      offsetY: -35,
       radius: '20px'
     },
     {
@@ -234,13 +233,15 @@ const OnboardingGuide = ({ onComplete }) => {
   const getSpotlightStyle = () => {
     if (!targetRect) return { opacity: 0 };
     
-    const offsetY = step.offsetY || 0;
-    
-    // Square mode — size from height only, centered horizontally, shifted by offsetY
+    // Square mode — size from height, centered horizontally
+    // Shifts up by 25% of element height to compensate for font descender space
+    // (the visible number sits in the upper ~75% of the em box)
+    // This scales with any font-size / screen size automatically
     if (step.square) {
       const size = targetRect.height + (padding * 2);
+      const descenderShift = targetRect.height * 0.25;
       return {
-        top: `${targetRect.top - padding + offsetY}px`,
+        top: `${targetRect.top - padding - descenderShift}px`,
         left: `${targetRect.centerX - size / 2}px`,
         width: `${size}px`,
         height: `${size}px`,
