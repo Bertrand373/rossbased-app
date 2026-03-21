@@ -302,7 +302,7 @@ router.get('/users', adminCheck, async (req, res) => {
     if (sort === 'active') sortObj = { lastSeen: -1 };
 
     const users = await User.find({},
-      'username email currentStreak startDate longestStreak relapseCount isPremium subscription.status subscription.trialEndDate subscription.currentPeriodEnd subscription.grandfatheredAt subscription.stripeSubscriptionId createdAt updatedAt lastSeen benefitTracking urgeLog aiUsage showOnLeaderboard discordUsername'
+      'username email currentStreak startDate longestStreak relapseCount isPremium subscription.status subscription.tier subscription.trialEndDate subscription.currentPeriodEnd subscription.grandfatheredAt subscription.stripeSubscriptionId createdAt updatedAt lastSeen benefitTracking urgeLog aiUsage showOnLeaderboard discordUsername'
     ).sort(sortObj).limit(parseInt(limit)).lean();
 
     res.json({
@@ -325,7 +325,9 @@ router.get('/users', adminCheck, async (req, res) => {
           return false;
         })(),
         subStatus: u.subscription?.status || 'none',
+        subTier: u.subscription?.tier || 'practitioner',
         isOG: !!u.subscription?.grandfatheredAt,
+        hasActiveStripeSub: !!(u.subscription?.stripeSubscriptionId && u.subscription?.currentPeriodEnd && new Date(u.subscription.currentPeriodEnd) > new Date()),
         totalLogs: u.benefitTracking?.length || 0, totalUrges: u.urgeLog?.length || 0,
         aiMessages: u.aiUsage?.lifetimeCount || 0,
         leaderboard: u.showOnLeaderboard || false, discord: u.discordUsername || '',

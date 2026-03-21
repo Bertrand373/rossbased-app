@@ -183,8 +183,8 @@ const OracleHealth = () => {
             <div className="oh-pool-section">
               <span className="oh-pool-title">All Users Today</span>
               {oracleUsage.topUsers.map((u, i) => {
-                const tierLabel = u.tier === 'grandfathered' ? 'GF' : u.tier === 'active' ? 'PRO' : u.tier === 'trialing' ? 'TRIAL' : u.tier === 'discord-only' ? 'DC' : 'FREE';
-                const tierClass = u.tier === 'grandfathered' ? 'gf' : u.tier === 'active' ? 'pro' : u.tier === 'trialing' ? 'pro' : u.tier === 'discord-only' ? 'dc' : 'free';
+                const tierLabel = u.tier === 'OG+ASC' ? 'OG·ASC' : u.tier === 'OG+PRO' ? 'OG·PRO' : u.tier === 'ascended' ? 'ASC' : u.tier === 'grandfathered' ? 'GF' : u.tier === 'active' ? 'PRO' : u.tier === 'trialing' ? 'TRIAL' : u.tier === 'discord-only' ? 'DC' : 'FREE';
+                const tierClass = u.tier === 'OG+ASC' || u.tier === 'OG+PRO' || u.tier === 'ascended' ? 'pro' : u.tier === 'grandfathered' ? 'gf' : u.tier === 'active' ? 'pro' : u.tier === 'trialing' ? 'pro' : u.tier === 'discord-only' ? 'dc' : 'free';
                 return (
                   <div key={i} className="oh-user-row">
                     <span className="oh-user-rank">#{i + 1}</span>

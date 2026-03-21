@@ -2404,7 +2404,7 @@ app.get('/api/admin/oracle-health', authenticate, async (req, res) => {
     // App usage today (users who used Oracle today, based on aiUsage.date)
     const appUsersToday = await User.find(
       { 'aiUsage.date': todayET, 'aiUsage.count': { $gt: 0 } },
-      { username: 1, 'aiUsage.count': 1, 'subscription.status': 1, discordId: 1 }
+      { username: 1, 'aiUsage.count': 1, 'subscription.status': 1, 'subscription.tier': 1, 'subscription.stripeSubscriptionId': 1, 'subscription.currentPeriodEnd': 1, discordId: 1 }
     ).lean();
     const totalAppToday = appUsersToday.reduce((sum, u) => sum + (u.aiUsage?.count || 0), 0);
     
@@ -2443,10 +2443,22 @@ app.get('/api/admin/oracle-health', authenticate, async (req, res) => {
     // --- TOP USERS TODAY (per-user usage breakdown) ---
     const userMap = {};
 
+    // Helper: compute display tier for admin views
+    const getDisplayTier = (sub) => {
+      if (!sub) return 'free';
+      const isGF = sub.status === 'grandfathered';
+      const hasStripe = !!sub.stripeSubscriptionId && sub.currentPeriodEnd && new Date(sub.currentPeriodEnd) > nowCheck;
+      if (isGF && hasStripe) return sub.tier === 'ascended' ? 'OG+ASC' : 'OG+PRO';
+      if (isGF) return 'grandfathered';
+      if (sub.status === 'active') return sub.tier === 'ascended' ? 'ascended' : 'active';
+      if (sub.status === 'trial') return 'trialing';
+      return sub.status || 'free';
+    };
+
     // Add all app users
     for (const u of appUsersToday) {
       const name = u.username;
-      if (!userMap[name]) userMap[name] = { username: name, app: 0, discord: 0, tier: u.subscription?.status || 'free', discordId: u.discordId || null };
+      if (!userMap[name]) userMap[name] = { username: name, app: 0, discord: 0, tier: getDisplayTier(u.subscription), discordId: u.discordId || null };
       userMap[name].app = u.aiUsage?.count || 0;
     }
 
@@ -2465,7 +2477,7 @@ app.get('/api/admin/oracle-health', authenticate, async (req, res) => {
       const linkedApp = appUsersToday.find(u => u.discordId === du.discordUserId);
       const linkedGf = grandfatheredUsers.find(u => u.discordId === du.discordUserId);
       const name = linkedApp?.username || linkedGf?.username || discordNameMap[du.discordUserId] || du.discordUserId;
-      if (!userMap[name]) userMap[name] = { username: name, app: 0, discord: 0, tier: linkedGf ? 'grandfathered' : (linkedApp?.subscription?.status || 'discord-only'), discordId: du.discordUserId };
+      if (!userMap[name]) userMap[name] = { username: name, app: 0, discord: 0, tier: linkedGf ? getDisplayTier(linkedGf.subscription) : (linkedApp ? getDisplayTier(linkedApp.subscription) : 'discord-only'), discordId: du.discordUserId };
       userMap[name].discord = du.count || 0;
     }
 

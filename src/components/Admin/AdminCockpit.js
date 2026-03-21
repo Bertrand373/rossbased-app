@@ -965,8 +965,8 @@ const AdminCockpit = () => {
               {sortedUsers.map((u, i) => {
                 const isOnline = u.lastActive && (Date.now() - new Date(u.lastActive).getTime()) < 10 * 60 * 1000;
                 const ago = timeAgo(u.lastActive);
-                const subLabel = u.subStatus === 'grandfathered' ? 'OG' :
-                  u.subStatus === 'active' ? (u.isOG ? 'OG·PRO' : 'PRO') :
+                const subLabel = u.subStatus === 'grandfathered' ? (u.hasActiveStripeSub ? (u.subTier === 'ascended' ? 'OG·ASC' : 'OG·PRO') : 'OG') :
+                  u.subStatus === 'active' ? (u.isOG ? 'OG·PRO' : (u.subTier === 'ascended' ? 'ASC' : 'PRO')) :
                   u.subStatus === 'trial' ? (u.isOG ? 'OG·TRIAL' : 'TRIAL') :
                   u.subStatus === 'canceled' ? (u.isOG ? 'OG·END' : 'END') :
                   u.subStatus === 'expired' ? (u.isOG ? 'OG' : 'EXP') : null;
