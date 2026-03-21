@@ -12,14 +12,29 @@ const API_URL = process.env.REACT_APP_API_URL || '';
 const Leaderboard = ({ isOpen, onClose }) => {
   const [sheetReady, setSheetReady] = useState(false);
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [dataLoaded, setDataLoaded] = useState(false);
   const panelRef = useRef(null);
 
-  // Animate in
+  // Fetch data FIRST, then animate sheet open — prevents height jump on desktop
   useEffect(() => {
     if (isOpen) {
-      requestAnimationFrame(() => requestAnimationFrame(() => setSheetReady(true)));
-      fetchLeaderboard();
+      setDataLoaded(false);
+      const token = localStorage.getItem('token');
+      fetch(`${API_URL}/api/leaderboard/in-app`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.ok ? res.json() : { users: [] })
+        .then(data => {
+          setUsers(data.users || []);
+          setDataLoaded(true);
+          // Now that data is set and height is stable, animate in
+          requestAnimationFrame(() => requestAnimationFrame(() => setSheetReady(true)));
+        })
+        .catch(() => {
+          setUsers([]);
+          setDataLoaded(true);
+          requestAnimationFrame(() => requestAnimationFrame(() => setSheetReady(true)));
+        });
     } else {
       setSheetReady(false);
     }
@@ -31,24 +46,6 @@ const Leaderboard = ({ isOpen, onClose }) => {
   }, [onClose]);
 
   useSheetSwipe(panelRef, isOpen, closeSheet);
-
-  const fetchLeaderboard = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${API_URL}/api/leaderboard/in-app`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setUsers(data.users || []);
-      }
-    } catch (err) {
-      console.error('Leaderboard fetch failed:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (!isOpen) return null;
 
@@ -68,7 +65,7 @@ const Leaderboard = ({ isOpen, onClose }) => {
 
           {/* List */}
           <div className="lb-list" data-no-swipe>
-            {loading ? (
+            {!dataLoaded ? (
               <div className="lb-loading">
                 <div className="lb-loading-spinner" />
               </div>
@@ -78,7 +75,7 @@ const Leaderboard = ({ isOpen, onClose }) => {
               </div>
             ) : (
               users.map((user, index) => (
-                <div key={user.username || index} className="lb-row">
+                <div key={user.username || index} className="lb-row" style={{ animationDelay: `${index * 30}ms` }}>
                   <span className="lb-rank">{index + 1}</span>
                   <div className="lb-avatar-wrap">
                     <img

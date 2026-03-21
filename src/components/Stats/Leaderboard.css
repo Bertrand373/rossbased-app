@@ -17,10 +17,8 @@
   flex-direction: column;
 }
 
-/* Desktop — prevent height-jump glitch by setting stable min-height */
 @media (min-width: 768px) {
   .sheet-panel.lb-sheet {
-    min-height: 420px;
     max-height: min(720px, calc(100vh - 80px));
   }
 }
@@ -92,7 +90,7 @@
 .lb-list::-webkit-scrollbar { display: none; }
 
 /* =============================================================================
-   ROW
+   ROW — staggered fade-in
    ============================================================================= */
 
 .lb-row {
@@ -101,6 +99,18 @@
   gap: 12px;
   padding: 10px 4px;
   border-bottom: 1px solid var(--border-subtle);
+  animation: lbRowIn 250ms ease both;
+}
+
+@keyframes lbRowIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .lb-row:last-child {
@@ -218,24 +228,23 @@
   color: var(--text-muted);
 }
 
-/* Ghost close button — matches app pattern */
+/* Ghost close button — standalone, no border */
 .lb-close-btn {
   width: 100%;
   padding: 14px 20px;
   background: transparent;
-  border: 1px solid var(--border-subtle);
+  border: none;
   color: var(--text-secondary);
   font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   border-radius: 9999px;
-  transition: border-color 150ms ease, color 150ms ease;
+  transition: color 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .lb-close-btn:hover {
-  border-color: var(--border);
   color: var(--text);
 }
 
