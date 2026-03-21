@@ -429,6 +429,12 @@ async function main() {
   let skipped = 0;
   let interpreted = 0;
   let failed = 0;
+  let duplicates = 0;
+
+  // Deduplication: hash each image to avoid interpreting the same image multiple times
+  // (Twitter archives embed the profile avatar next to every single tweet)
+  const crypto = require('crypto');
+  const seenImageHashes = new Map(); // hash -> description (reuse for dupes)
 
   for (let i = 0; i < imageSections.length; i++) {
     const section = imageSections[i];
@@ -446,6 +452,19 @@ async function main() {
       continue;
     }
 
+    // Deduplication check — hash the first 10KB of image data (fast, unique enough)
+    const hashInput = imageData.base64.substring(0, 14000); // ~10KB of base64
+    const imageHash = crypto.createHash('md5').update(hashInput).digest('hex');
+
+    if (seenImageHashes.has(imageHash)) {
+      duplicates++;
+      // Don't log every single duplicate — just every 100th
+      if (duplicates % 100 === 1) {
+        console.log(`  [Image ${section.imageIndex}] Duplicate #${duplicates} — skipping (reusing first interpretation)`);
+      }
+      continue;
+    }
+
     const description = await interpretImage(
       imageData.base64,
       imageData.contentType,
@@ -454,6 +473,9 @@ async function main() {
     );
 
     if (description) {
+      // Cache this interpretation for any future duplicates
+      seenImageHashes.set(imageHash, description);
+      
       imageDescriptions.push({
         imageIndex: section.imageIndex,
         description: description,
@@ -471,11 +493,12 @@ async function main() {
 
     // Progress
     if ((i + 1) % 10 === 0) {
-      console.log(`  Progress: ${i + 1}/${imageSections.length} (${interpreted} interpreted, ${skipped} skipped)`);
+      console.log(`  Progress: ${i + 1}/${imageSections.length} (${interpreted} interpreted, ${skipped} skipped, ${duplicates} duplicates)`);
     }
   }
 
-  console.log(`  Done: ${interpreted} interpreted, ${skipped} skipped, ${failed} failed`);
+  console.log(`  Done: ${interpreted} interpreted, ${skipped} skipped, ${duplicates} duplicates`);
+  console.log(`  Unique images: ${seenImageHashes.size}`);
 
   // Build combined content for chunking
   console.log('[5/6] Building chunks...');
