@@ -1330,8 +1330,13 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     // --- SHARED POOL: Grandfathered users have a combined Discord+App daily limit ---
     const isGrandfathered = user.subscription?.status === 'grandfathered';
     const { hasPremium: userHasPremium } = checkPremiumAccess(user); // Always use subscription-aware check — never raw isPremium field (can be stale from beta)
-    const isAscended = userHasPremium && !isGrandfathered && user.subscription?.tier === 'ascended';
-    const discordUsageToday = isGrandfathered ? await getDiscordUsageForUser(user) : 0;
+    // OG users with active Stripe subs get their PAID tier limits, not OG 1/day
+    const hasActiveStripeSub = !!user.subscription?.stripeSubscriptionId && 
+      user.subscription?.currentPeriodEnd && 
+      new Date(user.subscription.currentPeriodEnd) > new Date();
+    const isAscended = user.subscription?.tier === 'ascended' && (hasActiveStripeSub || (userHasPremium && !isGrandfathered));
+    const isPureOG = isGrandfathered && !hasActiveStripeSub;
+    const discordUsageToday = isPureOG ? await getDiscordUsageForUser(user) : 0;
     const combinedCount = currentCount + discordUsageToday;
     
     // --- ANTI-ABUSE: IP-based multi-account detection (free users only) ---
@@ -1380,20 +1385,20 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
         error: 'Daily limit reached',
         message: `You've used all ${BETA_DAILY_LIMIT} daily messages. Resets at midnight.`
       });
-    } else if (!isBetaPeriod && isGrandfathered && combinedCount >= GRANDFATHERED_DAILY_LIMIT) {
-      return res.status(429).json({ 
-        error: 'Daily limit reached',
-        message: `You've used all ${GRANDFATHERED_DAILY_LIMIT} daily messages. Resets at midnight.`
-      });
     } else if (!isBetaPeriod && isAscended && currentCount >= ASCENDED_DAILY_LIMIT) {
       return res.status(429).json({ 
         error: 'Daily limit reached',
         message: `You've used all ${ASCENDED_DAILY_LIMIT} daily messages. Resets at midnight.`
       });
-    } else if (!isBetaPeriod && userHasPremium && !isGrandfathered && !isAscended && currentCount >= PREMIUM_DAILY_LIMIT) {
+    } else if (!isBetaPeriod && userHasPremium && !isAscended && !isPureOG && currentCount >= PREMIUM_DAILY_LIMIT) {
       return res.status(429).json({ 
         error: 'Daily limit reached',
         message: `You've used all ${PREMIUM_DAILY_LIMIT} daily messages. Resets at midnight.`
+      });
+    } else if (!isBetaPeriod && isPureOG && combinedCount >= GRANDFATHERED_DAILY_LIMIT) {
+      return res.status(429).json({ 
+        error: 'Daily limit reached',
+        message: `You've used all ${GRANDFATHERED_DAILY_LIMIT} daily messages. Resets at midnight.`
       });
     } else if (!isBetaPeriod && !userHasPremium && currentWeeklyCount >= FREE_WEEKLY_LIMIT) {
       return res.status(429).json({ 
@@ -1407,15 +1412,15 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     if (isBetaPeriod) {
       preStreamRemaining = BETA_DAILY_LIMIT - currentCount - 1;
       userTier = 'beta';
-    } else if (isGrandfathered) {
-      preStreamRemaining = GRANDFATHERED_DAILY_LIMIT - combinedCount - 1;
-      userTier = 'grandfathered';
     } else if (isAscended) {
       preStreamRemaining = ASCENDED_DAILY_LIMIT - currentCount - 1;
       userTier = 'ascended';
-    } else if (userHasPremium) {
+    } else if (userHasPremium && !isPureOG) {
       preStreamRemaining = PREMIUM_DAILY_LIMIT - currentCount - 1;
       userTier = 'premium';
+    } else if (isPureOG) {
+      preStreamRemaining = GRANDFATHERED_DAILY_LIMIT - combinedCount - 1;
+      userTier = 'grandfathered';
     } else {
       preStreamRemaining = FREE_WEEKLY_LIMIT - currentWeeklyCount - 1;
       userTier = 'free';
@@ -1839,18 +1844,18 @@ Examples:
       effectiveUsed = currentCount + 1;
       effectiveLimit = BETA_DAILY_LIMIT;
       messagesRemaining = BETA_DAILY_LIMIT - effectiveUsed;
-    } else if (isGrandfathered) {
-      effectiveUsed = combinedCount + 1; // app + discord combined
-      effectiveLimit = GRANDFATHERED_DAILY_LIMIT;
-      messagesRemaining = GRANDFATHERED_DAILY_LIMIT - effectiveUsed;
     } else if (isAscended) {
       effectiveUsed = currentCount + 1;
       effectiveLimit = ASCENDED_DAILY_LIMIT;
       messagesRemaining = ASCENDED_DAILY_LIMIT - effectiveUsed;
-    } else if (userHasPremium) {
+    } else if (userHasPremium && !isPureOG) {
       effectiveUsed = currentCount + 1;
       effectiveLimit = PREMIUM_DAILY_LIMIT;
       messagesRemaining = PREMIUM_DAILY_LIMIT - effectiveUsed;
+    } else if (isPureOG) {
+      effectiveUsed = combinedCount + 1; // app + discord combined
+      effectiveLimit = GRANDFATHERED_DAILY_LIMIT;
+      messagesRemaining = GRANDFATHERED_DAILY_LIMIT - effectiveUsed;
     } else {
       effectiveUsed = isNewWeek ? 1 : currentWeeklyCount + 1;
       effectiveLimit = FREE_WEEKLY_LIMIT;
@@ -1931,8 +1936,12 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
     let messagesUsed, messagesLimit, messagesRemaining, resetsAt;
     const isGrandfathered = user.subscription?.status === 'grandfathered';
     const { hasPremium: userHasPremium } = checkPremiumAccess(user); // Always use subscription-aware check — never raw isPremium field (can be stale from beta)
-    const isAscended = userHasPremium && !isGrandfathered && user.subscription?.tier === 'ascended';
-    const discordUsageToday = isGrandfathered ? await getDiscordUsageForUser(user) : 0;
+    const hasActiveStripeSub = !!user.subscription?.stripeSubscriptionId && 
+      user.subscription?.currentPeriodEnd && 
+      new Date(user.subscription.currentPeriodEnd) > new Date();
+    const isAscended = user.subscription?.tier === 'ascended' && (hasActiveStripeSub || (userHasPremium && !isGrandfathered));
+    const isPureOG = isGrandfathered && !hasActiveStripeSub;
+    const discordUsageToday = isPureOG ? await getDiscordUsageForUser(user) : 0;
     const isAdminUser = ['rossbased', 'ross'].includes(user.username?.toLowerCase());
 
     if (isAdminUser) {
@@ -1945,20 +1954,20 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
       messagesLimit = BETA_DAILY_LIMIT;
       messagesRemaining = BETA_DAILY_LIMIT - currentCount;
       resetsAt = 'midnight';
-    } else if (isGrandfathered) {
-      messagesUsed = currentCount + discordUsageToday;
-      messagesLimit = GRANDFATHERED_DAILY_LIMIT;
-      messagesRemaining = GRANDFATHERED_DAILY_LIMIT - messagesUsed;
-      resetsAt = 'midnight';
     } else if (isAscended) {
       messagesUsed = currentCount;
       messagesLimit = ASCENDED_DAILY_LIMIT;
       messagesRemaining = ASCENDED_DAILY_LIMIT - currentCount;
       resetsAt = 'midnight';
-    } else if (userHasPremium) {
+    } else if (userHasPremium && !isPureOG) {
       messagesUsed = currentCount;
       messagesLimit = PREMIUM_DAILY_LIMIT;
       messagesRemaining = PREMIUM_DAILY_LIMIT - currentCount;
+      resetsAt = 'midnight';
+    } else if (isPureOG) {
+      messagesUsed = currentCount + discordUsageToday;
+      messagesLimit = GRANDFATHERED_DAILY_LIMIT;
+      messagesRemaining = GRANDFATHERED_DAILY_LIMIT - messagesUsed;
       resetsAt = 'midnight';
     } else {
       messagesUsed = currentWeeklyCount;
@@ -2024,28 +2033,32 @@ app.get('/api/ai-usage/:username', authenticate, async (req, res) => {
     let messagesUsed, messagesLimit, messagesRemaining, resetsAt;
     const isGrandfathered = user.subscription?.status === 'grandfathered';
     const { hasPremium: userHasPremium } = checkPremiumAccess(user); // Always use subscription-aware check — never raw isPremium field (can be stale from beta)
-    const isAscended = userHasPremium && !isGrandfathered && user.subscription?.tier === 'ascended';
-    const discordUsageToday = isGrandfathered ? await getDiscordUsageForUser(user) : 0;
+    const hasActiveStripeSub = !!user.subscription?.stripeSubscriptionId && 
+      user.subscription?.currentPeriodEnd && 
+      new Date(user.subscription.currentPeriodEnd) > new Date();
+    const isAscended = user.subscription?.tier === 'ascended' && (hasActiveStripeSub || (userHasPremium && !isGrandfathered));
+    const isPureOG = isGrandfathered && !hasActiveStripeSub;
+    const discordUsageToday = isPureOG ? await getDiscordUsageForUser(user) : 0;
 
     if (isBetaPeriod) {
       messagesUsed = currentCount;
       messagesLimit = BETA_DAILY_LIMIT;
       messagesRemaining = BETA_DAILY_LIMIT - currentCount;
       resetsAt = 'midnight';
-    } else if (isGrandfathered) {
-      messagesUsed = currentCount + discordUsageToday;
-      messagesLimit = GRANDFATHERED_DAILY_LIMIT;
-      messagesRemaining = GRANDFATHERED_DAILY_LIMIT - messagesUsed;
-      resetsAt = 'midnight';
     } else if (isAscended) {
       messagesUsed = currentCount;
       messagesLimit = ASCENDED_DAILY_LIMIT;
       messagesRemaining = ASCENDED_DAILY_LIMIT - currentCount;
       resetsAt = 'midnight';
-    } else if (userHasPremium) {
+    } else if (userHasPremium && !isPureOG) {
       messagesUsed = currentCount;
       messagesLimit = PREMIUM_DAILY_LIMIT;
       messagesRemaining = PREMIUM_DAILY_LIMIT - currentCount;
+      resetsAt = 'midnight';
+    } else if (isPureOG) {
+      messagesUsed = currentCount + discordUsageToday;
+      messagesLimit = GRANDFATHERED_DAILY_LIMIT;
+      messagesRemaining = GRANDFATHERED_DAILY_LIMIT - messagesUsed;
       resetsAt = 'midnight';
     } else {
       messagesUsed = currentWeeklyCount;

@@ -805,15 +805,12 @@ const isRateLimited = async (userId, username) => {
     const isGrandfathered = linkedUser.subscription?.status === 'grandfathered';
     const { hasPremium: userHasPremium } = checkPremiumAccess(linkedUser);
 
-    if (isGrandfathered) {
-      // GF: 1/day shared pool across Discord + App
-      if (combinedToday >= GRANDFATHERED_DAILY_POOL) {
-        return { limited: true, reason: 'daily' };
-      }
-      return { limited: false, tier: 'grandfathered', remaining: GRANDFATHERED_DAILY_POOL - combinedToday };
-    }
-
-    const isAscended = userHasPremium && linkedUser.subscription?.tier === 'ascended';
+    // OG users with active Stripe subs get their PAID tier limits, not OG 1/day
+    const hasActiveStripeSub = !!linkedUser.subscription?.stripeSubscriptionId && 
+      linkedUser.subscription?.currentPeriodEnd && 
+      new Date(linkedUser.subscription.currentPeriodEnd) > new Date();
+    const isAscended = linkedUser.subscription?.tier === 'ascended' && (hasActiveStripeSub || (userHasPremium && !isGrandfathered));
+    const isPureOG = isGrandfathered && !hasActiveStripeSub;
 
     if (isAscended) {
       // Ascended: 9/day shared pool across Discord + App
@@ -823,12 +820,20 @@ const isRateLimited = async (userId, username) => {
       return { limited: false, tier: 'ascended', remaining: ASCENDED_DAILY_LIMIT - combinedToday };
     }
 
-    if (userHasPremium) {
+    if (userHasPremium && !isPureOG) {
       // Paid (Practitioner): 3/day shared pool across Discord + App
       if (combinedToday >= PREMIUM_DAILY_LIMIT) {
         return { limited: true, reason: 'daily' };
       }
       return { limited: false, tier: 'premium', remaining: PREMIUM_DAILY_LIMIT - combinedToday };
+    }
+
+    if (isPureOG) {
+      // Pure OG (no active Stripe sub): 1/day shared pool across Discord + App
+      if (combinedToday >= GRANDFATHERED_DAILY_POOL) {
+        return { limited: true, reason: 'daily' };
+      }
+      return { limited: false, tier: 'grandfathered', remaining: GRANDFATHERED_DAILY_POOL - combinedToday };
     }
 
     // Free linked: 3/week shared pool across Discord + App
@@ -2577,16 +2582,19 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       if (linkedUser) {
         const { hasPremium: userHasPremium } = checkPremiumAccess(linkedUser);
         const isGrandfathered = linkedUser.subscription?.status === 'grandfathered';
+        const hasActiveStripeSub = !!linkedUser.subscription?.stripeSubscriptionId && 
+          linkedUser.subscription?.currentPeriodEnd && 
+          new Date(linkedUser.subscription.currentPeriodEnd) > new Date();
         const appCountNow = (linkedUser.aiUsage?.date === todayStr) ? (linkedUser.aiUsage?.count || 0) : 0;
-        if (isGrandfathered) {
-          discordUserTier = 'grandfathered';
-          remaining = GRANDFATHERED_DAILY_POOL - (discordUsedNow + appCountNow);
-        } else if (userHasPremium && linkedUser.subscription?.tier === 'ascended') {
+        if (linkedUser.subscription?.tier === 'ascended' && (hasActiveStripeSub || (userHasPremium && !isGrandfathered))) {
           discordUserTier = 'ascended';
           remaining = ASCENDED_DAILY_LIMIT - (discordUsedNow + appCountNow);
-        } else if (userHasPremium) {
+        } else if (userHasPremium && !(isGrandfathered && !hasActiveStripeSub)) {
           discordUserTier = 'premium';
           remaining = PREMIUM_DAILY_LIMIT - (discordUsedNow + appCountNow);
+        } else if (isGrandfathered) {
+          discordUserTier = 'grandfathered';
+          remaining = GRANDFATHERED_DAILY_POOL - (discordUsedNow + appCountNow);
         } else {
           discordUserTier = 'free';
           const weeklyUsed = linkedUser.aiUsage?.weeklyCount || 0;
