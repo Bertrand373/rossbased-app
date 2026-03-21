@@ -6,6 +6,7 @@
 const { Client, GatewayIntentBits, Partials, EmbedBuilder } = require('discord.js');
 const Anthropic = require('@anthropic-ai/sdk');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
+const { getKnowledgeManifest } = require('./services/knowledgeManifest');
 const { logIfRelevant, generateWeeklyInsight, generateObservations, detectAnomaly, generatePulseAlert, getPulseStats } = require('./services/oracleInsight');
 const { evaluateAndGenerate, onRelevantEvent } = require('./services/communityPulseEngine');
 const CommunityPulse = require('./models/CommunityPulse');
@@ -2424,6 +2425,8 @@ client.on('messageCreate', async (message) => {
     
     // RAG: Retrieve relevant knowledge
     const ragContext = await retrieveKnowledge(content, { limit: 5, maxTokens: 2000 });
+    // Knowledge manifest: Oracle's awareness of what it knows
+    const knowledgeManifest = await getKnowledgeManifest();
     
     // --- LINKED USER CONTEXT ---
     // Check if this Discord user has a linked TitanTrack account
@@ -2526,7 +2529,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       ? `\n\n${outcomePatterns}\nReference these patterns naturally when relevant. Say things like "based on what I've seen with practitioners at your phase" or "most men in your situation who..." Never cite exact percentages unless it strengthens the point.\n`
       : '';
     const lunarContext = buildLunarContext();
-    const systemWithKnowledge = SYSTEM_PROMPT + dateContext + lunarContext + personalContext + communityContext + outcomeContext + ragContext;
+    const systemWithKnowledge = SYSTEM_PROMPT + dateContext + lunarContext + knowledgeManifest + personalContext + communityContext + outcomeContext + ragContext;
     
     // Call Claude (with silent retry on overload)
     const response = await callClaude({

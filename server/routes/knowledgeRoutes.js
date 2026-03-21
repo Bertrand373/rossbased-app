@@ -435,6 +435,34 @@ router.put('/document/:parentId/category', adminCheck, async (req, res) => {
   }
 });
 
+// --- GET /document/:parentId/chunks - Preview document chunks ---
+router.get('/document/:parentId/chunks', adminCheck, async (req, res) => {
+  try {
+    const { parentId } = req.params;
+    const { page = 1, limit = 20 } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const chunks = await KnowledgeChunk.find({ parentId })
+      .sort({ chunkIndex: 1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .select('content chunkIndex source tokenEstimate protected')
+      .lean();
+
+    const total = await KnowledgeChunk.countDocuments({ parentId });
+
+    res.json({
+      chunks,
+      total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / parseInt(limit))
+    });
+  } catch (error) {
+    console.error('Chunk preview error:', error);
+    res.status(500).json({ error: 'Failed to load chunks' });
+  }
+});
+
 // ============================================================
 // SEARCH / RETRIEVAL (used by Oracle bots)
 // This is the core RAG function

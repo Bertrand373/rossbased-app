@@ -40,12 +40,42 @@ const KnowledgeBase = () => {
   const [docSource, setDocSource] = useState('all');         // all, uploaded, oracle, discord
   const [filterCategory, setFilterCategory] = useState('all'); // all, or any category value
   const [filterStatus, setFilterStatus] = useState('all');    // all, enabled, disabled
+  const [expandedDoc, setExpandedDoc] = useState(null);       // parentId of doc being previewed
+  const [previewChunks, setPreviewChunks] = useState([]);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewPage, setPreviewPage] = useState(1);
+  const [previewTotal, setPreviewTotal] = useState(0);
 
   const docsRef = useRef(null);
 
   const headers = {
     'Authorization': `Bearer ${token}`,
     'Content-Type': 'application/json'
+  };
+
+  // Fetch chunks for document preview
+  const fetchChunks = async (parentId, page = 1) => {
+    setPreviewLoading(true);
+    try {
+      const res = await fetch(`${API}/api/knowledge/document/${parentId}/chunks?page=${page}&limit=10`, { headers });
+      const data = await res.json();
+      setPreviewChunks(data.chunks || []);
+      setPreviewTotal(data.total || 0);
+      setPreviewPage(page);
+    } catch (err) {
+      setPreviewChunks([]);
+    }
+    setPreviewLoading(false);
+  };
+
+  const toggleDocPreview = (parentId) => {
+    if (expandedDoc === parentId) {
+      setExpandedDoc(null);
+      setPreviewChunks([]);
+    } else {
+      setExpandedDoc(parentId);
+      fetchChunks(parentId, 1);
+    }
   };
 
   const fetchStats = useCallback(async () => {
@@ -482,40 +512,81 @@ const KnowledgeBase = () => {
               ) : (
                 <div className="kb-doc-list">
                   {filtered.map(doc => (
-                    <div key={doc._id} className={`kb-doc ${!doc.enabled ? 'kb-doc-disabled' : ''}`}>
-                      <div className="kb-doc-left">
-                        <div className={`kb-doc-dot ${doc.enabled ? 'on' : 'off'}`} />
-                        <div className="kb-doc-info">
-                          <span className="kb-doc-name">
-                            {doc.name}
-                            {doc.protected && <span className="kb-protected-badge">PROTECTED</span>}
-                          </span>
-                          <span className="kb-doc-meta">
-                            {doc.type} · {doc.chunks} chunks · ~{doc.totalTokens.toLocaleString()} tokens{doc.author ? ` · by ${doc.author}` : ''}
-                          </span>
-                          {doc.createdAt && (
-                            <span className="kb-doc-date">{timeAgo(doc.createdAt)}</span>
+                    <React.Fragment key={doc._id}>
+                      <div className={`kb-doc ${!doc.enabled ? 'kb-doc-disabled' : ''} ${expandedDoc === doc._id ? 'kb-doc-expanded' : ''}`}>
+                        <div className="kb-doc-left" onClick={() => toggleDocPreview(doc._id)} style={{ cursor: 'pointer' }}>
+                          <div className={`kb-doc-dot ${doc.enabled ? 'on' : 'off'}`} />
+                          <div className="kb-doc-info">
+                            <span className="kb-doc-name">
+                              {doc.name}
+                              {doc.protected && <span className="kb-protected-badge">PROTECTED</span>}
+                              <span className="kb-preview-arrow">{expandedDoc === doc._id ? '▾' : '▸'}</span>
+                            </span>
+                            <span className="kb-doc-meta">
+                              {doc.type} · {doc.chunks} chunks · ~{doc.totalTokens.toLocaleString()} tokens{doc.author ? ` · by ${doc.author}` : ''}
+                            </span>
+                            {doc.createdAt && (
+                              <span className="kb-doc-date">{timeAgo(doc.createdAt)}</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="kb-doc-actions">
+                          <select value={doc.category} onChange={e => handleCategoryChange(doc._id, e.target.value)} className="kb-cat-select">
+                            {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                          </select>
+                          <button className={`kb-toggle ${doc.enabled ? 'on' : 'off'}`}
+                            onClick={() => handleToggle(doc._id, doc.enabled)}>
+                            {doc.enabled ? 'ON' : 'OFF'}
+                          </button>
+                          {deleteConfirm === doc._id ? (
+                            <div className="kb-confirm-row">
+                              <button onClick={() => handleDelete(doc._id)} className="kb-confirm-yes">Delete</button>
+                              <button onClick={() => setDeleteConfirm(null)} className="kb-confirm-no">×</button>
+                            </div>
+                          ) : (
+                            <button className="kb-remove" onClick={() => setDeleteConfirm(doc._id)}>Remove</button>
                           )}
                         </div>
                       </div>
-                      <div className="kb-doc-actions">
-                        <select value={doc.category} onChange={e => handleCategoryChange(doc._id, e.target.value)} className="kb-cat-select">
-                          {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-                        </select>
-                        <button className={`kb-toggle ${doc.enabled ? 'on' : 'off'}`}
-                          onClick={() => handleToggle(doc._id, doc.enabled)}>
-                          {doc.enabled ? 'ON' : 'OFF'}
-                        </button>
-                        {deleteConfirm === doc._id ? (
-                          <div className="kb-confirm-row">
-                            <button onClick={() => handleDelete(doc._id)} className="kb-confirm-yes">Delete</button>
-                            <button onClick={() => setDeleteConfirm(null)} className="kb-confirm-no">×</button>
-                          </div>
-                        ) : (
-                          <button className="kb-remove" onClick={() => setDeleteConfirm(doc._id)}>Remove</button>
-                        )}
-                      </div>
-                    </div>
+                      {/* Chunk Preview Panel */}
+                      {expandedDoc === doc._id && (
+                        <div className="kb-chunk-preview">
+                          {previewLoading ? (
+                            <div className="kb-chunk-loading">Loading chunks...</div>
+                          ) : (
+                            <>
+                              <div className="kb-chunk-list">
+                                {previewChunks.map((chunk, ci) => (
+                                  <div key={ci} className="kb-chunk-item">
+                                    <div className="kb-chunk-header">
+                                      <span className="kb-chunk-index">#{chunk.chunkIndex}</span>
+                                      <span className="kb-chunk-type">{chunk.source?.type || 'text'}</span>
+                                      <span className="kb-chunk-tokens">~{chunk.tokenEstimate} tokens</span>
+                                    </div>
+                                    <div className="kb-chunk-content">{chunk.content}</div>
+                                  </div>
+                                ))}
+                              </div>
+                              {previewTotal > 10 && (
+                                <div className="kb-chunk-pagination">
+                                  <button
+                                    disabled={previewPage <= 1}
+                                    onClick={() => fetchChunks(doc._id, previewPage - 1)}
+                                    className="kb-chunk-page-btn">← Prev</button>
+                                  <span className="kb-chunk-page-info">
+                                    {previewPage} / {Math.ceil(previewTotal / 10)} ({previewTotal} chunks)
+                                  </span>
+                                  <button
+                                    disabled={previewPage >= Math.ceil(previewTotal / 10)}
+                                    onClick={() => fetchChunks(doc._id, previewPage + 1)}
+                                    className="kb-chunk-page-btn">Next →</button>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </React.Fragment>
                   ))}
                 </div>
               )}

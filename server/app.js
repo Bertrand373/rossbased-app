@@ -27,6 +27,7 @@ const analyticsRoutes = require('./routes/analyticsRoutes');
 const adminRevenueRoutes = require('./routes/adminRevenue');
 const { initializeSchedulers } = require('./services/notificationScheduler');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
+const { getKnowledgeManifest } = require('./services/knowledgeManifest');
 const { getCommunityPulse } = require('./services/communityPulse');
 const { getOutcomePatterns } = require('./services/outcomeAggregation');
 const { runYouTubeFetch, getYouTubeStats } = require('./services/youtubeComments');
@@ -1557,6 +1558,8 @@ When in doubt, shorter. Say what needs to be said. Stop.
 
     // RAG: Retrieve relevant knowledge
     const ragContext = await retrieveKnowledge(message, { limit: 5, maxTokens: 2000 });
+    // Knowledge manifest: Oracle's awareness of what it knows
+    const knowledgeManifest = await getKnowledgeManifest();
     // Inject community pulse between system prompt and RAG context
     const communityContext = communityPulse 
       ? `\n\nCOMMUNITY PULSE (what the broader TitanTrack community is experiencing right now):\n${communityPulse}\nUse this awareness naturally. You can reference community patterns when relevant ("you're not alone in this — several practitioners are hitting the same wall right now"). Never name specific members.\n`
@@ -1594,7 +1597,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       }
     }
 
-    const systemWithKnowledge = systemPrompt + dateContext + communityContext + outcomeContext + ragContext + limitNudgeContext;
+    const systemWithKnowledge = systemPrompt + dateContext + knowledgeManifest + communityContext + outcomeContext + ragContext + limitNudgeContext;
 
     // Set up SSE headers
     res.setHeader('Content-Type', 'text/event-stream');
