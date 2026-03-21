@@ -1203,7 +1203,6 @@ async function gatherHealthData() {
   ).lean();
 
   const poolUsage = [];
-  const now = new Date();
   for (const gf of grandfathered) {
     const ac = gf.aiUsage?.date === today ? (gf.aiUsage?.count || 0) : 0;
     const dr = discordUsageRecords.find(d => d.discordUserId === gf.discordId);
