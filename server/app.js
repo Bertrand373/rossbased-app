@@ -755,6 +755,18 @@ app.get('/api/leaderboard', async (req, res) => {
   }
 });
 
+// In-app leaderboard — 180+ day streaks for the app's leaderboard sheet
+app.get('/api/leaderboard/in-app', authenticate, async (req, res) => {
+  try {
+    const { getInAppLeaderboardUsers } = require('./services/leaderboardService');
+    const users = await getInAppLeaderboardUsers();
+    res.json({ success: true, users });
+  } catch (err) {
+    console.error('In-app leaderboard error:', err);
+    res.status(500).json({ error: 'Failed to fetch leaderboard' });
+  }
+});
+
 // Get user's rank on leaderboard
 app.get('/api/leaderboard/rank/:username', authenticate, async (req, res) => {
   try {

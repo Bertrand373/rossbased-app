@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema({
   discordDisplayName: String, // What people see in Discord (global_name)
   discordOracleSync: { type: Boolean, default: true }, // Oracle shares context across app & Discord
   timezone: { type: String, default: '' }, // IANA timezone (e.g. 'America/New_York') — set by app on each Oracle use
+  country: { type: String, default: '' }, // ISO 3166-1 alpha-2 country code (e.g. 'US', 'NG', 'GB')
   startDate: Date,
   
   // NEW: Birth date for Energy Almanac calculations (numerology, Chinese zodiac)

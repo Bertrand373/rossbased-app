@@ -12,6 +12,7 @@ import toast from 'react-hot-toast';
 
 // Import extracted components
 import { StatCardModal } from './StatsComponents';
+import Leaderboard from './Leaderboard';
 import EmotionalTimeline from '../EmotionalTimeline/EmotionalTimeline';
 // Import ShareCard component
 import ShareCard from '../ShareCard/ShareCard';
@@ -44,6 +45,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [showStatModal, setShowStatModal] = useState(false);
   const [selectedStatCard, setSelectedStatCard] = useState(null);
   const [showMilestonesSheet, setShowMilestonesSheet] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [milestonesView, setMilestonesView] = useState('list'); // 'list' | 'detail'
   const [morphing, setMorphing] = useState(false);
 
@@ -343,6 +345,22 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           <span className="stats-header-title">Your Stats</span>
           <div className="stats-view-toggle">
             <button
+              className="stats-vt-btn stats-lb-btn"
+              onClick={() => setShowLeaderboard(true)}
+              aria-label="Leaderboard"
+              style={{ padding: '8px 10px', display: 'flex', alignItems: 'center' }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                <path d="M4 22h16"/>
+                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+              </svg>
+            </button>
+            <span className="stats-vt-div" />
+            <button
               className={`stats-vt-btn ${activeView === 'analytics' ? 'active' : ''}`}
               onClick={() => setActiveView('analytics')}
             >Analytics</button>
@@ -535,6 +553,9 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     </div>
 
     {/* ====== ALL MODALS/SHEETS RENDER OUTSIDE stats-page so overflow:auto doesn't trap them ====== */}
+
+    {/* Leaderboard Sheet */}
+    <Leaderboard isOpen={showLeaderboard} onClose={() => setShowLeaderboard(false)} />
 
     <StatCardModal
       showModal={showStatModal}

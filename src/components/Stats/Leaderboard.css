@@ -1,0 +1,207 @@
+/* src/components/Stats/Leaderboard.css */
+/* Content styles — positioning handled by BottomSheet.css */
+
+/* =============================================================================
+   SHEET OVERRIDES
+   ============================================================================= */
+
+.sheet-backdrop.lb-backdrop {
+  z-index: 9000;
+}
+
+.sheet-panel.lb-sheet {
+  z-index: 9001;
+  max-height: 85dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =============================================================================
+   CONTENT WRAPPER
+   ============================================================================= */
+
+.lb-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+}
+
+/* =============================================================================
+   HEADER
+   ============================================================================= */
+
+.lb-header {
+  text-align: center;
+  padding-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.lb-eyebrow {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.lb-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.03em;
+  margin: 0 0 4px 0;
+}
+
+.lb-subtitle {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-tertiary);
+}
+
+/* =============================================================================
+   LIST — scrollable
+   ============================================================================= */
+
+.lb-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 4px 0;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 8px, black calc(100% - 8px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8px, black calc(100% - 8px), transparent 100%);
+}
+
+.lb-list::-webkit-scrollbar { display: none; }
+
+/* =============================================================================
+   ROW
+   ============================================================================= */
+
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.lb-row:last-child {
+  border-bottom: none;
+}
+
+.lb-rank {
+  width: 24px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-align: center;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Top 3 rank styling */
+.lb-row:nth-child(1) .lb-rank { color: var(--text); }
+.lb-row:nth-child(2) .lb-rank { color: var(--text-secondary); }
+.lb-row:nth-child(3) .lb-rank { color: var(--text-secondary); }
+
+.lb-avatar-wrap {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.lb-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.lb-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.lb-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lb-flag {
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+.lb-streak {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* =============================================================================
+   LOADING / EMPTY
+   ============================================================================= */
+
+.lb-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+.lb-loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border);
+  border-top-color: var(--text-secondary);
+  border-radius: 50%;
+  animation: lbSpin 0.8s linear infinite;
+}
+
+@keyframes lbSpin {
+  to { transform: rotate(360deg); }
+}
+
+.lb-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+/* =============================================================================
+   FOOTER
+   ============================================================================= */
+
+.lb-footer {
+  text-align: center;
+  padding: 12px 0 0;
+  flex-shrink: 0;
+}
+
+.lb-footer span {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}

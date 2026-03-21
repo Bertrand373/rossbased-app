@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import './Profile.css';
 import '../../styles/BottomSheet.css';
 import useSheetSwipe from '../../hooks/useSheetSwipe';
+import { COUNTRIES } from '../../utils/countries';
 import { useNotifications } from '../../hooks/useNotifications';
 // Theme context
 import { useTheme } from '../../App';
@@ -41,6 +42,7 @@ const Profile = ({
   const [username, setUsername] = useState(userData.username || '');
   const [email, setEmail] = useState(userData.email || '');
   const [discordUsername, setDiscordUsername] = useState(userData.discordUsername || '');
+  const [country, setCountry] = useState(userData.country || '');
   const [showOnLeaderboard, setShowOnLeaderboard] = useState(userData.showOnLeaderboard || false);
   const [discordOracleSync, setDiscordOracleSync] = useState(userData.discordOracleSync !== false); // default ON
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -433,7 +435,8 @@ const Profile = ({
       username: username.trim(),
       email: email.trim(),
       discordUsername: discordUsername.trim(),
-      birthDate: parsedBirthDate
+      birthDate: parsedBirthDate,
+      country: country
     });
     
     if (success) {
@@ -452,6 +455,7 @@ const Profile = ({
     setUsername(userData.username || '');
     setEmail(userData.email || '');
     setDiscordUsername(userData.discordUsername || '');
+    setCountry(userData.country || '');
     // Extract UTC date to avoid timezone shift
     if (userData.birthDate) {
       const d = new Date(userData.birthDate);
@@ -714,6 +718,35 @@ const Profile = ({
                 max={format(new Date(), 'yyyy-MM-dd')}
               />
               <span className="form-hint">Enables personalized numerology & zodiac insights</span>
+            </div>
+
+            <div className="form-group">
+              <label>Country</label>
+              <select
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                disabled={!isEditingProfile}
+                style={{
+                  width: '100%',
+                  padding: '16px',
+                  background: 'var(--border-subtle)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '12px',
+                  color: country ? 'var(--text)' : 'var(--text-tertiary)',
+                  fontSize: '0.9375rem',
+                  fontFamily: 'inherit',
+                  WebkitAppearance: 'none',
+                  appearance: 'none',
+                  opacity: !isEditingProfile ? 0.4 : 1,
+                  cursor: !isEditingProfile ? 'not-allowed' : 'pointer'
+                }}
+              >
+                <option value="">Select country</option>
+                {COUNTRIES.map(c => (
+                  <option key={c.code} value={c.code}>{c.name}</option>
+                ))}
+              </select>
+              <span className="form-hint">Shows your flag on the leaderboard</span>
             </div>
 
             {/* Save/Cancel buttons - only visible when editing, stacked */}
