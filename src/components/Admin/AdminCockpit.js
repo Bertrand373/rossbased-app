@@ -970,12 +970,13 @@ const AdminCockpit = () => {
                   u.subStatus === 'trial' ? (u.isOG ? 'OG·TRIAL' : 'TRIAL') :
                   u.subStatus === 'canceled' ? (u.isOG ? 'OG·END' : 'END') :
                   u.subStatus === 'expired' ? (u.isOG ? 'OG' : 'EXP') : null;
+                const badgeClass = u.hasActiveStripeSub ? 'active' : u.subStatus;
                 return (
                   <div key={i} className={`ac-user-card ${isOnline ? 'ac-user-online' : ''}`}>
                     <div className="ac-uc-row1">
                       <span className="ac-uc-name">{u.username}</span>
                       <div className="ac-uc-badges">
-                        {subLabel && <span className={`ac-sub-badge ${u.subStatus}`}>{subLabel}</span>}
+                        {subLabel && <span className={`ac-sub-badge ${badgeClass}`}>{subLabel}</span>}
                         {isOnline ? <span className="ac-online-badge">now</span> : <span className="ac-uc-ago">{ago}</span>}
                       </div>
                     </div>

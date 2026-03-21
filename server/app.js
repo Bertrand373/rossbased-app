@@ -29,6 +29,7 @@ const { initializeSchedulers } = require('./services/notificationScheduler');
 const { retrieveKnowledge } = require('./services/knowledgeRetrieval');
 const { getKnowledgeManifest } = require('./services/knowledgeManifest');
 const { getCommunityPulse } = require('./services/communityPulse');
+const { getRedditContext } = require('./services/redditContext');
 const { getOutcomePatterns } = require('./services/outcomeAggregation');
 const { runYouTubeFetch, getYouTubeStats } = require('./services/youtubeComments');
 const { runContentPipeline, getLatestReport } = require('./services/youtubeContentPipeline');
@@ -373,6 +374,44 @@ mongoose.connect(mongoUri, {
         }
       });
       console.log('🔮 Oracle transmission pipeline scheduled (10 AM EST daily)');
+
+      // ============================================
+      // REDDIT INGESTION PIPELINE (every 6 hours + daily summary)
+      // Pulls posts from r/semenretention for Oracle community intelligence
+      // ============================================
+      const { ingestRedditPosts, generateRedditSummary } = require('./services/redditIngestion');
+      
+      // Ingest new posts every 6 hours
+      cron.schedule('0 */6 * * *', async () => {
+        try {
+          console.log('📡 Running Reddit ingestion...');
+          await ingestRedditPosts();
+        } catch (e) {
+          console.error('Reddit ingestion cron error:', e.message);
+        }
+      });
+
+      // Generate daily summary at 6 AM EST (11:00 UTC)
+      cron.schedule('0 11 * * *', async () => {
+        try {
+          console.log('📡 Generating Reddit daily summary...');
+          await generateRedditSummary();
+        } catch (e) {
+          console.error('Reddit summary cron error:', e.message);
+        }
+      });
+
+      // Run first ingestion 2 minutes after startup
+      setTimeout(async () => {
+        try {
+          await ingestRedditPosts();
+          await generateRedditSummary();
+        } catch (e) {
+          console.error('Reddit initial ingestion error:', e.message);
+        }
+      }, 2 * 60 * 1000);
+
+      console.log('📡 Reddit ingestion pipeline scheduled (every 6h + daily summary)');
     } catch (error) {
       console.error('Failed to initialize schedulers:', error);
     }
@@ -1437,6 +1476,9 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     // Inject community pulse (async, cached — adds ~0ms after first fetch)
     const communityPulse = await getCommunityPulse();
 
+    // Inject Reddit community intelligence (async, cached 30min)
+    const redditContext = await getRedditContext();
+
     // Inject outcome patterns (async, cached 6h — real success rates from measured outcomes)
     const outcomePatterns = await getOutcomePatterns();
 
@@ -1606,7 +1648,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       }
     }
 
-    const systemWithKnowledge = systemPrompt + dateContext + knowledgeManifest + communityContext + outcomeContext + ragContext + limitNudgeContext;
+    const systemWithKnowledge = systemPrompt + dateContext + knowledgeManifest + communityContext + redditContext + outcomeContext + ragContext + limitNudgeContext;
 
     // Set up SSE headers
     res.setHeader('Content-Type', 'text/event-stream');

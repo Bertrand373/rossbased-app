@@ -11,6 +11,7 @@ const { logIfRelevant, generateWeeklyInsight, generateObservations, detectAnomal
 const { evaluateAndGenerate, onRelevantEvent } = require('./services/communityPulseEngine');
 const CommunityPulse = require('./models/CommunityPulse');
 const { getCommunityPulse } = require('./services/communityPulse');
+const { getRedditContext } = require('./services/redditContext');
 const { getOutcomePatterns } = require('./services/outcomeAggregation');
 const { buildLunarContext } = require('./utils/lunarData');
 const { classifyInteraction } = require('./services/interactionClassifier');
@@ -2548,7 +2549,8 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       ? `\n\n${outcomePatterns}\nReference these patterns naturally when relevant. Say things like "based on what I've seen with practitioners at your phase" or "most men in your situation who..." Never cite exact percentages unless it strengthens the point.\n`
       : '';
     const lunarContext = buildLunarContext();
-    const systemWithKnowledge = SYSTEM_PROMPT + dateContext + lunarContext + knowledgeManifest + personalContext + communityContext + outcomeContext + ragContext;
+    const redditContext = await getRedditContext();
+    const systemWithKnowledge = SYSTEM_PROMPT + dateContext + lunarContext + knowledgeManifest + personalContext + communityContext + redditContext + outcomeContext + ragContext;
     
     // Call Claude (with silent retry on overload)
     const response = await callClaude({
