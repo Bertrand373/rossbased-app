@@ -17,6 +17,14 @@
   flex-direction: column;
 }
 
+/* Desktop — prevent height-jump glitch by setting stable min-height */
+@media (min-width: 768px) {
+  .sheet-panel.lb-sheet {
+    min-height: 420px;
+    max-height: min(720px, calc(100vh - 80px));
+  }
+}
+
 /* =============================================================================
    CONTENT WRAPPER
    ============================================================================= */
@@ -199,9 +207,38 @@
   text-align: center;
   padding: 12px 0 0;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
 .lb-footer span {
   font-size: 0.6875rem;
   color: var(--text-muted);
+}
+
+/* Ghost close button — matches app pattern */
+.lb-close-btn {
+  width: 100%;
+  padding: 14px 20px;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 9999px;
+  transition: border-color 150ms ease, color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.lb-close-btn:hover {
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.lb-close-btn:active {
+  transform: scale(0.98);
 }

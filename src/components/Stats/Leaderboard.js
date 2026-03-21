@@ -108,6 +108,7 @@ const Leaderboard = ({ isOpen, onClose }) => {
           {/* Footer */}
           <div className="lb-footer">
             <span>Opt in via Profile to appear here</span>
+            <button className="lb-close-btn" onClick={closeSheet}>Close</button>
           </div>
         </div>
       </div>
