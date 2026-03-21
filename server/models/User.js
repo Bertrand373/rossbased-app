@@ -218,6 +218,11 @@ const userSchema = new mongoose.Schema({
     }
   },
   
+  // Free Oracle access until this date (inclusive, checked as now < freeAccessUntil)
+  // Usage still counts toward lifetimeCount but daily/weekly limits are bypassed.
+  // Set via Render shell for customer service credits. Reusable for any user.
+  freeAccessUntil: { type: Date, default: null },
+  
   // Daily Transmission Cache
   // Stores the AI-generated transmission for the current day
   dailyTransmission: {

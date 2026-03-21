@@ -1341,10 +1341,11 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     
     // --- ANTI-ABUSE: IP-based multi-account detection (free users only) ---
     const isAdminUser = ['rossbased', 'ross'].includes(user.username?.toLowerCase());
+    const hasFreeAccess = user.freeAccessUntil && new Date() < new Date(user.freeAccessUntil);
     // Aggregates Oracle usage across ALL free-tier accounts sharing this IP.
     // Uses lastUsed (not weekStart) to avoid timezone-mismatch bypasses.
     const clientIP = getClientIP(req);
-    if (clientIP && !isAdminUser && !userHasPremium && !isGrandfathered) {
+    if (clientIP && !isAdminUser && !hasFreeAccess && !userHasPremium && !isGrandfathered) {
       try {
         const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
         const ipAccounts = await User.find({
@@ -1377,8 +1378,8 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
       }
     }
 
-    // Admin unlimited access — skip all rate limits
-    if (isAdminUser) {
+    // Admin or free access credit — skip all rate limits
+    if (isAdminUser || hasFreeAccess) {
       // no-op: fall through to Oracle response
     } else if (isBetaPeriod && currentCount >= BETA_DAILY_LIMIT) {
       return res.status(429).json({ 
@@ -1400,7 +1401,7 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
         error: 'Daily limit reached',
         message: `You've used all ${GRANDFATHERED_DAILY_LIMIT} daily messages. Resets at midnight.`
       });
-    } else if (!isBetaPeriod && !userHasPremium && currentWeeklyCount >= FREE_WEEKLY_LIMIT) {
+    } else if (!isBetaPeriod && !userHasPremium && !isPureOG && currentWeeklyCount >= FREE_WEEKLY_LIMIT) {
       return res.status(429).json({ 
         error: 'Weekly limit reached',
         message: `You've used your ${FREE_WEEKLY_LIMIT} weekly messages. Resets Monday. Upgrade for unlimited.`
@@ -1409,7 +1410,10 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
 
     // Calculate remaining BEFORE stream — needed to inject tier-aware nudge into system prompt
     let preStreamRemaining, userTier;
-    if (isBetaPeriod) {
+    if (isAdminUser || hasFreeAccess) {
+      preStreamRemaining = 999;
+      userTier = isAdminUser ? 'admin' : (isAscended ? 'ascended' : userHasPremium ? 'premium' : isPureOG ? 'grandfathered' : 'free');
+    } else if (isBetaPeriod) {
       preStreamRemaining = BETA_DAILY_LIMIT - currentCount - 1;
       userTier = 'beta';
     } else if (isAscended) {
@@ -1836,7 +1840,7 @@ Examples:
 
     // Calculate remaining
     let messagesRemaining, effectiveLimit, effectiveUsed;
-    if (isAdminUser) {
+    if (isAdminUser || hasFreeAccess) {
       effectiveUsed = currentCount + 1;
       effectiveLimit = 999;
       messagesRemaining = 999;
@@ -1943,8 +1947,9 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
     const isPureOG = isGrandfathered && !hasActiveStripeSub;
     const discordUsageToday = isPureOG ? await getDiscordUsageForUser(user) : 0;
     const isAdminUser = ['rossbased', 'ross'].includes(user.username?.toLowerCase());
+    const hasFreeAccess = user.freeAccessUntil && new Date() < new Date(user.freeAccessUntil);
 
-    if (isAdminUser) {
+    if (isAdminUser || hasFreeAccess) {
       messagesUsed = currentCount;
       messagesLimit = 999;
       messagesRemaining = 999;
@@ -1984,6 +1989,7 @@ app.get('/api/ai/usage', authenticate, async (req, res) => {
       isPremium: userHasPremium,
       isGrandfathered,
       resetsAt,
+      freeAccessUntil: user.freeAccessUntil || null,
       needsOracleIntro: user.needsOracleIntro !== false && !!user.startDate
     });
   } catch (err) {
@@ -2039,8 +2045,14 @@ app.get('/api/ai-usage/:username', authenticate, async (req, res) => {
     const isAscended = user.subscription?.tier === 'ascended' && (hasActiveStripeSub || (userHasPremium && !isGrandfathered));
     const isPureOG = isGrandfathered && !hasActiveStripeSub;
     const discordUsageToday = isPureOG ? await getDiscordUsageForUser(user) : 0;
+    const hasFreeAccess = user.freeAccessUntil && new Date() < new Date(user.freeAccessUntil);
 
-    if (isBetaPeriod) {
+    if (hasFreeAccess) {
+      messagesUsed = currentCount;
+      messagesLimit = 999;
+      messagesRemaining = 999;
+      resetsAt = 'never';
+    } else if (isBetaPeriod) {
       messagesUsed = currentCount;
       messagesLimit = BETA_DAILY_LIMIT;
       messagesRemaining = BETA_DAILY_LIMIT - currentCount;
@@ -2399,21 +2411,31 @@ app.get('/api/admin/oracle-health', authenticate, async (req, res) => {
     // Grandfathered users — shared pool check
     const grandfatheredUsers = await User.find(
       { 'subscription.status': 'grandfathered', discordId: { $exists: true, $ne: null, $ne: '' } },
-      { username: 1, discordId: 1, 'aiUsage.count': 1, 'aiUsage.date': 1 }
+      { username: 1, discordId: 1, 'aiUsage.count': 1, 'aiUsage.date': 1, 'subscription.stripeSubscriptionId': 1, 'subscription.currentPeriodEnd': 1, 'subscription.tier': 1 }
     ).lean();
     
     const grandfatheredUsage = [];
+    const nowCheck = new Date();
     for (const gf of grandfatheredUsers) {
       const appCount = gf.aiUsage?.date === todayET ? (gf.aiUsage?.count || 0) : 0;
       const discordRecord = discordUsageToday.find(d => d.discordUserId === gf.discordId);
       const discordCount = discordRecord?.count || 0;
+      // OG users with active Stripe subs get their paid tier limit
+      const hasStripeSub = !!gf.subscription?.stripeSubscriptionId && 
+        gf.subscription?.currentPeriodEnd && 
+        new Date(gf.subscription.currentPeriodEnd) > nowCheck;
+      const effectiveLimit = hasStripeSub 
+        ? (gf.subscription?.tier === 'ascended' ? ASCENDED_DAILY_LIMIT : PREMIUM_DAILY_LIMIT)
+        : GRANDFATHERED_DAILY_LIMIT;
+      const tierTag = hasStripeSub ? (gf.subscription?.tier === 'ascended' ? 'OG+ASC' : 'OG+PRO') : 'OG';
       if (appCount > 0 || discordCount > 0) {
         grandfatheredUsage.push({
           username: gf.username,
           app: appCount,
           discord: discordCount,
           combined: appCount + discordCount,
-          limit: 15
+          limit: effectiveLimit,
+          tier: tierTag
         });
       }
     }

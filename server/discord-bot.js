@@ -805,6 +805,12 @@ const isRateLimited = async (userId, username) => {
     const isGrandfathered = linkedUser.subscription?.status === 'grandfathered';
     const { hasPremium: userHasPremium } = checkPremiumAccess(linkedUser);
 
+    // Free access credit — skip all rate limits
+    const hasFreeAccess = linkedUser.freeAccessUntil && new Date() < new Date(linkedUser.freeAccessUntil);
+    if (hasFreeAccess) {
+      return { limited: false, tier: 'free_credit', remaining: 999 };
+    }
+
     // OG users with active Stripe subs get their PAID tier limits, not OG 1/day
     const hasActiveStripeSub = !!linkedUser.subscription?.stripeSubscriptionId && 
       linkedUser.subscription?.currentPeriodEnd && 
@@ -1193,14 +1199,23 @@ async function gatherHealthData() {
   // Grandfathered pool
   const grandfathered = await User.find(
     { 'subscription.status': 'grandfathered', discordId: { $exists: true, $ne: null, $ne: '' } },
-    { username: 1, discordId: 1, 'aiUsage.count': 1, 'aiUsage.date': 1 }
+    { username: 1, discordId: 1, 'aiUsage.count': 1, 'aiUsage.date': 1, 'subscription.stripeSubscriptionId': 1, 'subscription.currentPeriodEnd': 1, 'subscription.tier': 1 }
   ).lean();
 
   const poolUsage = [];
+  const now = new Date();
   for (const gf of grandfathered) {
     const ac = gf.aiUsage?.date === today ? (gf.aiUsage?.count || 0) : 0;
     const dr = discordUsageRecords.find(d => d.discordUserId === gf.discordId);
-    poolUsage.push({ username: gf.username, app: ac, discord: dr?.count || 0, combined: ac + (dr?.count || 0), limit: GRANDFATHERED_DAILY_POOL });
+    // OG users with active Stripe subs get their paid tier limit
+    const hasStripeSub = !!gf.subscription?.stripeSubscriptionId && 
+      gf.subscription?.currentPeriodEnd && 
+      new Date(gf.subscription.currentPeriodEnd) > now;
+    const effectiveLimit = hasStripeSub 
+      ? (gf.subscription?.tier === 'ascended' ? ASCENDED_DAILY_LIMIT : PREMIUM_DAILY_LIMIT)
+      : GRANDFATHERED_DAILY_POOL;
+    const tierTag = hasStripeSub ? (gf.subscription?.tier === 'ascended' ? 'OG+ASC' : 'OG+PRO') : 'OG';
+    poolUsage.push({ username: gf.username, app: ac, discord: dr?.count || 0, combined: ac + (dr?.count || 0), limit: effectiveLimit, tier: tierTag });
   }
 
   // Streaks
@@ -2580,6 +2595,12 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       const usage = await OracleUsage.findOne({ discordUserId: message.author.id, date: todayStr });
       const discordUsedNow = usage?.count || 0;
       if (linkedUser) {
+        // Free access credit — show unlimited remaining
+        const hasFreeAccess = linkedUser.freeAccessUntil && new Date() < new Date(linkedUser.freeAccessUntil);
+        if (hasFreeAccess) {
+          discordUserTier = 'free_credit';
+          remaining = 999;
+        } else {
         const { hasPremium: userHasPremium } = checkPremiumAccess(linkedUser);
         const isGrandfathered = linkedUser.subscription?.status === 'grandfathered';
         const hasActiveStripeSub = !!linkedUser.subscription?.stripeSubscriptionId && 
@@ -2600,6 +2621,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
           const weeklyUsed = linkedUser.aiUsage?.weeklyCount || 0;
           remaining = FREE_WEEKLY_LIMIT - weeklyUsed;
         }
+        } // close hasFreeAccess else
       }
     } catch (err) { /* silent */ }
     remaining = Math.max(0, remaining);
