@@ -183,6 +183,7 @@ router.get('/stats', adminCheck, async (req, res) => {
           totalTokens: { $sum: '$tokenEstimate' },
           enabled: { $first: '$enabled' },
           author: { $first: '$author' },
+          protected: { $max: '$protected' },
           createdAt: { $min: '$createdAt' }
         }
       },

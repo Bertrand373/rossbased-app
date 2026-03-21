@@ -657,6 +657,21 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kb-protected-badge {
+  flex-shrink: 0;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #d4af37;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 4px;
+  padding: 1px 5px;
 }
 
 .kb-doc-meta {
@@ -973,6 +988,11 @@
   border-color: rgba(0,0,0,0.06);
 }
 [data-theme="light"] .kb-doc-name { color: #000000; }
+[data-theme="light"] .kb-protected-badge {
+  color: #9a7b2a;
+  background: rgba(154, 123, 42, 0.08);
+  border-color: rgba(154, 123, 42, 0.2);
+}
 [data-theme="light"] .kb-doc-meta { color: rgba(0,0,0,0.3); }
 
 [data-theme="light"] .kb-cat-select {

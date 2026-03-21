@@ -396,13 +396,15 @@ const KnowledgeBase = () => {
           // Classify docs by source
           const isOracle = d => d.author && d.author.toLowerCase().includes('oracle');
           const isDiscord = d => d.type === 'channel';
-          const isUploaded = d => !isOracle(d) && !isDiscord(d);
+          const isProtected = d => d.protected;
+          const isUploaded = d => !isOracle(d) && !isDiscord(d) && !isProtected(d);
 
           const counts = {
             all: stats.documents.length,
             uploaded: stats.documents.filter(isUploaded).length,
             oracle: stats.documents.filter(isOracle).length,
             discord: stats.documents.filter(isDiscord).length,
+            protected: stats.documents.filter(isProtected).length,
           };
 
           // Source filter
@@ -410,6 +412,7 @@ const KnowledgeBase = () => {
           if (docSource === 'uploaded') sourceFiltered = stats.documents.filter(isUploaded);
           else if (docSource === 'oracle') sourceFiltered = stats.documents.filter(isOracle);
           else if (docSource === 'discord') sourceFiltered = stats.documents.filter(isDiscord);
+          else if (docSource === 'protected') sourceFiltered = stats.documents.filter(isProtected);
 
           // Category filter
           const cats = [...new Set(sourceFiltered.map(d => d.category))].sort();
@@ -425,6 +428,7 @@ const KnowledgeBase = () => {
             { key: 'uploaded', label: 'Uploaded' },
             { key: 'oracle', label: 'Oracle' },
             { key: 'discord', label: 'Discord' },
+            { key: 'protected', label: 'Protected' },
           ].filter(t => counts[t.key] > 0 || t.key === 'all');
 
           return (
@@ -482,7 +486,10 @@ const KnowledgeBase = () => {
                       <div className="kb-doc-left">
                         <div className={`kb-doc-dot ${doc.enabled ? 'on' : 'off'}`} />
                         <div className="kb-doc-info">
-                          <span className="kb-doc-name">{doc.name}</span>
+                          <span className="kb-doc-name">
+                            {doc.name}
+                            {doc.protected && <span className="kb-protected-badge">PROTECTED</span>}
+                          </span>
                           <span className="kb-doc-meta">
                             {doc.type} · {doc.chunks} chunks · ~{doc.totalTokens.toLocaleString()} tokens{doc.author ? ` · by ${doc.author}` : ''}
                           </span>
