@@ -449,6 +449,18 @@ function App() {
     const timer = setTimeout(() => setMinLoadingComplete(true), 600);
     return () => clearTimeout(timer);
   }, []);
+
+  // SAFETY NET: If loading states hang (stale SW cache, slow API, etc.),
+  // force the app to show after 10 seconds. Prevents infinite splash screen.
+  const [loadingSafetyTimeout, setLoadingSafetyTimeout] = useState(false);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoadingSafetyTimeout(true);
+      console.warn('⚠️ App loading safety timeout triggered — forcing app visible');
+    }, 10000);
+    return () => clearTimeout(timer);
+  }, []);
   
   const { 
     userData, 
@@ -518,9 +530,12 @@ function App() {
   const isAuthCallback = window.location.pathname.startsWith('/auth/');
 
   // App ready = everything resolved. One flag, one transition.
-  const appReady = !isLoading && !isRefreshLoading && minLoadingComplete && 
+  // Safety timeout forces app visible after 10s to prevent infinite splash.
+  const appReady = (
+    !isLoading && !isRefreshLoading && minLoadingComplete && 
     (!isLoggedIn || subscriptionStatus.reason !== 'loading') &&
-    !isAuthCallback;
+    !isAuthCallback
+  ) || (loadingSafetyTimeout && !isAuthCallback);
 
   // Control the SINGLE loading icon — the one from index.html.
   // React never renders its own. Zero handoffs. Zero animation phase mismatches.
