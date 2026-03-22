@@ -24,19 +24,18 @@ const TRIGGER_ICONS = {
   FaHome, FaWineGlass, FaBed
 };
 
-// Intensity level descriptions
-const INTENSITY_LABELS = {
-  1: 'Barely noticeable',
-  2: 'Very mild',
-  3: 'Mild',
-  4: 'Moderate',
-  5: 'Noticeable',
-  6: 'Strong',
-  7: 'Very strong',
-  8: 'Intense',
-  9: 'Severe',
-  10: 'Overwhelming'
-};
+// 9-level thermal heat map — teal → yellow-green → amber → orange → red
+const HEAT_LEVELS = [
+  { level: 1, label: 'Whisper', desc: 'Barely there', bg: 'rgba(52,211,153,0.06)', color: 'rgba(52,211,153,0.7)', ring: 'rgba(52,211,153,0.4)' },
+  { level: 2, label: 'Flicker', desc: 'Brief, passing', bg: 'rgba(52,211,153,0.09)', color: 'rgba(52,211,153,0.85)', ring: 'rgba(52,211,153,0.5)' },
+  { level: 3, label: 'Pulse', desc: 'Noticeable', bg: 'rgba(163,210,51,0.07)', color: 'rgba(163,210,51,0.8)', ring: 'rgba(163,210,51,0.45)' },
+  { level: 4, label: 'Rising', desc: 'Building', bg: 'rgba(234,179,8,0.06)', color: 'rgba(234,179,8,0.75)', ring: 'rgba(234,179,8,0.4)' },
+  { level: 5, label: 'Surge', desc: 'Demanding', bg: 'rgba(245,158,11,0.07)', color: 'rgba(245,158,11,0.8)', ring: 'rgba(245,158,11,0.45)' },
+  { level: 6, label: 'Gripping', desc: 'Hard to ignore', bg: 'rgba(249,115,22,0.08)', color: 'rgba(249,115,22,0.8)', ring: 'rgba(249,115,22,0.45)' },
+  { level: 7, label: 'Burning', desc: 'Consuming', bg: 'rgba(239,68,68,0.07)', color: 'rgba(239,68,68,0.75)', ring: 'rgba(239,68,68,0.4)' },
+  { level: 8, label: 'Raging', desc: 'Overwhelming', bg: 'rgba(220,38,38,0.09)', color: 'rgba(220,38,38,0.8)', ring: 'rgba(220,38,38,0.45)' },
+  { level: 9, label: 'Critical', desc: 'Emergency', bg: 'rgba(185,28,28,0.11)', color: 'rgba(185,28,28,0.9)', ring: 'rgba(185,28,28,0.5)' },
+];
 
 // Microcosmic Orbit energy points
 const ORBIT_POINTS = [
@@ -54,12 +53,15 @@ const ORBIT_POINTS = [
 
 const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   // Core States
-  const [activeView, setActiveView] = useState('based30');
+  const [activeView, setActiveView] = useState('intervene');
   const [currentStep, setCurrentStep] = useState('assessment');
   const [urgeIntensity, setUrgeIntensity] = useState(0);
   const [activeProtocol, setActiveProtocol] = useState(null);
   const [recommendedProtocol, setRecommendedProtocol] = useState(null);
   const [selectedTrigger, setSelectedTrigger] = useState('');
+  
+  // Protocol detail sheet
+  const [showProtocolSheet, setShowProtocolSheet] = useState(false);
   
   // Experience level detection
   const [experienceLevel, setExperienceLevel] = useState('beginner');
@@ -107,7 +109,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
   const coldIntervalRef = useRef(null);
   
   // Lock body scroll for modals
-  useBodyScrollLock(showBreathingModal || showOrbitModal || showGroundingModal || showColdModal);
+  useBodyScrollLock(showBreathingModal || showOrbitModal || showGroundingModal || showColdModal || showProtocolSheet);
   
   const currentDay = userData.currentStreak || 0;
 
@@ -212,19 +214,19 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
   // INTENSITY & PROTOCOL SELECTION
   // ============================================================
   
-  const handleUrgeIntensity = (intensity) => {
-    setUrgeIntensity(intensity);
+  const handleUrgeIntensity = (level) => {
+    setUrgeIntensity(level);
     
     if (!sessionStartTime) setSessionStartTime(new Date());
     
-    // Smart protocol suggestion based on intensity and level
+    // Smart protocol suggestion based on heat level (1-9)
     let suggested;
-    if (intensity >= 8) {
+    if (level >= 7) {
       suggested = 'breathing';
       setAdvancedBreathing(experienceLevel !== 'beginner');
-    } else if (intensity >= 6) {
+    } else if (level >= 5) {
       suggested = experienceLevel !== 'beginner' ? 'energy' : 'physical';
-    } else if (intensity >= 4) {
+    } else if (level >= 3) {
       suggested = 'physical';
     } else {
       suggested = 'mental';
@@ -233,7 +235,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
     setRecommendedProtocol(suggested);
     setActiveProtocol(suggested);
     
-    setTimeout(() => setCurrentStep('protocol'), 500);
+    setTimeout(() => setCurrentStep('protocol'), 400);
   };
 
   // ============================================================
@@ -550,6 +552,49 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
     }
   };
 
+  // Unified reinforce grid — 3×2, interactive tools top row + redirects bottom row
+  const getReinforceItems = () => {
+    const items = [];
+    
+    // Interactive tools (open modals)
+    if (experienceLevel !== 'beginner') {
+      items.push({
+        id: 'orbit', label: 'Orbit', desc: 'Energy circulation', interactive: true,
+        action: () => {
+          setOrbitTargetCycles(experienceLevel === 'advanced' ? 18 : 9);
+          animateModalOpen(setShowOrbitModal);
+          startActiveTimer();
+        }
+      });
+    }
+    
+    items.push({
+      id: 'grounding', label: 'Grounding', desc: '5-4-3-2-1', interactive: true,
+      action: () => { animateModalOpen(setShowGroundingModal); startActiveTimer(); }
+    });
+    
+    items.push({
+      id: 'cold', label: 'Cold', desc: experienceLevel === 'beginner' ? '2 min timer' : '5 min timer', interactive: true,
+      action: () => { setColdTarget(experienceLevel === 'beginner' ? 120 : 300); animateModalOpen(setShowColdModal); }
+    });
+    
+    // Quick redirects (simple actions)
+    const quickActions = getQuickActions();
+    const quickLabels = experienceLevel === 'beginner' 
+      ? [{ label: 'Leave', desc: 'Change environment' }, { label: 'Call Someone', desc: 'Break isolation' }, { label: 'Move', desc: '20 push-ups' }]
+      : experienceLevel === 'intermediate'
+      ? [{ label: 'Create', desc: 'Channel energy' }, { label: 'Serve', desc: 'Help others' }, { label: 'Move', desc: 'Intense workout' }]
+      : [{ label: 'Teach', desc: 'Mentor someone' }, { label: 'Mission', desc: 'Work on purpose' }, { label: 'Meditate', desc: 'Extended practice' }];
+    
+    // Fill remaining slots to reach 6
+    const remaining = 6 - items.length;
+    for (let i = 0; i < Math.min(remaining, quickLabels.length); i++) {
+      items.push({ id: `quick-${i}`, ...quickLabels[i], interactive: false, action: () => {} });
+    }
+    
+    return items;
+  };
+
   // ============================================================
   // DATA LOGGING
   // ============================================================
@@ -587,6 +632,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
   const resetSession = () => {
     stopActiveTimer();
     setModalAnimOpen(false);
+    setShowProtocolSheet(false);
     setCurrentStep('assessment');
     setUrgeIntensity(0);
     setActiveProtocol(null);
@@ -666,25 +712,41 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
   };
 
   // ============================================================
+  // PROTOCOL CELL TAP — opens detail sheet for the selected protocol
+  // ============================================================
+
+  const handleProtocolTap = (key) => {
+    setActiveProtocol(key);
+    if (key === 'breathing') {
+      animateModalOpen(setShowBreathingModal);
+    } else {
+      animateModalOpen(setShowProtocolSheet);
+    }
+  };
+
+  // Selected heat level label for footer display
+  const selectedHeat = HEAT_LEVELS.find(h => h.level === urgeIntensity);
+
+  // ============================================================
   // RENDER
   // ============================================================
 
   return (
     <div className="ut-page">
-      {/* ====== STICKY HEADER — mirrors Stats header exactly ====== */}
+      {/* ====== STICKY HEADER ====== */}
       <div className="ut-header-sticky">
         <div className="ut-header-row">
           <span className="ut-header-title">Urges</span>
           <div className="ut-view-toggle">
             <button
-              className={`ut-vt-btn ${activeView === 'based30' ? 'active' : ''}`}
-              onClick={() => setActiveView('based30')}
-            >Based30</button>
-            <span className="ut-vt-div" />
-            <button
               className={`ut-vt-btn ${activeView === 'intervene' ? 'active' : ''}`}
               onClick={() => setActiveView('intervene')}
             >Intervene</button>
+            <span className="ut-vt-div" />
+            <button
+              className={`ut-vt-btn ${activeView === 'based30' ? 'active' : ''}`}
+              onClick={() => setActiveView('based30')}
+            >Based30</button>
           </div>
         </div>
       </div>
@@ -698,306 +760,178 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
 
       {/* ====== INTERVENTION VIEW ====== */}
       {activeView === 'intervene' && (
-        <div className="ut-view-intervene">
-          {/* Peak State Recording — shows most recent during crisis */}
+        <>
+          {/* Transmission Strip — only if user has peak recordings */}
           {userData.peakRecordings && userData.peakRecordings.length > 0 && (() => {
             const latest = userData.peakRecordings[userData.peakRecordings.length - 1];
             return (
-              <div className="ut-peak-recording">
-                <div className="ut-peak-signal">YOUR TRANSMISSION</div>
-                <div className="ut-peak-meta">Day {latest.streakDay} · {new Date(latest.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-                <p className="ut-peak-message">{latest.message}</p>
+              <div className="ut-tx-strip">
+                <div className="ut-tx-signal">YOUR TRANSMISSION · DAY {latest.streakDay}</div>
+                <div className="ut-tx-msg">"{latest.message}"</div>
               </div>
             );
           })()}
 
-          {/* Phase Indicator */}
-          <div className="ut-phase">
-        <span className="ut-phase-num">{currentPhase.num}</span>
-        <div className="ut-phase-info">
-          <span className="ut-phase-name">{currentPhase.name}</span>
-          <span className="ut-phase-detail">Day {currentDay} · {experienceLevel.charAt(0).toUpperCase() + experienceLevel.slice(1)} Tools</span>
-        </div>
-      </div>
-
-      {/* Step Navigation */}
-      <nav className="ut-steps">
-        {steps.map((step, index) => (
-          <React.Fragment key={step.id}>
-            <button
-              className={`ut-step ${currentStep === step.id ? 'active' : ''}`}
-              onClick={() => canNavigateTo(step.id) && setCurrentStep(step.id)}
-              disabled={!canNavigateTo(step.id)}
-            >
-              {step.label}
-            </button>
-            {index < steps.length - 1 && <div className="ut-step-divider" />}
-          </React.Fragment>
-        ))}
-      </nav>
-
-      {/* Content */}
-      <div className="ut-content">
-        
-        {/* ================================================================
-            ASSESSMENT STEP
-            ================================================================ */}
-        {currentStep === 'assessment' && (
-          <>
-            <div className="ut-section-header">
-              <h2 className="ut-section-title">How intense is this urge?</h2>
-              <p className="ut-section-desc">
-                {urgeIntensity > 0 ? INTENSITY_LABELS[urgeIntensity] : 'Select your current level'}
-              </p>
-            </div>
-            
-            <div className="ut-intensity">
-              <div className="ut-intensity-scale">
-                {[1,2,3,4,5,6,7,8,9,10].map(level => (
+          {/* Step Strip — sticky nav */}
+          <div className="ut-step-strip">
+            <div className="ut-step-nav">
+              {steps.map((step, index) => (
+                <React.Fragment key={step.id}>
                   <button
-                    key={level}
-                    className={`ut-intensity-btn ${urgeIntensity === level ? 'selected' : ''}`}
-                    onClick={() => handleUrgeIntensity(level)}
+                    className={`ut-step-btn ${currentStep === step.id ? 'active' : ''}`}
+                    onClick={() => canNavigateTo(step.id) && setCurrentStep(step.id)}
+                    disabled={!canNavigateTo(step.id)}
                   >
-                    <span className="ut-intensity-num">{level}</span>
+                    {step.label}
                   </button>
-                ))}
-              </div>
-              <div className="ut-intensity-track">
-                <div 
-                  className="ut-intensity-fill" 
-                  style={{ width: urgeIntensity > 0 ? `${((urgeIntensity - 0.5) / 10) * 100}%` : '0%' }}
-                />
-              </div>
-              <div className="ut-intensity-endpoints">
-                <span className="ut-intensity-endpoint">Mild</span>
-                <span className="ut-intensity-endpoint">Overwhelming</span>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* ================================================================
-            PROTOCOL STEP
-            ================================================================ */}
-        {currentStep === 'protocol' && (
-          <>
-            <div className="ut-section-header">
-              <h2 className="ut-section-title">Select Protocol</h2>
-              <p className="ut-section-desc">Choose your intervention strategy</p>
-            </div>
-            
-            <div className="ut-protocols">
-              {Object.entries(protocols).map(([key, protocol], index, arr) => (
-                <React.Fragment key={key}>
-                  <button
-                    className={`ut-protocol ${activeProtocol === key ? 'active' : ''}`}
-                    onClick={() => setActiveProtocol(key)}
-                  >
-                    <div className="ut-protocol-main">
-                      <span className="ut-protocol-name">{protocol.name}</span>
-                      <div className="ut-protocol-meta">
-                        {recommendedProtocol === key && <span className="ut-protocol-rec">Recommended</span>}
-                        <span className="ut-protocol-duration">{protocol.duration}</span>
-                      </div>
-                    </div>
-                    <p className="ut-protocol-desc">{protocol.description}</p>
-                  </button>
-                  {index < arr.length - 1 && <div className="ut-protocol-divider" />}
+                  {index < steps.length - 1 && <span className="ut-step-div" />}
                 </React.Fragment>
               ))}
             </div>
+            <div className="ut-phase-line">
+              Phase {currentPhase.num} · {currentPhase.name} · Day {currentDay}
+            </div>
+          </div>
 
-            {/* Breathing Protocol */}
-            {activeProtocol === 'breathing' && (
-              <div className="ut-breathing-trigger">
-                <div className="ut-breathing-info-card">
-                  <span className="ut-breathing-title">
-                    {advancedBreathing && experienceLevel !== 'beginner' ? 'Advanced Breathing' : 'Box Breathing'}
-                  </span>
-                  <span className="ut-breathing-desc">
-                    {advancedBreathing && experienceLevel !== 'beginner' 
-                      ? 'Bhastrika + retention for energy transmutation' 
-                      : '4-4-4-4 pattern for calm and focus'}
-                  </span>
-                </div>
-                
-                {experienceLevel !== 'beginner' && (
-                  <div className="ut-breathing-modes">
-                    <button
-                      className={`ut-mode-btn ${!advancedBreathing ? 'active' : ''}`}
-                      onClick={() => setAdvancedBreathing(false)}
-                    >
-                      Standard
-                    </button>
-                    <span className="ut-mode-divider" />
-                    <button
-                      className={`ut-mode-btn ${advancedBreathing ? 'active' : ''}`}
-                      onClick={() => setAdvancedBreathing(true)}
-                    >
-                      Advanced
-                    </button>
-                  </div>
-                )}
-                
-                <button className="ut-btn-primary" onClick={() => animateModalOpen(setShowBreathingModal)}>
-                  Begin Session
-                </button>
+          {/* Content Area */}
+          <div className="ut-content-area">
+
+            {/* ====== ASSESS — 3×3 heat map ====== */}
+            {currentStep === 'assessment' && (
+              <div className="ut-grid ut-grid-9">
+                {HEAT_LEVELS.map((heat) => (
+                  <button
+                    key={heat.level}
+                    className={`ut-cell ${urgeIntensity === heat.level ? 'selected' : ''}`}
+                    style={{ 
+                      background: heat.bg, 
+                      '--cell-ring': heat.ring 
+                    }}
+                    onClick={() => handleUrgeIntensity(heat.level)}
+                  >
+                    <span className="ut-cell-label" style={{ color: heat.color }}>{heat.label}</span>
+                    <span className="ut-cell-desc">{heat.desc}</span>
+                  </button>
+                ))}
               </div>
             )}
 
-            {/* Other Protocol Steps */}
-            {(activeProtocol === 'mental' || activeProtocol === 'physical' || activeProtocol === 'energy') && (
-              <>
-                <div className="ut-protocol-steps">
-                  <div className="ut-steps-header">{protocols[activeProtocol].name}</div>
-                  <div className="ut-steps-list">
-                    {getProtocolSteps().map((step, index) => (
-                      <div key={index} className="ut-step-item">
-                        <span className="ut-step-num">{String(index + 1).padStart(2, '0')}</span>
-                        <span className="ut-step-text">{step}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="ut-actions">
-                  <button 
-                    className="ut-btn-primary"
-                    onClick={() => {
-                      startActiveTimer();
-                      setCurrentStep('tools');
-                    }}
+            {/* ====== PROTOCOL — 2×2 grid ====== */}
+            {currentStep === 'protocol' && (
+              <div className={`ut-grid ut-grid-protocol`}>
+                {Object.entries(protocols).map(([key, protocol]) => (
+                  <button
+                    key={key}
+                    className={`ut-cell ${activeProtocol === key ? 'selected' : ''}`}
+                    style={{ '--cell-ring': 'rgba(255,255,255,0.2)' }}
+                    onClick={() => handleProtocolTap(key)}
                   >
-                    I've Completed This
+                    {recommendedProtocol === key && <span className="ut-cell-badge">Recommended</span>}
+                    <span className="ut-cell-label" style={{ color: 'var(--text-secondary)' }}>{protocol.name}</span>
+                    <span className="ut-cell-desc">{protocol.duration} · {protocol.description}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* ====== REINFORCE — 3×2 grid ====== */}
+            {currentStep === 'tools' && (
+              <>
+                <div className="ut-grid ut-grid-6">
+                  {getReinforceItems().map((item) => (
+                    <button
+                      key={item.id}
+                      className="ut-cell"
+                      style={{ '--cell-ring': 'rgba(255,255,255,0.15)' }}
+                      onClick={item.action}
+                    >
+                      <span className="ut-cell-label" style={{ color: item.interactive ? 'var(--text-secondary)' : 'var(--text-tertiary)' }}>{item.label}</span>
+                      <span className="ut-cell-desc">{item.desc}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="ut-footer-strip">
+                  <span className="ut-footer-stats">
+                    {selectedHeat ? selectedHeat.label : '—'} · {protocols[activeProtocol]?.name || '—'} · {Math.floor(totalActiveTime / 60)}m {Math.round(totalActiveTime % 60)}s
+                  </span>
+                  <button className="ut-footer-btn" onClick={() => { stopActiveTimer(); setCurrentStep('summary'); }}>
+                    Log Session
                   </button>
                 </div>
               </>
             )}
-          </>
-        )}
 
-        {/* ================================================================
-            TOOLS STEP
-            ================================================================ */}
-        {currentStep === 'tools' && (
-          <>
-            <div className="ut-section-header">
-              <h2 className="ut-section-title">Reinforce</h2>
-              <p className="ut-section-desc">Protocol complete. Lock in your state.</p>
-            </div>
-            
-            {/* Interactive Tools */}
-            <div className="ut-interactive-tools">
-              <div className="ut-tools-label">Practices</div>
-              {getInteractiveTools().map((tool, index, arr) => (
-                <React.Fragment key={tool.id}>
-                  <button className="ut-interactive-tool" onClick={tool.action}>
-                    <div className="ut-tool-info">
-                      <span className="ut-tool-name">{tool.name}</span>
-                      <span className="ut-tool-desc">{tool.desc}</span>
-                    </div>
-                    <span className="ut-tool-arrow">→</span>
+            {/* ====== COMPLETE — trigger grid ====== */}
+            {currentStep === 'summary' && (
+              <>
+                <div className="ut-grid ut-grid-triggers">
+                  {getTriggerOptions().map((trigger) => (
+                    <button
+                      key={trigger.id}
+                      className={`ut-cell ${selectedTrigger === trigger.id ? 'selected' : ''}`}
+                      style={{ '--cell-ring': 'rgba(255,255,255,0.2)' }}
+                      onClick={() => setSelectedTrigger(trigger.id)}
+                    >
+                      <span className="ut-cell-label" style={{ color: selectedTrigger === trigger.id ? 'var(--text)' : 'var(--text-tertiary)' }}>{trigger.label}</span>
+                      {selectedTrigger === trigger.id && <span className="ut-cell-check">✓</span>}
+                    </button>
+                  ))}
+                </div>
+                <div className="ut-footer-strip">
+                  <span className="ut-footer-stats">
+                    {selectedHeat ? selectedHeat.label : '—'} · {protocols[activeProtocol]?.name || '—'} · {Math.floor(totalActiveTime / 60)}m {Math.round(totalActiveTime % 60)}s
+                  </span>
+                  <button className="ut-footer-btn" onClick={() => { logTrigger(); resetSession(); }}>
+                    Complete
                   </button>
-                  {index < arr.length - 1 && <div className="ut-tool-divider" />}
-                </React.Fragment>
-              ))}
+                </div>
+              </>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* ================================================================
+          PROTOCOL DETAIL SHEET (Mental / Physical / Energy steps)
+          ================================================================ */}
+      {showProtocolSheet && (
+        <div className={`sheet-backdrop${modalAnimOpen ? ' open' : ''}`}
+          onClick={() => animateModalClose(setShowProtocolSheet)}>
+          <div className={`sheet-panel ut-sheet${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" />
+
+            <div className="ut-modal-header">
+              <span className="ut-modal-title">{protocols[activeProtocol]?.name}</span>
+              <span className="ut-modal-subtitle">{protocols[activeProtocol]?.duration} · {protocols[activeProtocol]?.bestFor}</span>
             </div>
-            
-            {/* Quick Actions */}
-            <div className="ut-quick-actions">
-              <div className="ut-tools-label">Redirects</div>
-              <div className="ut-quick-list">
-                {getQuickActions().map((action, index) => (
-                  <div key={index} className="ut-quick-item">
-                    <span className="ut-quick-num">{String(index + 1).padStart(2, '0')}</span>
-                    <span className="ut-quick-text">{action}</span>
+
+            <div className="ut-protocol-detail">
+              <div className="ut-steps-list">
+                {getProtocolSteps().map((step, index) => (
+                  <div key={index} className="ut-step-item">
+                    <span className="ut-step-num">{String(index + 1).padStart(2, '0')}</span>
+                    <span className="ut-step-text">{step}</span>
                   </div>
                 ))}
               </div>
             </div>
-            
-            <div className="ut-actions">
-              <button 
-                className="ut-btn-primary"
-                onClick={() => {
-                  stopActiveTimer();
-                  setCurrentStep('summary');
-                }}
-              >
-                Log Session
-              </button>
-            </div>
-          </>
-        )}
 
-        {/* ================================================================
-            SUMMARY STEP
-            ================================================================ */}
-        {currentStep === 'summary' && (
-          <>
-            <div className="ut-section-header">
-              <h2 className="ut-section-title">Session Complete</h2>
-              <p className="ut-section-desc">What triggered this urge?</p>
-            </div>
-            
-            <div className="ut-triggers">
-              <div className="ut-triggers-label">Select Trigger</div>
-              <div className="ut-triggers-list">
-                {getTriggerOptions().map((trigger, index, arr) => (
-                  <React.Fragment key={trigger.id}>
-                    <button
-                      className={`ut-trigger ${selectedTrigger === trigger.id ? 'selected' : ''}`}
-                      onClick={() => setSelectedTrigger(trigger.id)}
-                    >
-                      <span>{trigger.label}</span>
-                      {selectedTrigger === trigger.id && <span className="ut-trigger-check">✓</span>}
-                    </button>
-                    {index < arr.length - 1 && <div className="ut-trigger-divider" />}
-                  </React.Fragment>
-                ))}
-              </div>
-            </div>
-            
-            <div className="ut-stats">
-              <div className="ut-stat">
-                <span className="ut-stat-label">Intensity</span>
-                <span className="ut-stat-value">{urgeIntensity}/10</span>
-              </div>
-              <div className="ut-stat">
-                <span className="ut-stat-label">Protocol</span>
-                <span className="ut-stat-value">{protocols[activeProtocol]?.name || 'None'}</span>
-              </div>
-              <div className="ut-stat">
-                <span className="ut-stat-label">Active Time</span>
-                <span className="ut-stat-value">
-                  {Math.floor(totalActiveTime / 60)}m {Math.round(totalActiveTime % 60)}s
-                </span>
-              </div>
-            </div>
-            
-            <div className="ut-actions">
-              <button 
-                className="ut-btn-primary"
-                onClick={() => {
-                  logTrigger();
-                  resetSession();
-                }}
-              >
-                Complete
+            <div className="ut-modal-footer">
+              <button className="ut-btn-primary" onClick={() => {
+                startActiveTimer();
+                animateModalClose(setShowProtocolSheet);
+                setCurrentStep('tools');
+              }}>
+                I've Completed This
               </button>
-              <button 
-                className="ut-btn-ghost"
-                onClick={resetSession}
-              >
-                New Session
+              <button className="ut-btn-ghost" onClick={() => animateModalClose(setShowProtocolSheet)}>
+                Cancel
               </button>
             </div>
-          </>
-        )}
-      </div>
-    </div>
-    )}
+          </div>
+        </div>
+      )}
+
 
       {/* ================================================================
           BREATHING MODAL
