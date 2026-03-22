@@ -806,46 +806,63 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
 
             {/* ====== ASSESS — 3×3 heat map ====== */}
             {currentStep === 'assessment' && (
-              <div className="ut-grid ut-grid-9">
-                {HEAT_LEVELS.map((heat) => (
-                  <button
-                    key={heat.level}
-                    className={`ut-cell ${urgeIntensity === heat.level ? 'selected' : ''}`}
-                    style={{ 
-                      background: heat.bg, 
-                      '--cell-glow': heat.glow 
-                    }}
-                    onClick={() => handleUrgeIntensity(heat.level)}
-                  >
-                    <span className="ut-cell-label" style={{ color: heat.color }}>{heat.label}</span>
-                    <span className="ut-cell-desc">{heat.desc}</span>
-                  </button>
-                ))}
-              </div>
+              <>
+                <div className="ut-grid ut-grid-9">
+                  {HEAT_LEVELS.map((heat) => (
+                    <button
+                      key={heat.level}
+                      className={`ut-cell ${urgeIntensity === heat.level ? 'selected' : ''}`}
+                      style={{ 
+                        background: heat.bg, 
+                        '--cell-glow': heat.glow 
+                      }}
+                      onClick={() => handleUrgeIntensity(heat.level)}
+                    >
+                      <span className="ut-cell-label" style={{ color: heat.color }}>{heat.label}</span>
+                      <span className="ut-cell-desc">{heat.desc}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="ut-urge-bar">
+                  <span className="ut-urge-bar-text">
+                    {userData.urgeLog && userData.urgeLog.length > 0
+                      ? `${userData.urgeLog.length} urge${userData.urgeLog.length !== 1 ? 's' : ''} logged · Last: ${new Date(userData.urgeLog[userData.urgeLog.length - 1].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+                      : 'Tap your current intensity to begin'
+                    }
+                  </span>
+                </div>
+              </>
             )}
 
             {/* ====== PROTOCOL — 2×2 grid ====== */}
             {currentStep === 'protocol' && (
-              <div className={`ut-grid ut-grid-protocol`}>
-                {Object.entries(protocols).map(([key, protocol]) => {
-                  const tint = PROTOCOL_TINTS[key] || {};
-                  return (
-                    <button
-                      key={key}
-                      className={`ut-cell ${activeProtocol === key ? 'selected' : ''}`}
-                      style={{ 
-                        background: tint.bg || 'var(--cal-cell-bg)',
-                        '--cell-glow': tint.glow || 'rgba(255,255,255,0.06)'
-                      }}
-                      onClick={() => handleProtocolTap(key)}
-                    >
-                      {recommendedProtocol === key && <span className="ut-cell-badge">Recommended</span>}
-                      <span className="ut-cell-label" style={{ color: tint.color || 'var(--text-secondary)' }}>{protocol.name}</span>
-                      <span className="ut-cell-desc">{protocol.duration} · {protocol.description}</span>
-                    </button>
-                  );
-                })}
-              </div>
+              <>
+                <div className={`ut-grid ut-grid-protocol`}>
+                  {Object.entries(protocols).map(([key, protocol]) => {
+                    const tint = PROTOCOL_TINTS[key] || {};
+                    return (
+                      <button
+                        key={key}
+                        className={`ut-cell ${activeProtocol === key ? 'selected' : ''}`}
+                        style={{ 
+                          background: tint.bg || 'var(--cal-cell-bg)',
+                          '--cell-glow': tint.glow || 'rgba(255,255,255,0.06)'
+                        }}
+                        onClick={() => handleProtocolTap(key)}
+                      >
+                        {recommendedProtocol === key && <span className="ut-cell-badge">Recommended</span>}
+                        <span className="ut-cell-label" style={{ color: tint.color || 'var(--text-secondary)' }}>{protocol.name}</span>
+                        <span className="ut-cell-desc">{protocol.duration} · {protocol.description}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="ut-urge-bar">
+                  <span className="ut-urge-bar-text">
+                    {selectedHeat ? `${selectedHeat.label} intensity` : '—'} · Tap a protocol to begin
+                  </span>
+                </div>
+              </>
             )}
 
             {/* ====== REINFORCE — 3×2 grid ====== */}
