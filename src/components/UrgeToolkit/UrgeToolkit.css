@@ -68,6 +68,8 @@
   z-index: 10;
   background: var(--background);
   border-bottom: 1px solid var(--border-subtle);
+  animation: fadeInUp 400ms ease forwards;
+  opacity: 0;
 }
 
 .ut-header-row {
@@ -147,6 +149,8 @@
   text-align: center;
   z-index: 5;
   background: var(--background);
+  animation: fadeInUp 400ms ease 50ms forwards;
+  opacity: 0;
 }
 
 .ut-tx-signal {
@@ -176,6 +180,8 @@
   border-bottom: 1px solid var(--border-subtle);
   z-index: 5;
   background: var(--background);
+  animation: fadeInUp 400ms ease 100ms forwards;
+  opacity: 0;
 }
 
 .ut-step-nav {
@@ -304,8 +310,8 @@
   font-size: 0.5625rem;
   padding: 2px 8px;
   border-radius: 9999px;
-  background: rgba(52,211,153,0.12);
-  color: rgba(52,211,153,0.8);
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
   font-weight: 600;
   letter-spacing: 0.03em;
 }
@@ -407,6 +413,8 @@
   border-top: 1px solid var(--border-subtle);
   background: var(--background);
   z-index: 5;
+  animation: fadeInUp 400ms ease 350ms forwards;
+  opacity: 0;
 }
 
 .ut-urge-bar-text {
@@ -750,5 +758,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ut-cell { animation: none; opacity: 1; }
+  .ut-cell,
+  .ut-header-sticky,
+  .ut-tx-strip,
+  .ut-step-strip,
+  .ut-urge-bar {
+    animation: none;
+    opacity: 1;
+  }
 }

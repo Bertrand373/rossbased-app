@@ -24,6 +24,9 @@
 
 @media (min-width: 1025px) {
   .main-content-wrapper:has(.stats-page) {
+    display: flex;
+    flex-direction: column;
+    max-width: none;
     height: calc(100dvh - var(--header-height));
     max-height: calc(100dvh - var(--header-height));
   }
@@ -147,6 +150,25 @@
   height: 14px;
   background: var(--border-prominent);
   flex-shrink: 0;
+}
+
+/* Trophy/leaderboard button — matches Calendar week-metrics-gear */
+.stats-lb-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.stats-lb-btn:active {
+  color: var(--text);
 }
 
 /* =============================================================================
@@ -1078,7 +1100,7 @@
 
 @media (min-width: 1025px) {
   .stats-analytics {
-    max-width: 1200px;
+    max-width: 1400px;
     align-self: center;
     width: 100%;
   }

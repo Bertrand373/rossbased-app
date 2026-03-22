@@ -744,7 +744,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
       {/* ====== STICKY HEADER ====== */}
       <div className="ut-header-sticky">
         <div className="ut-header-row">
-          <span className="ut-header-title">Urges</span>
+          <span className="ut-header-title">Phase {currentPhase.num} · {currentPhase.name}</span>
           <div className="ut-view-toggle">
             <button
               className={`ut-vt-btn ${activeView === 'intervene' ? 'active' : ''}`}
@@ -795,9 +795,6 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
                   {index < steps.length - 1 && <span className="ut-step-div" />}
                 </React.Fragment>
               ))}
-            </div>
-            <div className="ut-phase-line">
-              Phase {currentPhase.num} · {currentPhase.name} · Day {currentDay}
             </div>
           </div>
 
