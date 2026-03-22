@@ -22,6 +22,9 @@
 
 @media (min-width: 1025px) {
   .main-content-wrapper:has(.ut-page) {
+    display: flex;
+    flex-direction: column;
+    max-width: none;
     height: calc(100dvh - var(--header-height));
     max-height: calc(100dvh - var(--header-height));
   }
@@ -235,6 +238,15 @@
   max-width: 1200px;
 }
 
+@media (min-width: 1024px) {
+  .ut-content-area {
+    padding: 16px 32px 0;
+  }
+  .ut-content-area > * {
+    max-width: 1400px;
+  }
+}
+
 /* =============================================================================
    GRID — shared DNA
    ============================================================================= */
@@ -380,6 +392,29 @@
 
 .ut-footer-btn:hover { background: var(--border); }
 .ut-footer-btn:active { transform: scale(0.97); }
+
+/* =============================================================================
+   URGE BAR — thin bottom strip matching Calendar moon bar (Assess/Protocol)
+   ============================================================================= */
+
+.ut-urge-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border-subtle);
+  background: var(--background);
+  z-index: 5;
+}
+
+.ut-urge-bar-text {
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: 0.02em;
+}
 
 /* =============================================================================
    BUTTONS
