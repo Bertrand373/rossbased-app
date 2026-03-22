@@ -37,14 +37,6 @@ const HEAT_LEVELS = [
   { level: 9, label: 'Critical', desc: 'Emergency', bg: 'rgba(185,28,28,0.11)', color: 'rgba(185,28,28,0.9)', glow: 'rgba(185,28,28,0.18)' },
 ];
 
-// Protocol cell tints — gives each protocol visual identity
-const PROTOCOL_TINTS = {
-  breathing: { bg: 'rgba(52,211,153,0.05)', color: 'rgba(52,211,153,0.8)', glow: 'rgba(52,211,153,0.10)' },
-  mental: { bg: 'rgba(139,92,246,0.05)', color: 'rgba(139,92,246,0.75)', glow: 'rgba(139,92,246,0.10)' },
-  physical: { bg: 'rgba(245,158,11,0.05)', color: 'rgba(245,158,11,0.75)', glow: 'rgba(245,158,11,0.10)' },
-  energy: { bg: 'rgba(212,175,55,0.05)', color: 'rgba(212,175,55,0.75)', glow: 'rgba(212,175,55,0.10)' },
-};
-
 // Microcosmic Orbit energy points
 const ORBIT_POINTS = [
   { id: 'perineum', name: 'Hui Yin', location: 'Perineum', instruction: 'Feel energy gather at the base' },
@@ -835,24 +827,18 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
             {currentStep === 'protocol' && (
               <>
                 <div className={`ut-grid ut-grid-protocol`}>
-                  {Object.entries(protocols).map(([key, protocol]) => {
-                    const tint = PROTOCOL_TINTS[key] || {};
-                    return (
-                      <button
-                        key={key}
-                        className={`ut-cell ${activeProtocol === key ? 'selected' : ''}`}
-                        style={{ 
-                          background: tint.bg || 'var(--cal-cell-bg)',
-                          '--cell-glow': tint.glow || 'rgba(255,255,255,0.06)'
-                        }}
-                        onClick={() => handleProtocolTap(key)}
-                      >
-                        {recommendedProtocol === key && <span className="ut-cell-badge">Recommended</span>}
-                        <span className="ut-cell-label" style={{ color: tint.color || 'var(--text-secondary)' }}>{protocol.name}</span>
-                        <span className="ut-cell-desc">{protocol.duration} · {protocol.description}</span>
-                      </button>
-                    );
-                  })}
+                  {Object.entries(protocols).map(([key, protocol]) => (
+                    <button
+                      key={key}
+                      className={`ut-cell ${activeProtocol === key ? 'selected' : ''}`}
+                      style={{ '--cell-glow': 'rgba(255,255,255,0.06)' }}
+                      onClick={() => handleProtocolTap(key)}
+                    >
+                      {recommendedProtocol === key && <span className="ut-cell-badge">Recommended</span>}
+                      <span className="ut-cell-label" style={{ color: 'var(--text-secondary)' }}>{protocol.name}</span>
+                      <span className="ut-cell-desc">{protocol.duration} · {protocol.description}</span>
+                    </button>
+                  ))}
                 </div>
                 <div className="ut-urge-bar">
                   <span className="ut-urge-bar-text">
