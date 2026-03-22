@@ -1,43 +1,210 @@
 /* UrgeToolkit.css - TITANTRACK ELITE
-   Theme-aware version - uses CSS variables from index.css */
+   Theme-aware version - uses CSS variables from index.css
+   V2: Viewport-locked layout matching Stats/Calendar DNA */
 
 /* =============================================================================
-   CONTAINER
+   PARENT WRAPPER CONSTRAINT — prevents scroll, same pattern as Calendar/Stats
    ============================================================================= */
 
-.urge-toolkit {
-  min-height: calc(100dvh - 56px - 80px);
+.main-content-wrapper:has(.ut-page) {
+  padding: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 48px 24px 120px;
-  background-color: var(--background);
-  width: 100%;
-  --grid-breakout: 16px;
-  overflow-x: hidden;
+  height: calc(100dvh - var(--header-height-mobile) - var(--nav-height-mobile) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - var(--header-height-mobile) - var(--nav-height-mobile) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+}
+
+.app-content:has(.ut-page) {
+  overflow: hidden;
+  padding-bottom: 0 !important;
 }
 
 @media (min-width: 1025px) {
-  .urge-toolkit {
-    min-height: calc(100dvh - 64px);
-    padding: 56px 24px 80px;
-  }
-  
-  .urge-toolkit > * {
-    max-width: 700px;
+  .main-content-wrapper:has(.ut-page) {
+    height: calc(100dvh - var(--header-height));
+    max-height: calc(100dvh - var(--header-height));
   }
 }
 
-.urge-toolkit > * {
+/* =============================================================================
+   PAGE CONTAINER — no scroll, flex column fills viewport
+   ============================================================================= */
+
+.ut-page {
+  flex: 1;
+  background-color: var(--background);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle ambient gradient — matches Calendar/Stats */
+.ut-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 100vw;
+  max-width: none;
+  left: 50%;
+  transform: translateX(-50%);
+  background: 
+    radial-gradient(ellipse 80% 50% at 50% -10%, var(--gradient-subtle) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 50% 110%, var(--gradient-subtle) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+[data-theme="light"] .ut-page::before {
+  display: none;
+}
+
+/* =============================================================================
+   HEADER — pixel-matched to Stats header
+   ============================================================================= */
+
+.ut-header-sticky {
+  flex-shrink: 0;
+  z-index: 10;
+  background: var(--background);
+  border-bottom: 1px solid var(--border-subtle);
+  animation: fadeInUp 500ms ease forwards;
+}
+
+.ut-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 0;
+  padding: 10px 16px;
+}
+
+.ut-header-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+@media (max-width: 480px) {
+  .ut-header-row {
+    gap: 8px;
+    padding: 0 16px;
+  }
+  .ut-header-title {
+    font-size: 1rem;
+  }
+}
+
+/* View toggle — identical to Stats Analytics|Timeline */
+.ut-view-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.ut-vt-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ut-vt-btn:hover:not(.active) {
+  color: var(--text-secondary);
+}
+
+.ut-vt-btn.active {
+  color: var(--text);
+  font-weight: 600;
+}
+
+@media (max-width: 480px) {
+  .ut-vt-btn {
+    font-size: 0.8125rem;
+    padding: 8px 12px;
+  }
+}
+
+.ut-vt-div {
+  width: 1px;
+  height: 14px;
+  background: var(--border-prominent);
+  flex-shrink: 0;
+}
+
+/* =============================================================================
+   BASED30 VIEW — centers MindProgram in viewport
+   ============================================================================= */
+
+.ut-view-based30 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.ut-view-based30 > .mp-section {
   width: 100%;
   max-width: 480px;
 }
 
+@media (min-width: 1025px) {
+  .ut-view-based30 > .mp-section {
+    max-width: 700px;
+  }
+}
+
 /* =============================================================================
-   GRID BREAKOUT — containers extend beyond page padding to match Stats/Calendar
+   INTERVENE VIEW — scrollable content area for the intervention flow
    ============================================================================= */
 
-/* Grandchildren inside ut-content — negative margins work in block flow */
+.ut-view-intervene {
+  flex: 1;
+  height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 32px 16px 40px;
+  position: relative;
+  z-index: 1;
+  --grid-breakout: 10px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.ut-view-intervene > * {
+  width: 100%;
+  max-width: 480px;
+}
+
+@media (min-width: 1025px) {
+  .ut-view-intervene {
+    padding: 40px 24px 60px;
+  }
+  .ut-view-intervene > * {
+    max-width: 700px;
+  }
+}
+
+/* =============================================================================
+   GRID BREAKOUT — containers extend beyond view padding
+   ============================================================================= */
+
 .ut-intensity,
 .ut-protocols,
 .ut-breathing-info-card,
@@ -47,21 +214,6 @@
 .ut-triggers {
   margin-left: calc(-1 * var(--grid-breakout));
   margin-right: calc(-1 * var(--grid-breakout));
-}
-
-/* Direct flex children — need explicit width calc (negative margins alone don't resize flex items) */
-.urge-toolkit > .mp-section,
-.urge-toolkit > .ut-peak-recording {
-  max-width: none;
-  width: calc(100% + 2 * var(--grid-breakout));
-}
-
-/* Desktop: re-cap direct children to match grandchild breakout width */
-@media (min-width: 1025px) {
-  .urge-toolkit > .mp-section,
-  .urge-toolkit > .ut-peak-recording {
-    max-width: calc(700px + 2 * var(--grid-breakout));
-  }
 }
 
 /* =============================================================================
@@ -986,11 +1138,11 @@
    ============================================================================= */
 
 @media (max-width: 768px) {
-  .urge-toolkit { padding: 48px 20px 120px; --grid-breakout: 12px; }
+  .ut-view-intervene { --grid-breakout: 8px; }
 }
 
 @media (max-width: 480px) {
-  .urge-toolkit { padding: 32px 16px 120px; --grid-breakout: 10px; }
+  .ut-view-intervene { --grid-breakout: 6px; }
   .ut-phase { padding-bottom: 24px; margin-bottom: 32px; }
   .ut-steps { margin-bottom: 36px; }
   .ut-step { padding: 8px 12px; font-size: 0.8125rem; }
@@ -1003,7 +1155,7 @@
 }
 
 @media (max-width: 360px) {
-  .urge-toolkit { padding: 28px 12px 100px; --grid-breakout: 6px; }
+  .ut-view-intervene { --grid-breakout: 4px; }
 }
 
 @media (min-width: 1024px) {

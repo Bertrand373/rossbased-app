@@ -54,6 +54,7 @@ const ORBIT_POINTS = [
 
 const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   // Core States
+  const [activeView, setActiveView] = useState('based30');
   const [currentStep, setCurrentStep] = useState('assessment');
   const [urgeIntensity, setUrgeIntensity] = useState(0);
   const [activeProtocol, setActiveProtocol] = useState(null);
@@ -669,27 +670,49 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
   // ============================================================
 
   return (
-    <div className="urge-toolkit">
-      {/* Mind Program — Always visible at top */}
-      <MindProgram isPremium={isPremium} userData={userData} updateUserData={updateUserData} openPlanModal={openPlanModal} />
-
-      {/* Peak State Recording — shows most recent during crisis */}
-      {userData.peakRecordings && userData.peakRecordings.length > 0 && (() => {
-        const latest = userData.peakRecordings[userData.peakRecordings.length - 1];
-        return (
-          <div className="ut-peak-recording">
-            <div className="ut-peak-signal">YOUR TRANSMISSION</div>
-            <div className="ut-peak-meta">Day {latest.streakDay} · {new Date(latest.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
-            <p className="ut-peak-message">{latest.message}</p>
+    <div className="ut-page">
+      {/* ====== STICKY HEADER — mirrors Stats header exactly ====== */}
+      <div className="ut-header-sticky">
+        <div className="ut-header-row">
+          <span className="ut-header-title">Urges</span>
+          <div className="ut-view-toggle">
+            <button
+              className={`ut-vt-btn ${activeView === 'based30' ? 'active' : ''}`}
+              onClick={() => setActiveView('based30')}
+            >Based30</button>
+            <span className="ut-vt-div" />
+            <button
+              className={`ut-vt-btn ${activeView === 'intervene' ? 'active' : ''}`}
+              onClick={() => setActiveView('intervene')}
+            >Intervene</button>
           </div>
-        );
-      })()}
+        </div>
+      </div>
 
-      {/* Urge Intervention Section */}
-      <div className="ut-intervention-label">URGE INTERVENTION</div>
+      {/* ====== BASED30 VIEW ====== */}
+      {activeView === 'based30' && (
+        <div className="ut-view-based30">
+          <MindProgram isPremium={isPremium} userData={userData} updateUserData={updateUserData} openPlanModal={openPlanModal} />
+        </div>
+      )}
 
-      {/* Phase Indicator */}
-      <div className="ut-phase">
+      {/* ====== INTERVENTION VIEW ====== */}
+      {activeView === 'intervene' && (
+        <div className="ut-view-intervene">
+          {/* Peak State Recording — shows most recent during crisis */}
+          {userData.peakRecordings && userData.peakRecordings.length > 0 && (() => {
+            const latest = userData.peakRecordings[userData.peakRecordings.length - 1];
+            return (
+              <div className="ut-peak-recording">
+                <div className="ut-peak-signal">YOUR TRANSMISSION</div>
+                <div className="ut-peak-meta">Day {latest.streakDay} · {new Date(latest.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                <p className="ut-peak-message">{latest.message}</p>
+              </div>
+            );
+          })()}
+
+          {/* Phase Indicator */}
+          <div className="ut-phase">
         <span className="ut-phase-num">{currentPhase.num}</span>
         <div className="ut-phase-info">
           <span className="ut-phase-name">{currentPhase.name}</span>
@@ -973,6 +996,8 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
           </>
         )}
       </div>
+    </div>
+    )}
 
       {/* ================================================================
           BREATHING MODAL
