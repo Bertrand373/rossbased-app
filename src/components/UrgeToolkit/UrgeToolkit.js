@@ -744,7 +744,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
       {/* ====== STICKY HEADER ====== */}
       <div className="ut-header-sticky">
         <div className="ut-header-row">
-          <span className="ut-header-title">Phase {currentPhase.num} · {currentPhase.name}</span>
+          <span className="ut-header-title">{currentPhase.name}</span>
           <div className="ut-view-toggle">
             <button
               className={`ut-vt-btn ${activeView === 'intervene' ? 'active' : ''}`}

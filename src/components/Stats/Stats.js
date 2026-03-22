@@ -342,7 +342,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       {/* ====== STICKY HEADER — mirrors Calendar header exactly ====== */}
       <div className="stats-header-sticky">
         <div className="stats-header-row">
-          <span className="stats-header-title">{safeUserData.currentStreak || 0} days · {phaseInfo.name}</span>
+          <span className="stats-header-title">{phaseInfo.name}</span>
           <div className="stats-view-toggle">
             <button
               className="stats-vt-btn stats-lb-btn"
