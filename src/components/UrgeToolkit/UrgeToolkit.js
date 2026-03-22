@@ -922,7 +922,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
                 animateModalClose(setShowProtocolSheet);
                 setCurrentStep('tools');
               }}>
-                I've Completed This
+                Completed
               </button>
               <button className="ut-btn-ghost" onClick={() => animateModalClose(setShowProtocolSheet)}>
                 Cancel
@@ -1259,7 +1259,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
               {!coldActive ? (
                 <>
                   <button className="ut-btn-primary" onClick={startCold}>
-                    Start Timer
+                    Start
                   </button>
                   <button className="ut-btn-ghost" onClick={() => animateModalClose(setShowColdModal)}>
                     Cancel
