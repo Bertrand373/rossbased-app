@@ -26,16 +26,24 @@ const TRIGGER_ICONS = {
 
 // 9-level thermal heat map — teal → yellow-green → amber → orange → red
 const HEAT_LEVELS = [
-  { level: 1, label: 'Whisper', desc: 'Barely there', bg: 'rgba(52,211,153,0.06)', color: 'rgba(52,211,153,0.7)', ring: 'rgba(52,211,153,0.4)' },
-  { level: 2, label: 'Flicker', desc: 'Brief, passing', bg: 'rgba(52,211,153,0.09)', color: 'rgba(52,211,153,0.85)', ring: 'rgba(52,211,153,0.5)' },
-  { level: 3, label: 'Pulse', desc: 'Noticeable', bg: 'rgba(163,210,51,0.07)', color: 'rgba(163,210,51,0.8)', ring: 'rgba(163,210,51,0.45)' },
-  { level: 4, label: 'Rising', desc: 'Building', bg: 'rgba(234,179,8,0.06)', color: 'rgba(234,179,8,0.75)', ring: 'rgba(234,179,8,0.4)' },
-  { level: 5, label: 'Surge', desc: 'Demanding', bg: 'rgba(245,158,11,0.07)', color: 'rgba(245,158,11,0.8)', ring: 'rgba(245,158,11,0.45)' },
-  { level: 6, label: 'Gripping', desc: 'Hard to ignore', bg: 'rgba(249,115,22,0.08)', color: 'rgba(249,115,22,0.8)', ring: 'rgba(249,115,22,0.45)' },
-  { level: 7, label: 'Burning', desc: 'Consuming', bg: 'rgba(239,68,68,0.07)', color: 'rgba(239,68,68,0.75)', ring: 'rgba(239,68,68,0.4)' },
-  { level: 8, label: 'Raging', desc: 'Overwhelming', bg: 'rgba(220,38,38,0.09)', color: 'rgba(220,38,38,0.8)', ring: 'rgba(220,38,38,0.45)' },
-  { level: 9, label: 'Critical', desc: 'Emergency', bg: 'rgba(185,28,28,0.11)', color: 'rgba(185,28,28,0.9)', ring: 'rgba(185,28,28,0.5)' },
+  { level: 1, label: 'Whisper', desc: 'Barely there', bg: 'rgba(52,211,153,0.06)', color: 'rgba(52,211,153,0.7)', glow: 'rgba(52,211,153,0.12)' },
+  { level: 2, label: 'Flicker', desc: 'Brief, passing', bg: 'rgba(52,211,153,0.09)', color: 'rgba(52,211,153,0.85)', glow: 'rgba(52,211,153,0.15)' },
+  { level: 3, label: 'Pulse', desc: 'Noticeable', bg: 'rgba(163,210,51,0.07)', color: 'rgba(163,210,51,0.8)', glow: 'rgba(163,210,51,0.14)' },
+  { level: 4, label: 'Rising', desc: 'Building', bg: 'rgba(234,179,8,0.06)', color: 'rgba(234,179,8,0.75)', glow: 'rgba(234,179,8,0.12)' },
+  { level: 5, label: 'Surge', desc: 'Demanding', bg: 'rgba(245,158,11,0.07)', color: 'rgba(245,158,11,0.8)', glow: 'rgba(245,158,11,0.14)' },
+  { level: 6, label: 'Gripping', desc: 'Hard to ignore', bg: 'rgba(249,115,22,0.08)', color: 'rgba(249,115,22,0.8)', glow: 'rgba(249,115,22,0.14)' },
+  { level: 7, label: 'Burning', desc: 'Consuming', bg: 'rgba(239,68,68,0.07)', color: 'rgba(239,68,68,0.75)', glow: 'rgba(239,68,68,0.12)' },
+  { level: 8, label: 'Raging', desc: 'Overwhelming', bg: 'rgba(220,38,38,0.09)', color: 'rgba(220,38,38,0.8)', glow: 'rgba(220,38,38,0.15)' },
+  { level: 9, label: 'Critical', desc: 'Emergency', bg: 'rgba(185,28,28,0.11)', color: 'rgba(185,28,28,0.9)', glow: 'rgba(185,28,28,0.18)' },
 ];
+
+// Protocol cell tints — gives each protocol visual identity
+const PROTOCOL_TINTS = {
+  breathing: { bg: 'rgba(52,211,153,0.05)', color: 'rgba(52,211,153,0.8)', glow: 'rgba(52,211,153,0.10)' },
+  mental: { bg: 'rgba(139,92,246,0.05)', color: 'rgba(139,92,246,0.75)', glow: 'rgba(139,92,246,0.10)' },
+  physical: { bg: 'rgba(245,158,11,0.05)', color: 'rgba(245,158,11,0.75)', glow: 'rgba(245,158,11,0.10)' },
+  energy: { bg: 'rgba(212,175,55,0.05)', color: 'rgba(212,175,55,0.75)', glow: 'rgba(212,175,55,0.10)' },
+};
 
 // Microcosmic Orbit energy points
 const ORBIT_POINTS = [
@@ -805,7 +813,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
                     className={`ut-cell ${urgeIntensity === heat.level ? 'selected' : ''}`}
                     style={{ 
                       background: heat.bg, 
-                      '--cell-ring': heat.ring 
+                      '--cell-glow': heat.glow 
                     }}
                     onClick={() => handleUrgeIntensity(heat.level)}
                   >
@@ -819,18 +827,24 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
             {/* ====== PROTOCOL — 2×2 grid ====== */}
             {currentStep === 'protocol' && (
               <div className={`ut-grid ut-grid-protocol`}>
-                {Object.entries(protocols).map(([key, protocol]) => (
-                  <button
-                    key={key}
-                    className={`ut-cell ${activeProtocol === key ? 'selected' : ''}`}
-                    style={{ '--cell-ring': 'rgba(255,255,255,0.2)' }}
-                    onClick={() => handleProtocolTap(key)}
-                  >
-                    {recommendedProtocol === key && <span className="ut-cell-badge">Recommended</span>}
-                    <span className="ut-cell-label" style={{ color: 'var(--text-secondary)' }}>{protocol.name}</span>
-                    <span className="ut-cell-desc">{protocol.duration} · {protocol.description}</span>
-                  </button>
-                ))}
+                {Object.entries(protocols).map(([key, protocol]) => {
+                  const tint = PROTOCOL_TINTS[key] || {};
+                  return (
+                    <button
+                      key={key}
+                      className={`ut-cell ${activeProtocol === key ? 'selected' : ''}`}
+                      style={{ 
+                        background: tint.bg || 'var(--cal-cell-bg)',
+                        '--cell-glow': tint.glow || 'rgba(255,255,255,0.06)'
+                      }}
+                      onClick={() => handleProtocolTap(key)}
+                    >
+                      {recommendedProtocol === key && <span className="ut-cell-badge">Recommended</span>}
+                      <span className="ut-cell-label" style={{ color: tint.color || 'var(--text-secondary)' }}>{protocol.name}</span>
+                      <span className="ut-cell-desc">{protocol.duration} · {protocol.description}</span>
+                    </button>
+                  );
+                })}
               </div>
             )}
 
@@ -842,7 +856,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
                     <button
                       key={item.id}
                       className="ut-cell"
-                      style={{ '--cell-ring': 'rgba(255,255,255,0.15)' }}
+                      style={{ '--cell-glow': 'rgba(255,255,255,0.06)' }}
                       onClick={item.action}
                     >
                       <span className="ut-cell-label" style={{ color: item.interactive ? 'var(--text-secondary)' : 'var(--text-tertiary)' }}>{item.label}</span>
@@ -869,7 +883,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
                     <button
                       key={trigger.id}
                       className={`ut-cell ${selectedTrigger === trigger.id ? 'selected' : ''}`}
-                      style={{ '--cell-ring': 'rgba(255,255,255,0.2)' }}
+                      style={{ '--cell-glow': 'rgba(255,255,255,0.06)' }}
                       onClick={() => setSelectedTrigger(trigger.id)}
                     >
                       <span className="ut-cell-label" style={{ color: selectedTrigger === trigger.id ? 'var(--text)' : 'var(--text-tertiary)' }}>{trigger.label}</span>
