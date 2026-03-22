@@ -1,32 +1,24 @@
 /* =============================================================================
    MIND PROGRAM — Based30
-   Sits at top of Toolkit page, always accessible
+   Nighttime cocoon: ambient, centered, peaceful
    ============================================================================= */
 
 .mp-section {
   width: 100%;
-  padding-bottom: 32px;
-  margin-bottom: 32px;
-  border-bottom: 1px solid var(--border-subtle);
-  animation: fadeInUp 500ms ease forwards;
-  opacity: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Section label */
-.mp-label {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 20px;
-  text-align: center;
-}
+/* =============================================================================
+   HEADER — centered title block
+   ============================================================================= */
 
-/* Header */
 .mp-header {
   text-align: center;
   margin-bottom: 28px;
+  animation: mpFadeIn 500ms ease forwards;
+  opacity: 0;
 }
 
 .mp-title {
@@ -53,17 +45,21 @@
 }
 
 /* =============================================================================
-   AUDIO PLAYER
+   AUDIO PLAYER — glass card surface
    ============================================================================= */
 
 .mp-player {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 28px;
-  padding: 18px 0;
-  border-top: 1px solid var(--border-subtle);
-  border-bottom: 1px solid var(--border-subtle);
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--cal-cell-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  animation: mpFadeIn 500ms ease 100ms forwards;
+  opacity: 0;
 }
 
 .mp-player-main {
@@ -72,7 +68,6 @@
   gap: 14px;
 }
 
-/* Album art thumbnail */
 .mp-album-art {
   width: 48px;
   height: 48px;
@@ -81,7 +76,6 @@
   flex-shrink: 0;
 }
 
-/* Play button */
 .mp-play-btn {
   width: 44px;
   height: 44px;
@@ -98,25 +92,11 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.mp-play-btn:hover {
-  background: var(--surface-overlay);
-}
+.mp-play-btn:hover { background: var(--surface-overlay); }
+.mp-play-btn:active { transform: scale(0.95); }
+.mp-play-btn.active { background: var(--surface-overlay); border-color: var(--border-prominent); }
+.mp-play-btn:disabled { opacity: 0.3; cursor: default; }
 
-.mp-play-btn:active {
-  transform: scale(0.95);
-}
-
-.mp-play-btn.active {
-  background: var(--surface-overlay);
-  border-color: var(--border-prominent);
-}
-
-.mp-play-btn:disabled {
-  opacity: 0.3;
-  cursor: default;
-}
-
-/* Track info */
 .mp-track-info {
   flex: 1;
   display: flex;
@@ -144,12 +124,12 @@
   font-feature-settings: 'tnum' 1;
 }
 
-/* Loop toggle — toggle switch row */
+/* Loop toggle row */
 .mp-loop-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 12px;
+  padding-top: 4px;
 }
 
 .mp-loop-label {
@@ -158,7 +138,7 @@
   color: var(--text-secondary);
 }
 
-/* Toggle Switch — matches Profile pattern exactly */
+/* Toggle Switch */
 .mp-toggle-switch {
   position: relative;
   width: 50px;
@@ -173,9 +153,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.mp-toggle-switch.active {
-  background: var(--text);
-}
+.mp-toggle-switch.active { background: var(--text); }
 
 .mp-toggle-knob {
   position: absolute;
@@ -224,7 +202,6 @@
   background: var(--text);
 }
 
-/* Audio error */
 .mp-audio-error {
   font-size: 0.75rem;
   color: var(--text-tertiary);
@@ -232,28 +209,29 @@
   padding: 4px 0;
 }
 
-/* Volume recommendation */
 .mp-volume-rec {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   color: var(--text-tertiary);
   text-align: center;
   display: block;
-  padding: 4px 0 0;
 }
 
 /* =============================================================================
-   30-NIGHT TRACKER
+   30-NIGHT TRACKER — Stats progress bar DNA
    ============================================================================= */
 
 .mp-tracker {
+  width: 100%;
   margin-bottom: 8px;
+  animation: mpFadeIn 500ms ease 200ms forwards;
+  opacity: 0;
 }
 
 .mp-tracker-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .mp-tracker-label {
@@ -275,12 +253,12 @@
   font-weight: 400;
 }
 
-/* Progress bar */
+/* Progress bar — matches Stats progress bar */
 .mp-progress-bar {
   width: 100%;
-  height: 3px;
-  background: var(--surface-overlay);
-  border-radius: 2px;
+  height: 2px;
+  background: var(--border-prominent);
+  border-radius: 1px;
   margin-bottom: 20px;
   overflow: hidden;
 }
@@ -288,16 +266,16 @@
 .mp-progress-fill {
   height: 100%;
   background: var(--text);
-  border-radius: 2px;
-  transition: width 400ms ease;
+  border-radius: 1px;
+  transition: width 800ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Confirm button — dark rectangle style */
+/* Confirm button */
 .mp-confirm-btn {
   width: 100%;
   padding: 14px 20px;
   border-radius: 9999px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-prominent);
   background: var(--surface-overlay);
   color: var(--text);
   font-size: 0.875rem;
@@ -309,13 +287,8 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.mp-confirm-btn:hover {
-  border-color: rgba(255, 255, 255, 0.25);
-}
-
-.mp-confirm-btn:active {
-  transform: scale(0.98);
-}
+.mp-confirm-btn:hover { border-color: rgba(255, 255, 255, 0.25); }
+.mp-confirm-btn:active { transform: scale(0.98); }
 
 .mp-confirm-btn.confirmed {
   background: var(--surface-overlay);
@@ -324,15 +297,10 @@
   cursor: default;
 }
 
-.mp-confirm-btn.confirmed:hover {
-  opacity: 1;
-}
+.mp-confirm-btn.confirmed:hover { opacity: 1; }
+.mp-confirm-btn.confirmed:active { transform: none; }
 
-.mp-confirm-btn.confirmed:active {
-  transform: none;
-}
-
-/* Reset link — subtle, doesn't encourage quitting */
+/* Reset link */
 .mp-reset-link {
   display: block;
   width: 100%;
@@ -349,19 +317,20 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.mp-reset-link:hover {
-  color: var(--text-muted);
-}
+.mp-reset-link:hover { color: var(--text-muted); }
 
 /* =============================================================================
    COMPLETION STATE
    ============================================================================= */
 
 .mp-complete {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-bottom: 8px;
+  animation: mpFadeIn 500ms ease 200ms forwards;
+  opacity: 0;
 }
 
 .mp-complete-info {
@@ -401,24 +370,19 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.mp-restart-btn:hover {
-  background: var(--surface-overlay);
-  color: var(--text);
-}
-
-.mp-restart-btn:active {
-  transform: scale(0.98);
-}
+.mp-restart-btn:hover { background: var(--surface-overlay); color: var(--text); }
+.mp-restart-btn:active { transform: scale(0.98); }
 
 /* =============================================================================
    LOCKED STATE (Non-premium)
    ============================================================================= */
 
 .mp-locked {
+  width: 100%;
   padding: 32px 0;
   text-align: center;
-  border-top: 1px solid var(--border-subtle);
-  margin-bottom: 8px;
+  animation: mpFadeIn 500ms ease 200ms forwards;
+  opacity: 0;
 }
 
 .mp-locked-text {
@@ -432,7 +396,7 @@
   margin: 16px auto 0;
   padding: 10px 24px;
   border-radius: 9999px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-prominent);
   background: var(--surface-overlay);
   color: var(--text);
   font-size: 0.8125rem;
@@ -443,13 +407,8 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.mp-locked-btn:hover {
-  border-color: rgba(255, 255, 255, 0.25);
-}
-
-.mp-locked-btn:active {
-  transform: scale(0.98);
-}
+.mp-locked-btn:hover { border-color: rgba(255, 255, 255, 0.25); }
+.mp-locked-btn:active { transform: scale(0.98); }
 
 /* =============================================================================
    ACCORDIONS (What this does / How to use)
@@ -466,6 +425,8 @@
   border-top: 1px solid var(--border-subtle);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  animation: mpFadeIn 500ms ease 300ms forwards;
+  opacity: 0;
 }
 
 .mp-accordion-label {
@@ -480,9 +441,7 @@
   transition: transform 200ms ease;
 }
 
-.mp-accordion-arrow.open {
-  transform: rotate(180deg);
-}
+.mp-accordion-arrow.open { transform: rotate(180deg); }
 
 .mp-accordion-content {
   display: flex;
@@ -498,9 +457,7 @@
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.mp-instr-item:last-child {
-  border-bottom: none;
-}
+.mp-instr-item:last-child { border-bottom: none; }
 
 .mp-instr-num {
   font-size: 0.75rem;
@@ -518,15 +475,26 @@
 }
 
 /* =============================================================================
-   URGE INTERVENTION LABEL (added between sections)
+   ANIMATION
    ============================================================================= */
 
-.ut-intervention-label {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 32px;
-  text-align: center;
+@keyframes mpFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* =============================================================================
+   REDUCED MOTION
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .mp-header,
+  .mp-player,
+  .mp-tracker,
+  .mp-complete,
+  .mp-locked,
+  .mp-accordion-toggle {
+    animation: none;
+    opacity: 1;
+  }
 }

@@ -276,9 +276,6 @@ const MindProgram = ({ isPremium, userData, updateUserData, openPlanModal }) => 
         onEnded={() => { if (!loopEnabled) setIsPlaying(false); }}
       />
 
-      {/* Section label */}
-      <div className="mp-label">MIND PROGRAM</div>
-
       {/* Header */}
       <div className="mp-header">
         <h2 className="mp-title">Based30</h2>
