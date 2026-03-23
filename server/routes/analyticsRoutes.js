@@ -7,7 +7,8 @@ const router = express.Router();
 const User = require('../models/User');
 
 // Timezone-safe streak calculation — handles "yyyy-MM-dd" strings AND legacy Date objects
-function calcStreak(startDate) {
+// Accepts optional timezone (e.g. 'America/New_York') so admin shows correct day
+function calcStreak(startDate, timezone) {
   if (!startDate) return 0;
   let y, m, d;
   if (typeof startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
@@ -16,9 +17,18 @@ function calcStreak(startDate) {
     const dt = new Date(startDate);
     y = dt.getUTCFullYear(); m = dt.getUTCMonth() + 1; d = dt.getUTCDate();
   }
-  const startMid = new Date(y, m - 1, d);
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  return Math.max(1, Math.floor((today - startMid) / (1000 * 60 * 60 * 24)) + 1);
+  const startMs = Date.UTC(y, m - 1, d);
+  let todayMs;
+  if (timezone) {
+    try {
+      const localStr = new Date().toLocaleDateString('en-CA', { timeZone: timezone });
+      const [ty, tm, td] = localStr.split('-').map(Number);
+      todayMs = Date.UTC(ty, tm - 1, td);
+    } catch { const t = new Date(); t.setHours(0,0,0,0); todayMs = t.getTime(); }
+  } else {
+    const t = new Date(); t.setHours(0,0,0,0); todayMs = t.getTime();
+  }
+  return Math.max(1, Math.floor((todayMs - startMs) / 86400000) + 1);
 }
 
 // POST /api/analytics/verify — check admin password
@@ -195,13 +205,13 @@ router.get('/streaks', adminCheck, async (req, res) => {
     // FIXED: Compute real streaks from startDate (not stale currentStreak field)
     const allUsers = await User.find(
       { ...adminFilter, startDate: { $exists: true, $ne: null } },
-      'username startDate currentStreak longestStreak'
+      'username startDate currentStreak longestStreak timezone'
     ).lean();
 
     const realStreaks = allUsers.map(u => ({
       username: u.username,
-      current: calcStreak(u.startDate),
-      longest: Math.max(u.longestStreak || 0, calcStreak(u.startDate))
+      current: calcStreak(u.startDate, u.timezone),
+      longest: Math.max(u.longestStreak || 0, calcStreak(u.startDate, u.timezone))
     }));
 
     const buckets = { 'Day 0': 0, '1-7': 0, '8-14': 0, '15-30': 0, '31-60': 0, '61-90': 0, '91-180': 0, '181-365': 0, '365+': 0 };
@@ -302,7 +312,7 @@ router.get('/users', adminCheck, async (req, res) => {
     if (sort === 'active') sortObj = { lastSeen: -1 };
 
     const users = await User.find({},
-      'username email currentStreak startDate longestStreak relapseCount isPremium subscription.status subscription.tier subscription.trialEndDate subscription.currentPeriodEnd subscription.grandfatheredAt subscription.stripeSubscriptionId createdAt updatedAt lastSeen benefitTracking urgeLog aiUsage showOnLeaderboard discordUsername'
+      'username email currentStreak startDate longestStreak relapseCount isPremium subscription.status subscription.tier subscription.trialEndDate subscription.currentPeriodEnd subscription.grandfatheredAt subscription.stripeSubscriptionId createdAt updatedAt lastSeen benefitTracking urgeLog aiUsage showOnLeaderboard discordUsername timezone'
     ).sort(sortObj).limit(parseInt(limit)).lean();
 
     res.json({
@@ -310,7 +320,7 @@ router.get('/users', adminCheck, async (req, res) => {
         // Compute real-time streak from startDate (same as Oracle)
         let streak = u.currentStreak || 0;
         if (u.startDate) {
-          streak = calcStreak(u.startDate);
+          streak = calcStreak(u.startDate, u.timezone);
         }
         return {
         username: u.username, email: u.email || '',
@@ -330,6 +340,9 @@ router.get('/users', adminCheck, async (req, res) => {
         hasActiveStripeSub: !!(u.subscription?.stripeSubscriptionId && u.subscription?.currentPeriodEnd && new Date(u.subscription.currentPeriodEnd) > new Date()),
         totalLogs: u.benefitTracking?.length || 0, totalUrges: u.urgeLog?.length || 0,
         aiMessages: u.aiUsage?.lifetimeCount || 0,
+        aiToday: u.aiUsage?.count || 0,
+        aiDate: u.aiUsage?.date || null,
+        aiLastUsed: u.aiUsage?.lastUsed || null,
         leaderboard: u.showOnLeaderboard || false, discord: u.discordUsername || '',
         joinedAt: u.createdAt, lastActive: u.lastSeen || u.updatedAt
       }; }),
@@ -616,6 +629,124 @@ router.get('/checkins', adminCheck, async (req, res) => {
   } catch (error) {
     console.error('Analytics checkins error:', error);
     res.status(500).json({ error: 'Failed to load check-in data' });
+  }
+});
+
+// GET /api/analytics/user/:username/activity — per-user activity feed for admin detail panel
+router.get('/user/:username/activity', adminCheck, async (req, res) => {
+  try {
+    const PageView = require('../models/PageView');
+    const { username } = req.params;
+    const sevenDaysAgo = getDateRange(7);
+    const thirtyDaysAgo = getDateRange(30);
+
+    // Parallel fetch: user doc + page views
+    const [user, recentPages, pageStats] = await Promise.all([
+      User.findOne({ username }, 
+        'benefitTracking urgeLog streakHistory oracleNotes aiUsage subscription timezone startDate currentStreak longestStreak relapseCount wetDreamCount discordUsername email createdAt lastSeen showOnLeaderboard'
+      ).lean(),
+      PageView.find({ userId: username, timestamp: { $gte: sevenDaysAgo } })
+        .sort({ timestamp: -1 }).limit(200).lean(),
+      PageView.aggregate([
+        { $match: { userId: username, timestamp: { $gte: thirtyDaysAgo } } },
+        { $group: { _id: '$page', count: { $sum: 1 }, lastVisit: { $max: '$timestamp' } } },
+        { $sort: { count: -1 } }
+      ])
+    ]);
+
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    // Build merged activity timeline (last 7 days, capped at 50 events)
+    const events = [];
+
+    // Page visits → collapsed into sessions (group visits < 2min apart)
+    recentPages.forEach(pv => {
+      events.push({ type: 'page', page: pv.page, at: pv.timestamp, sid: pv.sessionId });
+    });
+
+    // Benefit logs
+    (user.benefitTracking || []).filter(l => new Date(l.date) >= sevenDaysAgo).forEach(l => {
+      events.push({ type: 'log', at: l.date, data: { energy: l.energy, focus: l.focus, confidence: l.confidence, aura: l.aura, sleep: l.sleep, workout: l.workout } });
+    });
+
+    // Urge logs
+    (user.urgeLog || []).filter(l => new Date(l.date) >= sevenDaysAgo).forEach(l => {
+      events.push({ type: 'urge', at: l.date, data: { intensity: l.intensity, trigger: l.trigger, overcame: l.overcame } });
+    });
+
+    // Relapses from streak history
+    (user.streakHistory || []).filter(s => s.end && new Date(s.end) >= sevenDaysAgo).forEach(s => {
+      events.push({ type: 'relapse', at: s.end, data: { days: s.days, trigger: s.trigger, reason: s.reason } });
+    });
+
+    // Oracle notes (last 5)
+    const recentNotes = (user.oracleNotes || []).slice(-5).reverse();
+
+    // Sort events by time desc, cap at 50
+    events.sort((a, b) => new Date(b.at) - new Date(a.at));
+
+    // Page time analysis — estimate time on each page from sequential visits
+    const pageTime = {};
+    const sortedPages = [...recentPages].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    for (let i = 0; i < sortedPages.length - 1; i++) {
+      const dur = (new Date(sortedPages[i + 1].timestamp) - new Date(sortedPages[i].timestamp)) / 1000;
+      if (dur > 0 && dur < 1800) { // cap at 30 min per page
+        const pg = sortedPages[i].page;
+        if (!pageTime[pg]) pageTime[pg] = { total: 0, visits: 0 };
+        pageTime[pg].total += dur;
+        pageTime[pg].visits++;
+      }
+    }
+
+    // Sessions (group page views by sessionId)
+    const sessionMap = {};
+    recentPages.forEach(pv => {
+      if (!sessionMap[pv.sessionId]) sessionMap[pv.sessionId] = { start: pv.timestamp, end: pv.timestamp, pages: 0 };
+      const s = sessionMap[pv.sessionId];
+      if (new Date(pv.timestamp) < new Date(s.start)) s.start = pv.timestamp;
+      if (new Date(pv.timestamp) > new Date(s.end)) s.end = pv.timestamp;
+      s.pages++;
+    });
+    const sessions = Object.values(sessionMap)
+      .map(s => ({ ...s, duration: Math.round((new Date(s.end) - new Date(s.start)) / 1000) }))
+      .sort((a, b) => new Date(b.start) - new Date(a.start));
+
+    res.json({
+      timeline: events.slice(0, 50),
+      pageStats: pageStats.map(p => ({
+        page: p._id,
+        visits: p.count,
+        lastVisit: p.lastVisit,
+        avgTime: pageTime[p._id] ? Math.round(pageTime[p._id].total / pageTime[p._id].visits) : null
+      })),
+      sessions: sessions.slice(0, 10),
+      oracle: {
+        lifetime: user.aiUsage?.lifetimeCount || 0,
+        today: user.aiUsage?.count || 0,
+        todayDate: user.aiUsage?.date || null,
+        lastUsed: user.aiUsage?.lastUsed || null,
+        weeklyCount: user.aiUsage?.weeklyCount || 0,
+        recentNotes
+      },
+      profile: {
+        email: user.email || '',
+        timezone: user.timezone || '',
+        startDate: user.startDate,
+        streak: user.startDate ? calcStreak(user.startDate, user.timezone) : (user.currentStreak || 0),
+        longestStreak: user.longestStreak || 0,
+        relapses: user.relapseCount || 0,
+        wetDreams: user.wetDreamCount || 0,
+        totalLogs: (user.benefitTracking || []).length,
+        totalUrges: (user.urgeLog || []).length,
+        leaderboard: user.showOnLeaderboard || false,
+        discord: user.discordUsername || '',
+        joinedAt: user.createdAt,
+        lastSeen: user.lastSeen
+      }
+    });
+  } catch (error) {
+    console.error('User activity error:', error);
+    res.status(500).json({ error: 'Failed to load user activity' });
   }
 });
 

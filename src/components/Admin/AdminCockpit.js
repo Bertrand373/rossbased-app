@@ -351,6 +351,9 @@ const AdminCockpit = () => {
   // Column sort state
   const [sortCol, setSortCol] = useState('joined');
   const [sortDir, setSortDir] = useState('desc');
+  const [expandedUser, setExpandedUser] = useState(null); // username of expanded user
+  const [userActivity, setUserActivity] = useState(null); // activity data for expanded user
+  const [activityLoading, setActivityLoading] = useState(false);
   const handleColSort = (col) => {
     if (sortCol === col) { setSortDir(sortDir === 'desc' ? 'asc' : 'desc'); }
     else { setSortCol(col); setSortDir('desc'); }
@@ -402,6 +405,51 @@ const AdminCockpit = () => {
         {d.b && <p className="ac-tip-bench">{d.b}</p>}
       </div>
     );
+  };
+
+  // Fetch per-user activity when expanding a user card
+  const fetchUserActivity = useCallback(async (username) => {
+    if (expandedUser === username) { setExpandedUser(null); setUserActivity(null); return; }
+    setExpandedUser(username);
+    setUserActivity(null);
+    setActivityLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API}/api/analytics/user/${encodeURIComponent(username)}/activity`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) { const data = await res.json(); setUserActivity(data); }
+    } catch (e) { console.error('User activity fetch:', e); }
+    setActivityLoading(false);
+  }, [expandedUser]);
+
+  const fmtDuration = (s) => {
+    if (!s || s < 1) return '< 1s';
+    if (s < 60) return `${Math.round(s)}s`;
+    if (s < 3600) return `${Math.round(s / 60)}m`;
+    return `${Math.round(s / 3600 * 10) / 10}h`;
+  };
+
+  const fmtTimeShort = (d) => {
+    if (!d) return '—';
+    const dt = new Date(d);
+    const now = new Date();
+    const diff = now - dt;
+    if (diff < 60000) return 'just now';
+    if (diff < 3600000) return `${Math.round(diff / 60000)}m ago`;
+    if (diff < 86400000) return `${Math.round(diff / 3600000)}h ago`;
+    return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
+  const pageName = (p) => {
+    if (!p) return '?';
+    if (p === '/') return 'Tracker';
+    if (p === '/calendar') return 'Calendar';
+    if (p === '/stats') return 'Stats';
+    if (p === '/urge-toolkit') return 'Urges';
+    if (p === '/admin') return 'Admin';
+    if (p === '/profile') return 'Profile';
+    return p.replace(/^\//, '');
   };
 
   const formatDate = d => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }) : '—';
@@ -971,22 +1019,129 @@ const AdminCockpit = () => {
                   u.subStatus === 'canceled' ? (u.isOG ? 'OG·END' : 'END') :
                   u.subStatus === 'expired' ? (u.isOG ? 'OG' : 'EXP') : null;
                 const badgeClass = u.hasActiveStripeSub ? 'active' : u.subStatus;
+                const isExpanded = expandedUser === u.username;
                 return (
-                  <div key={i} className={`ac-user-card ${isOnline ? 'ac-user-online' : ''}`}>
-                    <div className="ac-uc-row1">
-                      <span className="ac-uc-name">{u.username}</span>
-                      <div className="ac-uc-badges">
-                        {subLabel && <span className={`ac-sub-badge ${badgeClass}`}>{subLabel}</span>}
-                        {isOnline ? <span className="ac-online-badge">now</span> : <span className="ac-uc-ago">{ago}</span>}
+                  <div key={i} className={`ac-user-card ${isOnline ? 'ac-user-online' : ''} ${isExpanded ? 'ac-user-expanded' : ''}`}>
+                    <div className="ac-uc-clickable" onClick={() => fetchUserActivity(u.username)}>
+                      <div className="ac-uc-row1">
+                        <span className="ac-uc-name">{u.username}</span>
+                        <div className="ac-uc-badges">
+                          {subLabel && <span className={`ac-sub-badge ${badgeClass}`}>{subLabel}</span>}
+                          {isOnline ? <span className="ac-online-badge">now</span> : <span className="ac-uc-ago">{ago}</span>}
+                        </div>
+                      </div>
+                      {u.discord && <span className="ac-uc-discord">{u.discord}</span>}
+                      <div className="ac-uc-stats">
+                        <span className="ac-streak-pill">{u.currentStreak}d</span>
+                        <span className="ac-uc-stat">{u.totalLogs} logs</span>
+                        <span className="ac-uc-stat">{u.aiMessages} ai{u.aiToday > 0 ? ` (${u.aiToday} today)` : ''}</span>
+                        <span className="ac-uc-joined">{formatDate(u.joinedAt)}</span>
                       </div>
                     </div>
-                    {u.discord && <span className="ac-uc-discord">{u.discord}</span>}
-                    <div className="ac-uc-stats">
-                      <span className="ac-streak-pill">{u.currentStreak}d</span>
-                      <span className="ac-uc-stat">{u.totalLogs} logs</span>
-                      <span className="ac-uc-stat">{u.aiMessages} ai</span>
-                      <span className="ac-uc-joined">{formatDate(u.joinedAt)}</span>
-                    </div>
+
+                    {/* Expanded detail panel */}
+                    {isExpanded && (
+                      <div className="ac-ud-panel">
+                        {activityLoading && <div className="ac-ud-loading">Loading activity...</div>}
+                        {userActivity && !activityLoading && (
+                          <>
+                            {/* Oracle usage */}
+                            <div className="ac-ud-section">
+                              <div className="ac-ud-label">Oracle</div>
+                              <div className="ac-ud-row">
+                                <span className="ac-ud-kv"><b>{userActivity.oracle.lifetime}</b> lifetime</span>
+                                <span className="ac-ud-kv"><b>{userActivity.oracle.today}</b> today ({userActivity.oracle.todayDate || '—'})</span>
+                                <span className="ac-ud-kv"><b>{userActivity.oracle.weeklyCount}</b> this week</span>
+                                <span className="ac-ud-kv">last: {fmtTimeShort(userActivity.oracle.lastUsed)}</span>
+                              </div>
+                            </div>
+
+                            {/* Page time breakdown */}
+                            {userActivity.pageStats?.length > 0 && (
+                              <div className="ac-ud-section">
+                                <div className="ac-ud-label">Page Activity (30d)</div>
+                                <div className="ac-ud-pages">
+                                  {userActivity.pageStats.map((p, j) => (
+                                    <div key={j} className="ac-ud-page-row">
+                                      <span className="ac-ud-page-name">{pageName(p.page)}</span>
+                                      <span className="ac-ud-page-visits">{p.visits}×</span>
+                                      {p.avgTime && <span className="ac-ud-page-time">~{fmtDuration(p.avgTime)}/visit</span>}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Recent sessions */}
+                            {userActivity.sessions?.length > 0 && (
+                              <div className="ac-ud-section">
+                                <div className="ac-ud-label">Recent Sessions</div>
+                                <div className="ac-ud-sessions">
+                                  {userActivity.sessions.slice(0, 5).map((s, j) => (
+                                    <div key={j} className="ac-ud-session-row">
+                                      <span className="ac-ud-session-time">{fmtTimeShort(s.start)}</span>
+                                      <span className="ac-ud-session-pages">{s.pages} pages</span>
+                                      <span className="ac-ud-session-dur">{fmtDuration(s.duration)}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Activity timeline */}
+                            {userActivity.timeline?.length > 0 && (
+                              <div className="ac-ud-section">
+                                <div className="ac-ud-label">Timeline (7d)</div>
+                                <div className="ac-ud-timeline">
+                                  {userActivity.timeline.slice(0, 20).map((ev, j) => (
+                                    <div key={j} className={`ac-ud-ev ac-ud-ev-${ev.type}`}>
+                                      <span className="ac-ud-ev-type">
+                                        {ev.type === 'page' ? '📄' : ev.type === 'log' ? '📊' : ev.type === 'urge' ? '🔥' : ev.type === 'relapse' ? '⚠️' : '•'}
+                                      </span>
+                                      <span className="ac-ud-ev-desc">
+                                        {ev.type === 'page' && pageName(ev.page)}
+                                        {ev.type === 'log' && `Logged: E${ev.data?.energy || '?'} F${ev.data?.focus || '?'} C${ev.data?.confidence || '?'}`}
+                                        {ev.type === 'urge' && `Urge (${ev.data?.intensity}/10) — ${ev.data?.trigger || 'no trigger'} ${ev.data?.overcame ? '✓' : '✗'}`}
+                                        {ev.type === 'relapse' && `Relapse after ${ev.data?.days}d — ${ev.data?.trigger || ev.data?.reason || '?'}`}
+                                      </span>
+                                      <span className="ac-ud-ev-time">{fmtTimeShort(ev.at)}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Oracle notes */}
+                            {userActivity.oracle.recentNotes?.length > 0 && (
+                              <div className="ac-ud-section">
+                                <div className="ac-ud-label">Oracle Memory (last 5)</div>
+                                <div className="ac-ud-notes">
+                                  {userActivity.oracle.recentNotes.map((n, j) => (
+                                    <div key={j} className="ac-ud-note">
+                                      <span className="ac-ud-note-day">Day {n.streakDay || '?'}</span>
+                                      <span className="ac-ud-note-text">{n.note}</span>
+                                      <span className="ac-ud-note-src">{n.source || 'app'} · {fmtTimeShort(n.date)}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Profile details */}
+                            <div className="ac-ud-section">
+                              <div className="ac-ud-label">Profile</div>
+                              <div className="ac-ud-row ac-ud-profile">
+                                {userActivity.profile.email && <span className="ac-ud-kv">{userActivity.profile.email}</span>}
+                                {userActivity.profile.timezone && <span className="ac-ud-kv">{userActivity.profile.timezone}</span>}
+                                <span className="ac-ud-kv">Longest: {userActivity.profile.longestStreak}d</span>
+                                <span className="ac-ud-kv">WD: {userActivity.profile.wetDreams}</span>
+                                <span className="ac-ud-kv">Leaderboard: {userActivity.profile.leaderboard ? 'yes' : 'no'}</span>
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })}

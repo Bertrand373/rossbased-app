@@ -2116,3 +2116,155 @@
 [data-theme="light"] .ac-ann-card-preview:hover { background: rgba(0,0,0,0.06); color: rgba(0,0,0,0.7); }
 [data-theme="light"] .ac-ann-card-edit { background: rgba(114,137,218,0.05); border-color: rgba(114,137,218,0.12); color: rgba(114,137,218,0.6); }
 [data-theme="light"] .ac-ann-card-edit:hover { background: rgba(114,137,218,0.1); color: rgba(114,137,218,0.8); }
+
+/* =============================================================================
+   USER DETAIL PANEL — expanded view when clicking a user card
+   ============================================================================= */
+
+.ac-uc-clickable { cursor: pointer; }
+.ac-user-expanded { background: rgba(255,255,255,0.02) !important; border-left: 2px solid rgba(212,175,55,0.3) !important; }
+
+.ac-ud-panel {
+  padding: 12px 0 8px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ac-ud-loading {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.3);
+  padding: 8px 0;
+}
+
+.ac-ud-section { display: flex; flex-direction: column; gap: 4px; }
+
+.ac-ud-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+}
+
+.ac-ud-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.ac-ud-kv {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.45);
+}
+.ac-ud-kv b {
+  color: rgba(255,255,255,0.7);
+  font-weight: 600;
+}
+
+/* Page stats */
+.ac-ud-pages { display: flex; flex-direction: column; gap: 2px; }
+.ac-ud-page-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+}
+.ac-ud-page-name {
+  color: rgba(255,255,255,0.55);
+  min-width: 70px;
+}
+.ac-ud-page-visits {
+  color: rgba(255,255,255,0.35);
+  font-variant-numeric: tabular-nums;
+}
+.ac-ud-page-time {
+  color: rgba(255,255,255,0.25);
+  font-size: 0.6875rem;
+}
+
+/* Sessions */
+.ac-ud-sessions { display: flex; flex-direction: column; gap: 2px; }
+.ac-ud-session-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.4);
+}
+.ac-ud-session-time { min-width: 60px; color: rgba(255,255,255,0.3); }
+.ac-ud-session-pages { color: rgba(255,255,255,0.5); }
+.ac-ud-session-dur { color: rgba(255,255,255,0.25); }
+
+/* Timeline */
+.ac-ud-timeline { display: flex; flex-direction: column; gap: 2px; max-height: 260px; overflow-y: auto; }
+.ac-ud-timeline::-webkit-scrollbar { width: 2px; }
+.ac-ud-timeline::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); }
+.ac-ud-ev {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  padding: 2px 0;
+}
+.ac-ud-ev-type { flex-shrink: 0; width: 16px; text-align: center; font-size: 0.6875rem; }
+.ac-ud-ev-desc { flex: 1; color: rgba(255,255,255,0.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ac-ud-ev-time { flex-shrink: 0; font-size: 0.6875rem; color: rgba(255,255,255,0.2); }
+.ac-ud-ev-page .ac-ud-ev-desc { color: rgba(255,255,255,0.35); }
+.ac-ud-ev-log .ac-ud-ev-desc { color: rgba(34,197,94,0.6); }
+.ac-ud-ev-urge .ac-ud-ev-desc { color: rgba(251,146,60,0.6); }
+.ac-ud-ev-relapse .ac-ud-ev-desc { color: rgba(239,68,68,0.6); }
+
+/* Oracle notes */
+.ac-ud-notes { display: flex; flex-direction: column; gap: 6px; }
+.ac-ud-note {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px 8px;
+  background: rgba(255,255,255,0.015);
+  border-radius: 6px;
+  border-left: 2px solid rgba(212,175,55,0.15);
+}
+.ac-ud-note-day {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: rgba(212,175,55,0.4);
+}
+.ac-ud-note-text {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.4;
+}
+.ac-ud-note-src {
+  font-size: 0.625rem;
+  color: rgba(255,255,255,0.15);
+}
+
+/* Profile row */
+.ac-ud-profile { gap: 6px 16px; }
+
+/* Light theme */
+[data-theme="light"] .ac-user-expanded { background: rgba(0,0,0,0.02) !important; border-left-color: rgba(180,140,20,0.25) !important; }
+[data-theme="light"] .ac-ud-panel { border-top-color: rgba(0,0,0,0.05); }
+[data-theme="light"] .ac-ud-loading { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .ac-ud-label { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .ac-ud-kv { color: rgba(0,0,0,0.45); }
+[data-theme="light"] .ac-ud-kv b { color: rgba(0,0,0,0.7); }
+[data-theme="light"] .ac-ud-page-name { color: rgba(0,0,0,0.55); }
+[data-theme="light"] .ac-ud-page-visits { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .ac-ud-page-time { color: rgba(0,0,0,0.25); }
+[data-theme="light"] .ac-ud-session-row { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .ac-ud-session-time { color: rgba(0,0,0,0.3); }
+[data-theme="light"] .ac-ud-ev-desc { color: rgba(0,0,0,0.5); }
+[data-theme="light"] .ac-ud-ev-time { color: rgba(0,0,0,0.2); }
+[data-theme="light"] .ac-ud-ev-page .ac-ud-ev-desc { color: rgba(0,0,0,0.35); }
+[data-theme="light"] .ac-ud-ev-log .ac-ud-ev-desc { color: rgba(22,163,74,0.7); }
+[data-theme="light"] .ac-ud-ev-urge .ac-ud-ev-desc { color: rgba(234,88,12,0.7); }
+[data-theme="light"] .ac-ud-ev-relapse .ac-ud-ev-desc { color: rgba(220,38,38,0.7); }
+[data-theme="light"] .ac-ud-note { background: rgba(0,0,0,0.015); border-left-color: rgba(180,140,20,0.2); }
+[data-theme="light"] .ac-ud-note-day { color: rgba(180,140,20,0.5); }
+[data-theme="light"] .ac-ud-note-text { color: rgba(0,0,0,0.5); }
+[data-theme="light"] .ac-ud-note-src { color: rgba(0,0,0,0.2); }
