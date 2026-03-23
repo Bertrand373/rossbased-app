@@ -868,11 +868,18 @@ const recordUsage = async (userId, timezone) => {
   
   const today = getUserToday(timezone);
   try {
-    await OracleUsage.findOneAndUpdate(
-      { discordUserId: userId, date: today },
-      { $inc: { count: 1 } },
-      { upsert: true, new: true }
-    );
+    await Promise.all([
+      OracleUsage.findOneAndUpdate(
+        { discordUserId: userId, date: today },
+        { $inc: { count: 1 } },
+        { upsert: true, new: true }
+      ),
+      // Persistent lifetime counter on User doc — survives OracleUsage 7-day TTL
+      User.updateOne(
+        { discordId: userId },
+        { $inc: { discordOracleLifetime: 1 } }
+      )
+    ]);
   } catch (err) {
     console.error('Failed to record Oracle usage:', err);
   }

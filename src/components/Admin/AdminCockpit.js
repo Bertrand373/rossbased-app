@@ -376,7 +376,7 @@ const AdminCockpit = () => {
         user: () => (a.username || '').localeCompare(b.username || '') * dir,
         streak: () => ((a.currentStreak || 0) - (b.currentStreak || 0)) * dir,
         logs: () => ((a.totalLogs || 0) - (b.totalLogs || 0)) * dir,
-        ai: () => ((a.aiMessages || 0) - (b.aiMessages || 0)) * dir,
+        ai: () => (((a.aiMessages || 0) + (a.discordAI || 0)) - ((b.aiMessages || 0) + (b.discordAI || 0))) * dir,
         joined: () => (new Date(a.joinedAt || 0) - new Date(b.joinedAt || 0)) * dir,
         active: () => (new Date(a.lastActive || 0) - new Date(b.lastActive || 0)) * dir,
       };
@@ -1034,7 +1034,7 @@ const AdminCockpit = () => {
                       <div className="ac-uc-stats">
                         <span className="ac-streak-pill">{u.currentStreak}d</span>
                         <span className="ac-uc-stat">{u.totalLogs} logs</span>
-                        <span className="ac-uc-stat">{u.aiMessages} ai{u.aiToday > 0 && u.aiDate === new Date().toLocaleDateString('en-CA') ? ` (${u.aiToday} today)` : ''}</span>
+                        <span className="ac-uc-stat">{(u.aiMessages || 0) + (u.discordAI || 0)} ai{(u.aiMessages > 0 || u.discordAI > 0) ? ` (${u.aiMessages}a${u.discordAI ? `·${u.discordAI}d` : ''})` : ''}{u.aiToday > 0 && u.aiDate === new Date().toLocaleDateString('en-CA') ? ` ${u.aiToday}↑` : ''}</span>
                         <span className="ac-uc-joined">{formatDate(u.joinedAt)}</span>
                       </div>
                     </div>
@@ -1049,7 +1049,8 @@ const AdminCockpit = () => {
                             <div className="ac-ud-section">
                               <div className="ac-ud-label">Oracle</div>
                               <div className="ac-ud-row">
-                                <span className="ac-ud-kv"><b>{userActivity.oracle.lifetime}</b> lifetime</span>
+                                <span className="ac-ud-kv"><b>{userActivity.oracle.lifetime + (userActivity.oracle.discordLifetime || 0)}</b> total</span>
+                                <span className="ac-ud-kv"><b>{userActivity.oracle.lifetime}</b> app · <b>{userActivity.oracle.discordLifetime || 0}</b> discord</span>
                                 <span className="ac-ud-kv"><b>{userActivity.oracle.today}</b> {userActivity.oracle.todayDate === new Date().toLocaleDateString('en-CA') ? 'today' : `on ${userActivity.oracle.todayDate || '—'}`}</span>
                                 <span className="ac-ud-kv"><b>{userActivity.oracle.weeklyCount}</b> this week</span>
                                 <span className="ac-ud-kv">last: {fmtTimeShort(userActivity.oracle.lastUsed)}</span>

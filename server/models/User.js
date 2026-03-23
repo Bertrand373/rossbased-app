@@ -224,6 +224,11 @@ const userSchema = new mongoose.Schema({
   // Set via Render shell for customer service credits. Reusable for any user.
   freeAccessUntil: { type: Date, default: null },
   
+  // Discord Oracle lifetime counter — mirrors aiUsage.lifetimeCount but for Discord bot messages
+  // Incremented by discord-bot.js recordUsage(). OracleUsage collection auto-deletes after 7d,
+  // so this is the only persistent record of total Discord Oracle messages.
+  discordOracleLifetime: { type: Number, default: 0 },
+  
   // Daily Transmission Cache
   // Stores the AI-generated transmission for the current day
   dailyTransmission: {
