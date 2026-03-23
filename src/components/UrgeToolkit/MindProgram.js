@@ -5,6 +5,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import './MindProgram.css';
+import '../../styles/BottomSheet.css';
+import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 
 // ============================================================
 // CONFIGURATION
@@ -64,6 +66,9 @@ const MindProgram = ({ isPremium, userData, updateUserData, openPlanModal }) => 
   const [progress, setProgress] = useState(getInitialProgress);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showWhatItDoes, setShowWhatItDoes] = useState(false);
+  const [sheetAnimOpen, setSheetAnimOpen] = useState(false);
+
+  useBodyScrollLock(showInstructions || showWhatItDoes);
 
   // Audio state
   const [isPlaying, setIsPlaying] = useState(false);
@@ -258,6 +263,17 @@ const MindProgram = ({ isPremium, userData, updateUserData, openPlanModal }) => 
 
   const audioProgress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
+  // Sheet open/close helpers
+  const openSheet = (setter) => {
+    setter(true);
+    requestAnimationFrame(() => requestAnimationFrame(() => setSheetAnimOpen(true)));
+  };
+
+  const closeSheet = (setter) => {
+    setSheetAnimOpen(false);
+    setTimeout(() => setter(false), 300);
+  };
+
   // ============================================================
   // RENDER
   // ============================================================
@@ -276,81 +292,74 @@ const MindProgram = ({ isPremium, userData, updateUserData, openPlanModal }) => 
         onEnded={() => { if (!loopEnabled) setIsPlaying(false); }}
       />
 
-      {/* Header */}
-      <div className="mp-header">
-        <h2 className="mp-title">Based30</h2>
-        <p className="mp-desc">Nightly subliminal audio · 30 nights</p>
-        <p className="mp-context">Audio is intentionally accelerated — your subconscious processes it while you sleep.</p>
+      {/* Hero — album art with play overlay */}
+      <div className="mp-hero">
+        <div className="mp-hero-art-wrap">
+          <img 
+            src="/images/based30-cover.png" 
+            alt="Based30" 
+            className="mp-hero-art"
+          />
+          <button
+            className={`mp-hero-play ${isPlaying ? 'active' : ''}`}
+            onClick={handlePlay}
+            disabled={audioError}
+          >
+            {isPlaying ? (
+              <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
+                <rect x="3" y="2" width="3.5" height="12" rx="1" />
+                <rect x="9.5" y="2" width="3.5" height="12" rx="1" />
+              </svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M4 2.5v11l9-5.5L4 2.5z" />
+              </svg>
+            )}
+          </button>
+        </div>
+        <span className="mp-hero-subtitle">Nightly subliminal · 30 nights</span>
       </div>
 
       {/* Premium gate */}
       {!isPremium ? (
         <div className="mp-locked">
-          <span className="mp-locked-text">Upgrade to Premium to unlock the Based30 Mind Program</span>
+          <span className="mp-locked-text">Upgrade to Premium to unlock Based30</span>
           {openPlanModal && (
             <button className="mp-locked-btn" onClick={openPlanModal}>
-              Upgrade to Premium
+              Upgrade
             </button>
           )}
         </div>
       ) : (
         <>
-          {/* Audio Player */}
-          <div className="mp-player">
-            <div className="mp-player-main">
-              <img 
-                src="/images/based30-cover.png" 
-                alt="Based30" 
-                className="mp-album-art"
-              />
-              <button
-                className={`mp-play-btn ${isPlaying ? 'active' : ''}`}
-                onClick={handlePlay}
-                disabled={audioError}
-              >
-                {isPlaying ? (
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                    <rect x="3" y="2" width="3.5" height="12" rx="1" />
-                    <rect x="9.5" y="2" width="3.5" height="12" rx="1" />
-                  </svg>
-                ) : (
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M4 2.5v11l9-5.5L4 2.5z" />
-                  </svg>
-                )}
-              </button>
-
-              <div className="mp-track-info">
-                <div className="mp-track-row">
-                  <span className="mp-track-name">Based30</span>
-                  <span className="mp-track-time">
-                    {formatTime(currentTime)} / {formatTime(duration)}
-                  </span>
-                </div>
-
-                {/* Progress bar */}
-                <div className="mp-audio-track" onClick={handleProgressClick}>
-                  <div className="mp-audio-fill" style={{ width: `${audioProgress}%` }} />
-                  {isPlaying && (
-                    <div className="mp-audio-thumb" style={{ left: `${audioProgress}%` }} />
-                  )}
-                </div>
+          {/* Audio Controls — compact card */}
+          <div className="mp-controls">
+            {/* Scrubber */}
+            <div className="mp-audio-track" onClick={handleProgressClick}>
+              <div className="mp-audio-fill" style={{ width: `${audioProgress}%` }} />
+              {isPlaying && (
+                <div className="mp-audio-thumb" style={{ left: `${audioProgress}%` }} />
+              )}
+            </div>
+            
+            {/* Time + Loop row */}
+            <div className="mp-controls-row">
+              <span className="mp-track-time">
+                {formatTime(currentTime)} / {formatTime(duration)}
+              </span>
+              <div className="mp-loop-row">
+                <span className="mp-loop-label">Loop</span>
+                <button
+                  className={`mp-toggle-switch ${loopEnabled ? 'active' : ''}`}
+                  onClick={toggleLoop}
+                  aria-label={loopEnabled ? 'Loop on' : 'Loop off'}
+                >
+                  <span className="mp-toggle-knob" />
+                </button>
               </div>
             </div>
 
-            {/* Loop toggle — toggle switch, matches Profile pattern */}
-            <div className="mp-loop-row">
-              <span className="mp-loop-label">Loop</span>
-              <button
-                className={`mp-toggle-switch ${loopEnabled ? 'active' : ''}`}
-                onClick={toggleLoop}
-                aria-label={loopEnabled ? 'Loop on' : 'Loop off'}
-              >
-                <span className="mp-toggle-knob" />
-              </button>
-            </div>
-
-            <span className="mp-volume-rec">Set phone volume to 20–30% before sleeping</span>
+            <span className="mp-volume-rec">Volume 20–30% before sleeping</span>
 
             {audioError && (
               <span className="mp-audio-error">Audio file not available</span>
@@ -409,78 +418,63 @@ const MindProgram = ({ isPremium, userData, updateUserData, openPlanModal }) => 
         </>
       )}
 
-      {/* What this does accordion */}
-      <button
-        className="mp-accordion-toggle"
-        onClick={() => setShowWhatItDoes(!showWhatItDoes)}
-      >
-        <span className="mp-accordion-label">What this does</span>
-        <span className={`mp-accordion-arrow ${showWhatItDoes ? 'open' : ''}`}>↓</span>
-      </button>
+      {/* Info Bar — bottom strip like moon bar */}
+      <div className="mp-info-bar">
+        <button className="mp-info-btn" onClick={() => openSheet(setShowWhatItDoes)}>
+          What this does
+        </button>
+        <span className="mp-info-div" />
+        <button className="mp-info-btn" onClick={() => openSheet(setShowInstructions)}>
+          How to use
+        </button>
+      </div>
 
+      {/* What This Does — bottom sheet */}
       {showWhatItDoes && (
-        <div className="mp-accordion-content">
-          <div className="mp-instr-item">
-            <span className="mp-instr-num">01</span>
-            <span className="mp-instr-text">
-              Your subconscious beliefs determine your behavior. Years of negative sexual habits created deeply wired patterns that make retention feel impossible.
-            </span>
-          </div>
-          <div className="mp-instr-item">
-            <span className="mp-instr-num">02</span>
-            <span className="mp-instr-text">
-              This audio delivers sped-up affirmations that bypass your conscious mind. Your subconscious processes them during theta/alpha sleep states — the same brainwave frequencies where habits are formed and broken.
-            </span>
-          </div>
-          <div className="mp-instr-item">
-            <span className="mp-instr-num">03</span>
-            <span className="mp-instr-text">
-              After 30 consecutive nights, your belief system around sexual energy shifts. Retention becomes the default rather than the struggle.
-            </span>
-          </div>
-          <div className="mp-instr-item">
-            <span className="mp-instr-num">04</span>
-            <span className="mp-instr-text">
-              The audio sounds fast and unclear — that's intentional. Your subconscious processes it easily while your conscious mind can't interfere.
-            </span>
+        <div className={`sheet-backdrop${sheetAnimOpen ? ' open' : ''}`} onClick={() => closeSheet(setShowWhatItDoes)}>
+          <div className={`sheet-panel${sheetAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" />
+            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <span style={{ fontSize: '1.25rem', fontWeight: 500, color: 'var(--text)', letterSpacing: '-0.02em' }}>What this does</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {[
+                'Your subconscious beliefs determine your behavior. Years of negative sexual habits created deeply wired patterns that make retention feel impossible.',
+                'This audio delivers sped-up affirmations that bypass your conscious mind. Your subconscious processes them during theta/alpha sleep states — the same brainwave frequencies where habits are formed and broken.',
+                'After 30 consecutive nights, your belief system around sexual energy shifts. Retention becomes the default rather than the struggle.',
+                'The audio sounds fast and unclear — that\'s intentional. Your subconscious processes it easily while your conscious mind can\'t interfere.'
+              ].map((text, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '14px 0', borderBottom: i < 3 ? '1px solid var(--border-subtle)' : 'none' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--text-tertiary)', fontFeatureSettings: "'tnum' 1", flexShrink: 0, width: '20px' }}>{String(i + 1).padStart(2, '0')}</span>
+                  <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{text}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
 
-      {/* How to use accordion */}
-      <button
-        className="mp-accordion-toggle"
-        onClick={() => setShowInstructions(!showInstructions)}
-      >
-        <span className="mp-accordion-label">How to use</span>
-        <span className={`mp-accordion-arrow ${showInstructions ? 'open' : ''}`}>↓</span>
-      </button>
-
+      {/* How To Use — bottom sheet */}
       {showInstructions && (
-        <div className="mp-accordion-content">
-          <div className="mp-instr-item">
-            <span className="mp-instr-num">01</span>
-            <span className="mp-instr-text">
-              Play every night on repeat while you sleep. Low to medium volume.
-            </span>
-          </div>
-          <div className="mp-instr-item">
-            <span className="mp-instr-num">02</span>
-            <span className="mp-instr-text">
-              Use a sleep headband or comfortable headphones that won't fall out.
-            </span>
-          </div>
-          <div className="mp-instr-item">
-            <span className="mp-instr-num">03</span>
-            <span className="mp-instr-text">
-              Confirm each morning. 30 consecutive nights — no skipping.
-            </span>
-          </div>
-          <div className="mp-instr-item">
-            <span className="mp-instr-num">04</span>
-            <span className="mp-instr-text">
-              The audio is sped up intentionally. Your subconscious processes it.
-            </span>
+        <div className={`sheet-backdrop${sheetAnimOpen ? ' open' : ''}`} onClick={() => closeSheet(setShowInstructions)}>
+          <div className={`sheet-panel${sheetAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" />
+            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <span style={{ fontSize: '1.25rem', fontWeight: 500, color: 'var(--text)', letterSpacing: '-0.02em' }}>How to use</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {[
+                'Play every night on repeat while you sleep. Low to medium volume.',
+                'Use a sleep headband or comfortable headphones that won\'t fall out.',
+                'Confirm each morning. 30 consecutive nights — no skipping.',
+                'Audio is intentionally sped up. Your subconscious processes it while you sleep.'
+              ].map((text, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', padding: '14px 0', borderBottom: i < 3 ? '1px solid var(--border-subtle)' : 'none' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--text-tertiary)', fontFeatureSettings: "'tnum' 1", flexShrink: 0, width: '20px' }}>{String(i + 1).padStart(2, '0')}</span>
+                  <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{text}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}

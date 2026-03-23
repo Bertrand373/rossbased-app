@@ -1,175 +1,98 @@
 /* =============================================================================
    MIND PROGRAM — Based30
-   Nighttime cocoon: ambient, centered, peaceful
+   Viewport-locked nighttime chamber: hero fills space, strips at bottom
    ============================================================================= */
 
 .mp-section {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* =============================================================================
-   HEADER — centered title block
-   ============================================================================= */
-
-.mp-header {
-  text-align: center;
-  margin-bottom: 28px;
-  animation: mpFadeIn 500ms ease forwards;
-  opacity: 0;
-}
-
-.mp-title {
-  font-size: 1.375rem;
-  font-weight: 500;
-  color: var(--text);
-  margin: 0 0 6px 0;
-  letter-spacing: -0.02em;
-}
-
-.mp-desc {
-  font-size: 0.8125rem;
-  color: var(--text-muted);
-  margin: 0;
-  letter-spacing: -0.01em;
-}
-
-.mp-context {
-  font-size: 0.75rem;
-  color: var(--text-tertiary);
-  margin: 10px 0 0 0;
-  line-height: 1.4;
-  font-style: italic;
-}
-
-/* =============================================================================
-   AUDIO PLAYER — glass card surface
-   ============================================================================= */
-
-.mp-player {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 24px;
-  padding: 20px;
-  background: var(--cal-cell-bg);
-  border: 1px solid var(--border-subtle);
-  border-radius: 10px;
-  animation: mpFadeIn 500ms ease 100ms forwards;
-  opacity: 0;
-}
-
-.mp-player-main {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.mp-album-art {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.mp-play-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1px solid var(--border-prominent);
-  background: transparent;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: all 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.mp-play-btn:hover { background: var(--surface-overlay); }
-.mp-play-btn:active { transform: scale(0.95); }
-.mp-play-btn.active { background: var(--surface-overlay); border-color: var(--border-prominent); }
-.mp-play-btn:disabled { opacity: 0.3; cursor: default; }
-
-.mp-track-info {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  min-width: 0;
+  overflow: hidden;
 }
 
-.mp-track-row {
+/* =============================================================================
+   HERO — album art fills available space, centered
+   ============================================================================= */
+
+.mp-hero {
+  flex: 1;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  min-height: 0;
+  animation: mpFadeIn 600ms ease forwards;
+  opacity: 0;
 }
 
-.mp-track-name {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text);
-  letter-spacing: -0.01em;
-}
-
-.mp-track-time {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  font-feature-settings: 'tnum' 1;
-}
-
-/* Loop toggle row */
-.mp-loop-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 4px;
-}
-
-.mp-loop-label {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-/* Toggle Switch */
-.mp-toggle-switch {
+.mp-hero-art-wrap {
   position: relative;
-  width: 50px;
-  height: 30px;
-  background: var(--border);
+  width: 100%;
+  max-width: 180px;
+  aspect-ratio: 1;
+  flex-shrink: 1;
+  min-height: 0;
+}
+
+.mp-hero-art {
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Play button overlay — centered on art */
+.mp-hero-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.3);
   border: none;
-  border-radius: 15px;
+  border-radius: 14px;
+  color: rgba(255,255,255,0.9);
   cursor: pointer;
-  transition: background-color 200ms ease;
-  flex-shrink: 0;
-  padding: 0;
+  transition: all 200ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.mp-toggle-switch.active { background: var(--text); }
+.mp-hero-play:hover { background: rgba(0,0,0,0.4); }
+.mp-hero-play:active { transform: scale(0.97); }
+.mp-hero-play.active { background: rgba(0,0,0,0.15); }
+.mp-hero-play:disabled { opacity: 0.3; cursor: default; }
 
-.mp-toggle-knob {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 24px;
-  height: 24px;
-  background: var(--text);
-  border-radius: 50%;
-  transition: transform 200ms ease, background-color 200ms ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+.mp-hero-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
 }
 
-.mp-toggle-switch.active .mp-toggle-knob {
-  transform: translateX(20px);
-  background: var(--background);
+/* =============================================================================
+   CONTROLS — compact strip, no card wrapper on viewport-locked
+   ============================================================================= */
+
+.mp-controls {
+  flex-shrink: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-subtle);
+  animation: mpFadeIn 600ms ease 100ms forwards;
+  opacity: 0;
+}
+
+.mp-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 /* Audio progress bar */
@@ -202,28 +125,80 @@
   background: var(--text);
 }
 
-.mp-audio-error {
+.mp-track-time {
   font-size: 0.75rem;
+  color: var(--text-muted);
+  font-feature-settings: 'tnum' 1;
+}
+
+.mp-loop-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mp-loop-label {
+  font-size: 0.75rem;
+  font-weight: 500;
   color: var(--text-tertiary);
-  text-align: center;
-  padding: 4px 0;
+}
+
+/* Toggle Switch — compact */
+.mp-toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 26px;
+  background: var(--border);
+  border: none;
+  border-radius: 13px;
+  cursor: pointer;
+  transition: background-color 200ms ease;
+  flex-shrink: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mp-toggle-switch.active { background: var(--text); }
+
+.mp-toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  background: var(--text);
+  border-radius: 50%;
+  transition: transform 200ms ease, background-color 200ms ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.mp-toggle-switch.active .mp-toggle-knob {
+  transform: translateX(18px);
+  background: var(--background);
 }
 
 .mp-volume-rec {
   font-size: 0.6875rem;
   color: var(--text-tertiary);
   text-align: center;
-  display: block;
+}
+
+.mp-audio-error {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  text-align: center;
 }
 
 /* =============================================================================
-   30-NIGHT TRACKER — Stats progress bar DNA
+   PROGRESS STRIP — attached below controls
    ============================================================================= */
 
 .mp-tracker {
+  flex-shrink: 0;
   width: 100%;
-  margin-bottom: 8px;
-  animation: mpFadeIn 500ms ease 200ms forwards;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border-subtle);
+  animation: mpFadeIn 600ms ease 200ms forwards;
   opacity: 0;
 }
 
@@ -231,7 +206,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .mp-tracker-label {
@@ -242,7 +217,7 @@
 }
 
 .mp-tracker-count {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--text);
   font-feature-settings: 'tnum' 1;
@@ -253,13 +228,12 @@
   font-weight: 400;
 }
 
-/* Progress bar — matches Stats progress bar */
 .mp-progress-bar {
   width: 100%;
   height: 2px;
   background: var(--border-prominent);
   border-radius: 1px;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   overflow: hidden;
 }
 
@@ -270,15 +244,15 @@
   transition: width 800ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Confirm button */
+/* Confirm button — compact */
 .mp-confirm-btn {
   width: 100%;
-  padding: 14px 20px;
+  padding: 12px 20px;
   border-radius: 9999px;
   border: 1px solid var(--border-prominent);
   background: var(--surface-overlay);
   color: var(--text);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
@@ -300,15 +274,14 @@
 .mp-confirm-btn.confirmed:hover { opacity: 1; }
 .mp-confirm-btn.confirmed:active { transform: none; }
 
-/* Reset link */
 .mp-reset-link {
   display: block;
   width: 100%;
-  padding: 12px 0 0;
+  padding: 8px 0 0;
   background: transparent;
   border: none;
   color: var(--text-tertiary);
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 400;
   font-family: inherit;
   cursor: pointer;
@@ -324,12 +297,14 @@
    ============================================================================= */
 
 .mp-complete {
+  flex-shrink: 0;
   width: 100%;
+  padding: 10px 16px;
+  border-top: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 8px;
-  animation: mpFadeIn 500ms ease 200ms forwards;
+  animation: mpFadeIn 600ms ease 200ms forwards;
   opacity: 0;
 }
 
@@ -337,36 +312,35 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 20px;
+  gap: 4px;
+  margin-bottom: 12px;
   text-align: center;
 }
 
 .mp-complete-title {
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--text);
   letter-spacing: -0.02em;
 }
 
 .mp-complete-desc {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
   line-height: 1.4;
 }
 
 .mp-restart-btn {
-  padding: 12px 24px;
+  padding: 10px 20px;
   border-radius: 9999px;
   border: 1px solid var(--border-prominent);
   background: transparent;
   color: var(--text-secondary);
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   transition: all 150ms ease;
-  letter-spacing: -0.01em;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -374,14 +348,19 @@
 .mp-restart-btn:active { transform: scale(0.98); }
 
 /* =============================================================================
-   LOCKED STATE (Non-premium)
+   LOCKED STATE
    ============================================================================= */
 
 .mp-locked {
+  flex: 1;
   width: 100%;
-  padding: 32px 0;
-  text-align: center;
-  animation: mpFadeIn 500ms ease 200ms forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 32px 16px;
+  animation: mpFadeIn 600ms ease 200ms forwards;
   opacity: 0;
 }
 
@@ -389,11 +368,10 @@
   font-size: 0.8125rem;
   color: var(--text-tertiary);
   line-height: 1.5;
+  text-align: center;
 }
 
 .mp-locked-btn {
-  display: block;
-  margin: 16px auto 0;
   padding: 10px 24px;
   border-radius: 9999px;
   border: 1px solid var(--border-prominent);
@@ -411,67 +389,43 @@
 .mp-locked-btn:active { transform: scale(0.98); }
 
 /* =============================================================================
-   ACCORDIONS (What this does / How to use)
+   INFO BAR — bottom strip like moon bar, triggers bottom sheets
    ============================================================================= */
 
-.mp-accordion-toggle {
-  width: 100%;
+.mp-info-bar {
+  flex-shrink: 0;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 16px 0;
-  background: transparent;
-  border: none;
+  justify-content: center;
+  gap: 0;
+  padding: 10px 16px;
   border-top: 1px solid var(--border-subtle);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  animation: mpFadeIn 500ms ease 300ms forwards;
+  background: var(--background);
+  animation: mpFadeIn 600ms ease 300ms forwards;
   opacity: 0;
 }
 
-.mp-accordion-label {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--text-muted);
-}
-
-.mp-accordion-arrow {
-  font-size: 0.875rem;
-  color: var(--text-tertiary);
-  transition: transform 200ms ease;
-}
-
-.mp-accordion-arrow.open { transform: rotate(180deg); }
-
-.mp-accordion-content {
-  display: flex;
-  flex-direction: column;
-  padding-bottom: 8px;
-}
-
-.mp-instr-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.mp-instr-item:last-child { border-bottom: none; }
-
-.mp-instr-num {
+.mp-info-btn {
+  background: transparent;
+  border: none;
+  padding: 4px 14px;
   font-size: 0.75rem;
   font-weight: 500;
+  font-family: inherit;
   color: var(--text-tertiary);
-  font-feature-settings: 'tnum' 1;
-  flex-shrink: 0;
-  width: 20px;
+  cursor: pointer;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.mp-instr-text {
-  font-size: 0.8125rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
+.mp-info-btn:hover { color: var(--text-secondary); }
+.mp-info-btn:active { color: var(--text); }
+
+.mp-info-div {
+  width: 1px;
+  height: 12px;
+  background: var(--border-prominent);
+  flex-shrink: 0;
 }
 
 /* =============================================================================
@@ -483,17 +437,13 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* =============================================================================
-   REDUCED MOTION
-   ============================================================================= */
-
 @media (prefers-reduced-motion: reduce) {
-  .mp-header,
-  .mp-player,
+  .mp-hero,
+  .mp-controls,
   .mp-tracker,
   .mp-complete,
   .mp-locked,
-  .mp-accordion-toggle {
+  .mp-info-bar {
     animation: none;
     opacity: 1;
   }
