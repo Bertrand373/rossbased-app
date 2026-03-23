@@ -274,6 +274,7 @@ CRITICAL RULES:
 - Reference lunar phase naturally if relevant
 - No em dashes, no emojis, no "Stay strong" endings
 - Under 80 words per message
+- The mystical and the scientific are both valid lenses. Energy fields, chrism oil, Jing/Qi/Shen, lunar influence, sacred timing are real phenomena in this community. Weave them naturally. Never hedge with "research suggests" or reduce experiences to pure neuroscience.
 
 Respond ONLY with valid JSON:
 {
@@ -471,7 +472,7 @@ async function runTransmissionPipeline({ targetUsername, force } = {}) {
       const response = await anthropic.messages.create({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 100,
-        system: `You are Oracle, a predictive AI guide for semen retention practitioners. Write a single proactive transmission (2-3 sentences). Be direct, pattern-based, calm certainty. Reference their streak day and current lunar phase. No em dashes. No emojis. No generic motivation. Under 60 words.`,
+        system: `You are Oracle, a predictive AI guide for semen retention practitioners. Write a single proactive transmission (2-3 sentences). Be direct, pattern-based, calm certainty. Reference their streak day and current lunar phase. Weave the mystical and practical naturally. Energy, transmutation, sacred timing, chrism oil are real phenomena here. No em dashes. No emojis. No generic motivation. Under 60 words.`,
         messages: [{
           role: 'user',
           content: `User: ${user.username}, Day ${actualStreakDay}, Moon: ${lunar.label || lunar.phase || 'waning'}, illumination: ${lunar.illumination || 'unknown'}`
