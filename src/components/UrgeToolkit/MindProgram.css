@@ -1,6 +1,6 @@
 /* =============================================================================
    MIND PROGRAM — Based30
-   Viewport-locked nighttime chamber: hero fills space, strips at bottom
+   Viewport-locked nighttime chamber
    ============================================================================= */
 
 .mp-section {
@@ -12,7 +12,7 @@
 }
 
 /* =============================================================================
-   HERO — album art fills available space, centered
+   HERO — art + play button fill available space
    ============================================================================= */
 
 .mp-hero {
@@ -21,50 +21,54 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 16px;
   padding: 16px;
   min-height: 0;
-  animation: mpFadeIn 600ms ease forwards;
+  animation: fadeInUp 400ms ease forwards;
   opacity: 0;
 }
 
-.mp-hero-art-wrap {
-  position: relative;
+.mp-hero-art {
   width: 100%;
   max-width: 180px;
   aspect-ratio: 1;
   flex-shrink: 1;
   min-height: 0;
-}
-
-.mp-hero-art {
-  width: 100%;
-  height: 100%;
   border-radius: 14px;
   object-fit: cover;
   display: block;
 }
 
-/* Play button overlay — centered on art */
-.mp-hero-play {
-  position: absolute;
-  inset: 0;
+/* Play button — prominent circle below art */
+.mp-play-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.3);
-  border: none;
-  border-radius: 14px;
-  color: rgba(255,255,255,0.9);
   cursor: pointer;
+  flex-shrink: 0;
   transition: all 200ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.mp-hero-play:hover { background: rgba(0,0,0,0.4); }
-.mp-hero-play:active { transform: scale(0.97); }
-.mp-hero-play.active { background: rgba(0,0,0,0.15); }
-.mp-hero-play:disabled { opacity: 0.3; cursor: default; }
+.mp-play-btn:hover {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.25);
+}
+
+.mp-play-btn:active { transform: scale(0.93); }
+
+.mp-play-btn.active {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.20);
+}
+
+.mp-play-btn:disabled { opacity: 0.3; cursor: default; }
 
 .mp-hero-subtitle {
   font-size: 0.75rem;
@@ -74,7 +78,7 @@
 }
 
 /* =============================================================================
-   CONTROLS — compact strip, no card wrapper on viewport-locked
+   CONTROLS — compact strip
    ============================================================================= */
 
 .mp-controls {
@@ -85,7 +89,7 @@
   gap: 8px;
   padding: 12px 16px;
   border-top: 1px solid var(--border-subtle);
-  animation: mpFadeIn 600ms ease 100ms forwards;
+  animation: fadeInUp 400ms ease 100ms forwards;
   opacity: 0;
 }
 
@@ -95,7 +99,6 @@
   justify-content: space-between;
 }
 
-/* Audio progress bar */
 .mp-audio-track {
   position: relative;
   height: 3px;
@@ -143,7 +146,6 @@
   color: var(--text-tertiary);
 }
 
-/* Toggle Switch — compact */
 .mp-toggle-switch {
   position: relative;
   width: 44px;
@@ -190,7 +192,7 @@
 }
 
 /* =============================================================================
-   PROGRESS STRIP — attached below controls
+   PROGRESS STRIP
    ============================================================================= */
 
 .mp-tracker {
@@ -198,7 +200,7 @@
   width: 100%;
   padding: 10px 16px;
   border-top: 1px solid var(--border-subtle);
-  animation: mpFadeIn 600ms ease 200ms forwards;
+  animation: fadeInUp 400ms ease 200ms forwards;
   opacity: 0;
 }
 
@@ -244,7 +246,6 @@
   transition: width 800ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Confirm button — compact */
 .mp-confirm-btn {
   width: 100%;
   padding: 12px 20px;
@@ -304,7 +305,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: mpFadeIn 600ms ease 200ms forwards;
+  animation: fadeInUp 400ms ease 200ms forwards;
   opacity: 0;
 }
 
@@ -321,7 +322,6 @@
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--text);
-  letter-spacing: -0.02em;
 }
 
 .mp-complete-desc {
@@ -360,7 +360,7 @@
   justify-content: center;
   gap: 16px;
   padding: 32px 16px;
-  animation: mpFadeIn 600ms ease 200ms forwards;
+  animation: fadeInUp 400ms ease 200ms forwards;
   opacity: 0;
 }
 
@@ -389,7 +389,7 @@
 .mp-locked-btn:active { transform: scale(0.98); }
 
 /* =============================================================================
-   INFO BAR — bottom strip like moon bar, triggers bottom sheets
+   INFO BAR — bottom strip, opens sheets via parent
    ============================================================================= */
 
 .mp-info-bar {
@@ -401,7 +401,7 @@
   padding: 10px 16px;
   border-top: 1px solid var(--border-subtle);
   background: var(--background);
-  animation: mpFadeIn 600ms ease 300ms forwards;
+  animation: fadeInUp 400ms ease 300ms forwards;
   opacity: 0;
 }
 
@@ -432,8 +432,8 @@
    ANIMATION
    ============================================================================= */
 
-@keyframes mpFadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 

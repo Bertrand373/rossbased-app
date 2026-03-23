@@ -63,6 +63,9 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
   // Protocol detail sheet
   const [showProtocolSheet, setShowProtocolSheet] = useState(false);
   
+  // MindProgram info sheet (lifted from MindProgram so it renders at page level)
+  const [mpInfoSheet, setMpInfoSheet] = useState(null); // 'whatItDoes' | 'howToUse' | null
+  
   // Experience level detection
   const [experienceLevel, setExperienceLevel] = useState('beginner');
   
@@ -109,7 +112,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
   const coldIntervalRef = useRef(null);
   
   // Lock body scroll for modals
-  useBodyScrollLock(showBreathingModal || showOrbitModal || showGroundingModal || showColdModal || showProtocolSheet);
+  useBodyScrollLock(showBreathingModal || showOrbitModal || showGroundingModal || showColdModal || showProtocolSheet || !!mpInfoSheet);
   
   const currentDay = userData.currentStreak || 0;
 
@@ -754,7 +757,10 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
       {/* ====== BASED30 VIEW ====== */}
       {activeView === 'based30' && (
         <div className="ut-view-based30">
-          <MindProgram isPremium={isPremium} userData={userData} updateUserData={updateUserData} openPlanModal={openPlanModal} />
+          <MindProgram isPremium={isPremium} userData={userData} updateUserData={updateUserData} openPlanModal={openPlanModal} onShowInfo={(type) => {
+            setMpInfoSheet(type);
+            requestAnimationFrame(() => requestAnimationFrame(() => setModalAnimOpen(true)));
+          }} />
         </div>
       )}
 
@@ -1284,6 +1290,49 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
                   End Exposure
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================================================================
+          MINDPROGRAM INFO SHEET (rendered at page level to escape overflow)
+          ================================================================ */}
+      {mpInfoSheet && (
+        <div className={`sheet-backdrop${modalAnimOpen ? ' open' : ''}`}
+          onClick={() => animateModalClose(() => setMpInfoSheet(null))}>
+          <div className={`sheet-panel ut-sheet${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" />
+
+            <div className="ut-modal-header">
+              <span className="ut-modal-title">{mpInfoSheet === 'whatItDoes' ? 'What this does' : 'How to use'}</span>
+            </div>
+
+            <div className="ut-protocol-detail">
+              <div className="ut-steps-list">
+                {(mpInfoSheet === 'whatItDoes' ? [
+                  'Your subconscious beliefs determine your behavior. Years of negative sexual habits created deeply wired patterns that make retention feel impossible.',
+                  'This audio delivers sped-up affirmations that bypass your conscious mind. Your subconscious processes them during theta/alpha sleep states — the same brainwave frequencies where habits are formed and broken.',
+                  'After 30 consecutive nights, your belief system around sexual energy shifts. Retention becomes the default rather than the struggle.',
+                  'The audio sounds fast and unclear — that\'s intentional. Your subconscious processes it easily while your conscious mind can\'t interfere.'
+                ] : [
+                  'Play every night on repeat while you sleep. Low to medium volume.',
+                  'Use a sleep headband or comfortable headphones that won\'t fall out.',
+                  'Confirm each morning. 30 consecutive nights — no skipping.',
+                  'Audio is intentionally sped up. Your subconscious processes it while you sleep.'
+                ]).map((text, i, arr) => (
+                  <div key={i} className="ut-step-item">
+                    <span className="ut-step-num">{String(i + 1).padStart(2, '0')}</span>
+                    <span className="ut-step-text">{text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="ut-modal-footer">
+              <button className="ut-btn-ghost" onClick={() => animateModalClose(() => setMpInfoSheet(null))}>
+                Close
+              </button>
             </div>
           </div>
         </div>
