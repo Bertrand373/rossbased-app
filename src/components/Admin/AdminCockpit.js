@@ -1034,7 +1034,7 @@ const AdminCockpit = () => {
                       <div className="ac-uc-stats">
                         <span className="ac-streak-pill">{u.currentStreak}d</span>
                         <span className="ac-uc-stat">{u.totalLogs} logs</span>
-                        <span className="ac-uc-stat">{u.aiMessages} ai{u.aiToday > 0 ? ` (${u.aiToday} today)` : ''}</span>
+                        <span className="ac-uc-stat">{u.aiMessages} ai{u.aiToday > 0 && u.aiDate === new Date().toLocaleDateString('en-CA') ? ` (${u.aiToday} today)` : ''}</span>
                         <span className="ac-uc-joined">{formatDate(u.joinedAt)}</span>
                       </div>
                     </div>
@@ -1050,7 +1050,7 @@ const AdminCockpit = () => {
                               <div className="ac-ud-label">Oracle</div>
                               <div className="ac-ud-row">
                                 <span className="ac-ud-kv"><b>{userActivity.oracle.lifetime}</b> lifetime</span>
-                                <span className="ac-ud-kv"><b>{userActivity.oracle.today}</b> today ({userActivity.oracle.todayDate || '—'})</span>
+                                <span className="ac-ud-kv"><b>{userActivity.oracle.today}</b> {userActivity.oracle.todayDate === new Date().toLocaleDateString('en-CA') ? 'today' : `on ${userActivity.oracle.todayDate || '—'}`}</span>
                                 <span className="ac-ud-kv"><b>{userActivity.oracle.weeklyCount}</b> this week</span>
                                 <span className="ac-ud-kv">last: {fmtTimeShort(userActivity.oracle.lastUsed)}</span>
                               </div>
