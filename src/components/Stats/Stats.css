@@ -1095,6 +1095,14 @@
 }
 
 @media (min-width: 1025px) {
+  .stats-header-row {
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
   .stats-analytics {
     max-width: 1400px;
     align-self: center;

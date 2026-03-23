@@ -793,6 +793,14 @@
 }
 
 @media (min-width: 1025px) {
+  .ut-header-row {
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
   .ut-modal-title { font-size: 1.5rem; }
   .ut-modal-timer { font-size: 3.5rem; }
 }
