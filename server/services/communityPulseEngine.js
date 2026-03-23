@@ -145,11 +145,13 @@ async function evaluateTriggers() {
 
     const recentRelapseRisk = await OracleInteraction.countDocuments({
       relapseRiskLanguage: true,
-      timestamp: { $gte: last24h }
+      timestamp: { $gte: last24h },
+      username: { $not: /^(ross|rossbased)$/i }
     });
     const weekRelapseRisk = await OracleInteraction.countDocuments({
       relapseRiskLanguage: true,
-      timestamp: { $gte: last7d }
+      timestamp: { $gte: last7d },
+      username: { $not: /^(ross|rossbased)$/i }
     });
     const dailyAvg = Math.max(0.5, weekRelapseRisk / 7);
 
@@ -171,7 +173,8 @@ async function evaluateTriggers() {
     const last48h = new Date(Date.now() - 48 * 60 * 60 * 1000);
 
     const recentInteractions = await OracleInteraction.find({
-      timestamp: { $gte: last48h }
+      timestamp: { $gte: last48h },
+      username: { $not: /^(ross|rossbased)$/i }
     }).select('topics userId discordUserId').lean();
 
     if (recentInteractions.length >= 5) {
@@ -203,7 +206,7 @@ async function evaluateTriggers() {
   // ── TRIGGER 4: Aggregate benefit shift ──
   try {
     const pipeline = [
-      { $match: { 'benefitTracking.0': { $exists: true } } },
+      { $match: { 'benefitTracking.0': { $exists: true }, username: { $not: /^(ross|rossbased)$/i } } },
       { $project: {
         recentLogs: {
           $filter: {
@@ -271,7 +274,7 @@ async function evaluateTriggers() {
 
   // ── TRIGGER 5: Community milestone ──
   try {
-    const totalUsers = await User.countDocuments({ startDate: { $exists: true } });
+    const totalUsers = await User.countDocuments({ startDate: { $exists: true }, username: { $not: /^(ross|rossbased)$/i } });
     const milestones = [50, 75, 100, 150, 200, 250, 300, 400, 500, 750, 1000];
     const hitMilestone = milestones.find(m => totalUsers >= m && totalUsers < m + 3);
 
@@ -311,7 +314,7 @@ async function generateObservation(primaryTrigger, allTriggers, avoidTopics) {
 
     // Aggregate stats
     try {
-      const users = await User.find({ startDate: { $exists: true } })
+      const users = await User.find({ startDate: { $exists: true }, username: { $not: /^(ross|rossbased)$/i } })
         .select('currentStreak')
         .lean();
       const totalUsers = users.length;
@@ -356,7 +359,7 @@ async function generateObservation(primaryTrigger, allTriggers, avoidTopics) {
     try {
       const OracleInteraction = require('../models/OracleInteraction');
       const last48h = new Date(Date.now() - 48 * 60 * 60 * 1000);
-      const interactions = await OracleInteraction.find({ timestamp: { $gte: last48h } })
+      const interactions = await OracleInteraction.find({ timestamp: { $gte: last48h }, username: { $not: /^(ross|rossbased)$/i } })
         .select('topics sentiment')
         .lean();
       if (interactions.length > 0) {

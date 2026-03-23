@@ -55,9 +55,10 @@ async function getOutcomePatterns() {
   }
 
   try {
-    // Only aggregate measured outcomes
+    // Only aggregate measured outcomes (exclude admin test accounts)
     const outcomes = await OracleOutcome.find({
-      'outcome.measured': true
+      'outcome.measured': true,
+      username: { $not: /^(ross|rossbased)$/i }
     })
       .select('snapshot outcome')
       .lean();

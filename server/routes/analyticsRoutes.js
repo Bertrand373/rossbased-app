@@ -57,7 +57,7 @@ const getDateRange = (days) => new Date(Date.now() - days * 86400000);
 const startOfDay = (date) => { const d = new Date(date); d.setHours(0,0,0,0); return d; };
 
 // Exclude admin accounts from user-facing metrics
-const adminFilter = { username: { $not: /^ross/i } };
+const adminFilter = { username: { $not: /^(ross|rossbased)$/i } };
 
 // GET /api/analytics/overview
 router.get('/overview', adminCheck, async (req, res) => {
@@ -365,7 +365,7 @@ router.get('/behavior', adminCheck, async (req, res) => {
     const fourteenDaysAgo = getDateRange(14);
     const thirtyDaysAgo = getDateRange(30);
     
-    const pvFilter = { userId: { $not: /^ross/i } };
+    const pvFilter = { userId: { $not: /^(ross|rossbased)$/i } };
 
     // Top pages (last 30 days)
     const topPages = await PageView.aggregate([

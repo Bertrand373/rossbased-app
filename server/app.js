@@ -2371,7 +2371,7 @@ app.get('/api/admin/oracle-health', authenticate, async (req, res) => {
 
     // --- MEMORY NOTES ---
     const usersWithNotes = await User.find(
-      { 'oracleNotes.0': { $exists: true } },
+      { 'oracleNotes.0': { $exists: true }, username: { $not: /^(ross|rossbased)$/i } },
       { oracleNotes: 1, username: 1, discordId: 1 }
     ).lean();
 
@@ -2788,7 +2788,7 @@ app.post('/api/admin/oracle-voice-review', authenticate, async (req, res) => {
   try {
     // Pull recent Oracle notes across all users (anonymized)
     const usersWithNotes = await User.find(
-      { 'oracleNotes.0': { $exists: true } },
+      { 'oracleNotes.0': { $exists: true }, username: { $not: /^(ross|rossbased)$/i } },
       { oracleNotes: 1, _id: 0 }
     ).limit(50).lean();
 
