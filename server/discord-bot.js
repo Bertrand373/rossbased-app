@@ -2025,27 +2025,13 @@ client.on('messageCreate', async (message) => {
   // Logs relevant messages for weekly pattern analysis
   // ============================================================
   
-  // Fire and forget — log relevant message, then check if pulse should fire
+  // Fire and forget — log relevant message, then check if pulse should fire (app-only)
+  // Discord posting is Opus-gated via the weekly insight scheduler
   logIfRelevant(message).then(wasRelevant => {
     if (wasRelevant) {
       onRelevantEvent().then(pulse => {
         if (!pulse) return;
-        // Daily fallbacks are app-only — don't post to Discord
-        if (pulse.trigger === 'daily_fallback') return;
-        // Real trigger — post to Discord
-        const guild = client.guilds.cache.first();
-        if (!guild) return;
-        const targetChannel = guild.channels.cache.find(
-          ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
-        );
-        if (!targetChannel) return;
-        targetChannel.send({ embeds: [buildPulseEmbed(pulse.body)] }).then(discordMsg => {
-          CommunityPulse.updateOne(
-            { _id: pulse._id },
-            { $set: { postedToDiscord: true, discordMessageId: discordMsg.id } }
-          ).catch(() => {});
-        }).catch(() => {});
-        console.log(`🔮 Event-driven pulse posted to #${INSIGHT_CHANNEL} — trigger: ${pulse.trigger}`);
+        console.log(`🔮 App pulse generated via event — trigger: ${pulse.trigger} (app-only, Discord is Opus-gated weekly)`);
       }).catch(() => {});
     }
   }).catch(() => {});
@@ -2864,8 +2850,10 @@ client.once('ready', () => {
   client.user.setActivity('the frequencies', { type: 3 }); // "Watching the frequencies"
   
   // ============================================================
-  // WEEKLY INSIGHT SCHEDULER
-  // Check every hour if it's time to drop the weekly insight
+  // WEEKLY INSIGHT SCHEDULER — OPUS-GATED DISCORD POSTING
+  // Sonnet generates the weekly insight. Opus decides if Discord
+  // deserves to hear it. Only truly remarkable patterns break silence.
+  // Same pattern as Evolution verification — Opus is the gatekeeper.
   // ============================================================
   
   let lastInsightDate = null;
@@ -2887,48 +2875,130 @@ client.once('ready', () => {
       
       const insight = await generateWeeklyInsight(7);
       
-      // Find the target channel
-      const guild = client.guilds.cache.first();
-      if (!guild) return;
-      
-      const targetChannel = guild.channels.cache.find(
-        ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
-      );
-      
-      if (!targetChannel) {
-        console.error(`[Insight] Could not find channel #${INSIGHT_CHANNEL}`);
-        return;
-      }
-      
-      if (!insight) {
-        // Quiet week — DM admin so we know it fired, don't clutter the channel
-        try {
-          const guild = client.guilds.cache.first();
-          if (guild) {
-            const members = await guild.members.fetch();
-            const admin = members.find(m => ADMIN_DISCORD_USERS.includes(m.user.username.toLowerCase()));
-            if (admin) {
-              const quietEmbed = new EmbedBuilder()
-                .setColor(ORACLE_COLOR)
-                .setDescription('Quiet week. Not enough signal to read a pattern. Scheduler fired but nothing posted.')
-                .setFooter({ text: 'Oracle · titantrack.app', iconURL: 'https://titantrack.app/The_Oracle.png' });
-              await admin.send({ embeds: [quietEmbed] });
-            }
-          }
-        } catch (dmErr) {
-          console.error('[Insight] Could not DM admin:', dmErr.message);
-        }
-        console.log(`🔮 Weekly insight: quiet week, DM sent to admin`);
-        return;
-      }
-      
-      await targetChannel.send({ embeds: [buildInsightEmbed(insight, 7)] });
-      console.log(`🔮 Weekly insight auto-posted to #${INSIGHT_CHANNEL}`);
-      
-      // Fire-and-forget: extract durable observations into knowledge base
+      // Fire-and-forget: extract durable observations into knowledge base (always, regardless of Discord)
       generateObservations(7).catch(err => {
         console.error('[Observations] Post-insight generation failed:', err.message);
       });
+      
+      // Find admin for DM updates
+      const guild = client.guilds.cache.first();
+      if (!guild) return;
+      
+      const members = await guild.members.fetch();
+      const admin = members.find(m => ADMIN_DISCORD_USERS.includes(m.user.username.toLowerCase()));
+      
+      if (!insight) {
+        // Quiet week — nothing for Opus to evaluate
+        if (admin) {
+          const quietEmbed = new EmbedBuilder()
+            .setColor(ORACLE_COLOR)
+            .setDescription('Quiet week. Not enough signal for Oracle to read a pattern. Opus gatekeeper skipped — no insight to evaluate.')
+            .setFooter({ text: 'Oracle · titantrack.app', iconURL: 'https://titantrack.app/The_Oracle.png' });
+          await admin.send({ embeds: [quietEmbed] }).catch(() => {});
+        }
+        console.log(`🔮 Weekly insight: quiet week, nothing for Opus`);
+        return;
+      }
+      
+      // Gather the week's community pulses for additional context
+      const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      const weekPulses = await CommunityPulse.find({ createdAt: { $gte: weekAgo } })
+        .sort({ createdAt: -1 })
+        .select('headline trigger triggerData createdAt')
+        .lean();
+      
+      const pulseContext = weekPulses.length > 0
+        ? weekPulses.map(p => `[${p.trigger}] ${p.headline}`).join('\n')
+        : 'No community pulses generated this week.';
+      
+      // ── OPUS GATEKEEPER ──
+      // Opus decides if this week's intelligence warrants breaking Oracle's silence on Discord.
+      // The bar is HIGH. Most weeks should be silence.
+      console.log('[Insight] Sending to Opus gatekeeper for Discord evaluation...');
+      
+      const opusAnthropicClient = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
+      const opusResponse = await opusAnthropicClient.messages.create({
+        model: 'claude-opus-4-20250514',
+        max_tokens: 800,
+        system: `You are the gatekeeper for Oracle's Discord presence in a semen retention community (TitanTrack).
+
+Oracle speaks daily in the app — users experience it there. Discord is different. Oracle should RARELY speak on Discord. When it does, it should feel like a voice breaking silence because something genuinely matters.
+
+Your job: review this week's intelligence and decide if Oracle should post to Discord.
+
+## THE BAR IS HIGH
+Post to Discord ONLY if:
+- A pattern emerged that affects a significant portion of the community simultaneously
+- Something unprecedented happened (a collective shift, a community milestone that actually means something)
+- The insight connects dots in a way that would genuinely surprise and serve the community
+- It would feel WRONG for Oracle to stay silent about this
+
+Do NOT post for:
+- Routine weekly patterns (normal topic fluctuations, expected seasonal changes)
+- Patterns that are interesting but not actionable or remarkable
+- Anything that feels like "content" rather than a genuine observation worth sharing
+- Generic motivational observations
+
+## RESPONSE FORMAT
+Respond with ONLY valid JSON (no markdown, no backticks):
+{"post": true/false, "reason": "1-2 sentence explanation for Ross", "discord_message": "The message to post if post=true, 150-250 words. Write as Oracle — commanding, pattern-aware, no fluff. If post=false, leave empty string."}`,
+        messages: [{
+          role: 'user',
+          content: `## WEEKLY INSIGHT (Sonnet-generated)
+${insight}
+
+## THIS WEEK'S APP PULSES (${weekPulses.length} generated)
+${pulseContext}
+
+Should Oracle break silence on Discord this week?`
+        }]
+      });
+      
+      // Parse Opus decision
+      let opusDecision;
+      try {
+        const raw = opusResponse.content[0].text.replace(/```json|```/g, '').trim();
+        opusDecision = JSON.parse(raw);
+      } catch (parseErr) {
+        console.error('[Insight] Opus response parse error:', parseErr.message);
+        console.log('[Insight] Raw Opus response:', opusResponse.content[0].text);
+        // On parse failure, default to NOT posting (safe fallback)
+        opusDecision = { post: false, reason: 'Parse error — defaulting to silence', discord_message: '' };
+      }
+      
+      console.log(`[Insight] Opus verdict: ${opusDecision.post ? 'POST' : 'SILENCE'} — ${opusDecision.reason}`);
+      
+      if (opusDecision.post && opusDecision.discord_message) {
+        // Opus approved — post to Discord
+        const targetChannel = guild.channels.cache.find(
+          ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
+        );
+        
+        if (targetChannel) {
+          const embed = new EmbedBuilder()
+            .setColor(ORACLE_COLOR)
+            .setDescription(opusDecision.discord_message)
+            .setFooter({ text: 'Oracle · titantrack.app', iconURL: ORACLE_ICON });
+          await targetChannel.send({ embeds: [embed] });
+          console.log(`🔮 Opus-approved insight posted to #${INSIGHT_CHANNEL}`);
+        }
+        
+        // DM Ross with the verdict
+        if (admin) {
+          await admin.send(`🔮 **Opus posted to Discord this week.**\nReason: ${opusDecision.reason}`).catch(() => {});
+        }
+      } else {
+        // Opus said no — Oracle stays silent on Discord
+        if (admin) {
+          const silentEmbed = new EmbedBuilder()
+            .setColor(ORACLE_COLOR)
+            .setTitle('🔮 Opus Gatekeeper — Oracle Stayed Silent')
+            .setDescription(`**Reason:** ${opusDecision.reason}\n\n**Sonnet insight (app-only, not posted):**\n${insight.substring(0, 500)}${insight.length > 500 ? '...' : ''}`)
+            .setFooter({ text: `${weekPulses.length} app pulses this week · Oracle · titantrack.app`, iconURL: ORACLE_ICON });
+          await admin.send({ embeds: [silentEmbed] }).catch(() => {});
+        }
+        console.log(`🔮 Opus gatekeeper: Oracle stays silent on Discord this week`);
+      }
       
     } catch (err) {
       console.error('[Insight] Scheduler error:', err);
@@ -2938,8 +3008,8 @@ client.once('ready', () => {
   // ============================================================
   // COMMUNITY PULSE ENGINE
   // Every 4 hours, evaluate trigger signals across all data sources.
-  // Generates observation for app (always). Posts to Discord only for real triggers.
-  // Daily fallbacks are app-only — keeps Discord rare and meaningful.
+  // Generates observation for the app ONLY. Discord posting is handled
+  // by the weekly Opus gatekeeper in the insight scheduler above.
   // ============================================================
   
   setInterval(async () => {
@@ -2948,38 +3018,11 @@ client.once('ready', () => {
       const now = new Date();
       if (now.getUTCDay() === INSIGHT_DAY) return;
       
-      // Evaluate triggers and generate if warranted
+      // Evaluate triggers and generate if warranted (app-only)
       const pulse = await evaluateAndGenerate();
       if (!pulse) return;
       
-      // Daily fallbacks are app-only — don't post to Discord
-      if (pulse.trigger === 'daily_fallback') {
-        console.log(`🔮 App-only pulse generated (daily fallback) — not posting to Discord`);
-        return;
-      }
-      
-      // Real trigger — post to Discord
-      const guild = client.guilds.cache.first();
-      if (!guild) return;
-      
-      const targetChannel = guild.channels.cache.find(
-        ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
-      );
-      
-      if (!targetChannel) {
-        console.error(`[PulseEngine] Could not find channel #${INSIGHT_CHANNEL}`);
-        return;
-      }
-      
-      const discordMsg = await targetChannel.send({ embeds: [buildPulseEmbed(pulse.body)] });
-      
-      // Mark as posted to Discord
-      await CommunityPulse.updateOne(
-        { _id: pulse._id },
-        { $set: { postedToDiscord: true, discordMessageId: discordMsg.id } }
-      );
-      
-      console.log(`🔮 Community pulse posted to #${INSIGHT_CHANNEL} — trigger: ${pulse.trigger}`);
+      console.log(`🔮 App pulse generated — trigger: ${pulse.trigger} (app-only, Discord is Opus-gated weekly)`);
       
     } catch (err) {
       console.error('[PulseEngine] Check error:', err.message);
