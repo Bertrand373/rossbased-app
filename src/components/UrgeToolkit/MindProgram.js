@@ -128,6 +128,10 @@ const MindProgram = ({ isPremium, userData, updateUserData, openPlanModal, onSho
   // ============================================================
 
   const handlePlay = useCallback(() => {
+    if (!isPremium) {
+      if (openPlanModal) openPlanModal();
+      return;
+    }
     if (!audioRef.current || audioError) return;
 
     if (isPlaying) {
@@ -159,7 +163,7 @@ const MindProgram = ({ isPremium, userData, updateUserData, openPlanModal, onSho
             });
         });
     }
-  }, [isPlaying, loopEnabled, audioError, setupMediaSession]);
+  }, [isPremium, openPlanModal, isPlaying, loopEnabled, audioError, setupMediaSession]);
 
   const handleTimeUpdate = useCallback(() => {
     if (audioRef.current) {
@@ -284,7 +288,7 @@ const MindProgram = ({ isPremium, userData, updateUserData, openPlanModal, onSho
         <button
           className={`mp-play-btn ${isPlaying ? 'active' : ''}`}
           onClick={handlePlay}
-          disabled={audioError}
+          disabled={audioError || !isPremium}
         >
           {isPlaying ? (
             <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor">
