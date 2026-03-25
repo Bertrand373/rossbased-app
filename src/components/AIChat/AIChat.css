@@ -322,57 +322,6 @@
 }
 
 /* ============================================================
-   ORACLE EYE TRAVEL — one eye, always at the latest response
-   ============================================================ */
-
-/* Past responses lose their avatar (layout preserved) */
-.ai-chat-avatar-past {
-  opacity: 0 !important;
-}
-
-/* Eye descends into position when Oracle begins responding */
-.ai-chat-avatar-descend {
-  animation: oracleDescend 600ms ease forwards;
-}
-
-@keyframes oracleDescend {
-  0% {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  50% {
-    opacity: 0.8;
-    filter: drop-shadow(0 0 6px rgba(212,175,55,0.35));
-  }
-  100% {
-    opacity: 0.6;
-    transform: translateY(0);
-    filter: drop-shadow(0 0 0 transparent);
-  }
-}
-
-[data-theme="light"] .ai-chat-avatar-descend {
-  animation: oracleDescendLight 600ms ease forwards;
-}
-
-@keyframes oracleDescendLight {
-  0% {
-    opacity: 0;
-    transform: translateY(-20px);
-    filter: invert(1);
-  }
-  50% {
-    opacity: 0.8;
-    filter: invert(1);
-  }
-  100% {
-    opacity: 0.6;
-    transform: translateY(0);
-    filter: invert(1);
-  }
-}
-
-/* ============================================================
    MESSAGE BUBBLES
    ============================================================ */
 
@@ -952,36 +901,22 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
   justify-content: space-between;
   margin: 2px 0 0 38px;
   padding-right: 4px;
-  opacity: 0;
+  opacity: 0.5;
   transition: opacity 200ms ease;
 }
 
-/* Desktop: show on parent hover */
-.ai-chat-message.assistant:hover .ai-chat-actions,
-.ai-chat-message.assistant .ai-chat-actions:focus-within {
-  opacity: 0.5;
+/* Desktop: brighten on hover */
+.ai-chat-message.assistant:hover .ai-chat-actions {
+  opacity: 0.6;
 }
 
-.ai-chat-message.assistant:hover .ai-chat-actions:hover {
-  opacity: 0.7;
+.ai-chat-message.assistant .ai-chat-actions:hover {
+  opacity: 0.75;
 }
 
-/* Mobile: always visible */
-@media (max-width: 768px) {
-  .ai-chat-actions {
-    opacity: 0.35;
-  }
-}
-
-/* Pinned state makes actions row always partially visible */
+/* Pinned state — slightly brighter to signal state */
 .ai-chat-actions:has(.ai-chat-pin-btn.pinned) {
-  opacity: 0.5;
-}
-
-@media (max-width: 768px) {
-  .ai-chat-actions:has(.ai-chat-pin-btn.pinned) {
-    opacity: 0.4;
-  }
+  opacity: 0.6;
 }
 
 .ai-chat-share-btn {

@@ -20,7 +20,10 @@ const OracleHealth = () => {
       const res = await fetch(`${API}/api/admin/oracle-health`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (!res.ok) throw new Error('Failed to fetch');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || errData.details || `HTTP ${res.status}`);
+      }
       const json = await res.json();
       setData(json);
       setError(null);
