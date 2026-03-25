@@ -29,8 +29,12 @@ import {
   getPhaseInfo,
   calculateMetricAverages,
   calculateMetricTrends,
-  identifyMetricExtremes
+  identifyMetricExtremes,
+  generateRelapsePatternAnalysis
 } from './StatsAnalyticsUtils';
+
+// Import relapse utility
+import { calculateDaysSinceLastRelapse } from './StatsUtils';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
@@ -46,6 +50,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [selectedStatCard, setSelectedStatCard] = useState(null);
   const [showMilestonesSheet, setShowMilestonesSheet] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showPatternsSheet, setShowPatternsSheet] = useState(false);
   const [milestonesView, setMilestonesView] = useState('list'); // 'list' | 'detail'
   const [morphing, setMorphing] = useState(false);
 
@@ -61,7 +66,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [sheetReady, setSheetReady] = useState(false);
   const sheetPanelRef = useRef(null);
 
-  const sheetVisible = showResetStreakModal || showResetAllModal || showMilestonesSheet;
+  const sheetVisible = showResetStreakModal || showResetAllModal || showMilestonesSheet || showPatternsSheet;
   useEffect(() => {
     if (sheetVisible) {
       requestAnimationFrame(() => requestAnimationFrame(() => setSheetReady(true)));
@@ -90,6 +95,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setShowResetStreakModal(false);
     setShowResetAllModal(false);
     setShowMilestonesSheet(false);
+    setShowPatternsSheet(false);
     setMilestonesView('list');
     setSelectedMilestone(null);
     setMorphing(false);
@@ -120,6 +126,10 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       phaseInfo: getPhaseInfo(safeUserData.currentStreak || 0)
     };
   }, [safeUserData, isPremium]);
+
+  // Relapse pattern data — for Patterns sheet
+  const relapsePatterns = useMemo(() => generateRelapsePatternAnalysis(safeUserData), [safeUserData]);
+  const daysSinceLastRelapse = useMemo(() => calculateDaysSinceLastRelapse(safeUserData), [safeUserData]);
 
   // Milestones
   const milestones = useMemo(() => {
@@ -209,7 +219,7 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           caretPadding: 10,
           callbacks: {
             title: (items) => items.length ? items[0].label : '',
-            label: (ctx) => ctx.parsed.y === null ? '' : `${ctx.parsed.y}`
+            label: (ctx) => ctx.parsed.y === null ? '' : `${Math.round(ctx.parsed.y)}`
           }
         }
       },
@@ -350,12 +360,8 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
               aria-label="Leaderboard"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-                <path d="M4 22h16"/>
-                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                <path d="M2 4l3 12h14l3-12-6 7-5-7-5 7-4-7z"/>
+                <path d="M5 16h14v2H5z"/>
               </svg>
             </button>
             <span className="stats-vt-div" />
@@ -475,57 +481,23 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
             })()}
           </div>
 
-          {/* ---- NUMBERS GRID: 3×2 ---- */}
-          {isPremium && memoizedInsights.metricAverages && (
-            <div className="numbers-grid-v2">
-              <div className="numbers-grid-top">
-                {['energy', 'focus', 'confidence', 'aura', 'sleep', 'workout'].map(metric => {
-                  const val = memoizedInsights.metricAverages?.averages?.[metric]?.value;
-                  const trend = memoizedInsights.metricTrends?.[metric];
-                  return (
-                    <div key={metric} className="num-cell">
-                      <span className="num-cell-value">{val ? val.toFixed(1) : '—'}</span>
-                      <span className="num-cell-label">{metricDisplayName[metric]}</span>
-                      {trend && trend.direction !== 'stable' && (
-                        <span className={`num-cell-delta ${trend.direction === 'up' ? 'delta-up' : 'delta-down'}`}>
-                          {trend.direction === 'up' ? '+' : ''}{trend.delta}
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-              {memoizedInsights.metricExtremes?.strongest && memoizedInsights.metricExtremes?.growthArea && (
-                <div className="numbers-grid-extremes">
-                  <div className="num-extreme-cell">
-                    <span className="num-extreme-label">Strongest</span>
-                    <span className="num-extreme-value">{metricDisplayName[memoizedInsights.metricExtremes.strongest.metric]}</span>
-                  </div>
-                  <div className="num-extreme-cell">
-                    <span className="num-extreme-label">Growth Area</span>
-                    <span className="num-extreme-value">{metricDisplayName[memoizedInsights.metricExtremes.growthArea.metric]}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
 
           {/* Free user — simple phase + upgrade */}
           {!isPremium && (
-            <div className="numbers-grid-v2">
-              <div className="numbers-grid-top" style={{ gridTemplateColumns: '1fr' }}>
-                <div className="num-cell" style={{ padding: '16px' }}>
-                  <span className="num-cell-label" style={{ marginBottom: '4px' }}>Day {safeUserData.currentStreak || 0} · {phaseInfo.name}</span>
-                  <button className="stats-upgrade-btn" onClick={openPlanModal}>Unlock detailed analytics</button>
-                </div>
-              </div>
+            <div className="free-phase-strip">
+              <span className="free-phase-text">Day {safeUserData.currentStreak || 0} · {phaseInfo.name}</span>
+              <button className="stats-upgrade-btn" onClick={openPlanModal}>Unlock detailed analytics</button>
             </div>
           )}
 
-          {/* ---- FOOTER: milestones + reset ---- */}
+          {/* ---- FOOTER: milestones + patterns + reset ---- */}
           <div className="stats-footer-row">
             <button className="stats-footer-btn" onClick={() => setShowMilestonesSheet(true)}>
               Milestones
+            </button>
+            <span className="stats-footer-div" />
+            <button className="stats-footer-btn" onClick={() => setShowPatternsSheet(true)}>
+              Patterns
             </button>
             <span className="stats-footer-div" />
             {!isPremium && (
@@ -670,6 +642,83 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                 <button className="btn-danger" onClick={confirmResetAll} disabled={resetConfirmText !== 'RESET'}>Reset All</button>
                 <button className="btn-ghost" onClick={() => closeSheet(() => { setShowResetAllModal(false); setResetConfirmText(''); })}>Cancel</button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ====== PATTERNS SHEET — relapse data + insights ====== */}
+      {showPatternsSheet && (
+        <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowPatternsSheet(false))}>
+          <div ref={sheetPanelRef} className={`sheet-panel stats-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+            <div className="sheet-header" />
+            <div className="patterns-sheet-content">
+              <h2 className="sheet-section-title">Patterns</h2>
+
+              {/* Relapse data */}
+              {relapsePatterns?.hasData ? (
+                <div className="patterns-section">
+                  <span className="patterns-section-label">
+                    {daysSinceLastRelapse >= 90 ? 'Conquered' : 'Relapse Data'}
+                  </span>
+
+                  {daysSinceLastRelapse >= 90 ? (
+                    <div className="patterns-conquered">
+                      <span className="patterns-conquered-num">{daysSinceLastRelapse}</span>
+                      <span className="patterns-conquered-label">days since last relapse</span>
+                    </div>
+                  ) : (
+                    <div className="patterns-stat-list">
+                      <div className="patterns-stat-row">
+                        <span className="patterns-stat-label">Total relapses</span>
+                        <span className="patterns-stat-value">{relapsePatterns.totalRelapses}</span>
+                      </div>
+                      {relapsePatterns.avgStreakAtRelapse && (
+                        <div className="patterns-stat-row">
+                          <span className="patterns-stat-label">Avg streak at relapse</span>
+                          <span className="patterns-stat-value">{relapsePatterns.avgStreakAtRelapse} days</span>
+                        </div>
+                      )}
+                      {relapsePatterns.dangerZone && (
+                        <div className="patterns-stat-row">
+                          <span className="patterns-stat-label">Danger zone</span>
+                          <span className="patterns-stat-value">Days {relapsePatterns.dangerZone}</span>
+                        </div>
+                      )}
+                      {relapsePatterns.primaryTriggerLabel && (
+                        <div className="patterns-stat-row">
+                          <span className="patterns-stat-label">Primary trigger</span>
+                          <span className="patterns-stat-value">{relapsePatterns.primaryTriggerLabel}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="patterns-empty">
+                  <span className="patterns-empty-text">No relapse data yet</span>
+                  <span className="patterns-empty-sub">Pattern analysis appears after your first relapse is logged</span>
+                </div>
+              )}
+
+              {/* Strongest / Growth Area — moved here from dead grid */}
+              {isPremium && memoizedInsights.metricExtremes?.strongest && memoizedInsights.metricExtremes?.growthArea && (
+                <div className="patterns-section">
+                  <span className="patterns-section-label">Metrics</span>
+                  <div className="patterns-stat-list">
+                    <div className="patterns-stat-row">
+                      <span className="patterns-stat-label">Strongest</span>
+                      <span className="patterns-stat-value">{metricDisplayName[memoizedInsights.metricExtremes.strongest.metric]}</span>
+                    </div>
+                    <div className="patterns-stat-row">
+                      <span className="patterns-stat-label">Growth area</span>
+                      <span className="patterns-stat-value">{metricDisplayName[memoizedInsights.metricExtremes.growthArea.metric]}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <button className="btn-ghost" onClick={() => closeSheet(() => setShowPatternsSheet(false))}>Close</button>
             </div>
           </div>
         </div>

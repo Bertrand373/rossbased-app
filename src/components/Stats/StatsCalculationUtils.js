@@ -187,7 +187,7 @@ export const generateChartData = (userData, selectedMetric, timeRange) => {
         const weekSlice = timeRangeArray.slice(w, w + 7);
         const validValues = weekSlice.filter(d => d.value !== null).map(d => d.value);
         const avgValue = validValues.length > 0 
-          ? Math.round(validValues.reduce((a, b) => a + b, 0) / validValues.length * 10) / 10
+          ? Math.round(validValues.reduce((a, b) => a + b, 0) / validValues.length)
           : null;
         weeklyBuckets.push({ date: weekSlice[weekSlice.length - 1].date, value: avgValue });
       }
