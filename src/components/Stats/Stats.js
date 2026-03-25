@@ -14,8 +14,6 @@ import toast from 'react-hot-toast';
 import { StatCardModal } from './StatsComponents';
 import Leaderboard from './Leaderboard';
 import EmotionalTimeline from '../EmotionalTimeline/EmotionalTimeline';
-// Import ShareCard component
-import ShareCard from '../ShareCard/ShareCard';
 
 // Import utility functions
 import {
@@ -563,7 +561,6 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                       );
                     })}
                   </div>
-                  {isPremium && <ShareCard userData={safeUserData} isVisible={true} />}
                   <button className="btn-ghost" onClick={() => closeSheet(() => { setShowMilestonesSheet(false); setMilestonesView('list'); setSelectedMilestone(null); })}>Close</button>
                 </div>
               ) : (
