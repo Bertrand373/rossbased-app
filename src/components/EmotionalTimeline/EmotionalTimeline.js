@@ -4,7 +4,7 @@
 import React, { useState, useRef, useMemo } from 'react';
 import './EmotionalTimeline.css';
 import '../../styles/BottomSheet.css';
-import { FaCheck, FaExclamationTriangle } from 'react-icons/fa';
+import { FaExclamationTriangle } from 'react-icons/fa';
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 import useSheetSwipe from '../../hooks/useSheetSwipe';
 
@@ -391,34 +391,15 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
           </div>
         </div>
 
-        {/* ---- JOURNEY SPINE — flex-fills viewport ---- */}
-        <div className="et-spine">
-          {phases.map((phase, i) => {
-            const status = getPhaseStatus(phase);
-            const isLast = i === phases.length - 1;
-            return (
-              <div
-                key={phase.id}
-                className={`et-node ${status}`}
-                onClick={() => openPhase(phase)}
-              >
-                <div className="et-rail">
-                  <div className={`et-dot ${status}`} />
-                  {!isLast && <div className={`et-line ${status}`} />}
-                </div>
-                <div className="et-node-content">
-                  <span className="et-node-name">{phase.name}</span>
-                  <span className="et-node-days">Days {phase.days}</span>
-                  {status === 'current' && (
-                    <>
-                      <span className="et-node-expect">{phase.expectation}</span>
-                      <span className="et-node-progress">{progress.text}</span>
-                    </>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+        {/* ---- PHASE HERO — fills viewport between progress bar and trajectory ---- */}
+        <div className="et-hero" onClick={() => openPhase(currentPhase)}>
+          <span className="et-hero-num">
+            {String(phases.findIndex(p => p.id === currentPhase.id) + 1).padStart(2, '0')}
+          </span>
+          <span className="et-hero-name">{currentPhase.name}</span>
+          <span className="et-hero-days">Days {currentPhase.days}</span>
+          <p className="et-hero-expect">{currentPhase.expectation}</p>
+          <span className="et-hero-progress">{progress.text}</span>
         </div>
 
         {/* ---- TRAJECTORY GRID ---- */}

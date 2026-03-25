@@ -139,161 +139,64 @@
 }
 
 /* =============================================================================
-   JOURNEY SPINE — flex-fills viewport, vertical rail with branching nodes
+   PHASE HERO — centered current phase, fills viewport between progress + traj
    ============================================================================= */
 
-.et-spine {
-  flex: 1;
-  height: 0;
-  display: flex;
-  flex-direction: column;
-  padding: 6px 0 0;
-  overflow: hidden;
-}
-
-.et-node {
-  display: flex;
-  gap: 14px;
+.et-hero {
   flex: 1;
   min-height: 0;
-  cursor: pointer;
-  transition: opacity 150ms ease;
-  -webkit-tap-highlight-color: transparent;
-  padding: 0 4px;
-}
-
-.et-node.current {
-  flex: 4;
-}
-
-.et-node.upcoming {
-  flex: 0 0 auto;
-}
-
-.et-node:hover { opacity: 0.75; }
-.et-node:active { opacity: 0.55; }
-
-/* Rail — vertical line + dots */
-.et-rail {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 20px;
-  flex-shrink: 0;
-  padding-top: 4px;
+  justify-content: center;
+  text-align: center;
+  padding: 16px 24px;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.et-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--text-tertiary);
-  flex-shrink: 0;
-  transition: all 200ms ease;
-}
+.et-hero:hover { opacity: 0.75; }
+.et-hero:active { opacity: 0.55; }
 
-.et-dot.completed {
-  background: var(--text-muted);
-}
-
-.et-dot.current {
-  width: 8px;
-  height: 8px;
-  background: var(--status-current);
-  box-shadow: 0 0 0 3px var(--cal-tint-current);
-}
-
-.et-dot.upcoming {
-  background: var(--border-prominent);
-}
-
-.et-line {
-  flex: 1;
-  width: 1px;
-  background: var(--border-subtle);
-  margin: 4px 0 0;
-}
-
-.et-line.completed {
-  background: var(--text-tertiary);
-  opacity: 0.5;
-}
-
-.et-line.current {
-  background: linear-gradient(
-    to bottom,
-    var(--text-tertiary) 0%,
-    var(--border-subtle) 100%
-  );
-}
-
-.et-line.upcoming {
-  background: var(--border-subtle);
-  opacity: 0.4;
-}
-
-/* Node content — right side of rail */
-.et-node-content {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  padding: 0 0 8px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.et-node:last-child .et-node-content {
-  border-bottom: none;
-}
-
-.et-node-name {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--text);
-  letter-spacing: -0.01em;
-  line-height: 1.2;
-}
-
-.et-node-days {
-  font-size: 0.625rem;
-  color: var(--text-muted);
+.et-hero-num {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  font-size: 5rem;
+  font-weight: 200;
+  color: var(--border-prominent);
+  line-height: 1;
   font-feature-settings: 'tnum' 1;
-  margin-top: 2px;
+  letter-spacing: -0.03em;
 }
 
-/* Upcoming — ghosted */
-.et-node.upcoming .et-node-name {
-  color: var(--text-tertiary);
-}
-
-.et-node.upcoming .et-node-days {
-  color: var(--text-tertiary);
-  opacity: 0.6;
-}
-
-/* Current — expanded with summary */
-.et-node.current .et-node-name {
-  font-size: 0.875rem;
+.et-hero-name {
+  font-size: 1.25rem;
   font-weight: 600;
-}
-
-.et-node.current .et-node-days {
-  font-size: 0.6875rem;
-}
-
-.et-node-expect {
-  font-size: 0.6875rem;
-  color: var(--text-muted);
-  line-height: 1.5;
+  color: var(--text);
+  letter-spacing: -0.02em;
   margin-top: 8px;
 }
 
-.et-node-progress {
-  font-size: 0.5625rem;
+.et-hero-days {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-feature-settings: 'tnum' 1;
+  margin-top: 4px;
+}
+
+.et-hero-expect {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 16px 0 0;
+  max-width: 320px;
+}
+
+.et-hero-progress {
+  font-size: 0.6875rem;
   color: var(--text-tertiary);
   font-feature-settings: 'tnum' 1;
-  margin-top: 6px;
+  margin-top: 10px;
 }
 
 /* =============================================================================
@@ -609,7 +512,7 @@
   opacity: 0;
 }
 
-.et-spine {
+.et-hero {
   animation: fadeInUp 400ms ease 100ms forwards;
   opacity: 0;
 }
@@ -624,12 +527,12 @@
    ============================================================================= */
 
 .et-strip-cell:active,
-.et-node:active {
+.et-hero:active {
   transform: scale(0.97);
 }
 
 .et-strip-cell,
-.et-node {
+.et-hero {
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -650,25 +553,16 @@
     font-size: 0.4375rem;
   }
 
-  .et-node {
-    gap: 12px;
+  .et-hero-num {
+    font-size: 4rem;
   }
 
-  .et-node-name {
-    font-size: 0.75rem;
+  .et-hero-name {
+    font-size: 1.125rem;
   }
 
-  .et-node.current .et-node-name {
+  .et-hero-expect {
     font-size: 0.8125rem;
-  }
-
-  .et-node-days {
-    font-size: 0.5625rem;
-  }
-
-  .et-node-expect {
-    font-size: 0.625rem;
-    margin-top: 6px;
   }
 
   .et-traj-value {
@@ -702,12 +596,12 @@
     font-size: 0.875rem;
   }
 
-  .et-node {
-    gap: 10px;
+  .et-hero-num {
+    font-size: 3rem;
   }
 
-  .et-rail {
-    width: 16px;
+  .et-hero-name {
+    font-size: 1rem;
   }
 
   .et-traj-value {
@@ -727,12 +621,17 @@
     font-size: 1.125rem;
   }
 
-  .et-node-name {
-    font-size: 0.875rem;
+  .et-hero-num {
+    font-size: 6rem;
   }
 
-  .et-node.current .et-node-name {
+  .et-hero-name {
+    font-size: 1.5rem;
+  }
+
+  .et-hero-expect {
     font-size: 1rem;
+    max-width: 400px;
   }
 
   .et-traj-value {
@@ -751,7 +650,7 @@
 @media (prefers-reduced-motion: reduce) {
   .et-phase-strip,
   .et-prog-bar,
-  .et-spine,
+  .et-hero,
   .et-traj {
     animation: none;
     opacity: 1;
@@ -762,7 +661,7 @@
   }
 
   .et-strip-cell,
-  .et-node {
+  .et-hero {
     transition: none;
   }
 }
