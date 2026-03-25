@@ -115,7 +115,7 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
       expectation: "Emotional stability returns. Clarity and calm become the norm.",
       socialShift: "Around day 60, something shifts externally. People treat you differently. Eye contact changes. Women notice you. Men either respect you or seem uncomfortable around you. This isn't imagination. Your energy has tangibly shifted. How you handle this attention is the next test.",
       criticalRule: "The temptation here is different. You feel powerful. Your brain will rationalize: I've got the benefits, I can release once. Don't believe it. You're accessing the surface of what's possible. The real transformation is still ahead.",
-      whatsNext: "Days 91-180 bring Integration. Your new capacities become baseline. The discipline that felt like effort becomes effortless. Your sense of purpose clarifies. You stop doing retention and start being retained.",
+      whatsNext: "Days 91-180 bring Integration & Growth. Your new capacities become baseline. The discipline that felt like effort becomes effortless. Your sense of purpose clarifies. You stop doing retention and start being retained.",
       symptoms: [
         "Dramatically improved focus",
         "Enhanced creativity and problem-solving",
@@ -138,7 +138,7 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
     },
     {
       id: 4,
-      name: "Integration",
+      name: "Integration & Growth",
       shortName: "Integrate",
       days: "91-180",
       start: 91,
@@ -151,7 +151,7 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
       expectation: "Deep inner peace. Emotions serve you rather than control you.",
       relationshipShift: "Relationships change during this phase. Some friendships fade naturally because you've outgrown them. New connections appear. People seek your advice without knowing why. Old flames may resurface. Not everyone will understand your transformation. That's okay.",
       criticalRule: "The danger here is complacency. You feel stable. You forget how hard the early days were. A single release might seem harmless. It's not. Protect what you've built. The cost of rebuilding is higher than the cost of maintaining.",
-      whatsNext: "Day 181+ marks Mastery. The question shifts from what can I gain to what can I contribute. Most men at this stage describe retention choosing them, rather than the other way around.",
+      whatsNext: "Day 181+ marks Mastery & Purpose. The question shifts from what can I gain to what can I contribute. Most men at this stage describe retention choosing them, rather than the other way around.",
       symptoms: [
         "Deep sense of life purpose",
         "Natural charisma and presence",
@@ -174,7 +174,7 @@ const EmotionalTimeline = ({ userData, updateUserData, isPremium, openPlanModal 
     },
     {
       id: 5,
-      name: "Mastery",
+      name: "Mastery & Purpose",
       shortName: "Master",
       days: "181+",
       start: 181,

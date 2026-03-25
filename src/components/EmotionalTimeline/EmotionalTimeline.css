@@ -163,7 +163,11 @@
 }
 
 .et-node.current {
-  flex: 3;
+  flex: 4;
+}
+
+.et-node.upcoming {
+  flex: 0 0 auto;
 }
 
 .et-node:hover { opacity: 0.75; }

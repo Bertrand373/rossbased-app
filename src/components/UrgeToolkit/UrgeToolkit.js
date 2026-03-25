@@ -133,8 +133,8 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
     if (currentDay <= 14) return { num: "01", name: "Initial Adaptation", color: "#22c55e" };
     if (currentDay <= 45) return { num: "02", name: "Emotional Processing", color: "#f59e0b" };
     if (currentDay <= 90) return { num: "03", name: "Mental Expansion", color: "#3b82f6" };
-    if (currentDay <= 180) return { num: "04", name: "Spiritual Integration", color: "#8b5cf6" };
-    return { num: "05", name: "Mastery & Service", color: "#ffdd00" };
+    if (currentDay <= 180) return { num: "04", name: "Integration & Growth", color: "#8b5cf6" };
+    return { num: "05", name: "Mastery & Purpose", color: "#ffdd00" };
   };
 
   const currentPhase = getCurrentPhase();
