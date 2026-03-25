@@ -1,4 +1,7 @@
-// AuthModal.js - TITANTRACK MODERN MINIMAL
+// AuthModal.js - TITANTRACK GLASS BOTTOM SHEET AUTH
+// Mobile: glass sheet from bottom, sticky icon top + CTA bottom, scrollable middle
+// Desktop: centered glass card
+// Swipe-to-dismiss on drag handle. Backdrop tap to close.
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './AuthModal.css';
 import { FaSpinner } from 'react-icons/fa';
@@ -45,7 +48,7 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
     setTimeout(() => { if (onClose) onClose(); }, 300);
   }, [isLoading, onClose]);
 
-  // Swipe-to-dismiss on the drag handle / panel top area
+  // Swipe-to-dismiss on drag handle
   const handleTouchStart = useCallback((e) => {
     touchStartY.current = e.touches[0].clientY;
     touchDeltaY.current = 0;
@@ -54,7 +57,6 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   const handleTouchMove = useCallback((e) => {
     const delta = e.touches[0].clientY - touchStartY.current;
     touchDeltaY.current = delta;
-    // Only allow downward drag
     if (delta > 0 && panelRef.current) {
       panelRef.current.style.transform = `translateY(${delta}px)`;
       panelRef.current.style.transition = 'none';
@@ -66,7 +68,6 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
       panelRef.current.style.transition = '';
       panelRef.current.style.transform = '';
     }
-    // Dismiss if dragged more than 100px
     if (touchDeltaY.current > 100) {
       closeSheet();
     }
@@ -102,7 +103,6 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('username', data.username);
       
-      // Track signup or login in Mixpanel
       if (data.isNewUser) {
         trackSignup('google');
       } else {
@@ -177,7 +177,6 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [username, email, password, confirmPassword]);
 
-  // Clear forgot password error when user types
   useEffect(() => {
     if (error && showForgotPassword) setError('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -263,7 +262,6 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('username', data.username);
         
-        // Track signup in Mixpanel
         trackSignup('email');
         
         const success = await onLogin(data.username, null, true);
@@ -278,7 +276,6 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
     }
   };
 
-  // Forgot password submit handler
   const handleForgotPassword = async (e) => {
     e.preventDefault();
 
@@ -349,12 +346,9 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   };
   
   const handleOverlayClick = () => {
-    if (!isLoading && onClose) {
-      closeSheet();
-    }
+    if (!isLoading) closeSheet();
   };
 
-  // Exit forgot password and go back to login
   const exitForgotPassword = () => {
     setShowForgotPassword(false);
     setForgotEmail('');
@@ -362,7 +356,7 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
     setError('');
   };
 
-  // Hidden Google button - ALWAYS rendered to prevent layout issues during OAuth
+  // Hidden Google button - ALWAYS rendered
   const hiddenGoogleButton = (
     <div 
       ref={googleButtonRef} 
@@ -371,17 +365,22 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
     />
   );
 
+  // =============================================
+  // LOADING STATE
+  // =============================================
   if (isLoading && !showForgotPassword) {
     return (
-      <div className={`auth-overlay${sheetReady ? ' ready' : ''}`}>
+      <div className={`auth-backdrop${sheetReady ? ' open' : ''}`}>
         {hiddenGoogleButton}
-        <div className="auth-panel" ref={panelRef} onClick={e => e.stopPropagation()}>
-          <div className="auth-drag-handle">
-            <div className="auth-drag-pill" />
+        <div className="auth-panel" ref={panelRef}>
+          <div className="auth-sheet-top">
+            <div className="auth-drag-zone">
+              <div className="auth-drag-pill" />
+            </div>
           </div>
           <div className="auth-loading">
             <img 
-              src="/icon-192.png" 
+              src="/tt-icon-white.png" 
               alt="" 
               className="auth-loading-icon"
             />
@@ -396,29 +395,23 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   // =============================================
   if (showForgotPassword) {
     return (
-      <div className={`auth-overlay${sheetReady ? ' ready' : ''}`} onClick={handleOverlayClick}>
+      <div className={`auth-backdrop${sheetReady ? ' open' : ''}`} onClick={handleOverlayClick}>
         {hiddenGoogleButton}
-        <div 
-          className="auth-panel" 
-          ref={panelRef}
-          onClick={e => e.stopPropagation()}
-        >
-          <div 
-            className="auth-drag-handle"
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          >
-            <div className="auth-drag-pill" />
-          </div>
+        <div className="auth-panel" ref={panelRef} onClick={e => e.stopPropagation()}>
 
-          <div className="auth-brand">
-            <img src="/icon-192.png" alt="" className="auth-brand-icon" />
-          </div>
-
-          <div className="auth-header">
-            <h2>{forgotSuccess ? 'Check your email' : 'Forgot password'}</h2>
-            <p>
+          {/* STICKY TOP — drag handle + icon + heading */}
+          <div className="auth-sheet-top">
+            <div 
+              className="auth-drag-zone"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              <div className="auth-drag-pill" />
+            </div>
+            <img src="/tt-icon-white.png" alt="" className="auth-sheet-icon" />
+            <h2 className="auth-sheet-title">{forgotSuccess ? 'Check your email' : 'Forgot password'}</h2>
+            <p className="auth-sheet-sub">
               {forgotSuccess 
                 ? 'If an account exists with that email, a reset link has been sent. Check your inbox and spam folder.'
                 : 'Enter the email you signed up with and we\'ll send you a reset link.'
@@ -426,28 +419,34 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
             </p>
           </div>
 
-          {error && (
-            <div className="auth-error">{error}</div>
-          )}
+          {/* SCROLLABLE MIDDLE */}
+          <div className="auth-sheet-scroll" data-no-swipe>
+            {error && <div className="auth-error">{error}</div>}
 
-          {!forgotSuccess ? (
-            <form className="auth-form" onSubmit={handleForgotPassword}>
-              <div className="auth-field">
-                <label htmlFor="forgot-email">Email</label>
-                <input
-                  id="forgot-email"
-                  type="email"
-                  value={forgotEmail}
-                  onChange={(e) => setForgotEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  autoComplete="email"
-                  autoCapitalize="off"
-                  autoFocus
-                  disabled={isLoading}
-                />
-              </div>
+            {!forgotSuccess && (
+              <form id="auth-forgot-form" className="auth-form" onSubmit={handleForgotPassword}>
+                <div className="auth-field">
+                  <label htmlFor="forgot-email">Email</label>
+                  <input
+                    id="forgot-email"
+                    type="email"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    autoComplete="email"
+                    autoCapitalize="off"
+                    autoFocus
+                    disabled={isLoading}
+                  />
+                </div>
+              </form>
+            )}
+          </div>
 
-              <button type="submit" className="auth-submit" disabled={isLoading}>
+          {/* STICKY BOTTOM — submit + back link */}
+          <div className="auth-sheet-bottom">
+            {!forgotSuccess && (
+              <button type="submit" form="auth-forgot-form" className="auth-submit" disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <FaSpinner className="auth-spinner" />
@@ -457,20 +456,19 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
                   <span>Send reset link</span>
                 )}
               </button>
-            </form>
-          ) : null}
-
-          <div className="auth-footer">
-            <p>
-              <button 
-                type="button" 
-                className="auth-switch" 
-                onClick={exitForgotPassword}
-                disabled={isLoading}
-              >
-                Back to sign in
-              </button>
-            </p>
+            )}
+            <div className="auth-footer">
+              <p>
+                <button 
+                  type="button" 
+                  className="auth-switch" 
+                  onClick={exitForgotPassword}
+                  disabled={isLoading}
+                >
+                  Back to sign in
+                </button>
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -481,139 +479,134 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   // MAIN AUTH VIEW (LOGIN / SIGNUP)
   // =============================================
   return (
-    <div className={`auth-overlay${sheetReady ? ' ready' : ''}`} onClick={handleOverlayClick}>
+    <div className={`auth-backdrop${sheetReady ? ' open' : ''}`} onClick={handleOverlayClick}>
       {hiddenGoogleButton}
-      <div 
-        className="auth-panel" 
-        ref={panelRef}
-        onClick={e => e.stopPropagation()}
-      >
-        <div 
-          className="auth-drag-handle"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          <div className="auth-drag-pill" />
-        </div>
+      <div className="auth-panel" ref={panelRef} onClick={e => e.stopPropagation()}>
         
-        <div className="auth-brand">
-          <img src="/icon-192.png" alt="" className="auth-brand-icon" />
+        {/* STICKY TOP — drag handle + icon + heading */}
+        <div className="auth-sheet-top">
+          <div 
+            className="auth-drag-zone"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            <div className="auth-drag-pill" />
+          </div>
+          <img src="/tt-icon-white.png" alt="" className="auth-sheet-icon" />
+          <h2 className="auth-sheet-title">{isLogin ? 'Welcome back' : 'Create account'}</h2>
+          <p className="auth-sheet-sub">{isLogin ? 'Sign in to continue your journey' : 'Start tracking your progress today'}</p>
         </div>
 
-        <div className="auth-header">
-          <h2>{isLogin ? 'Welcome back' : 'Create account'}</h2>
-          <p>{isLogin ? 'Sign in to continue your journey' : 'Start tracking your progress today'}</p>
-        </div>
-        
-        {error && (
-          <div className="auth-error">
-            {error}
-          </div>
-        )}
-        
-        <div className="auth-social">
-          <button
-            type="button"
-            className="auth-social-btn auth-social-google"
-            onClick={() => handleSocialLogin('Google')}
-            disabled={!googleLoaded || isLoading}
-          >
-            <FcGoogle />
-            <span>Google</span>
-          </button>
+        {/* SCROLLABLE MIDDLE — social, divider, form fields */}
+        <div className="auth-sheet-scroll" data-no-swipe>
+          {error && <div className="auth-error">{error}</div>}
           
-          <button
-            type="button"
-            className="auth-social-btn auth-social-discord"
-            onClick={() => handleSocialLogin('Discord')}
-            disabled={isLoading}
-          >
-            <BsDiscord />
-            <span>Discord</span>
-          </button>
-        </div>
-        
-        <div className="auth-divider">
-          <span>or</span>
-        </div>
-        
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="auth-field">
-            <label htmlFor="username">Username</label>
-            <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
-              autoComplete="username"
-              autoCapitalize="off"
+          <div className="auth-social">
+            <button
+              type="button"
+              className="auth-social-btn auth-social-google"
+              onClick={() => handleSocialLogin('Google')}
+              disabled={!googleLoaded || isLoading}
+            >
+              <FcGoogle />
+              <span>Google</span>
+            </button>
+            
+            <button
+              type="button"
+              className="auth-social-btn auth-social-discord"
+              onClick={() => handleSocialLogin('Discord')}
               disabled={isLoading}
-            />
+            >
+              <BsDiscord />
+              <span>Discord</span>
+            </button>
           </div>
           
-          {!isLogin && (
+          <div className="auth-divider">
+            <span>or</span>
+          </div>
+          
+          <form id="auth-main-form" className="auth-form" onSubmit={handleSubmit}>
             <div className="auth-field">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="username">Username</label>
               <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                autoComplete="email"
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter your username"
+                autoComplete="username"
                 autoCapitalize="off"
                 disabled={isLoading}
               />
             </div>
-          )}
-          
-          <div className="auth-field">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              autoComplete={isLogin ? 'current-password' : 'new-password'}
-              disabled={isLoading}
-            />
-          </div>
-
-          {/* Forgot password link - login mode only */}
-          {isLogin && (
-            <div className="auth-forgot-row">
-              <button
-                type="button"
-                className="auth-forgot-link"
-                onClick={() => {
-                  setShowForgotPassword(true);
-                  setError('');
-                }}
-              >
-                Forgot password?
-              </button>
-            </div>
-          )}
-          
-          {!isLogin && (
+            
+            {!isLogin && (
+              <div className="auth-field">
+                <label htmlFor="email">Email</label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  autoComplete="email"
+                  autoCapitalize="off"
+                  disabled={isLoading}
+                />
+              </div>
+            )}
+            
             <div className="auth-field">
-              <label htmlFor="confirmPassword">Confirm Password</label>
+              <label htmlFor="password">Password</label>
               <input
-                id="confirmPassword"
+                id="password"
                 type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm your password"
-                autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                autoComplete={isLogin ? 'current-password' : 'new-password'}
                 disabled={isLoading}
               />
             </div>
-          )}
-          
-          <button type="submit" className="auth-submit" disabled={isLoading}>
+
+            {isLogin && (
+              <div className="auth-forgot-row">
+                <button
+                  type="button"
+                  className="auth-forgot-link"
+                  onClick={() => {
+                    setShowForgotPassword(true);
+                    setError('');
+                  }}
+                >
+                  Forgot password?
+                </button>
+              </div>
+            )}
+            
+            {!isLogin && (
+              <div className="auth-field">
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm your password"
+                  autoComplete="new-password"
+                  disabled={isLoading}
+                />
+              </div>
+            )}
+          </form>
+        </div>
+
+        {/* STICKY BOTTOM — submit + mode switcher */}
+        <div className="auth-sheet-bottom">
+          <button type="submit" form="auth-main-form" className="auth-submit" disabled={isLoading}>
             {isLoading ? (
               <>
                 <FaSpinner className="auth-spinner" />
@@ -623,20 +616,20 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
               <span>{isLogin ? 'Sign in' : 'Create account'}</span>
             )}
           </button>
-        </form>
-        
-        <div className="auth-footer">
-          <p>
-            {isLogin ? "Don't have an account?" : 'Already have an account?'}
-            <button 
-              type="button" 
-              className="auth-switch" 
-              onClick={() => setIsLogin(!isLogin)}
-              disabled={isLoading}
-            >
-              {isLogin ? 'Sign up' : 'Sign in'}
-            </button>
-          </p>
+          
+          <div className="auth-footer">
+            <p>
+              {isLogin ? "Don't have an account?" : 'Already have an account?'}
+              <button 
+                type="button" 
+                className="auth-switch" 
+                onClick={() => setIsLogin(!isLogin)}
+                disabled={isLoading}
+              >
+                {isLogin ? 'Sign up' : 'Sign in'}
+              </button>
+            </p>
+          </div>
         </div>
       </div>
     </div>

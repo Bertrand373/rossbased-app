@@ -46,9 +46,9 @@
   opacity: 0.7;
 }
 
-/* Auth sheet on landing — fully opaque backdrop to block GoldenSmoke bleed */
-.landing .auth-overlay.ready {
-  background-color: rgba(0, 0, 0, 1);
+/* Auth sheet on landing — stronger backdrop to block GoldenSmoke bleed */
+.landing .auth-backdrop.open {
+  background-color: rgba(0, 0, 0, 0.92);
 }
 
 /* ============================================================

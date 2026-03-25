@@ -1,30 +1,30 @@
-/* AuthModal.css - TITANTRACK BOTTOM SHEET AUTH */
-/* Mobile: slides up from bottom. Desktop: centered modal. */
-/* Swipe-to-dismiss on drag handle. Backdrop tap to close. */
+/* AuthModal.css — TITANTRACK GLASS BOTTOM SHEET AUTH */
+/* Matches BottomSheet.css DNA: glass bg, highlight layer, blur, sticky zones */
+/* Mobile: slides up from bottom. Desktop: centered glass card. */
 
 /* =============================================================================
-   OVERLAY / BACKDROP
+   BACKDROP — matches sheet-backdrop
    ============================================================================= */
 
-.auth-overlay {
+.auth-backdrop {
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0);
   z-index: 2000;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: center;
+  pointer-events: none;
   transition: background-color 300ms ease;
-  overflow: hidden;
 }
 
-.auth-overlay.ready {
-  background-color: rgba(0, 0, 0, 0.85);
+.auth-backdrop.open {
+  background-color: var(--overlay-bg, rgba(0, 0, 0, 0.6));
+  pointer-events: auto;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  touch-action: none;
 }
 
 /* =============================================================================
-   HIDDEN GOOGLE BUTTON - Bulletproof invisibility during OAuth flow
+   HIDDEN GOOGLE BUTTON
    ============================================================================= */
 
 .google-hidden-button {
@@ -52,99 +52,180 @@
 }
 
 /* =============================================================================
-   PANEL — Bottom sheet on mobile, centered on desktop
+   PANEL — glass sheet, matches sheet-panel
    ============================================================================= */
 
 .auth-panel {
-  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2001;
+  display: flex;
+  flex-direction: column;
   max-width: 500px;
   max-height: 92dvh;
-  background: rgba(18, 18, 18, 0.98);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  padding: 0 24px 24px;
-  padding-bottom: max(24px, calc(env(safe-area-inset-bottom) + 16px));
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
+  margin: 0 auto;
+  background: var(--sheet-bg, rgba(28, 28, 30, 0.75));
+  backdrop-filter: blur(40px) saturate(1.2);
+  -webkit-backdrop-filter: blur(40px) saturate(1.2);
+  border-top: 1px solid var(--sheet-border, rgba(255, 255, 255, 0.08));
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
   transform: translateY(100%);
   transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
+  pointer-events: none;
+  overflow: hidden;
 }
 
-.auth-overlay.ready .auth-panel {
+/* Glass highlight layer — identical to sheet-panel */
+.auth-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--sheet-highlight, linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 40%));
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.auth-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.auth-backdrop.open .auth-panel {
   transform: translateY(0);
+  pointer-events: auto;
 }
 
 /* =============================================================================
-   DRAG HANDLE — swipe affordance
+   STICKY TOP — drag handle + icon + heading
+   Stays visible when form content scrolls underneath
    ============================================================================= */
 
-.auth-drag-handle {
-  display: flex;
-  justify-content: center;
-  padding: 12px 0 20px;
-  cursor: grab;
-  -webkit-tap-highlight-color: transparent;
+.auth-sheet-top {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 0 24px 16px;
+  background: var(--sheet-bg, rgba(28, 28, 30, 0.75));
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
   position: sticky;
   top: 0;
-  z-index: 2;
-  background: rgba(18, 18, 18, 0.98);
+  z-index: 3;
+}
+
+/* Fade mask at bottom edge of sticky top */
+.auth-sheet-top::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: linear-gradient(to bottom, var(--sheet-bg, rgba(28, 28, 30, 0.75)), transparent);
+  pointer-events: none;
+}
+
+/* Drag handle zone — swipe target */
+.auth-drag-zone {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 16px;
+  cursor: grab;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
 }
 
 .auth-drag-pill {
   width: 36px;
   height: 4px;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--border-prominent, rgba(255, 255, 255, 0.2));
   border-radius: 2px;
+  opacity: 0.7;
 }
 
-/* =============================================================================
-   BRAND ICON - Centered above header
-   ============================================================================= */
-
-.auth-brand {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
+/* Icon */
+.auth-sheet-icon {
+  width: 36px;
+  height: 36px;
+  opacity: 0.7;
+  margin-bottom: 16px;
 }
 
-.auth-brand-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  object-fit: contain;
+[data-theme="light"] .auth-sheet-icon {
+  filter: invert(1);
 }
 
-/* =============================================================================
-   HEADER - Centered, clean typography
-   ============================================================================= */
-
-.auth-header {
-  text-align: center;
-  margin-bottom: 28px;
-}
-
-.auth-header h2 {
+/* Title + subtitle */
+.auth-sheet-title {
   font-size: 1.5rem;
   font-weight: 500;
-  color: #ffffff;
-  margin: 0 0 8px 0;
+  color: var(--text, #ffffff);
+  margin: 0 0 6px 0;
   letter-spacing: -0.02em;
 }
 
-.auth-header p {
+.auth-sheet-sub {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted, rgba(255, 255, 255, 0.4));
   font-weight: 400;
   margin: 0;
   line-height: 1.5;
 }
 
 /* =============================================================================
-   SOCIAL BUTTONS - Side by side
+   SCROLLABLE MIDDLE — form fields, social buttons
+   ============================================================================= */
+
+.auth-sheet-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 8px 24px 0;
+  touch-action: pan-y;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.auth-sheet-scroll::-webkit-scrollbar { display: none; }
+
+/* =============================================================================
+   STICKY BOTTOM — submit button + mode switcher
+   ============================================================================= */
+
+.auth-sheet-bottom {
+  flex-shrink: 0;
+  padding: 16px 24px 24px;
+  padding-bottom: max(24px, calc(env(safe-area-inset-bottom) + 16px));
+  background: var(--sheet-bg, rgba(28, 28, 30, 0.75));
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+}
+
+/* Fade mask at top edge of sticky bottom */
+.auth-sheet-bottom::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: linear-gradient(to top, var(--sheet-bg, rgba(28, 28, 30, 0.75)), transparent);
+  pointer-events: none;
+}
+
+/* =============================================================================
+   SOCIAL BUTTONS
    ============================================================================= */
 
 .auth-social {
@@ -162,9 +243,9 @@
   gap: 8px;
   padding: 14px 12px;
   background-color: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
   border-radius: 9999px;
-  color: #ffffff;
+  color: var(--text, #ffffff);
   font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
@@ -174,7 +255,7 @@
 }
 
 .auth-social-btn:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--surface-overlay, rgba(255, 255, 255, 0.05));
   border-color: rgba(255, 255, 255, 0.15);
 }
 
@@ -205,7 +286,7 @@
 }
 
 /* =============================================================================
-   DIVIDER — background matches panel
+   DIVIDER — bg matches glass panel, not old opaque overlay
    ============================================================================= */
 
 .auth-divider {
@@ -221,17 +302,18 @@
   left: 0;
   right: 0;
   height: 1px;
-  background-color: rgba(255, 255, 255, 0.06);
+  background-color: var(--border-subtle, rgba(255, 255, 255, 0.06));
 }
 
 .auth-divider span {
   position: relative;
-  background-color: rgba(18, 18, 18, 0.98);
   padding: 0 16px;
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--text-muted, rgba(255, 255, 255, 0.25));
   font-size: 0.75rem;
   font-weight: 400;
   text-transform: lowercase;
+  /* Transparent bg — let glass panel show through instead of solid color */
+  background: transparent;
 }
 
 /* =============================================================================
@@ -243,7 +325,7 @@
   border: 1px solid rgba(248, 113, 113, 0.15);
   border-radius: 12px;
   padding: 14px 16px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   color: #f87171;
   font-size: 0.8125rem;
   font-weight: 400;
@@ -270,7 +352,7 @@
 .auth-field label {
   font-size: 0.75rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted, rgba(255, 255, 255, 0.4));
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -279,9 +361,9 @@
   width: 100%;
   padding: 16px;
   background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
   border-radius: 12px;
-  color: #ffffff;
+  color: var(--text, #ffffff);
   font-size: 1rem;
   font-family: inherit;
   transition: all 150ms ease;
@@ -291,12 +373,12 @@
 
 .auth-field input:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: var(--border-prominent, rgba(255, 255, 255, 0.2));
   background-color: rgba(255, 255, 255, 0.05);
 }
 
 .auth-field input::placeholder {
-  color: rgba(255, 255, 255, 0.2);
+  color: var(--text-muted, rgba(255, 255, 255, 0.2));
 }
 
 /* =============================================================================
@@ -310,11 +392,10 @@
   gap: 10px;
   width: 100%;
   padding: 16px 24px;
-  margin-top: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--surface-overlay, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
   border-radius: 9999px;
-  color: #ffffff;
+  color: var(--text, #ffffff);
   font-size: 1rem;
   font-weight: 600;
   font-family: inherit;
@@ -339,27 +420,26 @@
 }
 
 .auth-spinner {
-  animation: spin 1s linear infinite;
+  animation: authSpin 1s linear infinite;
 }
 
-@keyframes spin {
+@keyframes authSpin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
 /* =============================================================================
-   FOOTER - Mode switcher
+   FOOTER — mode switcher
    ============================================================================= */
 
 .auth-footer {
   text-align: center;
-  margin-top: 28px;
-  padding-bottom: 8px;
+  margin-top: 16px;
 }
 
 .auth-footer p {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-muted, rgba(255, 255, 255, 0.4));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -370,7 +450,7 @@
 .auth-switch {
   background: none;
   border: none;
-  color: #ffffff;
+  color: var(--text, #ffffff);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -379,14 +459,8 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.auth-switch:hover {
-  opacity: 0.7;
-}
-
-.auth-switch:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
+.auth-switch:hover { opacity: 0.7; }
+.auth-switch:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* =============================================================================
    LOADING STATE
@@ -400,14 +474,19 @@
 }
 
 .auth-loading-icon {
-  width: 64px;
-  height: 64px;
-  animation: iconPulse 2s ease-in-out infinite;
+  width: 56px;
+  height: 56px;
+  animation: authIconPulse 2s ease-in-out infinite;
+  opacity: 0.7;
 }
 
-@keyframes iconPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.95); }
+[data-theme="light"] .auth-loading-icon {
+  filter: invert(1);
+}
+
+@keyframes authIconPulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.95); }
 }
 
 /* =============================================================================
@@ -423,7 +502,7 @@
 .auth-forgot-link {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--text-tertiary, rgba(255, 255, 255, 0.35));
   font-size: 0.8125rem;
   font-weight: 400;
   cursor: pointer;
@@ -434,7 +513,7 @@
 }
 
 .auth-forgot-link:hover {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
 }
 
 /* =============================================================================
@@ -442,81 +521,87 @@
    ============================================================================= */
 
 @media (max-width: 480px) {
-  .auth-panel {
-    padding: 0 20px 20px;
+  .auth-sheet-top { padding: 0 20px 12px; }
+  .auth-sheet-scroll { padding: 8px 20px 0; }
+  .auth-sheet-bottom {
+    padding: 12px 20px 20px;
     padding-bottom: max(20px, calc(env(safe-area-inset-bottom) + 12px));
   }
-
-  .auth-brand { margin-bottom: 16px; }
-  .auth-brand-icon { width: 36px; height: 36px; border-radius: 9px; }
-  .auth-header { margin-bottom: 24px; }
-  .auth-header h2 { font-size: 1.375rem; }
-  .auth-header p { font-size: 0.8125rem; }
+  .auth-sheet-title { font-size: 1.375rem; }
+  .auth-sheet-sub { font-size: 0.8125rem; }
+  .auth-sheet-icon { width: 32px; height: 32px; margin-bottom: 12px; }
   .auth-social { margin-bottom: 20px; }
   .auth-social-btn { padding: 14px 10px; font-size: 0.8125rem; }
   .auth-divider { margin-bottom: 20px; }
   .auth-form { gap: 14px; }
   .auth-field input { padding: 14px; }
   .auth-submit { padding: 14px 20px; font-size: 0.9375rem; }
-  .auth-footer { margin-top: 24px; }
   .auth-footer p { font-size: 0.8125rem; }
   .auth-switch { font-size: 0.8125rem; }
   .auth-error { padding: 12px 14px; font-size: 0.75rem; }
-  .auth-loading-icon { width: 56px; height: 56px; }
 }
 
 @media (max-width: 360px) {
-  .auth-panel {
-    padding: 0 16px 16px;
+  .auth-sheet-top { padding: 0 16px 10px; }
+  .auth-sheet-scroll { padding: 6px 16px 0; }
+  .auth-sheet-bottom {
+    padding: 10px 16px 16px;
     padding-bottom: max(16px, calc(env(safe-area-inset-bottom) + 8px));
   }
-  .auth-header h2 { font-size: 1.25rem; }
+  .auth-sheet-title { font-size: 1.25rem; }
   .auth-social-btn { padding: 12px 8px; font-size: 0.75rem; }
   .auth-field input { padding: 14px; border-radius: 10px; }
   .auth-submit { padding: 14px 16px; }
   .auth-error { border-radius: 10px; }
 }
 
-/* Landscape mobile */
+/* Landscape mobile — allow scroll, compact spacing */
 @media (max-height: 600px) and (orientation: landscape) {
-  .auth-overlay { justify-content: center; }
-  .auth-panel { max-height: 95dvh; border-radius: 20px; }
-  .auth-drag-handle { padding: 10px 0 16px; }
-  .auth-brand { margin-bottom: 16px; }
-  .auth-brand-icon { width: 32px; height: 32px; }
-  .auth-header { margin-bottom: 20px; }
+  .auth-panel { max-height: 100dvh; border-radius: 0; }
+  .auth-drag-zone { padding: 8px 0 10px; }
+  .auth-sheet-icon { width: 28px; height: 28px; margin-bottom: 10px; }
+  .auth-sheet-title { font-size: 1.25rem; }
+  .auth-sheet-top { padding-bottom: 8px; }
   .auth-social { margin-bottom: 16px; }
   .auth-divider { margin-bottom: 16px; }
   .auth-form { gap: 12px; }
-  .auth-footer { margin-top: 20px; }
+  .auth-footer { margin-top: 12px; }
 }
 
 /* =============================================================================
-   DESKTOP — Centered modal, not bottom sheet
+   DESKTOP — centered floating glass card
    ============================================================================= */
 
 @media (min-width: 768px) {
-  .auth-overlay {
-    justify-content: center;
-  }
-
   .auth-panel {
-    max-width: 380px;
-    max-height: 90vh;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    top: 50%;
+    width: 400px;
+    max-width: none;
+    max-height: min(90vh, 720px);
+    margin: 0;
     border-radius: 20px;
-    transform: translateY(40px) scale(0.97);
+    border: 1px solid var(--sheet-border, rgba(255, 255, 255, 0.08));
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+    transform: translate(-50%, -50%) scale(0.96);
     opacity: 0;
-    transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
-                opacity 250ms ease;
+    transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease;
   }
 
-  .auth-overlay.ready .auth-panel {
-    transform: translateY(0) scale(1);
+  .auth-backdrop.open .auth-panel {
+    transform: translate(-50%, -50%) scale(1);
     opacity: 1;
   }
 
-  .auth-drag-handle {
-    display: none;
+  /* Hide drag pill on desktop */
+  .auth-drag-pill { display: none; }
+  .auth-drag-zone { padding: 8px 0 0; cursor: default; }
+
+  /* Light mode shadow */
+  [data-theme="light"] .auth-panel {
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.08);
   }
 }
 
@@ -525,10 +610,10 @@
    ============================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .auth-overlay { transition: none; }
+  .auth-backdrop { transition: none; }
   .auth-panel { transition: none; }
-  .auth-overlay.ready { background-color: rgba(0, 0, 0, 0.85); }
-  .auth-overlay.ready .auth-panel { transform: none; opacity: 1; }
-  .auth-loading-icon { animation: none; opacity: 0.7; }
+  .auth-backdrop.open { background-color: var(--overlay-bg, rgba(0, 0, 0, 0.6)); }
+  .auth-backdrop.open .auth-panel { transform: translateY(0); opacity: 1; }
+  .auth-loading-icon { animation: none; opacity: 0.5; }
   .auth-social-btn, .auth-submit { transition: none; }
 }
