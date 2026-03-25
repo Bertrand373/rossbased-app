@@ -232,9 +232,21 @@ const RevenueCard = () => {
                       <span className="rv-drilldown-email">{s.email}</span>
                     </div>
                     <div className="rv-drilldown-right">
-                      {s.trialEnd && <span className="rv-drilldown-date">trial ends {fmtShortDate(s.trialEnd)}</span>}
-                      {s.periodEnd && !s.trialEnd && <span className="rv-drilldown-date">ends {fmtShortDate(s.periodEnd)}</span>}
-                      {s.canceledAt && <span className="rv-drilldown-date">canceled {fmtShortDate(s.canceledAt)}</span>}
+                      {subDrilldown === 'trialing' && s.trialEnd && (
+                        <span className="rv-drilldown-date">trial ends {fmtShortDate(s.trialEnd)}</span>
+                      )}
+                      {subDrilldown === 'active' && s.trialEnd && new Date(s.trialEnd) < new Date() && (
+                        <span className="rv-drilldown-date">trial ended {fmtShortDate(s.trialEnd)}</span>
+                      )}
+                      {subDrilldown === 'active' && s.periodEnd && (
+                        <span className="rv-drilldown-date">renews {fmtShortDate(s.periodEnd)}</span>
+                      )}
+                      {subDrilldown === 'canceled' && s.canceledAt && (
+                        <span className="rv-drilldown-date">canceled {fmtShortDate(s.canceledAt)}</span>
+                      )}
+                      {subDrilldown === 'canceled' && s.periodEnd && (
+                        <span className="rv-drilldown-date">access until {fmtShortDate(s.periodEnd)}</span>
+                      )}
                       <span className="rv-drilldown-plan">{s.amount ? `$${(s.amount / 100).toFixed(0)}` : ''}{s.amount ? '/' : ''}{s.plan === 'monthly' ? 'mo' : s.plan === 'yearly' ? 'yr' : s.plan || '—'}</span>
                       {s.subId && <span className="rv-drilldown-subid" title={s.subId}>sub_...{s.subId.slice(-8)}</span>}
                     </div>
