@@ -128,7 +128,7 @@ const Landing = ({ onLogin }) => {
           'price': '8.00',
           'priceCurrency': 'USD',
           'billingIncrement': 'P1M',
-          'description': 'Premium monthly with AI predictions, Oracle, and advanced analytics'
+          'description': 'Practitioner monthly with benefit tracking, calendar, leaderboard, and Oracle access'
         },
         {
           '@type': 'Offer',
@@ -441,7 +441,7 @@ const Landing = ({ onLogin }) => {
         <p className="landing-tier-desc">
           {pricingTier === 'practitioner'
             ? 'Core tracking, benefit logging, calendar, leaderboard, and limited Oracle access.'
-            : 'Everything in Practitioner plus 9 Oracle messages/day, priority transmissions, and advanced analytics.'
+            : 'Everything in Practitioner plus 9 Oracle messages per day and priority transmissions.'
           }
         </p>
 
