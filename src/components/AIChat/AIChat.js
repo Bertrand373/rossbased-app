@@ -1032,6 +1032,15 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   // Don't render if not logged in
   if (!isLoggedIn) return null;
 
+  // Oracle eye — only the latest assistant response gets the visible avatar
+  const lastAssistantIndex = (() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === 'assistant') return i;
+    }
+    return -1;
+  })();
+  const oracleIsElsewhere = isLoading || !!streamingText;
+
   return (
     <>
       {/* Chat Panel */}
@@ -1086,7 +1095,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                 {msg.role === 'assistant' ? (
                   <>
                     <div className="ai-chat-message-row">
-                      <img src="/The_Oracle.png" alt="" className="ai-chat-avatar" />
+                      <img src="/The_Oracle.png" alt="" className={`ai-chat-avatar${index === lastAssistantIndex && !oracleIsElsewhere ? '' : ' ai-chat-avatar-past'}`} />
                       <div className="ai-chat-message-content">
                         {msg.isTransmission && <span className="ai-chat-transmission-label" />}
                         {renderMarkdown(msg.content)}
@@ -1140,12 +1149,9 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
             {isLoading && !streamingText && (
               <div className="ai-chat-message assistant">
                 <div className="ai-chat-message-row">
-                  <div className="ai-chat-loading">
-                    <img 
-                      src={getLoadingIcon()} 
-                      alt="" 
-                      className="ai-chat-loading-icon"
-                    />
+                  <img src="/The_Oracle.png" alt="" className="ai-chat-avatar ai-chat-avatar-descend" />
+                  <div className="ai-chat-message-content">
+                    <span className="ai-chat-cursor" />
                   </div>
                 </div>
               </div>
