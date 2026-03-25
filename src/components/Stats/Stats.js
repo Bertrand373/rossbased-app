@@ -313,9 +313,12 @@ const Stats = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const currentAvg = useMemo(() => calculateAverage(safeUserData, selectedMetric, timeRange, isPremium), [safeUserData, selectedMetric, timeRange, isPremium]);
 
   const currentTrend = useMemo(() => {
-    if (!isPremium || !memoizedInsights.metricTrends?.[selectedMetric]) return null;
-    return memoizedInsights.metricTrends[selectedMetric];
-  }, [isPremium, memoizedInsights.metricTrends, selectedMetric]);
+    if (!isPremium) return null;
+    const periodMap = { week: 7, month: 30, quarter: 90 };
+    const days = periodMap[timeRange] || 7;
+    const trends = calculateMetricTrends(safeUserData, days, days);
+    return trends?.[selectedMetric] || null;
+  }, [isPremium, safeUserData, selectedMetric, timeRange]);
 
   // Phase info for progress bar
   const phaseInfo = memoizedInsights.phaseInfo || getPhaseInfo(safeUserData.currentStreak || 0);
