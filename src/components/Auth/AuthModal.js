@@ -19,6 +19,7 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [googleLoaded, setGoogleLoaded] = useState(false);
   const [googleButtonRendered, setGoogleButtonRendered] = useState(false);
+  const [sheetReady, setSheetReady] = useState(false);
   
   // Forgot password state
   const [showForgotPassword, setShowForgotPassword] = useState(false);
@@ -26,8 +27,50 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   const [forgotSuccess, setForgotSuccess] = useState(false);
   
   const googleButtonRef = useRef(null);
+  const panelRef = useRef(null);
+  const touchStartY = useRef(0);
+  const touchDeltaY = useRef(0);
   
   useBodyScrollLock(true);
+
+  // Sheet entry animation
+  useEffect(() => {
+    requestAnimationFrame(() => setSheetReady(true));
+  }, []);
+
+  // Animate close then call onClose
+  const closeSheet = useCallback(() => {
+    if (isLoading) return;
+    setSheetReady(false);
+    setTimeout(() => { if (onClose) onClose(); }, 300);
+  }, [isLoading, onClose]);
+
+  // Swipe-to-dismiss on the drag handle / panel top area
+  const handleTouchStart = useCallback((e) => {
+    touchStartY.current = e.touches[0].clientY;
+    touchDeltaY.current = 0;
+  }, []);
+
+  const handleTouchMove = useCallback((e) => {
+    const delta = e.touches[0].clientY - touchStartY.current;
+    touchDeltaY.current = delta;
+    // Only allow downward drag
+    if (delta > 0 && panelRef.current) {
+      panelRef.current.style.transform = `translateY(${delta}px)`;
+      panelRef.current.style.transition = 'none';
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    if (panelRef.current) {
+      panelRef.current.style.transition = '';
+      panelRef.current.style.transform = '';
+    }
+    // Dismiss if dragged more than 100px
+    if (touchDeltaY.current > 100) {
+      closeSheet();
+    }
+  }, [closeSheet]);
   
   const GOOGLE_CLIENT_ID = '81026306470-im14ikk81801f6l1obk0b4cu260nito1.apps.googleusercontent.com';
   const DISCORD_CLIENT_ID = '1446165239174529132';
@@ -307,7 +350,7 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   
   const handleOverlayClick = () => {
     if (!isLoading && onClose) {
-      onClose();
+      closeSheet();
     }
   };
 
@@ -330,9 +373,12 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
 
   if (isLoading && !showForgotPassword) {
     return (
-      <div className="auth-overlay">
+      <div className={`auth-overlay${sheetReady ? ' ready' : ''}`}>
         {hiddenGoogleButton}
-        <div className="auth-modal" onClick={e => e.stopPropagation()}>
+        <div className="auth-panel" ref={panelRef} onClick={e => e.stopPropagation()}>
+          <div className="auth-drag-handle">
+            <div className="auth-drag-pill" />
+          </div>
           <div className="auth-loading">
             <img 
               src="/icon-192.png" 
@@ -350,9 +396,21 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   // =============================================
   if (showForgotPassword) {
     return (
-      <div className="auth-overlay" onClick={handleOverlayClick}>
+      <div className={`auth-overlay${sheetReady ? ' ready' : ''}`} onClick={handleOverlayClick}>
         {hiddenGoogleButton}
-        <div className="auth-modal" onClick={e => e.stopPropagation()}>
+        <div 
+          className="auth-panel" 
+          ref={panelRef}
+          onClick={e => e.stopPropagation()}
+        >
+          <div 
+            className="auth-drag-handle"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            <div className="auth-drag-pill" />
+          </div>
 
           <div className="auth-brand">
             <img src="/icon-192.png" alt="" className="auth-brand-icon" />
@@ -423,9 +481,21 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
   // MAIN AUTH VIEW (LOGIN / SIGNUP)
   // =============================================
   return (
-    <div className="auth-overlay" onClick={handleOverlayClick}>
+    <div className={`auth-overlay${sheetReady ? ' ready' : ''}`} onClick={handleOverlayClick}>
       {hiddenGoogleButton}
-      <div className="auth-modal" onClick={e => e.stopPropagation()}>
+      <div 
+        className="auth-panel" 
+        ref={panelRef}
+        onClick={e => e.stopPropagation()}
+      >
+        <div 
+          className="auth-drag-handle"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div className="auth-drag-pill" />
+        </div>
         
         <div className="auth-brand">
           <img src="/icon-192.png" alt="" className="auth-brand-icon" />
