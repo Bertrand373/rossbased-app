@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import './Timeline.css';
+import GoldenSmoke from '../GoldenSmoke/GoldenSmoke';
 
 // ============================================================
 // PHASE DATA — Built from 7+ years of practitioner observation
@@ -422,7 +423,7 @@ const Timeline = () => {
 
   return (
     <div className="tl">
-      <div className="tl-bg" />
+      <GoldenSmoke />
 
       {/* ── Header ── */}
       <header className={`tl-header${headerSolid ? ' tl-header-solid' : ''}`}>

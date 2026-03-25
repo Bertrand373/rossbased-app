@@ -34,35 +34,17 @@
   background-size: 256px 256px;
 }
 
-/* Ambient gradient — identical to Landing */
-.tl-bg {
+/* Golden Smoke canvas — same particle background as Tracker tab */
+.tl .golden-smoke {
   position: fixed;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
   pointer-events: none;
   z-index: 0;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(15, 10, 45, 0.7) 0%, transparent 50%),
-    radial-gradient(circle at 70% 50%, rgba(8, 14, 35, 0.5) 0%, transparent 50%),
-    radial-gradient(circle at 50% 80%, rgba(20, 8, 35, 0.3) 0%, transparent 40%);
-  animation: tlAmbientDrift 30s ease-in-out infinite;
-  will-change: transform;
-}
-
-.tl-bg::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(ellipse 70% 35% at 50% 0%, rgba(15, 12, 35, 0.5) 0%, transparent 60%);
-  pointer-events: none;
-}
-
-@keyframes tlAmbientDrift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(-3%, -2%) scale(1.02); }
-  66% { transform: translate(2%, -4%) scale(1.01); }
+  opacity: 0.7;
 }
 
 /* ============================================================
@@ -1138,9 +1120,8 @@
     transition: none;
   }
 
-  .tl-bg {
-    animation: none;
-    transform: none;
+  .tl .golden-smoke {
+    display: none;
   }
 
   .tl-progress-fill {

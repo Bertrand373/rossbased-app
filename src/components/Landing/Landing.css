@@ -31,36 +31,17 @@
   background-size: 256px 256px;
 }
 
-/* Ambient gradient — slow-moving deep darks that make the page breathe */
-.landing-bg {
+/* Golden Smoke canvas — same particle background as Tracker tab */
+.landing .golden-smoke {
   position: fixed;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
   pointer-events: none;
   z-index: 0;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(15, 10, 45, 0.7) 0%, transparent 50%),
-    radial-gradient(circle at 70% 50%, rgba(8, 14, 35, 0.5) 0%, transparent 50%),
-    radial-gradient(circle at 50% 80%, rgba(20, 8, 35, 0.3) 0%, transparent 40%);
-  animation: ambientDrift 30s ease-in-out infinite;
-  will-change: transform;
-}
-
-/* Static radial glow anchored at hero — focal depth */
-.landing-bg::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(ellipse 70% 35% at 50% 0%, rgba(15, 12, 35, 0.5) 0%, transparent 60%);
-  pointer-events: none;
-}
-
-@keyframes ambientDrift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(-3%, -2%) scale(1.02); }
-  66% { transform: translate(2%, -4%) scale(1.01); }
+  opacity: 0.7;
 }
 
 /* ============================================================
@@ -690,6 +671,67 @@
 }
 
 /* ============================================================
+   TIER TOGGLE — Practitioner / Ascended segmented control
+   ============================================================ */
+
+.landing-tier-toggle {
+  display: flex;
+  gap: 0;
+  max-width: 320px;
+  margin: 0 auto 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.landing-tier-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background 200ms ease, color 200ms ease;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.35);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.landing-tier-btn.active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.landing-tier-btn.landing-tier-ascended.active {
+  color: rgba(255, 221, 0, 0.85);
+}
+
+.landing-tier-desc {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: center;
+  max-width: 400px;
+  margin: 0 auto 28px;
+  line-height: 1.5;
+}
+
+/* Ascended gold tint on featured card */
+.landing-price-card.featured.ascended {
+  border-color: rgba(212, 175, 55, 0.25);
+  background: rgba(212, 175, 55, 0.04);
+}
+
+.landing-price-card.featured.ascended .landing-price-badge {
+  background: rgba(212, 175, 55, 0.15);
+  color: rgba(212, 175, 55, 0.9);
+}
+
+/* ============================================================
    FOOTER
    ============================================================ */
 
@@ -1155,8 +1197,7 @@
     transition: none;
   }
 
-  .landing-bg {
-    animation: none;
-    transform: none;
+  .landing .golden-smoke {
+    display: none;
   }
 }

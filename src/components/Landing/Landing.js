@@ -4,10 +4,12 @@ import { Link } from 'react-router-dom';
 import './Landing.css';
 import AuthModal from '../Auth/AuthModal';
 import trackerLogo from '../../assets/trackerapplogo-white.png';
+import GoldenSmoke from '../GoldenSmoke/GoldenSmoke';
 
 const Landing = ({ onLogin }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [headerSolid, setHeaderSolid] = useState(false);
+  const [pricingTier, setPricingTier] = useState('practitioner');
   const featuresRef = useRef(null);
   const problemRef = useRef(null);
   const testimonialRef = useRef(null);
@@ -42,7 +44,7 @@ const Landing = ({ onLogin }) => {
           }
         });
       },
-      { threshold: 0.15 }
+      { threshold: 0.05 }
     );
 
     [featuresRef, problemRef, testimonialRef, journeyRef, pricingRef, oracleRef].forEach(ref => {
@@ -57,13 +59,13 @@ const Landing = ({ onLogin }) => {
     const originalTitle = document.title;
 
     // Page title — keyword-rich for the landing page
-    document.title = 'TitanTrack — AI-Powered Semen Retention Tracker App';
+    document.title = 'TitanTrack — Semen Retention Tracker with AI That Learns Your Patterns';
 
     // Meta description — replace generic one from index.html
     const existingMeta = document.querySelector('meta[name="description"]');
     const originalDesc = existingMeta ? existingMeta.content : '';
     if (existingMeta) {
-      existingMeta.content = 'Track your semen retention streak with AI predictions, 6-metric benefit tracking, emotional timeline mapping, and crisis tools. Free to start. Built by a 2,400+ day practitioner.';
+      existingMeta.content = 'Track your semen retention streak with AI that learns your patterns and predicts when you\'re vulnerable. 6-metric benefit tracking, Oracle AI guide, emotional timeline. Free to start. Built by a 2,500+ day practitioner.';
     }
 
     // Canonical URL
@@ -74,8 +76,8 @@ const Landing = ({ onLogin }) => {
 
     // Open Graph tags
     const ogTags = [
-      { property: 'og:title', content: 'TitanTrack — AI-Powered Semen Retention Tracker' },
-      { property: 'og:description', content: 'The retention tracker that learns your patterns and predicts when you\'re vulnerable. 6-metric tracking, emotional timeline, AI crisis intervention. Free to start.' },
+      { property: 'og:title', content: 'TitanTrack — Semen Retention Tracker with AI That Learns Your Patterns' },
+      { property: 'og:description', content: 'The retention tracker built by a 2,500+ day practitioner. It learns your patterns, predicts your weak points, and intervenes before you break. Free to start.' },
       { property: 'og:url', content: 'https://titantrack.app/' },
       { property: 'og:type', content: 'website' },
       { property: 'og:site_name', content: 'TitanTrack' },
@@ -92,8 +94,8 @@ const Landing = ({ onLogin }) => {
     // Twitter card
     const twitterTags = [
       { name: 'twitter:card', content: 'summary' },
-      { name: 'twitter:title', content: 'TitanTrack — AI-Powered Semen Retention Tracker' },
-      { name: 'twitter:description', content: 'Track your retention streak with AI predictions, benefit tracking, and crisis tools. Built by a 2,400+ day practitioner.' }
+      { name: 'twitter:title', content: 'TitanTrack — Semen Retention Tracker with AI That Learns Your Patterns' },
+      { name: 'twitter:description', content: 'Track your retention streak with AI that learns your patterns. Built by a 2,500+ day practitioner. Free to start.' }
     ];
     const twitterElements = twitterTags.map(tag => {
       const el = document.createElement('meta');
@@ -134,6 +136,20 @@ const Landing = ({ onLogin }) => {
           'priceCurrency': 'USD',
           'billingIncrement': 'P1Y',
           'description': 'Premium yearly — save 35%'
+        },
+        {
+          '@type': 'Offer',
+          'price': '17.00',
+          'priceCurrency': 'USD',
+          'billingIncrement': 'P1M',
+          'description': 'Ascended monthly with 9 Oracle messages/day and priority transmissions'
+        },
+        {
+          '@type': 'Offer',
+          'price': '170.00',
+          'priceCurrency': 'USD',
+          'billingIncrement': 'P1Y',
+          'description': 'Ascended yearly — save 17%'
         }
       ],
       'featureList': 'AI pattern recognition, 6-metric benefit tracking, Emotional timeline, Crisis intervention, Subliminal mind program, Oracle AI guide'
@@ -153,7 +169,7 @@ const Landing = ({ onLogin }) => {
 
   return (
     <div className="landing">
-      <div className="landing-bg" />
+      <GoldenSmoke />
 
       {/* Sticky header — logo + sign in for returning users */}
       <header className={`landing-header${headerSolid ? ' header-solid' : ''}`}>
@@ -170,13 +186,14 @@ const Landing = ({ onLogin }) => {
         <div className="landing-hero-inner">
           <div className="landing-hero-copy">
             <h1 className="landing-headline">
-              Your patterns are predictable.<br />
-              <span className="landing-headline-accent">Now they work for you.</span>
+              It's 2am. You know what happens next.<br />
+              <span className="landing-headline-accent">So does TitanTrack.</span>
             </h1>
 
             <p className="landing-sub">
-              The AI-powered retention tracker that learns your vulnerabilities
-              and intervenes before you relapse.
+              The retention tracker built by a 2,500+ day practitioner.
+              It learns your patterns, predicts your weak points,
+              and intervenes before you break.
             </p>
 
             <button className="landing-cta" onClick={openAuth}>
@@ -212,14 +229,13 @@ const Landing = ({ onLogin }) => {
           Day counters don't work.
         </h2>
         <p className="landing-problem-text">
-          You know the cycle. Start strong. Hit the same wall.
-          Relapse at the same point. Reset to zero.
-          The counter goes up and comes back down
-          because counting days doesn't address the pattern underneath.
+          Start strong. Hit the same wall at the same point. Reset to zero.
+          Every app in this space gives you a number and some quotes.
+          None of them address the pattern underneath.
         </p>
         <p className="landing-problem-text">
-          You don't need another number on a screen.
-          You need something that actually understands when and why you fall — and warns you before it happens.
+          You don't need motivation. You need intelligence.
+          Something that actually sees when and why you fall — and warns you before it happens.
         </p>
       </section>
 
@@ -404,15 +420,48 @@ const Landing = ({ onLogin }) => {
           ============================================================ */}
       <section className="landing-pricing" ref={pricingRef}>
         <p className="landing-section-label">Pricing</p>
+
+        {/* Tier toggle */}
+        <div className="landing-tier-toggle">
+          <button
+            className={`landing-tier-btn${pricingTier === 'practitioner' ? ' active' : ''}`}
+            onClick={() => setPricingTier('practitioner')}
+          >
+            Practitioner
+          </button>
+          <button
+            className={`landing-tier-btn landing-tier-ascended${pricingTier === 'ascended' ? ' active' : ''}`}
+            onClick={() => setPricingTier('ascended')}
+          >
+            Ascended
+          </button>
+        </div>
+
+        {/* Tier description */}
+        <p className="landing-tier-desc">
+          {pricingTier === 'practitioner'
+            ? 'Core tracking, benefit logging, calendar, leaderboard, and limited Oracle access.'
+            : 'Everything in Practitioner plus 9 Oracle messages/day, priority transmissions, and advanced analytics.'
+          }
+        </p>
+
         <div className="landing-pricing-cards">
           <div className="landing-price-card">
             <span className="landing-price-period">Monthly</span>
-            <span className="landing-price-amount">$8<span className="landing-price-unit">/mo</span></span>
+            <span className="landing-price-amount">
+              {pricingTier === 'practitioner' ? '$8' : '$17'}
+              <span className="landing-price-unit">/mo</span>
+            </span>
           </div>
-          <div className="landing-price-card featured">
-            <span className="landing-price-badge">Save 35%</span>
+          <div className={`landing-price-card featured${pricingTier === 'ascended' ? ' ascended' : ''}`}>
+            <span className="landing-price-badge">
+              {pricingTier === 'practitioner' ? 'Save 35%' : 'Save 17%'}
+            </span>
             <span className="landing-price-period">Yearly</span>
-            <span className="landing-price-amount">$62<span className="landing-price-unit">/yr</span></span>
+            <span className="landing-price-amount">
+              {pricingTier === 'practitioner' ? '$62' : '$170'}
+              <span className="landing-price-unit">/yr</span>
+            </span>
           </div>
         </div>
 
