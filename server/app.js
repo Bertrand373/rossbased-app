@@ -1310,6 +1310,7 @@ async function buildOracleContext(user, timezone) {
 // ============================================
 const GRANDFATHERED_DAILY_LIMIT = 1;
 const ASCENDED_DAILY_LIMIT = 9;
+const PREMIUM_DAILY_LIMIT = 3;
 
 // Get today's date in Eastern Time (matches Discord bot's reset boundary)
 function getTodayET() {
