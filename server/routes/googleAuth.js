@@ -5,6 +5,7 @@ const { OAuth2Client } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const BannedIP = require('../models/BannedIP');
+const { checkSignupAbuse } = require('../services/abuseDetection');
 
 function getClientIP(req) {
   const forwarded = req.headers['x-forwarded-for'];
@@ -92,6 +93,9 @@ router.post('/google', async (req, res) => {
       
       await user.save();
       console.log('Created new user via Google:', finalUsername);
+      
+      // Fire-and-forget: check if this IP has other accounts and alert Ross
+      if (clientIP) checkSignupAbuse(clientIP, finalUsername, 'google').catch(() => {});
     } else if (!user.googleId) {
       // Ban check
       if (user.banned) {

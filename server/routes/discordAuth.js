@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const BannedIP = require('../models/BannedIP');
 const { checkAndApplyGrandfather } = require('../middleware/subscriptionMiddleware');
+const { checkSignupAbuse } = require('../services/abuseDetection');
 
 function getClientIP(req) {
   const forwarded = req.headers['x-forwarded-for'];
@@ -175,6 +176,9 @@ router.post('/discord', async (req, res) => {
 
       await user.save();
       console.log('Created new user via Discord:', username);
+      
+      // Fire-and-forget: check if this IP has other accounts and alert Ross
+      if (clientIP) checkSignupAbuse(clientIP, username, 'discord').catch(() => {});
     } else {
       // Ban check — banned users cannot log in via Discord
       if (user.banned) {

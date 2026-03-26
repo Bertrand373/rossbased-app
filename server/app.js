@@ -53,6 +53,7 @@ const announcementRoutes = require('./routes/announcementRoutes');
 const oracleIntroRoutes = require('./routes/oracleIntroRoutes');
 const { expireStaleTrials, expireStaleCanceled, checkPremiumAccess, syncStripeSubscriptions } = require('./middleware/subscriptionMiddleware');
 const { checkAndSendOnboardingNotification } = require('./services/notificationService');
+const { checkSignupAbuse } = require('./services/abuseDetection');
 
 // Import leaderboard service
 const { 
@@ -586,6 +587,9 @@ app.post('/api/signup', async (req, res) => {
     
     await user.save();
     console.log('User created:', username);
+    
+    // Fire-and-forget: check if this IP has other accounts and alert Ross
+    if (signupIP) checkSignupAbuse(signupIP, username, 'app').catch(() => {});
     
     const jwtSecret = process.env.JWT_SECRET || 'rossbased_secret_key';
     const token = jwt.sign({ username }, jwtSecret, { expiresIn: '7d' });
