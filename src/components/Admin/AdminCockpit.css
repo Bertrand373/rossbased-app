@@ -1081,6 +1081,37 @@
 
 .ac-user-card:hover { background: rgba(255,255,255,0.025); }
 .ac-user-card.ac-user-online { border-left: 2px solid rgba(34,197,94,0.3); }
+.ac-user-card.ac-user-banned { border-left: 2px solid rgba(239,68,68,0.4); opacity: 0.7; }
+.ac-user-card.ac-user-banned .ac-uc-name { text-decoration: line-through; text-decoration-color: rgba(239,68,68,0.3); }
+
+.ac-banned-badge {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+  color: rgba(239,68,68,0.9); background: rgba(239,68,68,0.12); border-radius: 3px; padding: 2px 5px;
+}
+
+.ac-sort-divider { color: rgba(255,255,255,0.1); font-size: 12px; align-self: center; }
+.ac-filter-banned { border-color: rgba(239,68,68,0.15) !important; color: rgba(239,68,68,0.5) !important; }
+.ac-filter-banned.active { background: rgba(239,68,68,0.1) !important; border-color: rgba(239,68,68,0.3) !important; color: rgba(239,68,68,0.8) !important; }
+
+/* Ban controls in expanded user panel */
+.ac-ud-ban-section { margin-top: 6px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.04); }
+.ac-ud-ban-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+.ac-ud-ban-label { font-size: 10px; font-weight: 700; color: rgba(239,68,68,0.9); background: rgba(239,68,68,0.12); padding: 2px 6px; border-radius: 3px; }
+.ac-ud-ban-reason { font-size: 10px; color: rgba(255,255,255,0.3); }
+.ac-ud-ban-date { font-size: 10px; color: rgba(255,255,255,0.15); }
+.ac-ud-ban-actions { display: flex; gap: 6px; }
+.ac-ud-ban-btn {
+  font-size: 10px; font-weight: 600; padding: 5px 12px; border-radius: 5px; border: none; cursor: pointer;
+  background: rgba(239,68,68,0.15); color: rgba(239,68,68,0.9); transition: all 0.15s;
+}
+.ac-ud-ban-btn:hover { background: rgba(239,68,68,0.25); }
+.ac-ud-ban-btn:disabled { opacity: 0.4; cursor: default; }
+.ac-ud-unban-btn {
+  font-size: 10px; font-weight: 600; padding: 5px 12px; border-radius: 5px; border: none; cursor: pointer;
+  background: rgba(34,197,94,0.12); color: rgba(34,197,94,0.8); transition: all 0.15s;
+}
+.ac-ud-unban-btn:hover { background: rgba(34,197,94,0.2); }
+.ac-ud-unban-btn:disabled { opacity: 0.4; cursor: default; }
 
 .ac-uc-row1 {
   display: flex;
@@ -1742,6 +1773,13 @@
 [data-theme="light"] .ac-user-card { background: rgba(0,0,0,0.01); border-bottom-color: rgba(0,0,0,0.04); }
 [data-theme="light"] .ac-user-card:hover { background: rgba(0,0,0,0.03); }
 [data-theme="light"] .ac-user-card.ac-user-online { border-left-color: rgba(22,163,74,0.3); }
+[data-theme="light"] .ac-user-card.ac-user-banned { border-left-color: rgba(220,38,38,0.3); }
+[data-theme="light"] .ac-banned-badge { color: rgba(220,38,38,0.9); background: rgba(220,38,38,0.08); }
+[data-theme="light"] .ac-sort-divider { color: rgba(0,0,0,0.1); }
+[data-theme="light"] .ac-filter-banned { border-color: rgba(220,38,38,0.15) !important; color: rgba(220,38,38,0.5) !important; }
+[data-theme="light"] .ac-filter-banned.active { background: rgba(220,38,38,0.06) !important; border-color: rgba(220,38,38,0.2) !important; color: rgba(220,38,38,0.8) !important; }
+[data-theme="light"] .ac-ud-ban-btn { background: rgba(220,38,38,0.08); color: rgba(220,38,38,0.8); }
+[data-theme="light"] .ac-ud-unban-btn { background: rgba(22,163,74,0.08); color: rgba(22,163,74,0.8); }
 [data-theme="light"] .ac-uc-name { color: rgba(0,0,0,0.65); }
 [data-theme="light"] .ac-uc-ago { color: rgba(0,0,0,0.2); }
 [data-theme="light"] .ac-uc-discord { color: rgba(0,0,0,0.15); }

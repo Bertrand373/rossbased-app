@@ -3,7 +3,14 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const BannedIP = require('../models/BannedIP');
 const { checkAndApplyGrandfather } = require('../middleware/subscriptionMiddleware');
+
+function getClientIP(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) return forwarded.split(',')[0].trim();
+  return req.ip || '';
+}
 
 const DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const DISCORD_CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
@@ -86,6 +93,20 @@ router.post('/discord', async (req, res) => {
     const isNewUser = !user;  // Track if this is a new user for Mixpanel
 
     if (!user) {
+      // IP ban check — block new signups from banned IPs
+      const clientIP = getClientIP(req);
+      if (clientIP) {
+        try {
+          const bannedIP = await BannedIP.findOne({ ip: clientIP });
+          if (bannedIP) {
+            console.log(`🚫 Discord signup blocked from banned IP: ${clientIP} (discord: ${discordUser.username})`);
+            return res.status(403).json({ error: 'Unable to create account. Please contact support.' });
+          }
+        } catch (ipErr) {
+          console.error('IP ban check failed (non-blocking):', ipErr.message);
+        }
+      }
+      
       // Create new user
       let username = discordUser.username.substring(0, 20);
       
@@ -155,6 +176,12 @@ router.post('/discord', async (req, res) => {
       await user.save();
       console.log('Created new user via Discord:', username);
     } else {
+      // Ban check — banned users cannot log in via Discord
+      if (user.banned) {
+        console.log('Discord login blocked - user is banned:', user.username);
+        return res.status(403).json({ error: 'This account has been suspended.' });
+      }
+      
       // Update existing user's Discord info
       user.discordId = discordUser.id;
       user.discordUsername = discordUser.username;

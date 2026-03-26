@@ -15,6 +15,7 @@ dotenv.config();
 // Import User model
 const User = require('./models/User');
 const PageView = require('./models/PageView');
+const BannedIP = require('./models/BannedIP');
 
 // Import notification modules (these need env vars to be loaded first!)
 const notificationRoutes = require('./routes/notifications');
@@ -473,6 +474,12 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ error: 'Account not found. Please sign up.' });
     }
     
+    // Ban check — banned users cannot log in
+    if (user.banned) {
+      console.log('Login blocked - user is banned:', username);
+      return res.status(403).json({ error: 'This account has been suspended.' });
+    }
+    
     if (user.password !== password) {
       console.log('Login failed - wrong password:', username);
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -515,6 +522,20 @@ app.post('/api/signup', async (req, res) => {
     if (existingEmail) {
       console.log('Signup failed - email taken:', email);
       return res.status(409).json({ error: 'Email already registered' });
+    }
+    
+    // IP ban check — block signups from banned IPs
+    const signupIP = getClientIP(req);
+    if (signupIP) {
+      try {
+        const bannedIP = await BannedIP.findOne({ ip: signupIP });
+        if (bannedIP) {
+          console.log(`🚫 Signup blocked from banned IP: ${signupIP} (attempted username: ${username})`);
+          return res.status(403).json({ error: 'Unable to create account. Please contact support.' });
+        }
+      } catch (ipErr) {
+        console.error('IP ban check failed (non-blocking):', ipErr.message);
+      }
     }
     
     // Create new user
@@ -1446,6 +1467,11 @@ app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
     const user = await User.findOne({ username: req.user.username });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Ban check — banned users cannot use Oracle
+    if (user.banned) {
+      return res.status(403).json({ error: 'This account has been suspended.' });
     }
 
     // --- EARLY IP CAPTURE: Log IP on every Oracle attempt, even if blocked/failed ---
@@ -3050,6 +3076,116 @@ app.post('/api/auth/reset-password', async (req, res) => {
   } catch (err) {
     console.error('Reset password error:', err);
     res.status(500).json({ error: 'Failed to reset password. Please try again.' });
+  }
+});
+
+// ============================================
+// ADMIN BAN SYSTEM
+// ============================================
+
+// Admin check helper (reusable)
+const isAdminRequest = (req) => ['rossbased', 'ross'].includes(req.user?.username?.toLowerCase());
+
+// GET /api/admin/bans — list all banned users and IPs
+app.get('/api/admin/bans', authenticate, async (req, res) => {
+  if (!isAdminRequest(req)) return res.status(403).json({ error: 'Admin only' });
+  try {
+    const bannedUsers = await User.find({ banned: true }, 'username email bannedAt bannedReason aiUsage.lastIP discordUsername subscription.status createdAt').lean();
+    const bannedIPs = await BannedIP.find({}).lean();
+    res.json({ bannedUsers, bannedIPs });
+  } catch (err) {
+    console.error('Fetch bans error:', err);
+    res.status(500).json({ error: 'Failed to fetch bans' });
+  }
+});
+
+// POST /api/admin/ban-user — ban a user by username
+app.post('/api/admin/ban-user', authenticate, async (req, res) => {
+  if (!isAdminRequest(req)) return res.status(403).json({ error: 'Admin only' });
+  const { username, reason } = req.body;
+  if (!username) return res.status(400).json({ error: 'Username required' });
+  
+  try {
+    const user = await User.findOne({ username: { $regex: new RegExp('^' + username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$', 'i') } });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    
+    user.banned = true;
+    user.bannedAt = new Date();
+    user.bannedReason = reason || 'Banned by admin';
+    user.subscription.status = 'banned';
+    user.subscription.tier = 'practitioner';
+    await user.save({ validateModifiedOnly: true });
+    
+    console.log(`🚫 BANNED: ${user.username} — reason: ${user.bannedReason}`);
+    res.json({ success: true, username: user.username });
+  } catch (err) {
+    console.error('Ban user error:', err);
+    res.status(500).json({ error: 'Failed to ban user' });
+  }
+});
+
+// POST /api/admin/unban-user — unban a user by username
+app.post('/api/admin/unban-user', authenticate, async (req, res) => {
+  if (!isAdminRequest(req)) return res.status(403).json({ error: 'Admin only' });
+  const { username } = req.body;
+  if (!username) return res.status(400).json({ error: 'Username required' });
+  
+  try {
+    const user = await User.findOne({ username: { $regex: new RegExp('^' + username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$', 'i') } });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    
+    user.banned = false;
+    user.bannedAt = null;
+    user.bannedReason = null;
+    user.subscription.status = 'none'; // Reset to free tier
+    await user.save({ validateModifiedOnly: true });
+    
+    console.log(`✅ UNBANNED: ${user.username}`);
+    res.json({ success: true, username: user.username });
+  } catch (err) {
+    console.error('Unban user error:', err);
+    res.status(500).json({ error: 'Failed to unban user' });
+  }
+});
+
+// POST /api/admin/ban-ip — ban an IP address
+app.post('/api/admin/ban-ip', authenticate, async (req, res) => {
+  if (!isAdminRequest(req)) return res.status(403).json({ error: 'Admin only' });
+  const { ip, reason } = req.body;
+  if (!ip) return res.status(400).json({ error: 'IP address required' });
+  
+  try {
+    // Find all usernames associated with this IP for reference
+    const associatedUsers = await User.find({ 'aiUsage.lastIP': ip }, 'username').lean();
+    const usernames = associatedUsers.map(u => u.username);
+    
+    await BannedIP.findOneAndUpdate(
+      { ip },
+      { ip, reason: reason || 'Banned by admin', bannedBy: req.user.username, bannedAt: new Date(), associatedUsernames: usernames },
+      { upsert: true, new: true }
+    );
+    
+    console.log(`🚫 IP BANNED: ${ip} — associated: ${usernames.join(', ')}`);
+    res.json({ success: true, ip, associatedUsernames: usernames });
+  } catch (err) {
+    console.error('Ban IP error:', err);
+    res.status(500).json({ error: 'Failed to ban IP' });
+  }
+});
+
+// POST /api/admin/unban-ip — unban an IP address
+app.post('/api/admin/unban-ip', authenticate, async (req, res) => {
+  if (!isAdminRequest(req)) return res.status(403).json({ error: 'Admin only' });
+  const { ip } = req.body;
+  if (!ip) return res.status(400).json({ error: 'IP address required' });
+  
+  try {
+    await BannedIP.deleteOne({ ip });
+    console.log(`✅ IP UNBANNED: ${ip}`);
+    res.json({ success: true, ip });
+  } catch (err) {
+    console.error('Unban IP error:', err);
+    res.status(500).json({ error: 'Failed to unban IP' });
   }
 });
 

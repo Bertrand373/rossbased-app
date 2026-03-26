@@ -354,6 +354,47 @@ const AdminCockpit = () => {
   const [expandedUser, setExpandedUser] = useState(null); // username of expanded user
   const [userActivity, setUserActivity] = useState(null); // activity data for expanded user
   const [activityLoading, setActivityLoading] = useState(false);
+  const [userFilter, setUserFilter] = useState('all'); // 'all' or 'banned'
+  const [banLoading, setBanLoading] = useState(null); // username currently being banned/unbanned
+  
+  // Ban/unban handlers
+  const handleBanUser = async (username, ip) => {
+    if (!window.confirm(`Ban ${username}? They will be unable to log in or use Oracle.`)) return;
+    setBanLoading(username);
+    try {
+      const token = localStorage.getItem('token');
+      await fetch(`${API}/api/admin/ban-user`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ username, reason: 'Banned via admin cockpit' }) });
+      // Also ban IP if available
+      if (ip) {
+        await fetch(`${API}/api/admin/ban-ip`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ ip, reason: `Associated with ${username}` }) });
+      }
+      // Refresh user list
+      await fetchData('/api/analytics/users', setUsers);
+      setExpandedUser(null); setUserActivity(null);
+    } catch (e) { console.error('Ban failed:', e); }
+    setBanLoading(null);
+  };
+  
+  const handleUnbanUser = async (username) => {
+    if (!window.confirm(`Unban ${username}?`)) return;
+    setBanLoading(username);
+    try {
+      const token = localStorage.getItem('token');
+      await fetch(`${API}/api/admin/unban-user`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ username }) });
+      await fetchData('/api/analytics/users', setUsers);
+      setExpandedUser(null); setUserActivity(null);
+    } catch (e) { console.error('Unban failed:', e); }
+    setBanLoading(null);
+  };
+  
+  const handleUnbanIP = async (ip) => {
+    if (!window.confirm(`Unban IP ${ip}?`)) return;
+    try {
+      const token = localStorage.getItem('token');
+      await fetch(`${API}/api/admin/unban-ip`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ ip }) });
+    } catch (e) { console.error('Unban IP failed:', e); }
+  };
+
   const handleColSort = (col) => {
     if (sortCol === col) { setSortDir(sortDir === 'desc' ? 'asc' : 'desc'); }
     else { setSortCol(col); setSortDir('desc'); }
@@ -362,12 +403,17 @@ const AdminCockpit = () => {
   const sortedUsers = useMemo(() => {
     if (!users?.users) return [];
     let filtered = [...users.users];
+    // Filter by banned status
+    if (userFilter === 'banned') {
+      filtered = filtered.filter(u => u.banned);
+    }
     if (userSearch.trim()) {
       const q = userSearch.toLowerCase();
       filtered = filtered.filter(u =>
         (u.username || '').toLowerCase().includes(q) ||
         (u.discord || '').toLowerCase().includes(q) ||
-        (u.email || '').toLowerCase().includes(q)
+        (u.email || '').toLowerCase().includes(q) ||
+        (u.lastIP || '').includes(q)
       );
     }
     return filtered.sort((a, b) => {
@@ -382,7 +428,7 @@ const AdminCockpit = () => {
       };
       return (map[sortCol] || map.joined)();
     });
-  }, [users, userSearch, sortCol, sortDir]);
+  }, [users, userSearch, sortCol, sortDir, userFilter]);
 
   const health = (metric, val) => {
     const thresholds = { activation: [40, 25], d7: [40, 25], premium: [10, 5], stickiness: [40, 20] };
@@ -995,6 +1041,10 @@ const AdminCockpit = () => {
             </div>
             {/* Sort controls */}
             <div className="ac-sort-row">
+              <button className={`ac-sort-pill ac-filter-banned ${userFilter === 'banned' ? 'active' : ''}`} onClick={() => setUserFilter(userFilter === 'banned' ? 'all' : 'banned')}>
+                Banned{userFilter === 'banned' ? ` (${sortedUsers.length})` : users?.users ? ` (${users.users.filter(u => u.banned).length})` : ''}
+              </button>
+              <span className="ac-sort-divider">|</span>
               {[
                 { id: 'active', label: 'Active' },
                 { id: 'streak', label: 'Streak' },
@@ -1021,12 +1071,13 @@ const AdminCockpit = () => {
                 const badgeClass = u.hasActiveStripeSub ? 'active' : u.subStatus;
                 const isExpanded = expandedUser === u.username;
                 return (
-                  <div key={i} className={`ac-user-card ${isOnline ? 'ac-user-online' : ''} ${isExpanded ? 'ac-user-expanded' : ''}`}>
+                  <div key={i} className={`ac-user-card ${isOnline ? 'ac-user-online' : ''} ${isExpanded ? 'ac-user-expanded' : ''} ${u.banned ? 'ac-user-banned' : ''}`}>
                     <div className="ac-uc-clickable" onClick={() => fetchUserActivity(u.username)}>
                       <div className="ac-uc-row1">
                         <span className="ac-uc-name">{u.username}</span>
                         <div className="ac-uc-badges">
-                          {subLabel && <span className={`ac-sub-badge ${badgeClass}`}>{subLabel}</span>}
+                          {u.banned && <span className="ac-banned-badge">BANNED</span>}
+                          {!u.banned && subLabel && <span className={`ac-sub-badge ${badgeClass}`}>{subLabel}</span>}
                           {isOnline ? <span className="ac-online-badge">now</span> : <span className="ac-uc-ago">{ago}</span>}
                         </div>
                       </div>
@@ -1134,10 +1185,33 @@ const AdminCockpit = () => {
                               <div className="ac-ud-row ac-ud-profile">
                                 {userActivity.profile.email && <span className="ac-ud-kv">{userActivity.profile.email}</span>}
                                 {userActivity.profile.timezone && <span className="ac-ud-kv">{userActivity.profile.timezone}</span>}
+                                {userActivity.profile.lastIP && <span className="ac-ud-kv">IP: {userActivity.profile.lastIP}</span>}
                                 <span className="ac-ud-kv">Longest: {userActivity.profile.longestStreak}d</span>
                                 <span className="ac-ud-kv">WD: {userActivity.profile.wetDreams}</span>
                                 <span className="ac-ud-kv">Leaderboard: {userActivity.profile.leaderboard ? 'yes' : 'no'}</span>
                               </div>
+                            </div>
+
+                            {/* Ban controls */}
+                            <div className="ac-ud-section ac-ud-ban-section">
+                              {u.banned ? (
+                                <>
+                                  <div className="ac-ud-ban-info">
+                                    <span className="ac-ud-ban-label">BANNED</span>
+                                    {u.bannedReason && <span className="ac-ud-ban-reason">{u.bannedReason}</span>}
+                                    {u.bannedAt && <span className="ac-ud-ban-date">{new Date(u.bannedAt).toLocaleDateString()}</span>}
+                                  </div>
+                                  <button className="ac-ud-unban-btn" disabled={banLoading === u.username} onClick={() => handleUnbanUser(u.username)}>
+                                    {banLoading === u.username ? 'Unbanning...' : 'Unban User'}
+                                  </button>
+                                </>
+                              ) : (
+                                <div className="ac-ud-ban-actions">
+                                  <button className="ac-ud-ban-btn" disabled={banLoading === u.username} onClick={() => handleBanUser(u.username, u.lastIP || userActivity?.profile?.lastIP)}>
+                                    {banLoading === u.username ? 'Banning...' : 'Ban User + IP'}
+                                  </button>
+                                </div>
+                              )}
                             </div>
                           </>
                         )}

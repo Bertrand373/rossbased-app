@@ -312,7 +312,7 @@ router.get('/users', adminCheck, async (req, res) => {
     if (sort === 'active') sortObj = { lastSeen: -1 };
 
     const users = await User.find({},
-      'username email currentStreak startDate longestStreak relapseCount isPremium subscription.status subscription.tier subscription.trialEndDate subscription.currentPeriodEnd subscription.grandfatheredAt subscription.stripeSubscriptionId createdAt updatedAt lastSeen benefitTracking urgeLog aiUsage showOnLeaderboard discordUsername discordId discordOracleLifetime timezone'
+      'username email currentStreak startDate longestStreak relapseCount isPremium subscription.status subscription.tier subscription.trialEndDate subscription.currentPeriodEnd subscription.grandfatheredAt subscription.stripeSubscriptionId createdAt updatedAt lastSeen benefitTracking urgeLog aiUsage showOnLeaderboard discordUsername discordId discordOracleLifetime timezone banned bannedAt bannedReason'
     ).sort(sortObj).limit(parseInt(limit)).lean();
 
     res.json({
@@ -345,6 +345,8 @@ router.get('/users', adminCheck, async (req, res) => {
         aiLastUsed: u.aiUsage?.lastUsed || null,
         discordAI: u.discordOracleLifetime || 0,
         leaderboard: u.showOnLeaderboard || false, discord: u.discordUsername || '',
+        lastIP: u.aiUsage?.lastIP || '',
+        banned: !!u.banned, bannedAt: u.bannedAt || null, bannedReason: u.bannedReason || '',
         joinedAt: u.createdAt, lastActive: u.lastSeen || u.updatedAt
       }; }),
       total: await User.countDocuments()
@@ -644,7 +646,7 @@ router.get('/user/:username/activity', adminCheck, async (req, res) => {
     // Parallel fetch: user doc + page views
     const [user, recentPages, pageStats] = await Promise.all([
       User.findOne({ username }, 
-        'benefitTracking urgeLog streakHistory oracleNotes aiUsage subscription timezone startDate currentStreak longestStreak relapseCount wetDreamCount discordUsername discordOracleLifetime email createdAt lastSeen showOnLeaderboard'
+        'benefitTracking urgeLog streakHistory oracleNotes aiUsage subscription timezone startDate currentStreak longestStreak relapseCount wetDreamCount discordUsername discordOracleLifetime email createdAt lastSeen showOnLeaderboard banned bannedAt bannedReason'
       ).lean(),
       PageView.find({ userId: username, timestamp: { $gte: sevenDaysAgo } })
         .sort({ timestamp: -1 }).limit(200).lean(),
@@ -733,6 +735,10 @@ router.get('/user/:username/activity', adminCheck, async (req, res) => {
       profile: {
         email: user.email || '',
         timezone: user.timezone || '',
+        lastIP: user.aiUsage?.lastIP || '',
+        banned: !!user.banned,
+        bannedAt: user.bannedAt || null,
+        bannedReason: user.bannedReason || '',
         startDate: user.startDate,
         streak: user.startDate ? calcStreak(user.startDate, user.timezone) : (user.currentStreak || 0),
         longestStreak: user.longestStreak || 0,

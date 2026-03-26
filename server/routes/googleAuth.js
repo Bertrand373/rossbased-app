@@ -4,6 +4,13 @@ const router = express.Router();
 const { OAuth2Client } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const BannedIP = require('../models/BannedIP');
+
+function getClientIP(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) return forwarded.split(',')[0].trim();
+  return req.ip || '';
+}
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -32,6 +39,20 @@ router.post('/google', async (req, res) => {
     const isNewUser = !user;  // Track if this is a new user for Mixpanel
     
     if (!user) {
+      // IP ban check — block new signups from banned IPs
+      const clientIP = getClientIP(req);
+      if (clientIP) {
+        try {
+          const bannedIP = await BannedIP.findOne({ ip: clientIP });
+          if (bannedIP) {
+            console.log(`🚫 Google signup blocked from banned IP: ${clientIP} (email: ${email})`);
+            return res.status(403).json({ error: 'Unable to create account. Please contact support.' });
+          }
+        } catch (ipErr) {
+          console.error('IP ban check failed (non-blocking):', ipErr.message);
+        }
+      }
+      
       // Create new user from Google data
       const username = email.split('@')[0].substring(0, 20);
       
@@ -72,10 +93,21 @@ router.post('/google', async (req, res) => {
       await user.save();
       console.log('Created new user via Google:', finalUsername);
     } else if (!user.googleId) {
+      // Ban check
+      if (user.banned) {
+        console.log('Google login blocked - user is banned:', user.username);
+        return res.status(403).json({ error: 'This account has been suspended.' });
+      }
       // Link Google to existing account
       user.googleId = googleId;
       await user.save({ validateModifiedOnly: true });
       console.log('Linked Google to existing user:', user.username);
+    }
+
+    // Ban check for returning users who already have googleId linked
+    if (!isNewUser && user.banned) {
+      console.log('Google login blocked - user is banned:', user.username);
+      return res.status(403).json({ error: 'This account has been suspended.' });
     }
 
     // Generate JWT

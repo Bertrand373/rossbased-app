@@ -12,6 +12,12 @@ const userSchema = new mongoose.Schema({
   discordOracleSync: { type: Boolean, default: true }, // Oracle shares context across app & Discord
   timezone: { type: String, default: '' }, // IANA timezone (e.g. 'America/New_York') — set by app on each Oracle use
   country: { type: String, default: '' }, // ISO 3166-1 alpha-2 country code (e.g. 'US', 'NG', 'GB')
+  
+  // Ban system — set via admin cockpit or Render shell
+  banned: { type: Boolean, default: false },
+  bannedAt: { type: Date, default: null },
+  bannedReason: { type: String, default: null },
+  
   startDate: Date,
   
   // NEW: Birth date for Energy Almanac calculations (numerology, Chinese zodiac)
@@ -139,7 +145,7 @@ const userSchema = new mongoose.Schema({
     // 'grandfathered'  = lifetime free access (Discord OG members)
     status: { 
       type: String, 
-      enum: ['none', 'trial', 'active', 'canceled', 'expired', 'grandfathered'], 
+      enum: ['none', 'trial', 'active', 'canceled', 'expired', 'grandfathered', 'banned'], 
       default: 'none' 
     },
     
@@ -284,6 +290,7 @@ const userSchema = new mongoose.Schema({
 // Returns true if user has active access (trial, active, canceled-but-not-expired, or grandfathered)
 // ============================================
 userSchema.virtual('hasPremiumAccess').get(function() {
+  if (this.banned) return false;
   const sub = this.subscription;
   if (!sub) return false;
   
