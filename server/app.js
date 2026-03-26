@@ -1301,6 +1301,107 @@ async function buildOracleContext(user, timezone) {
     // Non-blocking — dynamic rules are enhancement, not requirement
   }
 
+  // --- JOURNAL ENTRIES (user's private unfiltered thoughts) ---
+  if (user.notes && typeof user.notes === 'object') {
+    const entries = Object.entries(user.notes)
+      .filter(([_, v]) => typeof v === 'string' && v.trim().length > 0)
+      .map(([dateKey, text]) => ({ date: dateKey, text }))
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .slice(0, 7);
+
+    if (entries.length > 0) {
+      lines.push('');
+      lines.push('USER\'S PRIVATE JOURNAL ENTRIES (most recent — they wrote these for themselves, not for you):');
+      entries.forEach(e => {
+        const preview = e.text.length > 400 ? e.text.substring(0, 400) + '...' : e.text;
+        lines.push(`- [${e.date}] ${preview}`);
+      });
+      lines.push('Use journal context to sense what they\'re processing. Never quote their journal back to them directly. Just know what\'s on their mind.');
+    }
+  }
+
+  // --- ACCOUNT CONTEXT (age, tier, investment level) ---
+  try {
+    const tierLabel = user.subscription?.tier || 'free';
+    const subStatus = user.subscription?.status || 'none';
+    const isGrandfatheredUser = subStatus === 'grandfathered';
+    const accountParts = [];
+
+    if (user.createdAt) {
+      const accountAge = Math.floor((new Date() - new Date(user.createdAt)) / (1000 * 60 * 60 * 24));
+      accountParts.push(`Account age: ${accountAge} days`);
+      if (accountAge <= 3) accountParts.push('(brand new user — first impressions matter)');
+    }
+
+    if (isGrandfatheredUser) {
+      accountParts.push('Tier: OG lifetime member (pre-launch Discord community)');
+    } else if (subStatus === 'active') {
+      accountParts.push(`Tier: ${tierLabel} ($${tierLabel === 'ascended' ? '17' : '8'}/month — paying subscriber)`);
+    } else {
+      accountParts.push('Tier: free');
+    }
+
+    if (user.discordId) accountParts.push('Discord: linked');
+
+    if (accountParts.length > 0) {
+      lines.push('');
+      lines.push(`ACCOUNT: ${accountParts.join('. ')}.`);
+    }
+  } catch (acErr) {
+    // Non-blocking
+  }
+
+  // --- PINNED ORACLE MESSAGES (what resonated with this user) ---
+  try {
+    const OraclePin = require('./models/OraclePin');
+    const pins = await OraclePin.find({ userId: user._id })
+      .sort({ pinnedAt: -1 })
+      .limit(5)
+      .select('message pinnedAt')
+      .lean();
+
+    if (pins.length > 0) {
+      lines.push('');
+      lines.push('MESSAGES THIS USER PINNED TO THEIR JOURNEY (these resonated deeply — lean into these patterns):');
+      pins.forEach(p => {
+        const preview = p.message.length > 300 ? p.message.substring(0, 300) + '...' : p.message;
+        const daysAgo = Math.floor((new Date() - new Date(p.pinnedAt)) / (1000 * 60 * 60 * 24));
+        const timeLabel = daysAgo === 0 ? 'today' : daysAgo === 1 ? 'yesterday' : `${daysAgo}d ago`;
+        lines.push(`- [pinned ${timeLabel}] ${preview}`);
+      });
+    }
+  } catch (pinErr) {
+    // Non-blocking — pins are enhancement
+  }
+
+  // --- LAST CONVERSATION CONTEXT (cross-session continuity) ---
+  try {
+    const OracleChatHistory = require('./models/OracleChatHistory');
+    const chatDoc = await OracleChatHistory.findOne({ username: user.username }).lean();
+    if (chatDoc && chatDoc.messages && chatDoc.messages.length > 0) {
+      // Pull last 4 messages (2 exchanges) for conversational continuity
+      const lastMsgs = chatDoc.messages.slice(-4);
+      const lastTimestamp = lastMsgs[lastMsgs.length - 1]?.timestamp;
+      const hoursAgo = lastTimestamp
+        ? Math.floor((new Date() - new Date(lastTimestamp)) / (1000 * 60 * 60))
+        : null;
+
+      // Only inject if last conversation was within the past 72 hours
+      if (hoursAgo !== null && hoursAgo <= 72) {
+        lines.push('');
+        const timeLabel = hoursAgo < 1 ? 'moments ago' : hoursAgo < 24 ? `${hoursAgo}h ago` : `${Math.floor(hoursAgo / 24)}d ago`;
+        lines.push(`LAST CONVERSATION (${timeLabel}):`);
+        lastMsgs.forEach(m => {
+          const preview = m.content.length > 250 ? m.content.substring(0, 250) + '...' : m.content;
+          lines.push(`${m.role === 'user' ? 'User' : 'Oracle'}: ${preview}`);
+        });
+        lines.push('Continue naturally from where you left off if relevant. Don\'t repeat yourself.');
+      }
+    }
+  } catch (chErr) {
+    // Non-blocking — chat history is enhancement
+  }
+
   return lines.join('\n');
 }
 
