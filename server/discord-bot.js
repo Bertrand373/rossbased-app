@@ -1915,6 +1915,18 @@ STRUCTURE:
 
 Total length: 150-250 words. Tight. Every sentence earns its place.
 
+SYNTHESIS RULES (CRITICAL — read before writing):
+The data below is your INTELLIGENCE. It informs what you write. It is NOT the content itself.
+- NEVER cite raw numbers, counts, or percentages in the email. No "48 men crossed 180 days." No "Oracle logged 129 conversations." No "39 anxious, 38 confident." Ross would never write like that. He'd write about what the pattern MEANS.
+- NEVER use the word "Oracle" in the email body. Ross doesn't talk about Oracle to his email list. He talks about what he's SEEING in his community. "I've been watching something split open this week..." not "Oracle logged..."
+- NEVER list data categories. No "sentiment was..." No "trending topics included..." No "streak distribution shows..." That's a dashboard readout, not an email from Ross.
+- ONE specific detail can ground the email (a single vivid observation, a real question someone asked, a pattern that emerged). But it serves the insight, not the other way around.
+- The data should make you THINK something. Write THAT thought. The way Ross would text it to a friend at midnight. Not the way an analyst would present it in a meeting.
+- If you find yourself listing more than one statistic, you've already failed. Start over.
+
+BAD (data dump): "48 men in this community have crossed 180 days. 61 are under 30. Oracle logged 129 curious conversations, 39 anxious ones..."
+GOOD (synthesis): "Something splits around the 6 month mark. The guys who make it that far stop posting about benefits. They stop asking questions. They just... go quiet. And the ones still in the first 30 days cant figure out why."
+
 ${dataBlock}
 
 Write the complete email now. Output ONLY the email with the subject line on the first line prefixed with "SUBJECT: ". No preamble, no commentary.`;
