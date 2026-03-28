@@ -728,7 +728,7 @@ const Profile = ({
                 disabled={!isEditingProfile}
                 style={{
                   width: '100%',
-                  padding: '16px',
+                  padding: '16px 40px 16px 16px',
                   background: 'var(--border-subtle)',
                   border: '1px solid var(--border)',
                   borderRadius: '12px',
@@ -737,6 +737,9 @@ const Profile = ({
                   fontFamily: 'inherit',
                   WebkitAppearance: 'none',
                   appearance: 'none',
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 16px center',
                   opacity: !isEditingProfile ? 0.4 : 1,
                   cursor: !isEditingProfile ? 'not-allowed' : 'pointer'
                 }}

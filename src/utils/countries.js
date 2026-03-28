@@ -42,6 +42,7 @@ export const COUNTRIES = [
   { code: 'GH', name: 'Ghana' },
   { code: 'GR', name: 'Greece' },
   { code: 'GT', name: 'Guatemala' },
+  { code: 'GY', name: 'Guyana' },
   { code: 'HT', name: 'Haiti' },
   { code: 'HN', name: 'Honduras' },
   { code: 'HU', name: 'Hungary' },
