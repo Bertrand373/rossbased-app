@@ -76,8 +76,7 @@ router.post('/subscribe', async (req, res) => {
   } catch (error) {
     console.error('❌ Error subscribing to notifications:', error);
     res.status(500).json({ 
-      error: 'Failed to subscribe to notifications',
-      details: error.message 
+      error: 'Failed to subscribe to notifications'
     });
   }
 });
@@ -112,8 +111,7 @@ router.post('/unsubscribe', async (req, res) => {
   } catch (error) {
     console.error('❌ Error unsubscribing from notifications:', error);
     res.status(500).json({ 
-      error: 'Failed to unsubscribe from notifications',
-      details: error.message 
+      error: 'Failed to unsubscribe from notifications'
     });
   }
 });
@@ -154,8 +152,7 @@ router.get('/preferences/:username', async (req, res) => {
   } catch (error) {
     console.error('❌ Error fetching notification preferences:', error);
     res.status(500).json({ 
-      error: 'Failed to fetch preferences',
-      details: error.message 
+      error: 'Failed to fetch preferences'
     });
   }
 });
@@ -209,8 +206,7 @@ router.put('/preferences', async (req, res) => {
   } catch (error) {
     console.error('❌ Error updating notification preferences:', error);
     res.status(500).json({ 
-      error: 'Failed to update preferences',
-      details: error.message 
+      error: 'Failed to update preferences'
     });
   }
 });
@@ -270,8 +266,7 @@ router.post('/notification-preferences/:username', async (req, res) => {
   } catch (error) {
     console.error('❌ Error saving notification preferences:', error);
     res.status(500).json({ 
-      error: 'Failed to save preferences',
-      details: error.message 
+      error: 'Failed to save preferences'
     });
   }
 });
@@ -306,8 +301,7 @@ router.post('/send', async (req, res) => {
   } catch (error) {
     console.error('❌ Error sending notification:', error);
     res.status(500).json({ 
-      error: 'Failed to send notification',
-      details: error.message 
+      error: 'Failed to send notification'
     });
   }
 });
@@ -334,8 +328,7 @@ router.post('/send-bulk', async (req, res) => {
   } catch (error) {
     console.error('❌ Error sending bulk notifications:', error);
     res.status(500).json({ 
-      error: 'Failed to send bulk notifications',
-      details: error.message 
+      error: 'Failed to send bulk notifications'
     });
   }
 });
@@ -362,8 +355,7 @@ router.post('/check-milestone', async (req, res) => {
   } catch (error) {
     console.error('❌ Error checking milestone:', error);
     res.status(500).json({ 
-      error: 'Failed to check milestone',
-      details: error.message 
+      error: 'Failed to check milestone'
     });
   }
 });
@@ -397,8 +389,7 @@ router.post('/test', async (req, res) => {
   } catch (error) {
     console.error('❌ Error sending test notification:', error);
     res.status(500).json({ 
-      error: 'Failed to send test notification',
-      details: error.message 
+      error: 'Failed to send test notification'
     });
   }
 });
@@ -595,8 +586,7 @@ router.post('/debug-test', async (req, res) => {
   } catch (error) {
     console.error('❌ Error in debug-test:', error);
     res.status(500).json({ 
-      error: 'Debug test failed',
-      details: error.message 
+      error: 'Debug test failed'
     });
   }
 });

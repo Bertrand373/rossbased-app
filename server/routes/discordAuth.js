@@ -48,8 +48,7 @@ router.post('/discord', async (req, res) => {
       const errorText = await tokenResponse.text();
       console.error('Discord token exchange failed:', tokenResponse.status, errorText);
       return res.status(401).json({ 
-        error: 'Discord authentication failed', 
-        details: `Discord returned ${tokenResponse.status}` 
+        error: 'Discord authentication failed'
       });
     }
 
@@ -59,8 +58,7 @@ router.post('/discord', async (req, res) => {
       const responseText = await tokenResponse.text();
       console.error('Discord returned non-JSON response:', contentType, responseText.substring(0, 500));
       return res.status(401).json({ 
-        error: 'Discord authentication failed',
-        details: 'Unexpected response format from Discord'
+        error: 'Discord authentication failed'
       });
     }
 
@@ -68,7 +66,7 @@ router.post('/discord', async (req, res) => {
     
     if (tokenData.error) {
       console.error('Discord token error:', tokenData);
-      return res.status(401).json({ error: 'Discord authentication failed', details: tokenData.error_description || tokenData.error });
+      return res.status(401).json({ error: 'Discord authentication failed' });
     }
 
     // Get user info from Discord
@@ -210,7 +208,8 @@ router.post('/discord', async (req, res) => {
     }
 
     // Generate JWT
-    const jwtSecret = process.env.JWT_SECRET || 'rossbased_secret_key';
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) return res.status(500).json({ error: 'Server configuration error' });
     const token = jwt.sign({ username: user.username }, jwtSecret, { expiresIn: '7d' });
 
     res.json({
@@ -221,7 +220,7 @@ router.post('/discord', async (req, res) => {
 
   } catch (error) {
     console.error('Discord auth error:', error);
-    res.status(401).json({ error: 'Discord authentication failed', details: error.message });
+    res.status(401).json({ error: 'Discord authentication failed' });
   }
 });
 

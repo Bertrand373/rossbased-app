@@ -20,7 +20,8 @@ const authenticate = (req, res, next) => {
   if (!token) return res.status(401).json({ error: 'Unauthorized' });
   
   try {
-    const jwtSecret = process.env.JWT_SECRET || 'rossbased_secret_key';
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) return res.status(401).json({ error: 'Unauthorized' });
     req.user = jwt.verify(token, jwtSecret);
     next();
   } catch (err) {

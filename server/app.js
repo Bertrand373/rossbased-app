@@ -7,6 +7,8 @@ const jwt = require('jsonwebtoken');
 const { format, addDays } = require('date-fns');
 const Anthropic = require('@anthropic-ai/sdk');
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
+const rateLimit = require('express-rate-limit');
 const { Resend } = require('resend');
 
 // CRITICAL: Load environment variables FIRST, before any other imports that need them
@@ -150,6 +152,52 @@ app.use((err, req, res, next) => {
   console.error('Server error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });
+
+// ============================================
+// RATE LIMITING
+// ============================================
+// Auth endpoints: tight limits to prevent brute-force
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,                   // 20 attempts per 15 min per IP
+  message: { error: 'Too many attempts. Please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    // Use X-Forwarded-For behind Render's proxy
+    const forwarded = req.headers['x-forwarded-for'];
+    return forwarded ? forwarded.split(',')[0].trim() : req.ip;
+  }
+});
+
+// Oracle endpoint: moderate limits to protect Anthropic API spend
+const oracleLimiter = rateLimit({
+  windowMs: 60 * 1000,      // 1 minute
+  max: 10,                   // 10 requests per minute per IP
+  message: { error: 'Oracle is processing too many requests. Please wait a moment.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    const forwarded = req.headers['x-forwarded-for'];
+    return forwarded ? forwarded.split(',')[0].trim() : req.ip;
+  }
+});
+
+// General API: generous but prevents abuse
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,      // 1 minute
+  max: 100,                  // 100 requests per minute per IP
+  message: { error: 'Too many requests. Please slow down.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    const forwarded = req.headers['x-forwarded-for'];
+    return forwarded ? forwarded.split(',')[0].trim() : req.ip;
+  }
+});
+
+// Apply general rate limit to all API routes
+app.use('/api/', apiLimiter);
 
 // MongoDB connection with optimized pooling for scale
 const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/rossbased';
@@ -420,9 +468,11 @@ mongoose.connect(mongoUri, {
   })
   .catch(err => console.error('MongoDB connection error:', err));
 
-// Debug middleware to log all requests
+// Request logging — method + URL only, never log bodies (passwords, tokens, etc.)
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`, req.body);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`${req.method} ${req.url}`);
+  }
   next();
 });
 
@@ -430,32 +480,25 @@ app.use((req, res, next) => {
 const authenticate = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
-    console.log('No authorization header provided');
-    return res.status(401).json({ error: 'Unauthorized - No token provided' });
+    return res.status(401).json({ error: 'Unauthorized' });
   }
   
   const tokenParts = authHeader.split(' ');
   if (tokenParts.length !== 2 || tokenParts[0] !== 'Bearer') {
-    console.log('Authorization header malformed:', authHeader);
-    return res.status(401).json({ error: 'Unauthorized - Invalid token format' });
+    return res.status(401).json({ error: 'Unauthorized' });
   }
   
   const token = tokenParts[1];
   
   try {
-    const jwtSecret = process.env.JWT_SECRET || 'rossbased_secret_key';
-    console.log('Verifying token with secret:', jwtSecret.substring(0, 3) + '...');
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) throw new Error('JWT_SECRET not configured');
     
     const decoded = jwt.verify(token, jwtSecret);
-    console.log('Token verified successfully for user:', decoded.username);
     req.user = decoded;
     next();
   } catch (err) {
-    console.error('JWT verification error:', err);
-    return res.status(401).json({ 
-      error: 'Unauthorized - Token invalid',
-      details: err.message 
-    });
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 };
 
@@ -464,44 +507,55 @@ const authenticate = (req, res, next) => {
 // ============================================
 
 // Login endpoint - ONLY authenticates existing users
-app.post('/api/login', async (req, res) => {
-  console.log('Received login request:', req.body);
+app.post('/api/login', authLimiter, async (req, res) => {
   const { username, password } = req.body;
   try {
     const user = await User.findOne({ username });
     
     if (!user) {
-      console.log('Login failed - user not found:', username);
       return res.status(401).json({ error: 'Account not found. Please sign up.' });
     }
     
     // Ban check — banned users cannot log in
     if (user.banned) {
-      console.log('Login blocked - user is banned:', username);
       return res.status(403).json({ error: 'This account has been suspended.' });
     }
     
-    if (user.password !== password) {
-      console.log('Login failed - wrong password:', username);
+    // Password verification with gradual bcrypt migration
+    // Supports both bcrypt hashes and legacy plaintext passwords
+    let passwordValid = false;
+    if (user.password && user.password.startsWith('$2')) {
+      // Already bcrypt-hashed
+      passwordValid = await bcrypt.compare(password, user.password);
+    } else {
+      // Legacy plaintext — compare directly, then upgrade to bcrypt
+      passwordValid = (user.password === password);
+      if (passwordValid) {
+        // Auto-migrate: hash the plaintext password in-place
+        user.password = await bcrypt.hash(password, 10);
+        await user.save({ validateModifiedOnly: true });
+        console.log('🔒 Auto-migrated password to bcrypt for:', username);
+      }
+    }
+    
+    if (!passwordValid) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
-    const jwtSecret = process.env.JWT_SECRET || 'rossbased_secret_key';
-    console.log('Generating token with secret:', jwtSecret.substring(0, 3) + '...');
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) return res.status(500).json({ error: 'Server configuration error' });
     
     const token = jwt.sign({ username }, jwtSecret, { expiresIn: '7d' });
-    console.log('Login successful, token generated for:', username);
     
     res.json({ token, ...user.toObject() });
   } catch (err) {
     console.error('Login error:', err);
-    res.status(500).json({ error: 'Server error', details: err.message });
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
 // Signup endpoint - Creates new accounts
-app.post('/api/signup', async (req, res) => {
-  console.log('Received signup request:', req.body);
+app.post('/api/signup', authLimiter, async (req, res) => {
   const { username, password, email } = req.body;
   
   try {
@@ -509,7 +563,6 @@ app.post('/api/signup', async (req, res) => {
     const escapedUsername = username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const existingUser = await User.findOne({ username: { $regex: new RegExp(`^${escapedUsername}$`, 'i') } });
     if (existingUser) {
-      console.log('Signup failed - username taken:', username);
       return res.status(409).json({ error: 'Username already taken' });
     }
     
@@ -521,7 +574,6 @@ app.post('/api/signup', async (req, res) => {
     // Check if email already exists
     const existingEmail = await User.findOne({ email: email.trim() });
     if (existingEmail) {
-      console.log('Signup failed - email taken:', email);
       return res.status(409).json({ error: 'Email already registered' });
     }
     
@@ -531,7 +583,7 @@ app.post('/api/signup', async (req, res) => {
       try {
         const bannedIP = await BannedIP.findOne({ ip: signupIP });
         if (bannedIP) {
-          console.log(`🚫 Signup blocked from banned IP: ${signupIP} (attempted username: ${username})`);
+          console.log(`🚫 Signup blocked from banned IP: ${signupIP}`);
           return res.status(403).json({ error: 'Unable to create account. Please contact support.' });
         }
       } catch (ipErr) {
@@ -539,11 +591,13 @@ app.post('/api/signup', async (req, res) => {
       }
     }
     
+    // Hash password with bcrypt before storing
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
     // Create new user
-    console.log('Creating new user:', username);
     const user = new User({
       username,
-      password,
+      password: hashedPassword,
       email: email.trim(),
       startDate: new Date(),
       currentStreak: 0,
@@ -591,14 +645,14 @@ app.post('/api/signup', async (req, res) => {
     // Fire-and-forget: check if this IP has other accounts and alert Ross
     if (signupIP) checkSignupAbuse(signupIP, username, 'app').catch(() => {});
     
-    const jwtSecret = process.env.JWT_SECRET || 'rossbased_secret_key';
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) return res.status(500).json({ error: 'Server configuration error' });
     const token = jwt.sign({ username }, jwtSecret, { expiresIn: '7d' });
-    console.log('Signup successful, token generated for:', username);
     
     res.json({ token, ...user.toObject() });
   } catch (err) {
     console.error('Signup error:', err);
-    res.status(500).json({ error: 'Server error', details: err.message });
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
@@ -608,14 +662,11 @@ app.post('/api/signup', async (req, res) => {
 
 // Get user data
 app.get('/api/user/:username', authenticate, async (req, res) => {
-  console.log('Received get user request for:', req.params.username);
   try {
     const user = await User.findOne({ username: req.params.username });
     if (!user) {
-      console.log('User not found:', req.params.username);
       return res.status(404).json({ error: 'User not found' });
     }
-    console.log('Returning user data for:', req.params.username);
     res.json(user);
   } catch (err) {
     console.error('Error fetching user:', err);
@@ -625,7 +676,6 @@ app.get('/api/user/:username', authenticate, async (req, res) => {
 
 // Update user data
 app.put('/api/user/:username', authenticate, async (req, res) => {
-  console.log('Received update for user:', req.params.username);
   try {
     // ── Free-tier benefit log enforcement (14 lifetime logs) ──
     if (req.body.benefitTracking) {
@@ -688,9 +738,10 @@ app.put('/api/user/:username', authenticate, async (req, res) => {
     // ── Issue new JWT if username changed ──
     let newToken = null;
     if (usernameChanging) {
-      const jwtSecret = process.env.JWT_SECRET || 'rossbased_secret_key';
-      newToken = jwt.sign({ username: req.body.username }, jwtSecret, { expiresIn: '7d' });
-      console.log('🔑 Username changed:', req.params.username, '→', req.body.username, '— new JWT issued');
+      const jwtSecret = process.env.JWT_SECRET;
+      if (jwtSecret) {
+        newToken = jwt.sign({ username: req.body.username }, jwtSecret, { expiresIn: '7d' });
+      }
     }
 
     console.log('User updated:', user.username);
@@ -743,8 +794,6 @@ app.post('/api/track', authenticate, async (req, res) => {
 // ACCOUNT DELETION ENDPOINT
 // ============================================
 app.delete('/api/user/:username', authenticate, async (req, res) => {
-  console.log('Received delete request for user:', req.params.username);
-  
   // Ensure user can only delete their own account
   if (req.user.username !== req.params.username) {
     return res.status(403).json({ error: 'Unauthorized - Can only delete your own account' });
@@ -1464,7 +1513,7 @@ function getClientIP(req) {
 }
 
 // AI Chat Streaming Endpoint
-app.post('/api/ai/chat/stream', authenticate, async (req, res) => {
+app.post('/api/ai/chat/stream', authenticate, oracleLimiter, async (req, res) => {
   const { message, conversationHistory, timezone } = req.body;
   
   try {
@@ -2361,7 +2410,12 @@ app.post('/api/feedback', async (req, res) => {
     return res.status(400).json({ error: 'Subject and message are required' });
   }
   
-  const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1446375361830195322/CNNQZse3lNF3VRJtJ0BZsschJeXmMkvBcbiDLukDrxPDRRqI0iyLIYp2d7UvNh9R2Dhl';
+  const DISCORD_WEBHOOK_URL = process.env.DISCORD_FEEDBACK_WEBHOOK;
+  
+  if (!DISCORD_WEBHOOK_URL) {
+    console.error('DISCORD_FEEDBACK_WEBHOOK not configured');
+    return res.status(500).json({ error: 'Feedback system not configured' });
+  }
   
   // Sanitize and truncate content (Discord limits: field value 1024 chars)
   const sanitize = (str, maxLength = 1000) => {
@@ -2727,7 +2781,7 @@ app.get('/api/admin/oracle-health', authenticate, async (req, res) => {
     });
   } catch (err) {
     console.error('Oracle health check error:', err);
-    res.status(500).json({ error: 'Health check failed', details: err.message });
+    res.status(500).json({ error: 'Health check failed' });
   }
 });
 
@@ -2978,7 +3032,7 @@ Be brutally specific. Give exact phrases to ban and exact alternatives.`,
 // ============================================
 
 // Step 1: User submits email → generate token, send reset email
-app.post('/api/auth/forgot-password', async (req, res) => {
+app.post('/api/auth/forgot-password', authLimiter, async (req, res) => {
   const { email } = req.body;
 
   if (!email || !email.trim()) {
@@ -3046,7 +3100,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
 });
 
 // Step 2: User clicks link, submits new password with token
-app.post('/api/auth/reset-password', async (req, res) => {
+app.post('/api/auth/reset-password', authLimiter, async (req, res) => {
   const { token, password } = req.body;
 
   if (!token || !password) {
@@ -3068,8 +3122,8 @@ app.post('/api/auth/reset-password', async (req, res) => {
       return res.status(400).json({ error: 'This reset link is invalid or has expired. Please request a new one.' });
     }
 
-    // Update password and clear reset fields
-    user.password = password;
+    // Update password (hashed) and clear reset fields
+    user.password = await bcrypt.hash(password, 10);
     user.resetPasswordToken = null;
     user.resetPasswordExpires = null;
     await user.save();

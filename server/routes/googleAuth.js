@@ -115,7 +115,8 @@ router.post('/google', async (req, res) => {
     }
 
     // Generate JWT
-    const jwtSecret = process.env.JWT_SECRET || 'rossbased_secret_key';
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) return res.status(500).json({ error: 'Server configuration error' });
     const token = jwt.sign({ username: user.username }, jwtSecret, { expiresIn: '7d' });
 
     res.json({ 
@@ -126,7 +127,7 @@ router.post('/google', async (req, res) => {
 
   } catch (error) {
     console.error('Google auth error:', error);
-    res.status(401).json({ error: 'Google authentication failed', details: error.message });
+    res.status(401).json({ error: 'Google authentication failed' });
   }
 });
 

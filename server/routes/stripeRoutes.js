@@ -48,7 +48,8 @@ const authenticate = (req, res, next) => {
   }
   
   try {
-    const jwtSecret = process.env.JWT_SECRET || 'rossbased_secret_key';
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) return res.status(401).json({ error: 'Unauthorized' });
     const decoded = jwt.verify(token, jwtSecret);
     req.user = decoded;
     next();
