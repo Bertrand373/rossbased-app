@@ -2784,7 +2784,30 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
     const msg = reaction.message;
 
-    // Skip bot messages
+    // Skip reactions from bots (including the bot's own ✅/❌ setup reactions)
+    if (user.bot) return;
+
+    // ── Oracle X approval: Ross reacts to bot's DM with ✅ or ❌ ──
+    if (!msg.guild && msg.author.bot && ADMIN_DISCORD_USERS.includes(user.username?.toLowerCase())) {
+      const emoji = reaction.emoji.name;
+      if (emoji === '✅' || emoji === '❌') {
+        try {
+          const { handleApprovalReaction } = require('./services/oracleXEngine');
+          const result = await handleApprovalReaction(msg.id, emoji);
+          if (result) {
+            const reply = result.action === 'approved'
+              ? '✅ Approved — will post within the hour.'
+              : '❌ Rejected — Oracle stays quiet today.';
+            await msg.reply(reply);
+            return; // Handled — don't fall through to knowledge ingestion
+          }
+        } catch (err) {
+          console.error('[OracleX] Reaction handler error:', err.message);
+        }
+      }
+    }
+
+    // Skip bot messages (for knowledge ingestion below)
     if (msg.author.bot) return;
 
     // Only trigger at exactly 3 total reactions (any emoji) to avoid re-processing

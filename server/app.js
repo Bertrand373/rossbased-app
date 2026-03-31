@@ -53,6 +53,7 @@ const oraclePulseRoutes = require('./routes/oraclePulseRoutes');
 const oraclePinRoutes = require('./routes/oraclePinRoutes');
 const announcementRoutes = require('./routes/announcementRoutes');
 const oracleIntroRoutes = require('./routes/oracleIntroRoutes');
+const oracleXRoutes = require('./routes/oracleXRoutes');
 const { expireStaleTrials, expireStaleCanceled, checkPremiumAccess, syncStripeSubscriptions } = require('./middleware/subscriptionMiddleware');
 const { checkAndSendOnboardingNotification } = require('./services/notificationService');
 const { checkSignupAbuse } = require('./services/abuseDetection');
@@ -424,6 +425,48 @@ mongoose.connect(mongoUri, {
         }
       });
       console.log('🔮 Oracle transmission pipeline scheduled (10 AM EST daily)');
+
+      // ============================================
+      // ORACLE X PIPELINE (@Oracle_Observes on X/Twitter)
+      // Generate daily post at 9 AM EST, post approved hourly, expire stale daily
+      // ============================================
+      const { generateXPost, postApprovedToX, expireStalePosts } = require('./services/oracleXEngine');
+
+      // Generate new X post daily at 9 AM EST (14:00 UTC)
+      cron.schedule('0 14 * * *', async () => {
+        try {
+          console.log('🐦 Generating Oracle X post...');
+          const entry = await generateXPost();
+          if (entry) {
+            console.log(`🐦 Oracle X post generated (status: ${entry.status})`);
+          }
+        } catch (e) {
+          console.error('Oracle X generation cron error:', e.message);
+        }
+      });
+
+      // Post approved tweets hourly
+      cron.schedule('0 * * * *', async () => {
+        try {
+          const result = await postApprovedToX();
+          if (result.posted > 0) {
+            console.log(`🐦 Oracle X posted: ${result.tweetId}`);
+          }
+        } catch (e) {
+          console.error('Oracle X posting cron error:', e.message);
+        }
+      });
+
+      // Expire stale pending posts daily at 11 PM EST (04:00 UTC next day)
+      cron.schedule('0 4 * * *', async () => {
+        try {
+          await expireStalePosts();
+        } catch (e) {
+          console.error('Oracle X expire cron error:', e.message);
+        }
+      });
+
+      console.log('🐦 Oracle X pipeline scheduled (generate 9AM, post hourly, expire nightly)');
 
       // ============================================
       // REDDIT INGESTION PIPELINE (every 6 hours + daily summary)
@@ -3287,6 +3330,7 @@ app.use('/api/oracle/share', authenticate, oracleShareApi);
 app.use('/api/oracle/pulse', authenticate, oraclePulseRoutes);
 app.use('/api/oracle/pins', authenticate, oraclePinRoutes);
 app.use('/api/oracle/intro', authenticate, oracleIntroRoutes);
+app.use('/api/admin/oracle-x', authenticate, oracleXRoutes);
 app.use('/o', oracleSharePage);
 announcementRoutes.init(authenticate);
 app.use('/api/announcements', announcementRoutes);
