@@ -1139,7 +1139,6 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                   <img src="/The_Oracle.png" alt="" className="ai-chat-avatar" />
                   <div className="ai-chat-message-content streaming">
                     {renderMarkdown(streamingText)}
-                    <span className="ai-chat-cursor" />
                   </div>
                 </div>
               </div>
@@ -1148,11 +1147,8 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
             {/* Loading indicator */}
             {isLoading && !streamingText && (
               <div className="ai-chat-message assistant">
-                <div className="ai-chat-message-row">
-                  <img src="/The_Oracle.png" alt="" className="ai-chat-avatar ai-chat-avatar-descend" />
-                  <div className="ai-chat-message-content">
-                    <span className="ai-chat-cursor" />
-                  </div>
+                <div className="ai-chat-loading">
+                  <img src="/The_Oracle.png" alt="" className="ai-chat-loading-icon" />
                 </div>
               </div>
             )}
