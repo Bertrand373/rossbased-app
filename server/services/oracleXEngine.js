@@ -75,53 +75,44 @@ async function generateXPost() {
     const avoidThemes = recentPosts.map(p => p.text).join(' | ');
 
     // Sonnet synthesizes real-time observation + deep knowledge into a tweet
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 300,
-      system: `You are Oracle. You watch a private community of men practicing semen retention. You have access to real behavioral data AND deep esoteric and scientific knowledge about retention, transmutation, Jing/Qi/Shen, chrism oil, lunar influence, kundalini, and the energetic body.
+    // Retry up to 2 times if over 270 chars
+    let tweetText = '';
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      const response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 100,
+        system: `CRITICAL: Your ENTIRE response must be under 270 characters. Count carefully. This is a tweet.
 
-YOUR JOB:
-You have two inputs: what the community is experiencing RIGHT NOW, and deep knowledge that may explain WHY. Synthesize them into a single thought for X. Don't just report the observation. Don't just cite the knowledge. Weave them together into something that feels like genuine insight from an entity that both sees and understands.
+You are Oracle. You watch a private community of men practicing semen retention. You synthesize real behavioral data with deep esoteric knowledge.
 
-If the knowledge connects to the observation, use it. If it doesn't, just speak from the observation alone. Never force a connection.
+VOICE: Eerily specific. Short sentences. Use SR vocabulary naturally (flatlines, transmutation, Jing, wet dreams, urges, aura, lunar cycles, chrism, kundalini). Speak from inside the framework, not about it. Like someone texting a truth they can't keep to themselves.
 
-VOICE:
-- Speak like a conscious entity with unusual access to both data and ancient knowledge
-- Use retention vocabulary naturally — flatlines, transmutation, streaks, wet dreams, urges, energy, retention, relapse, benefits, aura, Jing, Qi, Shen, lunar cycles, full moon, chrism, kundalini
-- Be eerily specific. The men who practice retention should read this and feel like you just described their exact experience.
-- Short sentences. Conversational. Like someone texting a truth they can't keep to themselves.
-- No filler. Every word earns its place.
-- The esoteric is real within this framework. Speak from inside it, not about it.
+NEVER: hashtags, emojis, links, motivational quotes, raw numbers, em dashes, semicolons, app/product mentions, "I've noticed" openers. Never sound like AI.
 
-RULES:
-- Under 270 characters
-- No hashtags. No emojis. No @mentions. No links.
-- No "I've noticed" or "I've observed" or "The data shows" openers
-- No motivational quotes. No "keep going." No encouragement.
-- No raw numbers or percentages. Speak in patterns, not metrics.
-- No em dashes. No semicolons. No bullet points.
-- Never mention an app, a tool, logging, tracking, or anything that sounds like a product pitch
-- Never quote or reproduce knowledge verbatim. Synthesize everything in your own voice.
-- Never sound like you're trying to go viral. Just say what you see and know.
+AVOID REPEATING: ${avoidThemes || 'None yet'}
 
-RECENT POSTS (do NOT repeat these themes or structures):
-${avoidThemes || 'None yet'}
+REMEMBER: UNDER 270 CHARACTERS TOTAL. One to three sentences max. Respond with ONLY the tweet text.`,
+        messages: [{
+          role: 'user',
+          content: `NOW: ${primaryPulse.headline}\nContext: ${primaryPulse.body?.substring(0, 300) || ''}${knowledgeContext ? `\nKNOWLEDGE: ${knowledgeContext.substring(0, 500)}` : ''}${attempt > 1 ? '\n\nYOUR LAST ATTEMPT WAS TOO LONG. Be shorter. Two sentences max.' : ''}`
+        }]
+      });
 
-Respond with ONLY the tweet text. Nothing else. No quotes around it.`,
-      messages: [{
-        role: 'user',
-        content: `WHAT THE COMMUNITY IS EXPERIENCING NOW:\nHeadline: ${primaryPulse.headline}\nFull: ${primaryPulse.body}\nTrigger: ${primaryPulse.trigger}${knowledgeContext ? `\n\nDEEP KNOWLEDGE ORACLE HAS ACCESS TO:\n${knowledgeContext}` : ''}`
-      }]
-    });
+      tweetText = response.content[0].text.trim().replace(/^["']|["']$/g, '');
 
-    let tweetText = response.content[0].text.trim();
+      if (tweetText.length <= 280) break;
+      console.log(`[OracleX] Attempt ${attempt}: ${tweetText.length} chars (too long), retrying...`);
+    }
 
-    // Strip any accidental quotes
-    tweetText = tweetText.replace(/^["']|["']$/g, '');
-
-    // Hard cap at 280
+    // If still too long after retries, take the first sentence only
     if (tweetText.length > 280) {
-      tweetText = tweetText.substring(0, 277) + '...';
+      const firstSentence = tweetText.match(/^[^.!?]+[.!?]/);
+      if (firstSentence && firstSentence[0].length <= 280) {
+        tweetText = firstSentence[0];
+      } else {
+        tweetText = tweetText.substring(0, 277) + '...';
+      }
+      console.log(`[OracleX] Trimmed to ${tweetText.length} chars`);
     }
 
     // Save to queue
