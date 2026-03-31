@@ -204,6 +204,9 @@ const RevenueCard = () => {
           <div className={`rv-sub-item rv-sub-tap ${subDrilldown === 'active' ? 'rv-sub-selected' : ''}`} onClick={() => fetchSubDetails('active')}>
             <span className="rv-sub-num active">{subscribers.active}</span>
             <span className="rv-sub-label">Active</span>
+            {subscribers.canceling > 0 && (
+              <span className="rv-sub-label" style={{ color: 'rgba(239,68,68,0.5)', marginTop: '2px', fontSize: '8px' }}>{subscribers.canceling} canceling</span>
+            )}
           </div>
           <div className={`rv-sub-item rv-sub-tap ${subDrilldown === 'trialing' ? 'rv-sub-selected' : ''}`} onClick={() => fetchSubDetails('trialing')}>
             <span className="rv-sub-num trial">{subscribers.trialing}</span>
@@ -238,7 +241,10 @@ const RevenueCard = () => {
                       {subDrilldown === 'active' && s.trialEnd && new Date(s.trialEnd) < new Date() && (
                         <span className="rv-drilldown-date">trial ended {fmtShortDate(s.trialEnd)}</span>
                       )}
-                      {subDrilldown === 'active' && s.periodEnd && (
+                      {subDrilldown === 'active' && s.periodEnd && s.cancelAtPeriodEnd && (
+                        <span className="rv-drilldown-date" style={{ color: 'rgba(239,68,68,0.6)' }}>cancels {fmtShortDate(s.periodEnd)}</span>
+                      )}
+                      {subDrilldown === 'active' && s.periodEnd && !s.cancelAtPeriodEnd && (
                         <span className="rv-drilldown-date">renews {fmtShortDate(s.periodEnd)}</span>
                       )}
                       {subDrilldown === 'canceled' && s.canceledAt && (

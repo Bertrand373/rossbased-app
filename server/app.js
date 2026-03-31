@@ -3167,6 +3167,20 @@ app.post('/api/admin/ban-user', authenticate, async (req, res) => {
     const user = await User.findOne({ username: { $regex: new RegExp('^' + username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$', 'i') } });
     if (!user) return res.status(404).json({ error: 'User not found' });
     
+    // Cancel Stripe subscription if one exists (removes from Stripe trialing/active counts)
+    let stripeCanceled = false;
+    if (user.subscription?.stripeSubscriptionId) {
+      try {
+        const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+        await stripe.subscriptions.cancel(user.subscription.stripeSubscriptionId);
+        stripeCanceled = true;
+        console.log(`🚫 Stripe sub ${user.subscription.stripeSubscriptionId} canceled for banned user ${user.username}`);
+      } catch (stripeErr) {
+        // Sub may already be canceled/expired — that's fine
+        console.log(`⚠️ Stripe cancel skipped for ${user.username}: ${stripeErr.message}`);
+      }
+    }
+    
     user.banned = true;
     user.bannedAt = new Date();
     user.bannedReason = reason || 'Banned by admin';
@@ -3175,7 +3189,7 @@ app.post('/api/admin/ban-user', authenticate, async (req, res) => {
     await user.save({ validateModifiedOnly: true });
     
     console.log(`🚫 BANNED: ${user.username} — reason: ${user.bannedReason}`);
-    res.json({ success: true, username: user.username });
+    res.json({ success: true, username: user.username, stripeCanceled });
   } catch (err) {
     console.error('Ban user error:', err);
     res.status(500).json({ error: 'Failed to ban user' });

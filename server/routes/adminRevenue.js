@@ -143,6 +143,9 @@ router.get('/revenue', adminCheck, async (req, res) => {
       }
     }
 
+    // Count active subs that are set to cancel at period end
+    const cancelingCount = activeSubs.filter(s => s.cancel_at_period_end).length;
+
     res.json({
       balance: {
         available: available,
@@ -152,6 +155,7 @@ router.get('/revenue', adminCheck, async (req, res) => {
       mrr: mrr,
       subscribers: {
         active: activeSubs.length,
+        canceling: cancelingCount,
         trialing: trialingSubs.data.length,
         canceledLast30d: canceledLast30d.length,
       },
@@ -241,6 +245,7 @@ router.get('/revenue/subscribers/:status', adminCheck, async (req, res) => {
         trialEnd: sub.trial_end ? new Date(sub.trial_end * 1000).toISOString() : null,
         periodEnd: sub.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null,
         canceledAt: sub.canceled_at ? new Date(sub.canceled_at * 1000).toISOString() : null,
+        cancelAtPeriodEnd: sub.cancel_at_period_end || false,
         created: new Date(sub.created * 1000).toISOString(),
         subId: sub.id
       });
