@@ -2796,10 +2796,14 @@ client.on('messageReactionAdd', async (reaction, user) => {
           const { handleApprovalReaction } = require('./services/oracleXEngine');
           const result = await handleApprovalReaction(msg.id, emoji);
           if (result) {
-            const reply = result.action === 'approved'
-              ? '✅ Approved — will post within the hour.'
-              : '❌ Rejected — Oracle stays quiet today.';
-            await msg.reply(reply);
+            if (result.action === 'approved') {
+              await msg.reply('✅ Approved — will post within the hour.');
+            } else if (result.action === 'rejected' && result.replacement) {
+              await msg.reply('❌ Rejected — generating a new one...');
+              // New DM with replacement will be sent automatically by generateXPost
+            } else {
+              await msg.reply('❌ Rejected — hit daily cap, Oracle stays quiet today.');
+            }
             return; // Handled — don't fall through to knowledge ingestion
           }
         } catch (err) {

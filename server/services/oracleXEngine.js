@@ -28,11 +28,20 @@ async function generateXPost() {
     todayStart.setHours(0, 0, 0, 0);
     const existingToday = await OracleXQueue.findOne({
       createdAt: { $gte: todayStart },
-      status: { $in: ['pending', 'approved', 'posted'] }
+      status: { $in: ['pending', 'approved'] }
     }).lean();
 
     if (existingToday) {
-      console.log('[OracleX] Already generated a post today — skipping');
+      console.log('[OracleX] Already have a pending/approved post today — skipping');
+      return null;
+    }
+
+    // Safety cap: max 3 generations per day (prevents infinite reject loops)
+    const todayCount = await OracleXQueue.countDocuments({
+      createdAt: { $gte: todayStart }
+    });
+    if (todayCount >= 3) {
+      console.log('[OracleX] Hit daily generation cap (3) — skipping');
       return null;
     }
 
@@ -210,8 +219,14 @@ async function handleApprovalReaction(messageId, emoji) {
       entry.status = 'rejected';
       entry.rejectedAt = new Date();
       await entry.save();
-      console.log(`[OracleX] Post rejected`);
-      return { action: 'rejected' };
+      console.log(`[OracleX] Post rejected — auto-generating replacement`);
+
+      // Auto-generate a new one
+      const replacement = await generateXPost();
+      return { 
+        action: 'rejected', 
+        replacement: replacement ? replacement.text : null 
+      };
     }
 
     return null;
