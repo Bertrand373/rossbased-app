@@ -100,6 +100,10 @@ REMEMBER: UNDER 270 CHARACTERS TOTAL. One to three sentences max. Respond with O
 
       tweetText = response.content[0].text.trim().replace(/^["']|["']$/g, '');
 
+      // Hard strip AI tells — no dashes or semicolons ever
+      tweetText = tweetText.replace(/—/g, '.').replace(/–/g, '.').replace(/;/g, '.');
+      tweetText = tweetText.replace(/\.\./g, '.').replace(/\. \./g, '.');
+
       if (tweetText.length <= 280) break;
       console.log(`[OracleX] Attempt ${attempt}: ${tweetText.length} chars (too long), retrying...`);
     }
