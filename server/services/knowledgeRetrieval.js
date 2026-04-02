@@ -1,8 +1,11 @@
 // server/services/knowledgeRetrieval.js
 // RAG retrieval service used by Discord bot and in-app Oracle
-// Searches knowledge base and returns formatted context for injection
+// PRIMARY: Atlas vector search (semantic similarity via embeddings)
+// FALLBACK: MongoDB text search + regex (keyword matching)
+// Gracefully degrades if OpenAI key not set or vector index not ready
 
 const KnowledgeChunk = require('../models/KnowledgeChunk');
+const { generateEmbedding, isVectorSearchEnabled } = require('./embeddings');
 
 /**
  * Search the knowledge base for relevant chunks
@@ -22,40 +25,20 @@ const retrieveKnowledge = async (query, options = {}) => {
 
     let results = [];
 
-    // Primary: MongoDB text search
-    try {
-      results = await KnowledgeChunk.find(
-        { enabled: true, $text: { $search: query } },
-        { score: { $meta: 'textScore' } }
-      )
-        .sort({ score: { $meta: 'textScore' } })
-        .limit(limit)
-        .select('content source category author protected score')
-        .lean();
-    } catch (err) {
-      // Text index might not exist yet, fall through to regex
+    // === PRIMARY: Vector search (semantic similarity) ===
+    if (isVectorSearchEnabled()) {
+      try {
+        results = await vectorSearch(query, limit);
+      } catch (vecErr) {
+        // Vector search failed (index not created yet, API hiccup, etc.)
+        // Fall through silently to text search
+        console.warn('Vector search failed, falling back to text search:', vecErr.message);
+      }
     }
 
-    // Fallback: regex search if text search returns nothing
+    // === FALLBACK: Text search if vector returned nothing ===
     if (results.length === 0) {
-      const words = query.toLowerCase()
-        .split(/\s+/)
-        .filter(w => w.length > 2)
-        .slice(0, 5); // Limit to 5 key words
-
-      if (words.length > 0) {
-        const orConditions = words.map(w => ({
-          content: { $regex: w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' }
-        }));
-
-        results = await KnowledgeChunk.find({
-          enabled: true,
-          $or: orConditions
-        })
-          .limit(limit)
-          .select('content source category author protected')
-          .lean();
-      }
+      results = await textSearch(query, limit);
     }
 
     if (results.length === 0) return '';
@@ -102,5 +85,94 @@ const retrieveKnowledge = async (query, options = {}) => {
     return ''; // Fail silently, Oracle still works without RAG
   }
 };
+
+/**
+ * Vector search using Atlas $vectorSearch aggregation
+ * Requires: embedding field on chunks + vector_index in Atlas
+ */
+async function vectorSearch(query, limit) {
+  const queryEmbedding = await generateEmbedding(query);
+  if (!queryEmbedding) return [];
+
+  try {
+    const results = await KnowledgeChunk.aggregate([
+      {
+        $vectorSearch: {
+          index: 'vector_index',
+          path: 'embedding',
+          queryVector: queryEmbedding,
+          numCandidates: limit * 10,
+          limit: limit,
+          filter: { enabled: true }
+        }
+      },
+      {
+        $project: {
+          content: 1,
+          source: 1,
+          category: 1,
+          author: 1,
+          protected: 1,
+          score: { $meta: 'vectorSearchScore' }
+        }
+      }
+    ]);
+
+    return results;
+  } catch (err) {
+    // Atlas vector index might not exist yet — not an error, just fall back
+    if (err.codeName === 'AtlasSearchNotAvailable' || err.message?.includes('vector')) {
+      console.warn('Atlas vector search not available — using text search fallback');
+      return [];
+    }
+    throw err; // Rethrow unexpected errors
+  }
+}
+
+/**
+ * Text search fallback — MongoDB text index + regex
+ * Same as original implementation (proven, reliable)
+ */
+async function textSearch(query, limit) {
+  let results = [];
+
+  // Primary: MongoDB text search
+  try {
+    results = await KnowledgeChunk.find(
+      { enabled: true, $text: { $search: query } },
+      { score: { $meta: 'textScore' } }
+    )
+      .sort({ score: { $meta: 'textScore' } })
+      .limit(limit)
+      .select('content source category author protected score')
+      .lean();
+  } catch (err) {
+    // Text index might not exist yet, fall through to regex
+  }
+
+  // Fallback: regex search if text search returns nothing
+  if (results.length === 0) {
+    const words = query.toLowerCase()
+      .split(/\s+/)
+      .filter(w => w.length > 2)
+      .slice(0, 5);
+
+    if (words.length > 0) {
+      const orConditions = words.map(w => ({
+        content: { $regex: w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' }
+      }));
+
+      results = await KnowledgeChunk.find({
+        enabled: true,
+        $or: orConditions
+      })
+        .limit(limit)
+        .select('content source category author protected')
+        .lean();
+    }
+  }
+
+  return results;
+}
 
 module.exports = { retrieveKnowledge };

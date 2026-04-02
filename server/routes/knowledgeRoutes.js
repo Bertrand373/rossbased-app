@@ -7,6 +7,7 @@ const router = express.Router();
 const multer = require('multer');
 const KnowledgeChunk = require('../models/KnowledgeChunk');
 const { randomUUID } = require('crypto');
+const { generateEmbedding, isVectorSearchEnabled } = require('../services/embeddings');
 
 // File upload config - store in memory for processing
 const upload = multer({
@@ -234,6 +235,21 @@ router.post('/ingest/text', adminCheck, async (req, res) => {
 
     await KnowledgeChunk.insertMany(docs);
 
+    // Auto-embed new chunks for vector search (fire-and-forget)
+    if (isVectorSearchEnabled()) {
+      (async () => {
+        for (const doc of docs) {
+          try {
+            const saved = await KnowledgeChunk.findOne({ parentId, chunkIndex: doc.chunkIndex });
+            if (saved) {
+              const vec = await generateEmbedding(doc.content);
+              if (vec) await KnowledgeChunk.findByIdAndUpdate(saved._id, { embedding: vec });
+            }
+          } catch (embErr) { /* non-blocking */ }
+        }
+      })();
+    }
+
     res.json({
       success: true,
       parentId,
@@ -309,6 +325,21 @@ router.post('/ingest/url', adminCheck, async (req, res) => {
 
     await KnowledgeChunk.insertMany(docs);
 
+    // Auto-embed new chunks for vector search (fire-and-forget)
+    if (isVectorSearchEnabled()) {
+      (async () => {
+        for (const doc of docs) {
+          try {
+            const saved = await KnowledgeChunk.findOne({ parentId, chunkIndex: doc.chunkIndex });
+            if (saved) {
+              const vec = await generateEmbedding(doc.content);
+              if (vec) await KnowledgeChunk.findByIdAndUpdate(saved._id, { embedding: vec });
+            }
+          } catch (embErr) { /* non-blocking */ }
+        }
+      })();
+    }
+
     res.json({
       success: true,
       parentId,
@@ -374,6 +405,21 @@ router.post('/ingest/file', adminCheck, upload.single('file'), async (req, res) 
     }));
 
     await KnowledgeChunk.insertMany(docs);
+
+    // Auto-embed new chunks for vector search (fire-and-forget)
+    if (isVectorSearchEnabled()) {
+      (async () => {
+        for (const doc of docs) {
+          try {
+            const saved = await KnowledgeChunk.findOne({ parentId, chunkIndex: doc.chunkIndex });
+            if (saved) {
+              const vec = await generateEmbedding(doc.content);
+              if (vec) await KnowledgeChunk.findByIdAndUpdate(saved._id, { embedding: vec });
+            }
+          } catch (embErr) { /* non-blocking */ }
+        }
+      })();
+    }
 
     res.json({
       success: true,

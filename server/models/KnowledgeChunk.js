@@ -86,6 +86,14 @@ const knowledgeChunkSchema = new mongoose.Schema({
   protected: {
     type: Boolean,
     default: false
+  },
+
+  // Vector embedding for semantic search (1536 dimensions, OpenAI text-embedding-3-small)
+  // Generated on ingestion and by backfill script. Null = not yet embedded.
+  embedding: {
+    type: [Number],
+    default: null,
+    select: false  // Don't return embeddings in normal queries (saves bandwidth)
   }
   
 }, {

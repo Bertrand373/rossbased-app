@@ -1039,6 +1039,64 @@ async function buildOracleContext(user, timezone) {
     }
   }
 
+  // --- STREAK HISTORY PATTERNS (relapse patterns, trajectory, triggers) ---
+  try {
+    const streakHistory = user.streakHistory || [];
+    const pastRelapses = streakHistory.filter(s => s.reason === 'relapse');
+
+    if (pastRelapses.length >= 2) {
+      const streakLengths = pastRelapses.map(r => r.days || 0).filter(d => d > 0);
+      const avgStreak = Math.round(streakLengths.reduce((a, b) => a + b, 0) / streakLengths.length);
+
+      // Are streaks getting longer over time?
+      let trajectory = 'stable';
+      if (streakLengths.length >= 3) {
+        const firstHalf = streakLengths.slice(0, Math.floor(streakLengths.length / 2));
+        const secondHalf = streakLengths.slice(Math.floor(streakLengths.length / 2));
+        const firstAvg = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
+        const secondAvg = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
+        if (secondAvg > firstAvg + 2) trajectory = 'improving';
+        else if (secondAvg < firstAvg - 2) trajectory = 'declining';
+      }
+
+      lines.push('');
+      lines.push(`STREAK HISTORY: ${pastRelapses.length} past relapses. Average streak before relapse: ${avgStreak} days. Trajectory: ${trajectory}.`);
+
+      // Danger zone — most common relapse range
+      const ranges = { '1-7': 0, '8-14': 0, '15-30': 0, '31-60': 0, '60+': 0 };
+      streakLengths.forEach(d => {
+        if (d <= 7) ranges['1-7']++;
+        else if (d <= 14) ranges['8-14']++;
+        else if (d <= 30) ranges['15-30']++;
+        else if (d <= 60) ranges['31-60']++;
+        else ranges['60+']++;
+      });
+      const dangerZone = Object.entries(ranges).reduce((max, [r, c]) => c > max.count ? { range: r, count: c } : max, { range: '', count: 0 });
+      if (dangerZone.count >= 2) {
+        lines.push(`Danger zone: Days ${dangerZone.range} (${dangerZone.count} of ${pastRelapses.length} relapses occurred here).`);
+        // Alert if currently in danger zone
+        if (streak > 0) {
+          const [lo, hi] = dangerZone.range.split('-').map(s => parseInt(s.replace('+', '')));
+          if (streak >= lo && (isNaN(hi) || streak <= hi)) {
+            lines.push(`⚠️ User is CURRENTLY in their personal danger zone.`);
+          }
+        }
+      }
+
+      // Top triggers
+      const triggers = {};
+      pastRelapses.forEach(r => {
+        if (r.trigger) triggers[r.trigger] = (triggers[r.trigger] || 0) + 1;
+      });
+      const topTriggers = Object.entries(triggers).sort((a, b) => b[1] - a[1]).slice(0, 3);
+      if (topTriggers.length > 0) {
+        lines.push(`Top triggers: ${topTriggers.map(([t, c]) => `${t} (${c}x)`).join(', ')}.`);
+      }
+    }
+  } catch (shErr) {
+    // Non-blocking — streak history is enhancement
+  }
+
   // --- BENEFIT TRENDS (last 7 days vs prior 7 days) ---
   if (user.benefitTracking && user.benefitTracking.length >= 3) {
     const sorted = [...user.benefitTracking]
@@ -1889,7 +1947,12 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       }
     }
 
-    const systemWithKnowledge = systemPrompt + dateContext + knowledgeManifest + communityContext + redditContext + outcomeContext + ragContext + limitNudgeContext;
+    // Prompt caching: static Oracle personality is cached (90% savings on repeat calls)
+    // Dynamic per-user context is NOT cached (changes every request)
+    const systemWithKnowledge = [
+      { type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } },
+      { type: 'text', text: dateContext + knowledgeManifest + communityContext + redditContext + outcomeContext + ragContext + limitNudgeContext }
+    ];
 
     // Set up SSE headers
     res.setHeader('Content-Type', 'text/event-stream');
