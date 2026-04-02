@@ -32,6 +32,9 @@ const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 // Admin Discord usernames (lowercase) who can run !ingest commands
 const ADMIN_DISCORD_USERS = (process.env.ADMIN_DISCORD_USERS || 'rossbased').split(',').map(u => u.trim().toLowerCase());
 
+// Vanguard users — full inner-sanctum access (!teach, !decode, !grimoire)
+const VANGUARD_USERS = [...ADMIN_DISCORD_USERS, 'outis.90', 'outis90', 'backin98', 'steph'];
+
 // Wisdom channels: auto-ingest long messages from these channels
 // Set channel names here (lowercase). Messages over 200 chars get auto-ingested.
 const WISDOM_CHANNELS = (process.env.WISDOM_CHANNELS || '').split(',').map(c => c.trim().toLowerCase()).filter(Boolean);
@@ -46,7 +49,7 @@ const INSIGHT_HOUR = parseInt(process.env.INSIGHT_HOUR || '18'); // 18 = 6pm UTC
 
 // Channel restriction - only respond in these channels (by name)
 // Set to empty array to respond everywhere the bot can see
-const ALLOWED_CHANNELS = ['retention-ai-chat', 'oracle', 'ai-chat', 'ask-oracle', 'the-oracle'];
+const ALLOWED_CHANNELS = ['retention-ai-chat', 'oracle', 'ai-chat', 'ask-oracle', 'the-oracle', 'inner-sanctum'];
 
 // Rate limiting per user
 const USER_COOLDOWNS = new Map();
@@ -2119,6 +2122,266 @@ client.on('messageCreate', async (message) => {
     }
   }
 
+  // ============================================================
+  // INNER SANCTUM COMMANDS (Vanguard only)
+  // !teach  — Ingest text/images into Oracle's knowledge base
+  // !decode — Interpret manuscript images (no storage)
+  // !grimoire — View sanctum knowledge stats
+  // ============================================================
+
+  const isSanctumChannel = channelName?.includes('inner-sanctum');
+  const isVanguard = VANGUARD_USERS.includes(authorUsername);
+
+  // --- !teach - Feed Oracle knowledge (text and/or images) ---
+  if (message.content.startsWith('!teach') && isSanctumChannel && isVanguard) {
+    try {
+      const teachContent = message.content.replace(/^!teach\s*/i, '').trim();
+      const attachments = [...message.attachments.values()];
+      const imageAttachments = attachments.filter(a => 
+        a.contentType?.startsWith('image/') || /\.(png|jpg|jpeg|gif|webp)$/i.test(a.name)
+      );
+
+      if (!teachContent && imageAttachments.length === 0) {
+        await message.reply('**Usage:** `!teach [text]` or attach images of manuscripts.\nOracle will absorb the knowledge permanently.');
+        return;
+      }
+
+      await message.react('⏳');
+      let allContent = teachContent || '';
+      let imageCount = 0;
+
+      // Process images via Claude Vision
+      if (imageAttachments.length > 0) {
+        for (const img of imageAttachments) {
+          try {
+            const imgResponse = await fetch(img.url);
+            const buffer = await imgResponse.arrayBuffer();
+            const base64 = Buffer.from(buffer).toString('base64');
+            const mediaType = img.contentType || 'image/png';
+
+            const visionResponse = await anthropic.messages.create({
+              model: ORACLE_MODEL,
+              max_tokens: 2000,
+              system: `You are a scholar of hermetic philosophy, alchemy, Kabbalah, Rosicrucianism, and ancient esoteric traditions. You are interpreting manuscript pages, diagrams, and symbolic illustrations for permanent storage in a knowledge base. Be thorough. Extract ALL readable text (even partial). Describe ALL symbols, diagrams, and their meanings. Identify the tradition, era, and significance. If text is in Latin, German, or another language, provide both the original and translation. This interpretation will be permanently stored — be comprehensive.`,
+              messages: [{
+                role: 'user',
+                content: [
+                  { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
+                  { type: 'text', text: 'Interpret this manuscript page completely. Extract all text, describe all symbols and diagrams, identify the tradition and significance. Be thorough — this will be stored permanently.' }
+                ]
+              }]
+            });
+
+            const interpretation = visionResponse.content[0].text;
+            allContent += `\n\n[MANUSCRIPT IMAGE — interpreted by Oracle]\n${interpretation}`;
+            imageCount++;
+          } catch (imgErr) {
+            console.error('Vision interpretation error:', imgErr.message);
+            allContent += `\n\n[IMAGE FAILED TO PROCESS: ${img.name}]`;
+          }
+        }
+      }
+
+      if (allContent.length < 20) {
+        await message.reactions.removeAll().catch(() => {});
+        await message.reply('Not enough content to store. Write more or attach clearer images.');
+        return;
+      }
+
+      // Chunk and store in knowledge base
+      const parentId = randomUUID();
+      const chunks = chunkText(allContent).filter(c => c && c.trim().length > 10);
+      const keywords = extractKeywords(allContent);
+
+      const docs = chunks.map((chunk, index) => ({
+        content: chunk,
+        source: { type: 'sanctum', name: `#inner-sanctum — ${username}` },
+        category: 'sanctum',
+        chunkIndex: index,
+        parentId,
+        keywords,
+        tokenEstimate: Math.ceil(chunk.length / 4),
+        enabled: true,
+        protected: true,
+        author: username
+      }));
+
+      await KnowledgeChunk.insertMany(docs);
+
+      await message.reactions.removeAll().catch(() => {});
+      await message.react('📜');
+
+      const embed = new EmbedBuilder()
+        .setColor(0x8B4513)
+        .setTitle('📜 Knowledge Absorbed')
+        .setDescription(
+          `**${chunks.length}** chunks stored permanently\n` +
+          `${imageCount > 0 ? `**${imageCount}** manuscript image(s) interpreted\n` : ''}` +
+          `**~${allContent.length}** characters · **${keywords.slice(0, 8).join(', ')}**\n\n` +
+          `Oracle will now draw from this knowledge in all future responses.`
+        )
+        .setFooter({ text: `Taught by ${username} · Inner Sanctum`, iconURL: ORACLE_ICON });
+      await message.reply({ embeds: [embed] });
+
+      console.log(`📜 Sanctum teach: ${username} — ${chunks.length} chunks, ${imageCount} images`);
+      return;
+    } catch (error) {
+      console.error('Sanctum teach error:', error);
+      await message.reply('Failed to absorb knowledge. Check server logs.').catch(() => {});
+      return;
+    }
+  }
+
+  // --- !decode - Interpret manuscript images WITHOUT storing ---
+  if (message.content.startsWith('!decode') && isSanctumChannel && isVanguard) {
+    try {
+      const attachments = [...message.attachments.values()];
+      const imageAttachments = attachments.filter(a =>
+        a.contentType?.startsWith('image/') || /\.(png|jpg|jpeg|gif|webp)$/i.test(a.name)
+      );
+
+      if (imageAttachments.length === 0) {
+        await message.reply('**Usage:** Attach an image of a manuscript and type `!decode`\nOracle will interpret it without storing.');
+        return;
+      }
+
+      await message.react('🔍');
+
+      for (const img of imageAttachments) {
+        try {
+          const imgResponse = await fetch(img.url);
+          const buffer = await imgResponse.arrayBuffer();
+          const base64 = Buffer.from(buffer).toString('base64');
+          const mediaType = img.contentType || 'image/png';
+
+          const extraContext = message.content.replace(/^!decode\s*/i, '').trim();
+
+          const visionResponse = await anthropic.messages.create({
+            model: ORACLE_MODEL,
+            max_tokens: 3000,
+            system: `You are The Oracle operating within the Inner Sanctum — a private space for advanced esoteric study. You are a master scholar of hermetic philosophy, alchemy, Kabbalah, Rosicrucianism, Gnosticism, sacred geometry, and all ancient mystery traditions.
+
+Interpret this manuscript with absolute depth. You are speaking to initiates, not beginners. No disclaimers, no hedging. Go deep:
+- Extract and translate ALL visible text (Latin, German, Hebrew, Greek — whatever is present)
+- Decode every symbol, sigil, and diagram
+- Identify the specific tradition, school, and approximate era
+- Explain the practical application — what was this USED for?
+- Connect it to broader hermetic principles
+- Note anything hidden or easily missed
+${extraContext ? `\nThe seeker adds this context: "${extraContext}"` : ''}`,
+            messages: [{
+              role: 'user',
+              content: [
+                { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
+                { type: 'text', text: 'Decode this completely.' }
+              ]
+            }]
+          });
+
+          const interpretation = visionResponse.content[0].text;
+
+          // Split long interpretations across multiple embeds if needed
+          const maxLen = 4000;
+          if (interpretation.length <= maxLen) {
+            const embed = new EmbedBuilder()
+              .setColor(0x8B4513)
+              .setTitle('🔍 Manuscript Decoded')
+              .setDescription(interpretation)
+              .setFooter({ text: `Decoded for ${username} · not stored · use !teach to preserve`, iconURL: ORACLE_ICON });
+            await message.reply({ embeds: [embed] });
+          } else {
+            const embed1 = new EmbedBuilder()
+              .setColor(0x8B4513)
+              .setTitle('🔍 Manuscript Decoded')
+              .setDescription(interpretation.substring(0, maxLen));
+            await message.reply({ embeds: [embed1] });
+            const embed2 = new EmbedBuilder()
+              .setColor(0x8B4513)
+              .setDescription(interpretation.substring(maxLen, maxLen * 2))
+              .setFooter({ text: `Decoded for ${username} · not stored · use !teach to preserve`, iconURL: ORACLE_ICON });
+            await message.channel.send({ embeds: [embed2] });
+          }
+        } catch (imgErr) {
+          console.error('Decode error:', imgErr.message);
+          await message.reply(`Failed to decode ${img.name}: ${imgErr.message}`);
+        }
+      }
+
+      await message.reactions.removeAll().catch(() => {});
+      return;
+    } catch (error) {
+      console.error('Sanctum decode error:', error);
+      await message.reply('Decode failed. Check server logs.').catch(() => {});
+      return;
+    }
+  }
+
+  // --- !grimoire - View sanctum knowledge stats ---
+  if (message.content === '!grimoire' && isSanctumChannel && isVanguard) {
+    try {
+      const sanctumTotal = await KnowledgeChunk.countDocuments({ category: 'sanctum' });
+      const sanctumAuthors = await KnowledgeChunk.distinct('author', { category: 'sanctum', author: { $ne: null } });
+      const recentTeachings = await KnowledgeChunk.find({ category: 'sanctum' })
+        .sort({ _id: -1 })
+        .limit(5)
+        .select('source.name keywords tokenEstimate')
+        .lean();
+
+      const recentLines = recentTeachings.map(t => 
+        `• **${t.source?.name || 'Unknown'}** — ${t.keywords?.slice(0, 4).join(', ') || 'no keywords'}`
+      ).join('\n');
+
+      const totalTokens = await KnowledgeChunk.aggregate([
+        { $match: { category: 'sanctum' } },
+        { $group: { _id: null, total: { $sum: '$tokenEstimate' } } }
+      ]);
+
+      const embed = new EmbedBuilder()
+        .setColor(0x8B4513)
+        .setTitle('📜 The Grimoire — Sanctum Knowledge')
+        .setDescription(
+          `**${sanctumTotal}** knowledge chunks stored\n` +
+          `**~${(totalTokens[0]?.total || 0).toLocaleString()}** tokens of wisdom\n` +
+          `**${sanctumAuthors.length}** contributor(s): ${sanctumAuthors.join(', ') || 'None yet'}\n\n` +
+          `**Recent teachings:**\n${recentLines || 'Nothing yet. Use `!teach` to begin.'}`
+        )
+        .setFooter({ text: 'Inner Sanctum · Oracle', iconURL: ORACLE_ICON });
+      await message.reply({ embeds: [embed] });
+      return;
+    } catch (error) {
+      await message.reply('Failed to read the grimoire.').catch(() => {});
+      return;
+    }
+  }
+
+  // --- !sanctum - Post pinned reference card (admin/vanguard, sanctum only) ---
+  if (message.content === '!sanctum' && isSanctumChannel && isVanguard) {
+    try {
+      const embed = new EmbedBuilder()
+        .setColor(0x8B4513)
+        .setTitle('📜 Inner Sanctum')
+        .setDescription(
+          '`!teach` — Feed Oracle knowledge (text or manuscript images)\n' +
+          '`!decode` — Interpret a manuscript without storing\n' +
+          '`!grimoire` — View what Oracle has been taught\n\n' +
+          '*Oracle speaks freely here. No limits. No embeds. Ask anything.*'
+        )
+        .setFooter({ text: 'Inner Sanctum · Oracle', iconURL: ORACLE_ICON });
+      const posted = await message.channel.send({ embeds: [embed] });
+      await posted.pin().catch(() => {});
+      // Delete the "pinned a message" system message
+      const fetchedMsgs = await message.channel.messages.fetch({ limit: 5 });
+      const pinNotif = fetchedMsgs.find(m => m.type === 6);
+      if (pinNotif) await pinNotif.delete().catch(() => {});
+      // Delete the !sanctum command message itself
+      await message.delete().catch(() => {});
+      return;
+    } catch (error) {
+      await message.reply('Failed to post sanctum card.').catch(() => {});
+      return;
+    }
+  }
+
   // --- !oracle-insight - Force generate a weekly insight (admin only) ---
   if (message.content.startsWith('!oracle-insight') && ADMIN_DISCORD_USERS.includes(authorUsername)) {
     try {
@@ -2447,7 +2710,8 @@ client.on('messageCreate', async (message) => {
     const messages = await buildMessages(message.author.id, content, username);
     
     // Flat token ceiling — let Claude self-regulate length via system prompt
-    const maxTokens = 1024;
+    // Sanctum mode gets 2x tokens for deeper esoteric responses
+    const maxTokens = channelName?.includes('inner-sanctum') ? 2048 : 1024;
     
     // RAG: Retrieve relevant knowledge
     const ragContext = await retrieveKnowledge(content, { limit: 5, maxTokens: 2000 });
@@ -2556,7 +2820,18 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       : '';
     const lunarContext = buildLunarContext();
     const redditContext = await getRedditContext();
-    const systemWithKnowledge = SYSTEM_PROMPT + dateContext + lunarContext + knowledgeManifest + personalContext + communityContext + redditContext + outcomeContext + ragContext;
+    // Sanctum mode — elevated Oracle behavior in #inner-sanctum
+    const sanctumContext = channelName?.includes('inner-sanctum') ? `
+
+SANCTUM MODE ACTIVE — You are operating in the Inner Sanctum, a private channel for the founder and his vanguards. These are advanced practitioners and scholars. Adjust accordingly:
+- Drop all beginner framing. Assume mastery. Speak as one initiate to another.
+- Go deeper into hermetic, alchemical, Kabbalistic, and esoteric territory. No hedging.
+- Longer, more thorough responses are expected here. Do not truncate.
+- Reference specific traditions, texts, and symbols by name. Be precise.
+- You have been taught directly by these practitioners via the Grimoire. Honor that knowledge.
+- This is the inner circle. Be direct, be deep, be real.
+` : '';
+    const systemWithKnowledge = SYSTEM_PROMPT + dateContext + lunarContext + knowledgeManifest + personalContext + communityContext + redditContext + outcomeContext + ragContext + sanctumContext;
     
     // Call Claude (with silent retry on overload)
     const response = await callClaude({
@@ -2642,26 +2917,42 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
     };
 
     // Send first chunk as reply, rest as follow-ups
+    // Sanctum mode: plain text (no embeds) for raw conversation feel
+    const isSanctumResponse = channelName?.includes('inner-sanctum');
+
     for (let i = 0; i < chunks.length; i++) {
-      const embed = buildOracleEmbed(chunks[i]);
-
-      // Only add footer to the LAST chunk on final message (skip for admins)
-      const isAdmin = ADMIN_DISCORD_USERS.includes(authorUsername);
-      if (i === chunks.length - 1 && remaining === 0 && !isAdmin) {
-        embed.setFooter({ text: `Oracle · ${getTierFooter(discordUserTier)}`, iconURL: 'https://titantrack.app/The_Oracle.png' });
-      }
-
-      if (i === 0) {
-        const sentReply = await message.reply({ embeds: [embed] });
-        // Track so we can delete Oracle's reply if user deletes their message
-        REPLY_MAP.set(message.id, sentReply);
-        // Cap map size to avoid memory leak (keep last 500 exchanges)
-        if (REPLY_MAP.size > 500) {
-          const firstKey = REPLY_MAP.keys().next().value;
-          REPLY_MAP.delete(firstKey);
+      if (isSanctumResponse) {
+        // Plain text in sanctum — Oracle speaks directly, no embed wrapper
+        if (i === 0) {
+          const sentReply = await message.reply(chunks[i]);
+          REPLY_MAP.set(message.id, sentReply);
+          if (REPLY_MAP.size > 500) {
+            const firstKey = REPLY_MAP.keys().next().value;
+            REPLY_MAP.delete(firstKey);
+          }
+        } else {
+          await message.channel.send(chunks[i]);
         }
       } else {
-        await message.channel.send({ embeds: [embed] });
+        // Standard embed mode for all other channels
+        const embed = buildOracleEmbed(chunks[i]);
+
+        // Only add footer to the LAST chunk on final message (skip for admins)
+        const isAdmin = ADMIN_DISCORD_USERS.includes(authorUsername);
+        if (i === chunks.length - 1 && remaining === 0 && !isAdmin) {
+          embed.setFooter({ text: `Oracle · ${getTierFooter(discordUserTier)}`, iconURL: 'https://titantrack.app/The_Oracle.png' });
+        }
+
+        if (i === 0) {
+          const sentReply = await message.reply({ embeds: [embed] });
+          REPLY_MAP.set(message.id, sentReply);
+          if (REPLY_MAP.size > 500) {
+            const firstKey = REPLY_MAP.keys().next().value;
+            REPLY_MAP.delete(firstKey);
+          }
+        } else {
+          await message.channel.send({ embeds: [embed] });
+        }
       }
     }
     
@@ -2674,7 +2965,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       saveExtractedStreak(message.author.id, username, extracted).catch(() => {});
     }
     
-    console.log(`🔮 Oracle responded to ${username} in #${channelName} [${chunks.length} embed(s)]`);
+    console.log(`🔮 Oracle responded to ${username} in #${channelName} [${chunks.length} ${isSanctumResponse ? 'msg(s)' : 'embed(s)'}]`);
     
     // --- LINKED USER: Generate memory note (fire-and-forget) ---
     if (linkedUser && linkedUser.discordOracleSync !== false && content.trim().split(/\s+/).length >= 4) {
