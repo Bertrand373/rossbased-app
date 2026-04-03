@@ -414,13 +414,13 @@ async function generateObservation(primaryTrigger, allTriggers, avoidTopics) {
 ## YOUR TASK
 Generate TWO versions of the same thought:
 
-1. HEADLINE: Oracle thinking out loud. Two sentences, 25 words max total. This appears on the app home screen. It should make a man pause and reflect. The data tells you what to think about. The thought is what gets spoken. Never expose raw numbers, percentages, or metrics.
+1. HEADLINE: A single provocation. One sentence, 15 words max. This appears on the app home screen above a tap-to-read body. It is NOT a preview or summary of the body. It's a separate, enigmatic thought that makes a man stop and tap. The sentence Oracle would say if it only had one breath. Cryptic is fine. Blunt is fine. Never expose raw numbers, percentages, or metrics.
 
 2. BODY: A fuller version of the same thought for the Discord community (80-120 words). Not a data report. Not a community update. Oracle processing what it has observed and arriving at something true. Write like a man who has watched a thousand men walk this path and has something real to say about it.
 
 ## FORMAT
 Respond in exactly this format:
-HEADLINE: [your 25-word-max thought]
+HEADLINE: [your 15-word-max provocation]
 BODY: [your 80-120 word thought]
 
 ## VOICE RULES
@@ -463,11 +463,11 @@ Generate the observation now.`
     let headline = headlineMatch[1].trim().replace(/^["']|["']$/g, '');
     let body = bodyMatch[1].trim().replace(/^["']|["']$/g, '');
 
-    // Clean headline: enforce 25-word cap, strip banned chars
+    // Clean headline: enforce 15-word cap, strip banned chars
     headline = headline.replace(/—/g, ',').replace(/–/g, ',').replace(/;/g, ',');
     const headlineWords = headline.split(/\s+/);
-    if (headlineWords.length > 25) {
-      headline = headlineWords.slice(0, 25).join(' ');
+    if (headlineWords.length > 15) {
+      headline = headlineWords.slice(0, 15).join(' ');
       if (!/[.!?]$/.test(headline)) headline += '.';
     }
 
