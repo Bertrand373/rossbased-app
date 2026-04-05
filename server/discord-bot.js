@@ -15,6 +15,7 @@ const { getRedditContext } = require('./services/redditContext');
 const { getOutcomePatterns } = require('./services/outcomeAggregation');
 const { buildLunarContext } = require('./utils/lunarData');
 const { classifyInteraction } = require('./services/interactionClassifier');
+const { handleAgentCommand, handleAgentReaction, registerEmailAgentCron } = require('./services/emailAgentDiscord');
 const KnowledgeChunk = require('./models/KnowledgeChunk');
 const OracleUsage = require('./models/OracleUsage');
 const DiscordMemory = require('./models/DiscordMemory');
@@ -1084,7 +1085,7 @@ const splitResponse = (text) => {
 // Every DM includes a persistent command footer — no memorization needed.
 // ============================================================
 
-const ADMIN_DM_FOOTER = '!status · !revenue · !users · !pool · !models · !brief · !email · !pulse-stats · !youtube · !content · !announce · !reset-channel #name confirm';
+const ADMIN_DM_FOOTER = '!status · !revenue · !users · !pool · !models · !brief · !email · !agent · !pulse-stats · !youtube · !content · !announce · !reset-channel #name confirm';
 const ORACLE_ICON = 'https://titantrack.app/The_Oracle.png';
 const BRIEFING_HOUR_ET = parseInt(process.env.BRIEFING_HOUR || '9'); // 9am ET default
 
@@ -1290,6 +1291,7 @@ async function handleAdminDM(message) {
       case '!models': return await dmModels(message);
       case '!brief': return await dmBriefing(message);
       case '!email': return await dmEmail(message);
+      case '!agent': return await handleAgentCommand(message, ADMIN_DM_FOOTER);
       case '!pulse-stats': return await dmPulseStats(message);
       case '!youtube': return await dmYouTube(message);
       case '!content': return await dmContent(message);
@@ -3103,6 +3105,15 @@ client.on('messageReactionAdd', async (reaction, user) => {
       }
     }
 
+    // ── Email Agent approval: Ross reacts to agent's DM with ✅ or ❌ ──
+    if (!msg.guild && msg.author.bot && ADMIN_DISCORD_USERS.includes(user.username?.toLowerCase())) {
+      const emoji = reaction.emoji.name;
+      if (emoji === '✅' || emoji === '❌') {
+        const handled = await handleAgentReaction(reaction, user);
+        if (handled) return;
+      }
+    }
+
     // Skip bot messages (for knowledge ingestion below)
     if (msg.author.bot) return;
 
@@ -3458,6 +3469,9 @@ Should Oracle break silence on Discord this week?`
       console.error('[Email] Scheduler error:', err.message);
     }
   }, 60 * 60 * 1000); // Check every hour
+
+  // Register Email Agent autonomous cron (Sunday noon ET)
+  registerEmailAgentCron(client, findAdminMember);
 
   // ============================================================
   // HEALTH MONITOR — Check note generation every 4 hours
