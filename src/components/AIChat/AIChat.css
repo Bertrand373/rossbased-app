@@ -993,3 +993,327 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
 [data-theme="light"] .ai-chat-pin-icon {
   filter: brightness(0.6);
 }
+
+/* =============================================================================
+   TEACH ORACLE BUTTON (admin-only)
+   ============================================================================= */
+
+.ai-chat-teach-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin: 0;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  font-family: inherit;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.ai-chat-teach-btn:active {
+  color: #d4af37;
+}
+
+/* =============================================================================
+   TEACH ORACLE MODAL — On-brand with Oracle eye, gold accents
+   ============================================================================= */
+
+.ai-teach-modal {
+  background: var(--surface-raised, #111);
+  border: 1px solid var(--border, #333);
+  border-radius: 16px;
+  padding: 24px 20px 20px;
+  width: 92%;
+  max-width: 380px;
+  max-height: 80vh;
+  overflow-y: auto;
+  text-align: center;
+  animation: clearScaleIn 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Header — Oracle eye + title with gold dashes */
+
+.ai-teach-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.ai-teach-eye {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  margin-bottom: 10px;
+  opacity: 0.85;
+  transition: all 400ms ease;
+}
+
+.ai-teach-eye-active {
+  opacity: 1;
+  animation: teachEyePulse 1.4s ease-in-out infinite;
+}
+
+.ai-teach-eye-done {
+  opacity: 1;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.6));
+}
+
+@keyframes teachEyePulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.4)); }
+}
+
+.ai-teach-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ai-teach-dash {
+  display: inline-block;
+  width: 16px;
+  height: 2px;
+  background: rgba(212, 175, 55, 0.4);
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.ai-teach-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text, #fff);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* Exchange preview */
+
+.ai-teach-preview {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border, #333);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  max-height: 140px;
+  overflow-y: auto;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  text-align: left;
+}
+
+.ai-teach-preview-msg {
+  margin-bottom: 10px;
+}
+
+.ai-teach-preview-msg:last-child {
+  margin-bottom: 0;
+}
+
+.ai-teach-label {
+  color: rgba(212, 175, 55, 0.6);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 3px;
+}
+
+/* Form inputs */
+
+.ai-teach-input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border, #333);
+  border-radius: 10px;
+  padding: 11px 14px;
+  color: var(--text, #fff);
+  font-size: 0.875rem;
+  font-family: inherit;
+  margin-bottom: 8px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 150ms ease;
+  text-align: left;
+}
+
+.ai-teach-input:focus {
+  border-color: rgba(212, 175, 55, 0.5);
+}
+
+.ai-teach-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.ai-teach-textarea {
+  resize: vertical;
+  min-height: 48px;
+}
+
+.ai-teach-select {
+  appearance: none;
+  cursor: pointer;
+}
+
+/* Dedup — scanning state */
+
+.ai-teach-dedup-checking {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 0;
+  margin-bottom: 12px;
+  color: var(--text-tertiary);
+  font-size: 0.8125rem;
+}
+
+.ai-teach-dedup-eye {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  animation: teachEyePulse 1.4s ease-in-out infinite;
+}
+
+/* Dedup — clear (new to Oracle) */
+
+.ai-teach-dedup-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 0;
+  margin-bottom: 14px;
+  color: rgba(212, 175, 55, 0.7);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Dedup — warning (matches found) */
+
+.ai-teach-dedup-warning {
+  background: rgba(232, 168, 56, 0.06);
+  border: 1px solid rgba(232, 168, 56, 0.2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.ai-teach-dedup-match {
+  background: rgba(0,0,0,0.2);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 8px 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.ai-teach-dedup-source {
+  display: block;
+  color: rgba(212, 175, 55, 0.6);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 3px;
+}
+
+.ai-teach-dedup-hint {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+/* Actions — submit + cancel */
+
+.ai-teach-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 16px;
+  align-items: center;
+}
+
+.ai-teach-submit {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 9999px;
+  border: none;
+  background: #d4af37;
+  color: #000;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 150ms ease, transform 100ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ai-teach-submit:active {
+  transform: scale(0.98);
+}
+
+.ai-teach-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ai-teach-cancel {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-subtle, #333);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ai-teach-cancel:active {
+  transform: scale(0.98);
+}
+
+/* Success state */
+
+.ai-teach-success {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 4px 0;
+  color: #d4af37;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Error */
+
+.ai-teach-error {
+  color: #ff4444;
+  font-size: 0.75rem;
+  margin-top: 2px;
+}

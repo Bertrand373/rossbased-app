@@ -385,6 +385,11 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   const [error, setError] = useState(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [pinnedMessages, setPinnedMessages] = useState(new Map()); // timestamp → pinId
+
+  // --- Teach Oracle (admin-only) ---
+  const [teachModal, setTeachModal] = useState(null); // { userMsg, oracleMsg, existingMatches, checking }
+  const [teachForm, setTeachForm] = useState({ title: '', note: '', category: 'general' });
+  const [teachStatus, setTeachStatus] = useState('idle'); // idle | saving | done | error
   
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -394,6 +399,16 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   const streamingMessageRef = useRef(null);
   const hasScrolledToStreamStart = useRef(false);
   const chatSyncTimer = useRef(null); // Debounced server sync
+
+  // Admin check — only rossbased sees Teach button
+  const isAdmin = (() => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return false;
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return ['rossbased', 'ross'].includes(payload.username?.toLowerCase());
+    } catch { return false; }
+  })();
 
   // Track chat opened (once per open)
   useEffect(() => {
@@ -964,6 +979,82 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   // Gold dash icon for pin toasts (matches app toast system)
   const goldDash = <span style={{ display: 'inline-block', width: 16, height: 3, borderRadius: 2, background: '#d4af37', flexShrink: 0 }} />;
 
+  // Teach Oracle — ingest conversation exchange into knowledge base (admin only)
+  const handleTeachOracle = async (oracleMsg, index) => {
+    let userMsg = '';
+    for (let i = index - 1; i >= 0; i--) {
+      if (messages[i].role === 'user') {
+        userMsg = messages[i].content;
+        break;
+      }
+    }
+    setTeachModal({ userMsg, oracleMsg, existingMatches: null, checking: true });
+    setTeachForm({ title: '', note: '', category: 'general' });
+    setTeachStatus('idle');
+
+    try {
+      const token = localStorage.getItem('token');
+      const searchQuery = oracleMsg.replace(/[#*_`>\-]/g, '').slice(0, 150).trim();
+      const res = await fetch(`${API_URL}/api/knowledge/search?q=${encodeURIComponent(searchQuery)}&limit=3`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const matches = (data.results || []).filter(r => r.content && r.content.length > 30);
+        setTeachModal(prev => prev ? { ...prev, existingMatches: matches, checking: false } : prev);
+      } else {
+        setTeachModal(prev => prev ? { ...prev, existingMatches: [], checking: false } : prev);
+      }
+    } catch {
+      setTeachModal(prev => prev ? { ...prev, existingMatches: [], checking: false } : prev);
+    }
+  };
+
+  const submitTeachOracle = async () => {
+    if (!teachModal || !teachForm.title.trim()) return;
+    setTeachStatus('saving');
+
+    const content = [
+      `[ORACLE INSIGHT — ${new Date().toLocaleDateString()}]`,
+      '',
+      teachModal.userMsg ? `Context (Ross asked): ${teachModal.userMsg}` : '',
+      '',
+      `Oracle's response/conclusion:`,
+      teachModal.oracleMsg,
+      '',
+      teachForm.note ? `Admin note: ${teachForm.note}` : ''
+    ].filter(Boolean).join('\n');
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/knowledge/ingest/text`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: teachForm.title.trim(),
+          content,
+          category: teachForm.category
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setTeachStatus('done');
+        setTimeout(() => setTeachModal(null), 1500);
+        toast('Knowledge ingested', {
+          icon: '🧠',
+          style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' }
+        });
+      } else {
+        setTeachStatus('error');
+      }
+    } catch {
+      setTeachStatus('error');
+    }
+  };
+
   // Pin/Unpin an Oracle message (toggle)
   const handlePinMessage = async (content, timestamp) => {
     const token = localStorage.getItem('token');
@@ -1114,6 +1205,19 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                         </svg>
                         Share
                       </button>
+                      {isAdmin && (
+                        <button
+                          className="ai-chat-teach-btn"
+                          onClick={() => handleTeachOracle(msg.content, index)}
+                          aria-label="Teach Oracle"
+                        >
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                          </svg>
+                          Teach
+                        </button>
+                      )}
                       <button
                         className={`ai-chat-pin-btn${pinnedMessages.has(msg.timestamp) ? ' pinned' : ''}`}
                         onClick={() => handlePinMessage(msg.content, msg.timestamp)}
@@ -1188,6 +1292,120 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                 <div className="ai-clear-actions">
                   <button className="ai-clear-btn-danger" onClick={handleClearChat}>Clear</button>
                   <button className="ai-clear-btn-cancel" onClick={() => setShowClearConfirm(false)}>Cancel</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Teach Oracle Modal (admin only) */}
+          {teachModal && (
+            <div className="ai-clear-overlay" onClick={() => setTeachModal(null)}>
+              <div className="ai-teach-modal" onClick={e => e.stopPropagation()}>
+
+                {/* Branded header — Oracle eye + gold dashes */}
+                <div className="ai-teach-header">
+                  <img src="/The_Oracle.png" alt="" className={`ai-teach-eye${teachStatus === 'saving' ? ' ai-teach-eye-active' : ''}${teachStatus === 'done' ? ' ai-teach-eye-done' : ''}`} />
+                  <div className="ai-teach-title-row">
+                    <span className="ai-teach-dash" />
+                    <h2 className="ai-teach-title">{teachStatus === 'done' ? 'Knowledge Absorbed' : 'Teach Oracle'}</h2>
+                    <span className="ai-teach-dash" />
+                  </div>
+                </div>
+
+                {teachStatus !== 'done' && (
+                  <>
+                    <div className="ai-teach-preview">
+                      {teachModal.userMsg && (
+                        <div className="ai-teach-preview-msg">
+                          <span className="ai-teach-label">You asked</span>
+                          <span>{teachModal.userMsg.length > 200 ? teachModal.userMsg.slice(0, 200) + '...' : teachModal.userMsg}</span>
+                        </div>
+                      )}
+                      <div className="ai-teach-preview-msg">
+                        <span className="ai-teach-label">Oracle said</span>
+                        <span>{teachModal.oracleMsg.length > 300 ? teachModal.oracleMsg.slice(0, 300) + '...' : teachModal.oracleMsg}</span>
+                      </div>
+                    </div>
+
+                    {/* Dedup check — scanning state */}
+                    {teachModal.checking && (
+                      <div className="ai-teach-dedup-checking">
+                        <img src="/The_Oracle.png" alt="" className="ai-teach-dedup-eye" />
+                        <span>Scanning knowledge base...</span>
+                      </div>
+                    )}
+                    {/* Dedup — matches found */}
+                    {!teachModal.checking && teachModal.existingMatches?.length > 0 && (
+                      <div className="ai-teach-dedup-warning">
+                        <span className="ai-teach-label" style={{ color: '#e8a838' }}>Oracle may already know this</span>
+                        {teachModal.existingMatches.map((match, i) => (
+                          <div key={i} className="ai-teach-dedup-match">
+                            <span className="ai-teach-dedup-source">{match.source?.name || 'Unknown source'}</span>
+                            <span>{match.content.slice(0, 150)}...</span>
+                          </div>
+                        ))}
+                        <span className="ai-teach-dedup-hint">You can still teach if this adds new insight.</span>
+                      </div>
+                    )}
+                    {/* Dedup — clear */}
+                    {!teachModal.checking && teachModal.existingMatches?.length === 0 && (
+                      <div className="ai-teach-dedup-clear">
+                        <span className="ai-teach-dash" />
+                        <span>New to Oracle</span>
+                        <span className="ai-teach-dash" />
+                      </div>
+                    )}
+
+                    <input
+                      type="text"
+                      className="ai-teach-input"
+                      placeholder="Title this insight..."
+                      value={teachForm.title}
+                      onChange={e => setTeachForm(f => ({ ...f, title: e.target.value }))}
+                      autoFocus
+                    />
+                    <textarea
+                      className="ai-teach-input ai-teach-textarea"
+                      placeholder="Optional note or context..."
+                      value={teachForm.note}
+                      onChange={e => setTeachForm(f => ({ ...f, note: e.target.value }))}
+                      rows={2}
+                    />
+                    <select
+                      className="ai-teach-input ai-teach-select"
+                      value={teachForm.category}
+                      onChange={e => setTeachForm(f => ({ ...f, category: e.target.value }))}
+                    >
+                      <option value="general">General</option>
+                      <option value="esoteric">Esoteric</option>
+                      <option value="science">Science</option>
+                      <option value="spiritual">Spiritual</option>
+                      <option value="practical">Practical</option>
+                      <option value="transmutation">Transmutation</option>
+                      <option value="kundalini">Kundalini</option>
+                      <option value="community">Community</option>
+                    </select>
+                  </>
+                )}
+
+                <div className="ai-teach-actions">
+                  {teachStatus === 'done' ? (
+                    <button className="ai-teach-cancel" onClick={() => setTeachModal(null)}>Close</button>
+                  ) : (
+                    <>
+                      <button
+                        className="ai-teach-submit"
+                        onClick={submitTeachOracle}
+                        disabled={!teachForm.title.trim() || teachStatus === 'saving'}
+                      >
+                        {teachStatus === 'saving' ? 'Absorbing...' : 'Teach Oracle'}
+                      </button>
+                      <button className="ai-teach-cancel" onClick={() => setTeachModal(null)}>Cancel</button>
+                    </>
+                  )}
+                  {teachStatus === 'error' && (
+                    <span className="ai-teach-error">Failed — try again</span>
+                  )}
                 </div>
               </div>
             </div>
