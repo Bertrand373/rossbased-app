@@ -17,6 +17,58 @@ const CommunityPulse = require('../models/CommunityPulse');
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // ============================================================
+// STYLE ANALYSIS — Tell Oracle what patterns to break
+// ============================================================
+
+function analyzeRecentStyle(texts) {
+  if (!texts || texts.length === 0) return 'No recent posts yet. Write freely.';
+
+  const youStarts = texts.filter(t => /^you\b/i.test(t)).length;
+  const heStarts = texts.filter(t => /^he\b/i.test(t)).length;
+  const theStarts = texts.filter(t => /^the\b/i.test(t)).length;
+  const questionCount = texts.filter(t => t.trim().endsWith('?')).length;
+  const firstPerson = texts.filter(t => /^I\b/.test(t)).length;
+
+  const avgLen = Math.round(texts.reduce((s, t) => s + t.length, 0) / texts.length);
+  const longCount = texts.filter(t => t.length > 200).length;
+  const shortCount = texts.filter(t => t.length < 100).length;
+
+  const openers = texts.slice(0, 5).map(t => t.split(/\s/)[0].toLowerCase());
+
+  const directives = [];
+
+  if (youStarts >= texts.length * 0.5) {
+    directives.push('TOO MANY "You..." openings recently. Use first person, third person, impersonal, or a question instead.');
+  }
+  if (longCount >= texts.length * 0.6) {
+    directives.push(`Recent posts average ${avgLen} chars. Go SHORT this time. Under 100 chars. Terse is better.`);
+  }
+  if (shortCount >= texts.length * 0.6) {
+    directives.push('Recent posts have been short. This one can breathe more if the thought needs it.');
+  }
+  if (heStarts >= 2) {
+    directives.push('Multiple recent "He..." openings. Try a different voice.');
+  }
+  if (questionCount === 0 && texts.length >= 4) {
+    directives.push('No questions in recent posts. Consider asking one.');
+  }
+  if (firstPerson === 0 && texts.length >= 4) {
+    directives.push('Oracle hasn\'t spoken in first person recently. Consider "I..." voice.');
+  }
+
+  const uniqueOpeners = [...new Set(openers)];
+  if (uniqueOpeners.length < openers.length * 0.6) {
+    directives.push(`Recent posts start with: ${openers.join(', ')}. Do NOT start with any of these words.`);
+  }
+
+  if (directives.length === 0) {
+    directives.push('Recent variety is decent. Just make sure this one feels different from the last post.');
+  }
+
+  return 'STYLE DIRECTIVES (based on analysis of your last ' + texts.length + ' posts):\n' + directives.join('\n');
+}
+
+// ============================================================
 // GENERATE — Create a tweet candidate from community data
 // Called daily by cron at 9 AM ET
 // ============================================================
@@ -83,6 +135,9 @@ async function generateXPost() {
 
     const avoidThemes = recentPosts.map(p => p.text).join(' | ');
 
+    // Analyze style patterns so Oracle knows what to break
+    const styleAnalysis = analyzeRecentStyle(recentPosts.map(p => p.text));
+
     // Sonnet synthesizes real-time observation + deep knowledge into a tweet
     // Retry up to 2 times if over 270 chars
     let tweetText = '';
@@ -124,6 +179,8 @@ TONE (pick one):
 - Matter of fact. Just reporting what it saw.
 
 Do NOT default to the same mode every time. The last 15 posts are shown below so you can see what patterns to BREAK. If recent posts are all second-person paragraph-length observations, do something completely different.
+
+${styleAnalysis}
 
 SR VOCABULARY: flatlines, transmutation, Jing, wet dreams, urges, aura, lunar cycles, chrism, kundalini. Use naturally when relevant. Speak from inside the framework, not about it.
 
