@@ -3,14 +3,13 @@
 // Runs on a cron (every 6 hours) to keep community intelligence fresh
 //
 // APPROACH (updated April 2026):
-// Reddit blocked new API app creation and 403s unauthenticated .json requests.
-// Solution: RSS feeds for post discovery + old.reddit.com JSON for comments.
-// RSS feeds are officially supported and don't require authentication.
-// old.reddit.com JSON endpoints still work with a browser-like User-Agent.
+// Reddit blocked new API app creation and 403s bot-style requests.
+// Solution: old.reddit.com JSON endpoints with browser-like headers.
+// Fallback chain: old.reddit.com → www.reddit.com
 //
 // Flow:
-// 1. Fetch hot posts from r/semenretention via RSS feed (.rss endpoint)
-// 2. For each new post, fetch top 5 comments via old.reddit.com JSON
+// 1. Fetch hot posts from r/semenretention via old.reddit.com JSON
+// 2. For each new post, fetch top 5 comments
 // 3. Store in RedditPost collection (skip duplicates via redditId)
 // 4. Once per day, generate a Haiku summary of recent themes
 
@@ -20,161 +19,80 @@ const SUBREDDIT = 'semenretention';
 const POSTS_PER_FETCH = 25;
 const COMMENTS_PER_POST = 5;
 
-// Browser-like UA — Reddit blocks bot-style user agents on old.reddit.com
-const BROWSER_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+// Browser-like headers — Reddit blocks bot-style user agents
+const BROWSER_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,application/json;q=0.8,*/*;q=0.7',
+  'Accept-Language': 'en-US,en;q=0.9',
+  'DNT': '1',
+  'Connection': 'keep-alive',
+  'Sec-Fetch-Dest': 'document',
+  'Sec-Fetch-Mode': 'navigate',
+  'Sec-Fetch-Site': 'none',
+  'Sec-Fetch-User': '?1',
+  'Cache-Control': 'max-age=0',
+};
 
 /**
- * Fetch JSON from old.reddit.com with browser-like headers
- * Used for comment fetching (RSS doesn't include comments)
+ * Try fetching JSON from multiple Reddit domains with fallbacks
+ * Logs detailed info for debugging blocked requests
  */
-async function oldRedditFetch(url) {
-  const response = await fetch(url, {
-    headers: {
-      'User-Agent': BROWSER_UA,
-      'Accept': 'application/json',
-      'Accept-Language': 'en-US,en;q=0.9',
+async function redditJsonFetch(path) {
+  const endpoints = [
+    `https://old.reddit.com${path}`,
+    `https://www.reddit.com${path}`,
+  ];
+
+  let lastError = null;
+
+  for (const url of endpoints) {
+    try {
+      const response = await fetch(url, { headers: BROWSER_HEADERS, redirect: 'follow' });
+
+      console.log(`[Reddit] ${url} → status ${response.status}, content-type: ${response.headers.get('content-type') || 'none'}`);
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.warn(`[Reddit] ${url} error body: ${text.substring(0, 200)}`);
+        lastError = new Error(`${response.status} from ${url}`);
+        continue;
+      }
+
+      const text = await response.text();
+
+      // Check if we got HTML instead of JSON (redirect to login/blocked page)
+      if (text.startsWith('<!') || text.startsWith('<html')) {
+        console.warn(`[Reddit] ${url} returned HTML (likely blocked). First 150 chars: ${text.substring(0, 150)}`);
+        lastError = new Error(`HTML response from ${url}`);
+        continue;
+      }
+
+      // Parse JSON
+      try {
+        const data = JSON.parse(text);
+        console.log(`[Reddit] ${url} → JSON parsed OK`);
+        return data;
+      } catch (parseErr) {
+        console.warn(`[Reddit] ${url} JSON parse failed. First 150 chars: ${text.substring(0, 150)}`);
+        lastError = new Error(`JSON parse failed from ${url}`);
+        continue;
+      }
+    } catch (fetchErr) {
+      console.warn(`[Reddit] ${url} fetch exception: ${fetchErr.message}`);
+      lastError = fetchErr;
+      continue;
     }
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`old.reddit.com fetch error (${response.status}): ${text.substring(0, 200)}`);
   }
 
-  return response.json();
+  throw lastError || new Error('All Reddit endpoints failed');
 }
 
 /**
- * Parse Reddit RSS feed (Atom XML) into post objects
- * RSS feeds are officially supported and don't require auth
- */
-function parseRSSPosts(xml) {
-  const posts = [];
-
-  // Extract each <entry> from the Atom feed
-  const entryRegex = /<entry>([\s\S]*?)<\/entry>/g;
-  let match;
-
-  while ((match = entryRegex.exec(xml)) !== null) {
-    const entry = match[1];
-
-    // Extract fields from each entry
-    const getId = entry.match(/<id>(.*?)<\/id>/);
-    const getTitle = entry.match(/<title>(.*?)<\/title>/);
-    const getContent = entry.match(/<content[^>]*>([\s\S]*?)<\/content>/);
-    const getAuthor = entry.match(/<name>(.*?)<\/name>/);
-    const getUpdated = entry.match(/<updated>(.*?)<\/updated>/);
-    const getLink = entry.match(/<link\s+href="([^"]*?)"/);
-    const getCategory = entry.match(/<category[^>]*term="([^"]*?)"/);
-
-    if (!getId || !getTitle) continue;
-
-    // Reddit RSS <id> is the full URL: https://www.reddit.com/r/sub/comments/abc123/title/
-    // Extract the Reddit fullname (t3_abc123) from the URL
-    const urlMatch = getId[1].match(/\/comments\/([a-z0-9]+)\//);
-    const postId = urlMatch ? urlMatch[1] : null;
-    if (!postId) continue;
-
-    // Decode HTML entities in title and content
-    const decodeHTML = (str) => {
-      if (!str) return '';
-      return str
-        .replace(/&amp;/g, '&')
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, "'")
-        .replace(/&#x27;/g, "'")
-        .replace(/&nbsp;/g, ' ');
-    };
-
-    // Extract selftext from content (strip HTML tags for plain text)
-    const rawContent = decodeHTML(getContent ? getContent[1] : '');
-    const selftext = rawContent
-      .replace(/<[^>]*>/g, ' ')   // Strip HTML tags
-      .replace(/\s+/g, ' ')       // Collapse whitespace
-      .trim()
-      .substring(0, 3000);        // Cap length (matches original)
-
-    // Build permalink from the URL
-    const fullUrl = getId[1] || '';
-    const permalink = fullUrl.replace('https://www.reddit.com', '');
-
-    posts.push({
-      redditId: `t3_${postId}`,
-      title: decodeHTML(getTitle[1]),
-      selftext,
-      author: getAuthor ? decodeHTML(getAuthor[1]) : '[unknown]',
-      permalink,
-      flair: getCategory ? decodeHTML(getCategory[1]) : '',
-      // RSS doesn't provide score/comments — we'll set defaults
-      // and update if we successfully fetch the JSON endpoint
-      score: 0,
-      numComments: 0,
-      upvoteRatio: 0,
-      redditCreatedAt: getUpdated ? new Date(getUpdated[1]) : new Date()
-    });
-  }
-
-  return posts;
-}
-
-/**
- * Fetch hot posts via RSS feed
- * Returns parsed post objects (without scores — RSS doesn't include them)
- */
-async function fetchPostsViaRSS() {
-  const url = `https://www.reddit.com/r/${SUBREDDIT}/hot/.rss?limit=${POSTS_PER_FETCH}`;
-
-  const response = await fetch(url, {
-    headers: {
-      'User-Agent': BROWSER_UA,
-      'Accept': 'application/atom+xml, application/xml, text/xml',
-    }
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`RSS fetch error (${response.status}): ${text.substring(0, 200)}`);
-  }
-
-  const xml = await response.text();
-  return parseRSSPosts(xml);
-}
-
-/**
- * Try to enrich a post with score/comment data from old.reddit.com JSON
- * Non-blocking — if this fails, we still have the post from RSS
- */
-async function enrichPostData(post) {
-  try {
-    if (!post.permalink) return post;
-
-    const data = await oldRedditFetch(`https://old.reddit.com${post.permalink}.json?limit=1`);
-    const postData = data?.[0]?.data?.children?.[0]?.data;
-
-    if (postData) {
-      post.score = postData.score || 0;
-      post.numComments = postData.num_comments || 0;
-      post.upvoteRatio = postData.upvote_ratio || 0;
-      post.author = postData.author || post.author;
-      // Check if stickied
-      post._stickied = postData.stickied || false;
-    }
-  } catch (err) {
-    // Non-fatal — we still have RSS data
-    console.warn(`[Reddit] Could not enrich post ${post.redditId}: ${err.message}`);
-  }
-
-  return post;
-}
-
-/**
- * Fetch top comments for a post via old.reddit.com JSON
+ * Fetch top comments for a post
  */
 async function fetchTopComments(permalink) {
   try {
-    const data = await oldRedditFetch(`https://old.reddit.com${permalink}.json?sort=top&limit=${COMMENTS_PER_POST + 2}`);
+    const data = await redditJsonFetch(`${permalink}.json?sort=top&limit=${COMMENTS_PER_POST + 2}`);
     // Reddit returns [post, comments] array
     const commentListing = data[1]?.data?.children || [];
 
@@ -200,12 +118,14 @@ async function ingestRedditPosts() {
   console.log('[Reddit] Starting ingestion from r/' + SUBREDDIT);
 
   try {
-    // Fetch hot posts via RSS feed (primary method — always works)
-    const rssPosts = await fetchPostsViaRSS();
-    console.log(`[Reddit] RSS returned ${rssPosts.length} posts`);
+    // Fetch hot posts via JSON endpoint with fallback chain
+    const listing = await redditJsonFetch(`/r/${SUBREDDIT}/hot.json?limit=${POSTS_PER_FETCH}`);
+    const posts = listing.data?.children || [];
 
-    if (rssPosts.length === 0) {
-      console.log('[Reddit] No posts from RSS — possible feed issue');
+    console.log(`[Reddit] JSON returned ${posts.length} posts`);
+
+    if (posts.length === 0) {
+      console.log('[Reddit] No posts returned — endpoint may be blocked from this IP');
       return { newPosts: 0, skipped: 0, errors: 0 };
     }
 
@@ -213,50 +133,49 @@ async function ingestRedditPosts() {
     let skipped = 0;
     let errors = 0;
 
-    for (const post of rssPosts) {
+    for (const item of posts) {
+      const post = item.data;
+
+      // Skip stickied/pinned posts (usually rules/meta)
+      if (post.stickied) {
+        skipped++;
+        continue;
+      }
+
       // Skip if we already have this post
-      const exists = await RedditPost.findOne({ redditId: post.redditId }).lean();
+      const exists = await RedditPost.findOne({ redditId: post.name }).lean();
       if (exists) {
         skipped++;
         continue;
       }
 
       try {
-        // Enrich with score data from old.reddit.com (non-blocking if fails)
-        await enrichPostData(post);
-
-        // Skip stickied/pinned posts (usually rules/meta)
-        if (post._stickied) {
-          skipped++;
-          continue;
-        }
-
         // Fetch top comments for this post
         const topComments = await fetchTopComments(post.permalink);
 
         await RedditPost.create({
-          redditId: post.redditId,
+          redditId: post.name,
           title: post.title,
-          selftext: post.selftext,
-          author: post.author,
-          score: post.score,
-          numComments: post.numComments,
-          upvoteRatio: post.upvoteRatio,
-          flair: post.flair,
+          selftext: (post.selftext || '').substring(0, 3000), // Cap post length
+          author: post.author || '[deleted]',
+          score: post.score || 0,
+          numComments: post.num_comments || 0,
+          upvoteRatio: post.upvote_ratio || 0,
+          flair: post.link_flair_text || '',
           permalink: post.permalink,
           topComments,
-          redditCreatedAt: post.redditCreatedAt
+          redditCreatedAt: post.created_utc ? new Date(post.created_utc * 1000) : new Date()
         });
 
         newPosts++;
 
-        // 2 second delay between posts to be respectful to old.reddit.com
+        // 2 second delay between comment fetches to be respectful
         await new Promise(r => setTimeout(r, 2000));
       } catch (postErr) {
         if (postErr.code === 11000) {
           skipped++; // Duplicate key — race condition, harmless
         } else {
-          console.error(`[Reddit] Error storing post ${post.redditId}:`, postErr.message);
+          console.error(`[Reddit] Error storing post ${post.name}:`, postErr.message);
           errors++;
         }
       }
