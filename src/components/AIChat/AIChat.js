@@ -934,7 +934,16 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
 
     } catch (err) {
       console.error('AI Chat error:', err);
-      setError(err.message || 'Failed to get response. Please try again.');
+      // Show Oracle-themed error instead of raw technical message
+      const isLimitError = err.message?.toLowerCase().includes('limit');
+      setError(isLimitError 
+        ? err.message 
+        : 'The Oracle is momentarily between dimensions. Try again shortly.'
+      );
+      // Auto-dismiss non-limit errors after 6 seconds
+      if (!isLimitError) {
+        setTimeout(() => setError(prev => prev === 'The Oracle is momentarily between dimensions. Try again shortly.' ? null : prev), 6000);
+      }
     } finally {
       setIsLoading(false);
       setStreamingText('');
@@ -1257,10 +1266,13 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
               </div>
             )}
 
-            {/* Error message */}
+            {/* Error message — styled as Oracle */}
             {error && (
-              <div className="ai-chat-error">
-                {error}
+              <div className="ai-chat-message assistant">
+                <div className="ai-chat-message-content ai-chat-oracle-error">
+                  <img src="/The_Oracle.png" alt="" className="oracle-error-eye" />
+                  <span>{error}</span>
+                </div>
               </div>
             )}
 

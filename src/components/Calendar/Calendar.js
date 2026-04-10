@@ -1306,11 +1306,11 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       const lunar = getLunarData(selectedDate);
       
       // Store wet dream with date (like Tracker.js does)
-      const updatedWetDreams = [...(userData.wetDreams || []), { date: selectedDate, streakDay, moonPhase: lunar.phase, moonIllumination: lunar.illumination }];
+      const updatedWetDreams = [...(userData.wetDreams || []), { date: selectedDate.toISOString(), streakDay, moonPhase: lunar.phase, moonIllumination: lunar.illumination }];
       updateUserData({ 
         wetDreams: updatedWetDreams,
         wetDreamCount: updatedWetDreams.length,
-        lastWetDream: selectedDate
+        lastWetDream: selectedDate.toISOString()
       });
       toast.success('Wet dream logged');
       closeEditModal();

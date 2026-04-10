@@ -476,6 +476,37 @@
   border: 1px solid var(--status-relapse-bg);
 }
 
+/* Oracle-themed error message */
+.ai-chat-oracle-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.45);
+  padding: 12px 0;
+  animation: oracleErrorFade 600ms ease forwards;
+}
+
+.oracle-error-eye {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  opacity: 0.3;
+  flex-shrink: 0;
+  animation: oracleErrorPulse 3s ease-in-out infinite;
+}
+
+@keyframes oracleErrorPulse {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.45; }
+}
+
+@keyframes oracleErrorFade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* ============================================================
    INPUT AREA
    ============================================================ */
