@@ -26,6 +26,13 @@ const userSchema = new mongoose.Schema({
   currentStreak: { type: Number, default: 0 },
   longestStreak: { type: Number, default: 0 },
   wetDreamCount: { type: Number, default: 0 },
+  wetDreams: [{
+    date: Date,
+    streakDay: Number,
+    moonPhase: String,
+    moonIllumination: Number
+  }],
+  lastWetDream: Date,
   relapseCount: { type: Number, default: 0 },
   isPremium: { type: Boolean, default: false },
   hasSeenOnboarding: { type: Boolean, default: false },
