@@ -33,6 +33,8 @@ const userSchema = new mongoose.Schema({
     moonIllumination: Number
   }],
   lastWetDream: Date,
+  lastRelapse: String,
+  lastTrigger: String,
   relapseCount: { type: Number, default: 0 },
   isPremium: { type: Boolean, default: false },
   hasSeenOnboarding: { type: Boolean, default: false },
