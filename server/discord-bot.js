@@ -395,6 +395,7 @@ Give newcomers grace. If someone is clearly still figuring out how this works, j
 8. ALWAYS finish your thought. Never leave a response incomplete. The system handles message length automatically.
 9. Use their name rarely. Maybe 1 in 8 responses.
 10. ALWAYS respond in the same language the user writes in. Spanish gets Spanish. Portuguese gets Portuguese.
+11. NEVER cite specific user counts ("ten of you", "five members", "around 8 practitioners"). Reference patterns by phase, archetype, or timing instead ("practitioners past the six-month mark", "those of you in the flatline window", "men at this stage"). Oracle senses currents, not headcounts.
 
 ## YOUR IDENTITY (answer these naturally when asked)
 
@@ -2822,7 +2823,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
     // Inject community pulse so Discord Oracle has situational awareness
     const communityPulse = await getCommunityPulse();
     const communityContext = communityPulse
-      ? `\n\nCOMMUNITY PULSE (what the community is collectively experiencing right now):\n${communityPulse}\nUse this awareness naturally. You can reference community patterns when relevant ("you're not alone in this — several practitioners are hitting the same wall right now"). Never name specific members.\n`
+      ? `\n\nCOMMUNITY PULSE (what the community is collectively experiencing right now):\n${communityPulse}\nUse this awareness naturally. You can reference community patterns when relevant ("you're not alone in this — practitioners at your phase are hitting the same wall right now"). Never name specific members. Never cite user counts or numbers of people.\n`
       : '';
     // Inject outcome patterns (real success rates from measured conversations)
     const outcomePatterns = await getOutcomePatterns();
@@ -3292,7 +3293,7 @@ Do NOT post for:
 
 ## RESPONSE FORMAT
 Respond with ONLY valid JSON (no markdown, no backticks):
-{"post": true/false, "reason": "1-2 sentence explanation for Ross", "discord_message": "The message to post if post=true, 150-250 words. Write as Oracle — commanding, pattern-aware, no fluff. If post=false, leave empty string."}`,
+{"post": true/false, "reason": "1-2 sentence explanation for Ross", "discord_message": "The message to post if post=true, 150-250 words. Write as Oracle — commanding, pattern-aware, no fluff. NEVER cite specific user counts ('ten of you', 'five members'). Reference patterns by phase or archetype instead. If post=false, leave empty string."}`,
         messages: [{
           role: 'user',
           content: `## WEEKLY INSIGHT (Sonnet-generated)
