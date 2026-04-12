@@ -174,6 +174,7 @@ function buildInsightEmbed(text, daysBack = 7) {
   const embed = new EmbedBuilder()
     .setColor(ORACLE_COLOR)
     .setAuthor({ name: 'Oracle Observes' })
+    .setThumbnail('https://titantrack.app/The_Oracle.png')
     .setDescription(desc)
     .setFooter({ text: `Oracle · titantrack.app · Pattern analysis · last ${daysBack} days`, iconURL: 'https://titantrack.app/The_Oracle.png' })
     .setTimestamp();
@@ -3319,6 +3320,7 @@ Should Oracle break silence on Discord this week?`
         if (targetChannel) {
           const embed = new EmbedBuilder()
             .setColor(ORACLE_COLOR)
+            .setThumbnail('https://titantrack.app/The_Oracle.png')
             .setDescription(opusDecision.discord_message)
             .setFooter({ text: 'Oracle · titantrack.app', iconURL: ORACLE_ICON });
           await targetChannel.send({ embeds: [embed] });
