@@ -128,10 +128,38 @@ async function gatherIntelligence() {
 }
 
 // ============================================================
+// PAST BROADCASTS — Fetch recent emails to avoid repeats
+// ============================================================
+
+async function getRecentBroadcasts(limit = 10) {
+  if (!KIT_API_KEY) return [];
+  try {
+    const res = await fetch(`${KIT_API_BASE}/broadcasts?per_page=${limit}`, {
+      headers: { 'X-Kit-Api-Key': KIT_API_KEY }
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    const broadcasts = data.broadcasts || [];
+    return broadcasts
+      .filter(b => b.subject && b.subject !== 'New Broadcast')
+      .map(b => ({
+        subject: b.subject,
+        snippet: (b.content || '').replace(/<[^>]*>/g, '').substring(0, 200).trim()
+      }));
+  } catch (err) {
+    console.error('[EmailAgent] Failed to fetch past broadcasts:', err.message);
+    return [];
+  }
+}
+
+// ============================================================
 // DRAFT GENERATION — Claude writes email in Ross's voice
 // ============================================================
 
 async function generateEmailDraft(intel) {
+  // Fetch past broadcasts to prevent repeats in subject AND content
+  const pastBroadcasts = await getRecentBroadcasts();
+
   // Build data block for Claude (same format as existing buildWeeklyEmailDraft)
   let dataBlock = 'COMMUNITY INTELLIGENCE DATA:\n\n';
 
@@ -204,6 +232,13 @@ STRUCTURE:
 
 Total length: 150-250 words. Tight. Every sentence earns its place.
 
+ANTI-FABRICATION RULE (CRITICAL):
+NEVER invent specific community moments, quotes, or anecdotes. If you reference something a community member said or did, it MUST come directly from the data provided below. If the data doesn't give you a vivid specific moment, close with a thought instead of a fake story. Do NOT make up "one man wrote..." or "someone in the community said..." unless the exact quote is in the data.
+
+PREVIOUS EMAILS (do NOT repeat these angles, metaphors, themes, or subject structures):
+${pastBroadcasts.length > 0 ? pastBroadcasts.map(b => `- "${b.subject}" — ${b.snippet || '(no preview)'}...`).join('\n') : '- (no previous emails found)'}
+Pick a completely DIFFERENT angle, topic, metaphor, and subject line than anything above. If you notice a theme you're about to reuse (e.g. "gap", "furnace", "quiet"), STOP and find a fresh angle from the data.
+
 ${dataBlock}
 
 Write the complete email now. Output ONLY the email with the subject line on the first line prefixed with "SUBJECT: ".`;
@@ -242,23 +277,21 @@ Write the complete email now. Output ONLY the email with the subject line on the
 async function createKitBroadcast(subject, body, tagId, sendAt) {
   if (!KIT_API_KEY) throw new Error('KIT_API_KEY not set in environment');
 
-  const payload = {
-    broadcast: {
-      subject,
-      content: body,
-      description: `Email Agent — Auto-generated ${new Date().toISOString().split('T')[0]}`,
-      public: false
-    }
+  // Step 1: Create the broadcast (Kit V4 uses flat fields, NOT nested under "broadcast")
+  const createPayload = {
+    subject,
+    content: body,
+    description: `Email Agent — Auto-generated ${new Date().toISOString().split('T')[0]}`,
+    public: false
   };
 
-  // Create the broadcast first
   const createRes = await fetch(`${KIT_API_BASE}/broadcasts`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-Kit-Api-Key': KIT_API_KEY
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(createPayload)
   });
 
   if (!createRes.ok) {
@@ -271,6 +304,37 @@ async function createKitBroadcast(subject, body, tagId, sendAt) {
   if (!broadcastId) throw new Error('Kit returned no broadcast ID');
 
   console.log(`[EmailAgent] Kit broadcast created: ${broadcastId}`);
+
+  // Step 2: Update with subscriber_filter if a tag ID is provided
+  if (tagId) {
+    const updatePayload = {
+      subscriber_filter: [
+        {
+          all: [
+            { type: 'tag', ids: [parseInt(tagId)] }
+          ]
+        }
+      ]
+    };
+
+    const updateRes = await fetch(`${KIT_API_BASE}/broadcasts/${broadcastId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Kit-Api-Key': KIT_API_KEY
+      },
+      body: JSON.stringify(updatePayload)
+    });
+
+    if (!updateRes.ok) {
+      const errText = await updateRes.text();
+      console.error(`[EmailAgent] Kit update subscriber_filter failed (${updateRes.status}): ${errText}`);
+      // Non-blocking — broadcast exists, Ross can manually set recipients in Kit
+    } else {
+      console.log(`[EmailAgent] Kit broadcast ${broadcastId} filtered to tag ${tagId}`);
+    }
+  }
+
   return broadcastId;
 }
 

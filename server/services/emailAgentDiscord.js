@@ -139,7 +139,7 @@ async function handleManualRun(message, footer) {
             `React ✅ to confirm the broadcast will send\n` +
             `React ❌ to cancel and delete it from Kit\n\n` +
             `Kit Broadcast ID: ${result.kitBroadcastId}\n` +
-            `If no reaction in 25 min, you'll need to handle it in Kit manually.`
+            `If no reaction in 2 hours, you'll need to handle it in Kit manually.`
           )
           .setFooter({ text: 'Email Agent' })
       ]});
@@ -152,8 +152,8 @@ async function handleManualRun(message, footer) {
         sendAt: result.sendAt
       });
 
-      // Auto-clear after 30 min
-      setTimeout(() => pendingApprovals.delete(approvalMsg.id), 30 * 60 * 1000);
+      // Auto-clear after 2 hours
+      setTimeout(() => pendingApprovals.delete(approvalMsg.id), 2 * 60 * 60 * 1000);
 
     } else if (result.mode === 'draft-only') {
       await message.channel.send({ embeds: [
@@ -440,7 +440,7 @@ function registerEmailAgentCron(client, findAdminMember) {
             .setDescription(
               `React ✅ to confirm | ❌ to cancel and delete from Kit\n` +
               `Kit ID: ${result.kitBroadcastId}\n\n` +
-              `If no reaction in 25 min, handle in Kit manually.`
+              `If no reaction in 2 hours, handle in Kit manually.`
             )
         ]});
         await approvalMsg.react('✅');
@@ -449,7 +449,7 @@ function registerEmailAgentCron(client, findAdminMember) {
           kitBroadcastId: result.kitBroadcastId,
           sendAt: result.sendAt
         });
-        setTimeout(() => pendingApprovals.delete(approvalMsg.id), 30 * 60 * 1000);
+        setTimeout(() => pendingApprovals.delete(approvalMsg.id), 2 * 60 * 60 * 1000);
 
       } else if (!result.kitBroadcastId) {
         await admin.send({ embeds: [

@@ -2423,8 +2423,12 @@ ${extraContext ? `\nThe seeker adds this context: "${extraContext}"` : ''}`,
         return;
       }
       
-      // Find the insight channel
-      const guild = message.guild;
+      // Find the insight channel (works from DMs or server)
+      const guild = message.guild || client.guilds.cache.first();
+      if (!guild) {
+        await message.reply('Could not find the server.');
+        return;
+      }
       const targetChannel = guild.channels.cache.find(
         ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
       );
@@ -2480,7 +2484,11 @@ ${extraContext ? `\nThe seeker adds this context: "${extraContext}"` : ''}`,
         return;
       }
       
-      const guild = message.guild;
+      const guild = message.guild || client.guilds.cache.first();
+      if (!guild) {
+        await message.reply('Could not find the server.');
+        return;
+      }
       const targetChannel = guild.channels.cache.find(
         ch => ch.name.toLowerCase().startsWith(INSIGHT_CHANNEL) && (ch.type === 0 || ch.type === 5)
       );
@@ -2489,7 +2497,7 @@ ${extraContext ? `\nThe seeker adds this context: "${extraContext}"` : ''}`,
         await message.reply(`Could not find channel #${INSIGHT_CHANNEL}.`);
         return;
       }
-      
+
       const discordMsg = await targetChannel.send({ embeds: [buildPulseEmbed(pulse.body)] });
       await CommunityPulse.updateOne(
         { _id: pulse._id },
