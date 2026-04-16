@@ -620,3 +620,102 @@
   background: rgba(160,130,0,0.03);
   border-left-color: rgba(160,130,0,0.15);
 }
+
+/* ===== ACTION TOAST (floating feedback) ===== */
+/* Pinned near the top of the panel so Ross always sees success/failure after tapping an action button */
+.oi-toast {
+  position: sticky;
+  top: 8px;
+  z-index: 20;
+  padding: 12px 14px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: acFadeIn 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+.oi-toast-success {
+  background: rgba(34,197,94,0.12);
+  border: 1px solid rgba(34,197,94,0.3);
+}
+
+.oi-toast-error {
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.3);
+}
+
+.oi-toast-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.oi-toast-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.oi-toast-success .oi-toast-icon {
+  background: rgba(34,197,94,0.25);
+  color: rgba(34,197,94,0.95);
+}
+
+.oi-toast-error .oi-toast-icon {
+  background: rgba(239,68,68,0.25);
+  color: rgba(239,68,68,0.95);
+}
+
+.oi-toast-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  flex: 1;
+}
+
+.oi-toast-success .oi-toast-label { color: rgba(34,197,94,0.95); }
+.oi-toast-error .oi-toast-label { color: rgba(239,68,68,0.95); }
+
+.oi-toast-close {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  font-family: inherit;
+}
+
+.oi-toast-close:hover { color: rgba(255,255,255,0.7); }
+
+.oi-toast-msg {
+  font-size: 12px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.45;
+  margin: 0;
+  padding-left: 26px;
+}
+
+/* Light mode */
+[data-theme="light"] .oi-toast-success {
+  background: rgba(22,163,74,0.08);
+  border-color: rgba(22,163,74,0.3);
+}
+[data-theme="light"] .oi-toast-error {
+  background: rgba(220,38,38,0.08);
+  border-color: rgba(220,38,38,0.3);
+}
+[data-theme="light"] .oi-toast-success .oi-toast-label { color: rgba(22,163,74,0.9); }
+[data-theme="light"] .oi-toast-error .oi-toast-label { color: rgba(220,38,38,0.9); }
+[data-theme="light"] .oi-toast-close { color: rgba(0,0,0,0.4); }
+[data-theme="light"] .oi-toast-close:hover { color: rgba(0,0,0,0.7); }
+[data-theme="light"] .oi-toast-msg { color: rgba(0,0,0,0.75); }

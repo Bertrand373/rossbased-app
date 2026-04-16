@@ -2,10 +2,14 @@
 // Oracle Evolution Intelligence Panel — lives inside AdminCockpit Oracle tab
 // Shows all 7 layers, evolution log, transmission stats, approve/reject proposals
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './OracleIntelligence.css';
 
 const API = process.env.REACT_APP_API || process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
+
+// Max time any single admin action is allowed to run before we force-stop it.
+// Evolution pipeline legitimately takes 60-90s, so we give it plenty of headroom.
+const ACTION_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes
 
 const OracleIntelligence = () => {
   const [intel, setIntel] = useState(null);
@@ -16,6 +20,8 @@ const OracleIntelligence = () => {
   const [activeSection, setActiveSection] = useState('layers');
   const [actionLoading, setActionLoading] = useState(null);
   const [actionResult, setActionResult] = useState(null);
+  const [toast, setToast] = useState(null); // { type: 'success'|'error', label, message }
+  const toastTimerRef = useRef(null);
 
   const token = localStorage.getItem('token');
 
@@ -50,21 +56,119 @@ const OracleIntelligence = () => {
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
+  // Show a toast that auto-dismisses after 6s (or 10s for errors)
+  const showToast = useCallback((type, label, message) => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToast({ type, label, message });
+    toastTimerRef.current = setTimeout(() => {
+      setToast(null);
+    }, type === 'error' ? 10000 : 6000);
+  }, []);
+
+  // Cleanup toast timer on unmount
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, []);
+
+  // Build a human-readable summary of an action result so Ross actually knows what happened
+  const summarizeResult = (endpoint, data) => {
+    if (!data || typeof data !== 'object') return 'Completed.';
+    // Backend sometimes returns { message: '...' } when there's nothing to do
+    if (data.message) return data.message;
+
+    // /evolve — runEvolutionPipeline returns { voice, profilesBuilt, responseAnalysis, patternsFound, opus, elapsed }
+    if (endpoint.includes('/evolve')) {
+      const parts = [];
+      if (typeof data.profilesBuilt === 'number') parts.push(`${data.profilesBuilt} psych profile${data.profilesBuilt === 1 ? '' : 's'} updated`);
+      if (typeof data.patternsFound === 'number' && data.patternsFound > 0) parts.push(`${data.patternsFound} pattern${data.patternsFound === 1 ? '' : 's'} found`);
+      if (data.opus && typeof data.opus.approved === 'number' && data.opus.approved > 0) parts.push(`${data.opus.approved} rule${data.opus.approved === 1 ? '' : 's'} approved`);
+      if (data.voice) parts.push('voice refined');
+      if (data.elapsed) parts.push(`${data.elapsed}s`);
+      return parts.length ? parts.join(' · ') : 'Pipeline complete.';
+    }
+
+    // /discover-patterns — returns { patterns: [...], ... } or { message: '...' }
+    if (endpoint.includes('/discover-patterns')) {
+      const n = data.patterns?.length || 0;
+      return n > 0 ? `${n} pattern${n === 1 ? '' : 's'} discovered.` : 'No new patterns found.';
+    }
+
+    // /prompt-proposal — returns { promptChanges, newRules, overallAssessment }
+    if (endpoint.includes('/prompt-proposal')) {
+      const c = data.promptChanges?.length || 0;
+      const r = data.newRules?.length || 0;
+      return c + r > 0 ? `${c} change${c === 1 ? '' : 's'}, ${r} new rule${r === 1 ? '' : 's'}. Check Evolution tab.` : 'Proposal saved. Check Evolution tab.';
+    }
+
+    // /risk-scan
+    if (endpoint.includes('/risk-scan')) {
+      const q = data.queue?.length ?? data.length ?? 0;
+      return `${q} user${q === 1 ? '' : 's'} flagged.`;
+    }
+
+    // /transmissions/run
+    if (endpoint.includes('/transmissions/run')) {
+      if (typeof data.sent === 'number') return `${data.sent} transmission${data.sent === 1 ? '' : 's'} sent.`;
+      return 'Transmissions dispatched.';
+    }
+
+    // /response-effectiveness
+    if (endpoint.includes('/response-effectiveness')) {
+      return 'Analysis complete. See details below.';
+    }
+
+    return 'Completed.';
+  };
+
   // Admin actions
   const runAction = async (endpoint, method = 'GET', label = '') => {
     setActionLoading(label);
     setActionResult(null);
+
+    // AbortController gives us a hard timeout so "Running..." can't hang forever
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), ACTION_TIMEOUT_MS);
+
     try {
       const res = await fetch(`${API}${endpoint}`, {
         method,
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
+        signal: controller.signal
       });
-      const data = await res.json();
-      setActionResult({ success: true, label, data });
-      fetchAll(); // Refresh
+
+      clearTimeout(timeoutId);
+
+      // Try to parse JSON, but fall back gracefully if the server returned HTML (e.g. proxy timeout page)
+      let data = null;
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        try { data = await res.json(); } catch (_) { data = null; }
+      } else {
+        // Non-JSON response — read as text for the error message
+        const text = await res.text().catch(() => '');
+        data = { error: text.slice(0, 200) || `Server returned ${res.status} ${res.statusText}` };
+      }
+
+      if (!res.ok) {
+        const msg = data?.error || `Request failed (${res.status})`;
+        setActionResult({ success: false, label, error: msg });
+        showToast('error', label, msg);
+      } else {
+        setActionResult({ success: true, label, data });
+        showToast('success', label, summarizeResult(endpoint, data));
+        fetchAll(); // Refresh data only on success
+      }
     } catch (e) {
-      setActionResult({ success: false, label, error: e.message });
+      clearTimeout(timeoutId);
+      const msg = e.name === 'AbortError'
+        ? `Timed out after ${Math.round(ACTION_TIMEOUT_MS / 1000)}s. The job may still be running on the server — check the Evolution tab in a minute.`
+        : (e.message || 'Request failed');
+      setActionResult({ success: false, label, error: msg });
+      showToast('error', label, msg);
     }
+
     setActionLoading(null);
   };
 
@@ -106,6 +210,18 @@ const OracleIntelligence = () => {
 
   return (
     <div className="oi-wrap">
+      {/* Floating toast — auto-dismisses, always visible regardless of scroll position */}
+      {toast && (
+        <div className={`oi-toast oi-toast-${toast.type}`} role="status" aria-live="polite">
+          <div className="oi-toast-head">
+            <span className="oi-toast-icon">{toast.type === 'success' ? '✓' : '!'}</span>
+            <span className="oi-toast-label">{toast.label}</span>
+            <button className="oi-toast-close" onClick={() => setToast(null)} aria-label="Dismiss">×</button>
+          </div>
+          <p className="oi-toast-msg">{toast.message}</p>
+        </div>
+      )}
+
       {/* Sub-nav */}
       <div className="ac-sub-nav">
         {[
