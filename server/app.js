@@ -1967,17 +1967,12 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       messages: messages
     });
 
-    // Small delay helper for natural pacing
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
     let fullResponse = '';
 
     for await (const event of stream) {
       if (event.type === 'content_block_delta' && event.delta?.text) {
         fullResponse += event.delta.text;
         res.write(`data: ${JSON.stringify({ type: 'content', text: event.delta.text })}\n\n`);
-        // Natural pacing - 35ms delay matches Claude's organic typing feel
-        await delay(35);
       }
     }
 
