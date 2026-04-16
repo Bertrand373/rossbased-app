@@ -9,7 +9,7 @@ const API = process.env.REACT_APP_API || process.env.REACT_APP_API_URL || 'https
 
 // Max time any single admin action is allowed to run before we force-stop it.
 // Evolution pipeline legitimately takes 60-90s, so we give it plenty of headroom.
-const ACTION_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes
+const ACTION_TIMEOUT_MS = 8 * 60 * 1000; // 8 minutes
 
 const OracleIntelligence = () => {
   const [intel, setIntel] = useState(null);
