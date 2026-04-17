@@ -443,14 +443,13 @@ function App() {
   const [loadingMessage, setLoadingMessage] = useState('Loading...');
   
   // Minimum loading screen duration for smooth UX (prevents flash).
-  // 1800ms ensures the pulse animation plays for ~one full visible cycle
-  // after the iOS PWA splash dismisses, before React hands off to the app.
-  // Shorter values caused the pulse to be invisible (splash covers it until
-  // ~500-800ms, then React was fading the loader ~100-300ms later).
+  // 3800ms = ~800ms iOS PWA splash + ~3000ms (~1.5 pulse cycles, where
+  // one full pulse is 2s) visible after the splash dismisses, before
+  // React hands off to the app. Tune up for more pulses, down for less.
   const [minLoadingComplete, setMinLoadingComplete] = useState(false);
   
   useEffect(() => {
-    const timer = setTimeout(() => setMinLoadingComplete(true), 1800);
+    const timer = setTimeout(() => setMinLoadingComplete(true), 3800);
     return () => clearTimeout(timer);
   }, []);
 
