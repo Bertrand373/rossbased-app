@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="google-site-verification" content="G3QGD4GhERfInurYXaCyX9liBD3cch10HRuNnuH5sz4" />
+    <!-- Favicon setup matching new chevron logo -->
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="96x96" href="%PUBLIC_URL%/favicon-96x96.png" />
+
+    <!-- Preload loader icons so they're ready the instant the <img> parses.
+         Both themes are preloaded so the theme swap on light-mode users is cache-hot. -->
+    <link rel="preload" as="image" href="%PUBLIC_URL%/icon-192.png" />
+    <link rel="preload" as="image" href="%PUBLIC_URL%/icon-192-black.png" />
+
+    <!-- Viewport and theme -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#000000" id="theme-color-meta" />
+    <meta name="description" content="AI-powered semen retention tracker with streak tracking, benefit analytics, emotional timeline, and neural network predictions. Free to start." />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    
+    <!-- iOS PWA meta tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="TitanTrack" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    
+    <!-- iOS PWA Icon -->
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/apple-touch-icon.png" />
+
+    <!-- =====================================================================
+         iOS PWA SPLASH SCREENS (apple-touch-startup-image)
+         ===================================================================== -->
+
+    <!-- iPhone SE 2nd/3rd gen, 6, 7, 8 (375×667 @2x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-se-dark.png"
+      media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-se-light.png"
+      media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone 6+, 7+, 8+ (414×736 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-8plus-dark.png"
+      media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-8plus-light.png"
+      media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone X, XS, 11 Pro, 12 mini, 13 mini (375×812 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-x-dark.png"
+      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-x-light.png"
+      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone XR, 11 (414×896 @2x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-xr-dark.png"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-xr-light.png"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone XS Max, 11 Pro Max (414×896 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-xsmax-dark.png"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-xsmax-light.png"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone 12, 12 Pro, 13, 13 Pro, 14 (390×844 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-12-dark.png"
+      media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-12-light.png"
+      media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone 12 Pro Max, 13 Pro Max, 14 Plus (428×926 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-12promax-dark.png"
+      media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-12promax-light.png"
+      media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone 14 Pro, 15, 15 Pro (393×852 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-14pro-dark.png"
+      media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-14pro-light.png"
+      media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone 14 Pro Max, 15 Plus, 15 Pro Max (430×932 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-14promax-dark.png"
+      media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-14promax-light.png"
+      media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone 16, 16 Pro (402×874 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-16pro-dark.png"
+      media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-16pro-light.png"
+      media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone 16 Plus, 16 Pro Max (440×956 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-16promax-dark.png"
+      media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-16promax-light.png"
+      media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPad 9.7", Mini (768×1024 @2x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-97-dark.png"
+      media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-97-light.png"
+      media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPad 10.2" (810×1080 @2x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-102-dark.png"
+      media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-102-light.png"
+      media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPad Pro 10.5" (834×1112 @2x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-105-dark.png"
+      media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-105-light.png"
+      media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPad Air 4/5, iPad Pro 11" (834×1194 @2x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-11-dark.png"
+      media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-11-light.png"
+      media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPad Pro 12.9" (1024×1366 @2x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-129-dark.png"
+      media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-129-light.png"
+      media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+    
+    <title>TitanTrack | Retention Intelligence</title>
+    
+    <!-- THEME INITIALIZATION - Runs before React to prevent flash -->
+    <script>
+      (function() {
+        // Read theme from localStorage (default to 'dark')
+        var theme = localStorage.getItem('titantrack-theme') || 'dark';
+        
+        // Apply theme to <html> element immediately
+        document.documentElement.setAttribute('data-theme', theme);
+        
+        // Update theme-color meta tag for browser chrome
+        var themeColorMeta = document.getElementById('theme-color-meta');
+        if (themeColorMeta) {
+          themeColorMeta.setAttribute('content', theme === 'light' ? '#ffffff' : '#000000');
+        }
+      })();
+    </script>
+    
+    <style>
+      /* Theme-aware background immediately */
+      html, body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+          sans-serif;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+      
+      /* Dark theme (default) */
+      html {
+        background-color: #000000;
+        color: #ffffff;
+      }
+      
+      /* Light theme */
+      html[data-theme="light"] {
+        background-color: #ffffff;
+        color: #000000;
+      }
+      
+      /* Allow text selection in inputs */
+      input, textarea, [contenteditable] {
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+        font-size: 16px !important;
+      }
+      
+      /* Full-viewport background for the loader.
+         Icon is positioned absolutely (see .loader-icon below), so this
+         container only provides the solid background color — no flex
+         centering happens here. */
+      #initial-loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100lvh;
+        z-index: 9999;
+        transition: background-color 0.2s ease;
+        background-color: #000000;
+      }
+      
+      html:not([data-theme="light"]) #initial-loader {
+        background-color: #000000;
+      }
+      
+      html[data-theme="light"] #initial-loader {
+        background-color: #ffffff;
+      }
+      
+      /* Icon uses position:fixed + device-pinned 'top' (see @media rules below)
+         instead of flex or viewport-% centering. This eliminates the iOS
+         viewport-settle race where '50% of current-viewport-height' briefly
+         computes wrong during WebKit's first-paint settle window. A hardcoded
+         pixel 'top' per device-height is stable from the first rendered
+         frame because device-height in media queries reflects the hardware,
+         not the runtime viewport — so it can't race. */
+      .loader-icon {
+        position: fixed;
+        top: 50%;  /* generic fallback — used by devices not in the @media list */
+        left: 50%;
+        width: 64px;
+        height: 64px;
+        opacity: 1;
+        transform: translate(-50%, -50%) translateZ(0);
+        -webkit-transform: translate(-50%, -50%) translateZ(0);
+        animation: pulse 2s ease-in-out infinite;
+      }
+      
+      /* Pulse animation preserves the centering transform so scale() doesn't
+         knock the icon off-center. */
+      @keyframes pulse {
+        0%, 100% {
+          opacity: 1;
+          transform: translate(-50%, -50%) translateZ(0) scale(1);
+        }
+        50% {
+          opacity: 0.4;
+          transform: translate(-50%, -50%) translateZ(0) scale(0.95);
+        }
+      }
+      
+      /* =================================================================
+         DEVICE-PINNED ICON POSITIONS
+         
+         Each rule pins the icon's Y-coordinate to exactly 50% of that
+         device's hardware height. Values match the icon center of the
+         corresponding apple-touch-startup-image splash, so splash → HTML
+         transition is pixel-identical on every supported device.
+         ================================================================= */
+      
+      /* iPhone SE/6/7/8 — 375×667 */
+      @media (device-height: 667px) and (orientation: portrait) {
+        .loader-icon { top: 334px; }
+      }
+      /* iPhone 6+/7+/8+ — 414×736 */
+      @media (device-height: 736px) and (orientation: portrait) {
+        .loader-icon { top: 368px; }
+      }
+      /* iPhone X/XS/11 Pro/12 mini/13 mini — 375×812 */
+      @media (device-height: 812px) and (orientation: portrait) {
+        .loader-icon { top: 406px; }
+      }
+      /* iPhone 12/13/14 — 390×844 */
+      @media (device-height: 844px) and (orientation: portrait) {
+        .loader-icon { top: 422px; }
+      }
+      /* iPhone 14 Pro/15/15 Pro — 393×852 */
+      @media (device-height: 852px) and (orientation: portrait) {
+        .loader-icon { top: 426px; }
+      }
+      /* iPhone 16/16 Pro — 402×874 */
+      @media (device-height: 874px) and (orientation: portrait) {
+        .loader-icon { top: 437px; }
+      }
+      /* iPhone XR/11/XS Max/11 Pro Max — 414×896 */
+      @media (device-height: 896px) and (orientation: portrait) {
+        .loader-icon { top: 448px; }
+      }
+      /* iPhone 12/13 Pro Max, 14 Plus — 428×926 */
+      @media (device-height: 926px) and (orientation: portrait) {
+        .loader-icon { top: 463px; }
+      }
+      /* iPhone 14 Pro Max/15 Plus/15 Pro Max — 430×932 */
+      @media (device-height: 932px) and (orientation: portrait) {
+        .loader-icon { top: 466px; }
+      }
+      /* iPhone 16 Plus/16 Pro Max — 440×956 */
+      @media (device-height: 956px) and (orientation: portrait) {
+        .loader-icon { top: 478px; }
+      }
+      /* iPad 9.7/Mini — 768×1024 */
+      @media (device-height: 1024px) and (orientation: portrait) {
+        .loader-icon { top: 512px; }
+      }
+      /* iPad 10.2 — 810×1080 */
+      @media (device-height: 1080px) and (orientation: portrait) {
+        .loader-icon { top: 540px; }
+      }
+      /* iPad Pro 10.5 — 834×1112 */
+      @media (device-height: 1112px) and (orientation: portrait) {
+        .loader-icon { top: 556px; }
+      }
+      /* iPad Air/Pro 11 — 834×1194 */
+      @media (device-height: 1194px) and (orientation: portrait) {
+        .loader-icon { top: 597px; }
+      }
+      /* iPad Pro 12.9 — 1024×1366 */
+      @media (device-height: 1366px) and (orientation: portrait) {
+        .loader-icon { top: 683px; }
+      }
+    </style>
+  </head>
+  <body style="background-color:#000000">
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    
+    <!-- Minimal loader - icon only, theme-aware -->
+    <div id="initial-loader">
+      <img class="loader-icon" id="loader-icon" src="%PUBLIC_URL%/icon-192.png" alt="" width="64" height="64" />
+    </div>
+    
+    <!-- Theme-aware loader icon swap (runs synchronously right after <img> parses) -->
+    <script>
+      (function() {
+        var theme = document.documentElement.getAttribute('data-theme') || 'dark';
+        var loaderIcon = document.getElementById('loader-icon');
+        if (loaderIcon && theme === 'light') {
+          loaderIcon.src = '%PUBLIC_URL%/icon-192-black.png';
+          document.body.style.backgroundColor = '#ffffff';
+          var ldr = document.getElementById('initial-loader');
+          if (ldr) ldr.style.backgroundColor = '#ffffff';
+        }
+      })();
+    </script>
+    
+    <div id="root"></div>
+    
+    <script>
+      // Zoom prevention
+      let lastTouchEnd = 0;
+      
+      document.addEventListener('touchstart', function(event) {
+        if (event.touches.length > 1) {
+          event.preventDefault();
+        }
+      }, { passive: false });
+      
+      document.addEventListener('touchmove', function(event) {
+        if (event.touches.length > 1) {
+          event.preventDefault();
+        }
+      }, { passive: false });
+      
+      document.addEventListener('touchend', function(event) {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, { passive: false });
+      
+      document.addEventListener('gesturestart', function(e) { e.preventDefault(); }, { passive: false });
+      document.addEventListener('gesturechange', function(e) { e.preventDefault(); }, { passive: false });
+      document.addEventListener('gestureend', function(e) { e.preventDefault(); }, { passive: false });
+      
+      document.addEventListener('keydown', function(event) {
+        if ((event.ctrlKey || event.metaKey) && 
+            (event.key === '+' || event.key === '-' || event.key === '0' || event.key === '=')) {
+          event.preventDefault();
+        }
+      }, { passive: false });
+      
+      document.addEventListener('wheel', function(event) {
+        if (event.ctrlKey || event.metaKey) {
+          event.preventDefault();
+        }
+      }, { passive: false });
+      
+      // Loader removal is handled by React (App.js useEffect)
+      // React fades out #initial-loader when app is fully ready
+      // (auth complete, subscription resolved, data loaded)
+    </script>
+  </body>
+</html>
