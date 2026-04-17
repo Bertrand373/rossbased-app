@@ -443,13 +443,18 @@ function App() {
   const [loadingMessage, setLoadingMessage] = useState('Loading...');
   
   // Minimum loading screen duration for smooth UX (prevents flash).
-  // 3800ms = ~800ms iOS PWA splash + ~3000ms (~1.5 pulse cycles, where
-  // one full pulse is 2s) visible after the splash dismisses, before
-  // React hands off to the app. Tune up for more pulses, down for less.
+  // PWA standalone mode needs a longer hold so the pulse animation has
+  // time to be visible after the iOS splash dismisses (~800ms splash +
+  // ~3000ms pulse = ~1.5 cycles). Browser/desktop never had this issue
+  // and stays at the original 600ms.
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true;
+  const MIN_LOADING_MS = isStandalone ? 3800 : 600;
+  
   const [minLoadingComplete, setMinLoadingComplete] = useState(false);
   
   useEffect(() => {
-    const timer = setTimeout(() => setMinLoadingComplete(true), 3800);
+    const timer = setTimeout(() => setMinLoadingComplete(true), MIN_LOADING_MS);
     return () => clearTimeout(timer);
   }, []);
 
