@@ -7,7 +7,12 @@
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/favicon.svg" />
     <link rel="icon" type="image/png" sizes="96x96" href="%PUBLIC_URL%/favicon-96x96.png" />
-    
+
+    <!-- Preload loader icons so they're ready the instant the <img> parses.
+         Both themes are preloaded so the theme swap on light-mode users is cache-hot. -->
+    <link rel="preload" as="image" href="%PUBLIC_URL%/icon-192.png" />
+    <link rel="preload" as="image" href="%PUBLIC_URL%/icon-192-black.png" />
+
     <!-- Viewport and theme -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#000000" id="theme-color-meta" />
@@ -112,12 +117,19 @@
         background-color: #ffffff;
       }
       
+      /* Icon: visible and animating from the first paint.
+         Previously held at opacity:0 with a 200ms setTimeout to mask a
+         WebKit viewport-settle position shift on iOS PWAs. That "fix"
+         caused a visible black screen before the icon appeared. The
+         micro-shift from viewport-settle is a single frame — the black
+         screen was dramatically more noticeable. */
       .loader-icon {
         width: 64px;
         height: 64px;
-        opacity: 0;
+        opacity: 1;
         transform: translateZ(0);
         -webkit-transform: translateZ(0);
+        animation: pulse 2s ease-in-out infinite;
       }
       
       @keyframes pulse {
@@ -147,7 +159,8 @@
       <img class="loader-icon" id="loader-icon" src="%PUBLIC_URL%/icon-192.png" alt="" width="64" height="64" />
     </div>
     
-    <!-- Theme-aware loader icon + viewport-settle reveal -->
+    <!-- Theme-aware loader icon swap (runs synchronously right after <img> parses,
+         so any visible dark→light icon flash is sub-perceptible for light-theme users) -->
     <script>
       (function() {
         var theme = document.documentElement.getAttribute('data-theme') || 'dark';
@@ -158,17 +171,7 @@
           var ldr = document.getElementById('initial-loader');
           if (ldr) ldr.style.backgroundColor = '#ffffff';
         }
-        // PWA FIX: In standalone mode with viewport-fit=cover, WebKit
-        // finalizes viewport height ~50-120ms after first paint. Flexbox
-        // centering shifts when this happens. 200ms guarantees the viewport
-        // is settled on all devices while remaining imperceptible after
-        // the iOS splash screen (which itself lasts 1-2 seconds).
-        setTimeout(function() {
-            if (loaderIcon) {
-              loaderIcon.style.opacity = '1';
-              loaderIcon.style.animation = 'pulse 2s ease-in-out infinite';
-            }
-        }, 200);
+        // Icon renders immediately via CSS — no setTimeout needed.
       })();
     </script>
     
