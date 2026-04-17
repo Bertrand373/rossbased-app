@@ -20,7 +20,9 @@ const retrieveKnowledge = async (query, options = {}) => {
 
   try {
     // Check if collection has any documents
+    const tCount = Date.now();
     const count = await KnowledgeChunk.countDocuments({ enabled: true });
+    console.log(`[Oracle timing]   countDocuments took ${Date.now() - tCount}ms`);
     if (count === 0) return '';
 
     let results = [];
@@ -28,7 +30,9 @@ const retrieveKnowledge = async (query, options = {}) => {
     // === PRIMARY: Vector search (semantic similarity) ===
     if (isVectorSearchEnabled()) {
       try {
+        const tVec = Date.now();
         results = await vectorSearch(query, limit);
+        console.log(`[Oracle timing]   vectorSearch total took ${Date.now() - tVec}ms, got ${results.length} results`);
       } catch (vecErr) {
         // Vector search failed (index not created yet, API hiccup, etc.)
         // Fall through silently to text search
@@ -38,7 +42,9 @@ const retrieveKnowledge = async (query, options = {}) => {
 
     // === FALLBACK: Text search if vector returned nothing ===
     if (results.length === 0) {
+      const tText = Date.now();
       results = await textSearch(query, limit);
+      console.log(`[Oracle timing]   textSearch fallback took ${Date.now() - tText}ms, got ${results.length} results`);
     }
 
     if (results.length === 0) return '';
@@ -91,10 +97,13 @@ const retrieveKnowledge = async (query, options = {}) => {
  * Requires: embedding field on chunks + vector_index in Atlas
  */
 async function vectorSearch(query, limit) {
+  const tEmb = Date.now();
   const queryEmbedding = await generateEmbedding(query);
+  console.log(`[Oracle timing]     generateEmbedding (OpenAI) took ${Date.now() - tEmb}ms`);
   if (!queryEmbedding) return [];
 
   try {
+    const tAtlas = Date.now();
     const results = await KnowledgeChunk.aggregate([
       {
         $vectorSearch: {
@@ -117,6 +126,7 @@ async function vectorSearch(query, limit) {
         }
       }
     ]);
+    console.log(`[Oracle timing]     $vectorSearch (Atlas) took ${Date.now() - tAtlas}ms, returned ${results.length}`);
 
     return results;
   } catch (err) {
