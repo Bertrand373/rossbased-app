@@ -1616,9 +1616,21 @@ function getClientIP(req) {
 // AI Chat Streaming Endpoint
 app.post('/api/ai/chat/stream', authenticate, oracleLimiter, async (req, res) => {
   const { message, conversationHistory, timezone } = req.body;
-  
+
+  // --- PERF TIMING (temporary — remove once bottleneck identified) ---
+  // Logs each major step so we can see exactly where the pre-stream latency is.
+  const __tStart = Date.now();
+  const __tMark = (label) => {
+    const now = Date.now();
+    const ms = now - (__tMark._last || __tStart);
+    const total = now - __tStart;
+    console.log(`[Oracle timing] ${label} took ${ms}ms (total ${total}ms)`);
+    __tMark._last = now;
+  };
+
   try {
     const user = await User.findOne({ username: req.user.username });
+    __tMark('user lookup');
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -1771,15 +1783,19 @@ app.post('/api/ai/chat/stream', authenticate, oracleLimiter, async (req, res) =>
 
     // Build deep user context from their data
     const userContext = await buildOracleContext(user, userTimezone);
-    
+    __tMark('buildOracleContext');
+
     // Inject community pulse (async, cached — adds ~0ms after first fetch)
     const communityPulse = await getCommunityPulse();
+    __tMark('getCommunityPulse');
 
     // Inject Reddit community intelligence (async, cached 30min)
     const redditContext = await getRedditContext();
+    __tMark('getRedditContext');
 
     // Inject outcome patterns (async, cached 6h — real success rates from measured outcomes)
     const outcomePatterns = await getOutcomePatterns();
+    __tMark('getOutcomePatterns');
 
     const systemPrompt = `You are The Oracle, the AI guide within TitanTrack.
 
@@ -1908,8 +1924,10 @@ When in doubt, shorter. Say what needs to be said. Stop.
 
     // RAG: Retrieve relevant knowledge
     const ragContext = await retrieveKnowledge(message, { limit: 5, maxTokens: 2000 });
+    __tMark('retrieveKnowledge (RAG vector search)');
     // Knowledge manifest: Oracle's awareness of what it knows
     const knowledgeManifest = await getKnowledgeManifest();
+    __tMark('getKnowledgeManifest');
     // Inject community pulse between system prompt and RAG context
     const communityContext = communityPulse 
       ? `\n\nCOMMUNITY PULSE (what the broader TitanTrack community is experiencing right now):\n${communityPulse}\nUse this awareness naturally. You can reference community patterns when relevant ("you're not alone in this — several practitioners are hitting the same wall right now"). Never name specific members.\n`
@@ -1966,11 +1984,17 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       system: systemWithKnowledge,
       messages: messages
     });
+    __tMark('Claude stream opened');
 
     let fullResponse = '';
+    let __firstChunkLogged = false;
 
     for await (const event of stream) {
       if (event.type === 'content_block_delta' && event.delta?.text) {
+        if (!__firstChunkLogged) {
+          __tMark('FIRST CHUNK from Claude');
+          __firstChunkLogged = true;
+        }
         fullResponse += event.delta.text;
         res.write(`data: ${JSON.stringify({ type: 'content', text: event.delta.text })}\n\n`);
       }
