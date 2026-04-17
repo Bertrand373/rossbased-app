@@ -443,13 +443,14 @@ function App() {
   const [loadingMessage, setLoadingMessage] = useState('Loading...');
   
   // Minimum loading screen duration for smooth UX (prevents flash).
-  // PWA standalone mode needs a longer hold so the pulse animation has
-  // time to be visible after the iOS splash dismisses (~800ms splash +
-  // ~3000ms pulse = ~1.5 cycles). Browser/desktop never had this issue
-  // and stays at the original 600ms.
+  //   PWA standalone: 3800ms (~800ms iOS splash + ~3000ms / ~1.5 pulses).
+  //   Browser/desktop: 1800ms — no splash to cover, but still long enough
+  //     for one clean pulse cycle to be visually perceivable. 600ms (the
+  //     original value) showed so little of the 2s pulse that it read as
+  //     static.
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches
     || window.navigator.standalone === true;
-  const MIN_LOADING_MS = isStandalone ? 3800 : 600;
+  const MIN_LOADING_MS = isStandalone ? 3800 : 1800;
   
   const [minLoadingComplete, setMinLoadingComplete] = useState(false);
   
