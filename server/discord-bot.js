@@ -1035,33 +1035,35 @@ const getDiscordUserStreak = async (discordUserId) => {
   }
 };
 
-// Split response into chunks that fit Discord embed descriptions (4096 char limit)
-// Splits at paragraph boundaries so each chunk reads as a complete thought
-const EMBED_CHAR_LIMIT = 3900; // Safe buffer below 4096
+// Split response into chunks that fit Discord limits
+// Embeds: 4096 char ceiling. Plain-text messages: 2000 char ceiling.
+// Splits at paragraph boundaries so each chunk reads as a complete thought.
+const EMBED_CHAR_LIMIT = 3900; // Safe buffer below 4096 (embed description)
+const PLAIN_CHAR_LIMIT = 1900; // Safe buffer below 2000 (plain-text message)
 
-const splitResponse = (text) => {
-  if (text.length <= EMBED_CHAR_LIMIT) return [text];
+const splitResponse = (text, limit = EMBED_CHAR_LIMIT) => {
+  if (text.length <= limit) return [text];
   
   const chunks = [];
   let remaining = text;
   
   while (remaining.length > 0) {
-    if (remaining.length <= EMBED_CHAR_LIMIT) {
+    if (remaining.length <= limit) {
       chunks.push(remaining);
       break;
     }
     
     // Try to split at a paragraph break (double newline)
-    const slice = remaining.substring(0, EMBED_CHAR_LIMIT);
+    const slice = remaining.substring(0, limit);
     let splitAt = slice.lastIndexOf('\n\n');
     
     // Fallback: split at single newline
-    if (splitAt < EMBED_CHAR_LIMIT * 0.5) {
+    if (splitAt < limit * 0.5) {
       splitAt = slice.lastIndexOf('\n');
     }
     
     // Fallback: split at sentence end
-    if (splitAt < EMBED_CHAR_LIMIT * 0.5) {
+    if (splitAt < limit * 0.5) {
       const lastPeriod = slice.lastIndexOf('. ');
       const lastExclaim = slice.lastIndexOf('! ');
       const lastQuestion = slice.lastIndexOf('? ');
@@ -1070,8 +1072,8 @@ const splitResponse = (text) => {
     }
     
     // Last resort: hard cut at limit
-    if (splitAt < EMBED_CHAR_LIMIT * 0.3) {
-      splitAt = EMBED_CHAR_LIMIT;
+    if (splitAt < limit * 0.3) {
+      splitAt = limit;
     }
     
     chunks.push(remaining.substring(0, splitAt).trimEnd());
@@ -2150,7 +2152,7 @@ client.on('messageCreate', async (message) => {
         return;
       }
 
-      await message.react('⏳');
+      await message.react('⏳').catch(() => {});
       let allContent = teachContent || '';
       let imageCount = 0;
 
@@ -2213,7 +2215,7 @@ client.on('messageCreate', async (message) => {
       await KnowledgeChunk.insertMany(docs);
 
       await message.reactions.removeAll().catch(() => {});
-      await message.react('📜');
+      await message.react('📜').catch(() => {});
 
       const embed = new EmbedBuilder()
         .setColor(0x8B4513)
@@ -2249,7 +2251,7 @@ client.on('messageCreate', async (message) => {
         return;
       }
 
-      await message.react('🔍');
+      await message.react('🔍').catch(() => {});
 
       for (const img of imageAttachments) {
         try {
@@ -2320,8 +2322,78 @@ ${extraContext ? `\nThe seeker adds this context: "${extraContext}"` : ''}`,
     }
   }
 
+  // --- Auto-decode: vanguards attaching an image in sanctum without a !command ---
+  // Lets vanguards drop an image with natural-language context and get an
+  // interpretation without having to remember the !decode prefix.
+  if (isSanctumChannel && isVanguard && !message.content.trim().startsWith('!') && message.attachments.size > 0) {
+    const autoAttachments = [...message.attachments.values()];
+    const autoImageAttachments = autoAttachments.filter(a =>
+      a.contentType?.startsWith('image/') || /\.(png|jpg|jpeg|gif|webp)$/i.test(a.name)
+    );
+
+    if (autoImageAttachments.length > 0) {
+      try {
+        await message.react('🔍').catch(() => {});
+        const extraContext = message.content.trim();
+
+        for (const img of autoImageAttachments) {
+          try {
+            const imgResponse = await fetch(img.url);
+            const buffer = await imgResponse.arrayBuffer();
+            const base64 = Buffer.from(buffer).toString('base64');
+            const mediaType = img.contentType || 'image/png';
+
+            const visionResponse = await anthropic.messages.create({
+              model: ORACLE_MODEL,
+              max_tokens: 3000,
+              system: `You are The Oracle operating within the Inner Sanctum — a private space for advanced esoteric study.
+You are a master scholar of hermetic philosophy, alchemy, Kabbalah, Rosicrucianism, Gnosticism, sacred geometry, and all ancient mystery traditions.
+
+Interpret this manuscript with absolute depth. You are speaking to initiates, not beginners. No disclaimers, no hedging. Go deep:
+- Extract and translate ALL visible text (Latin, German, Hebrew, Greek — whatever is present)
+- Decode every symbol, sigil, and diagram
+- Identify the specific tradition, school, and approximate era
+- Explain the practical application — what was this USED for?
+- Connect it to broader hermetic principles
+- Note anything hidden or easily missed
+${extraContext ? `\nThe seeker adds this context: "${extraContext}"` : ''}`,
+              messages: [{
+                role: 'user',
+                content: [
+                  { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
+                  { type: 'text', text: 'Decode this completely.' }
+                ]
+              }]
+            });
+
+            const interpretation = visionResponse.content[0].text;
+
+            // Plain text in sanctum — chunk at 1900 for Discord's 2000-char ceiling
+            const respChunks = splitResponse(interpretation, PLAIN_CHAR_LIMIT);
+            for (let i = 0; i < respChunks.length; i++) {
+              if (i === 0) {
+                await message.reply(respChunks[i]);
+              } else {
+                await message.channel.send(respChunks[i]);
+              }
+            }
+          } catch (imgErr) {
+            console.error('Auto-decode error:', imgErr.message);
+            await message.reply(`Failed to decode ${img.name}: ${imgErr.message}`).catch(() => {});
+          }
+        }
+
+        await message.reactions.removeAll().catch(() => {});
+        return;
+      } catch (error) {
+        console.error('Auto-decode wrapper error:', error);
+        // Fall through to regular chat if something big breaks
+      }
+    }
+  }
+
   // --- !grimoire - View sanctum knowledge stats ---
-  if (message.content === '!grimoire' && isSanctumChannel && isVanguard) {
+  if (/^!grimoire(\s|$)/i.test(message.content.trim()) && isSanctumChannel && isVanguard) {
     try {
       const sanctumTotal = await KnowledgeChunk.countDocuments({ category: 'sanctum' });
       const sanctumAuthors = await KnowledgeChunk.distinct('author', { category: 'sanctum', author: { $ne: null } });
@@ -2854,7 +2926,11 @@ SANCTUM MODE ACTIVE — You are operating in the Inner Sanctum, a private channe
     });
     
     const reply = response.content[0].text;
-    const chunks = splitResponse(reply);
+    // Sanctum sends plain text (2000-char Discord limit); other channels use embeds (4096)
+    const chunks = splitResponse(
+      reply,
+      channelName?.includes('inner-sanctum') ? PLAIN_CHAR_LIMIT : EMBED_CHAR_LIMIT
+    );
     
     // Record Discord usage
     await recordUsage(message.author.id, userTz);

@@ -15,7 +15,7 @@ const knowledgeChunkSchema = new mongoose.Schema({
   source: {
     type: {
       type: String,
-      enum: ['document', 'url', 'text', 'channel', 'vision'],
+      enum: ['document', 'url', 'text', 'channel', 'vision', 'sanctum'],
       required: true
     },
     name: {
@@ -40,6 +40,7 @@ const knowledgeChunkSchema = new mongoose.Schema({
       'samael-aun-weor',
       'community',
       'general',
+      'sanctum',
       'other'
     ],
     default: 'general'
