@@ -120,6 +120,26 @@ knowledgeChunkSchema.index({ parentId: 1 });
 // Index for category filtering
 knowledgeChunkSchema.index({ category: 1, enabled: 1 });
 
+// ============================================================
+// Auto-invalidate the knowledge manifest cache on any write.
+// Covers every ingestion path (routes, Discord bot, future code)
+// without each caller needing to remember to invalidate manually.
+// Lazy require avoids a circular import with knowledgeManifest.js.
+// ============================================================
+function invalidateManifest() {
+  try {
+    const { invalidateManifestCache } = require('../services/knowledgeManifest');
+    invalidateManifestCache();
+    console.log('🔮 Knowledge manifest cache invalidated');
+  } catch (err) {
+    // Silent fail — never break ingestion because of a cache concern
+  }
+}
+
+knowledgeChunkSchema.post('insertMany', invalidateManifest);
+knowledgeChunkSchema.post('deleteMany', invalidateManifest);
+knowledgeChunkSchema.post('updateMany', invalidateManifest);
+
 const KnowledgeChunk = mongoose.model('KnowledgeChunk', knowledgeChunkSchema);
 
 module.exports = KnowledgeChunk;

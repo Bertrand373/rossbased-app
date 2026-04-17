@@ -1,13 +1,13 @@
 // server/services/knowledgeManifest.js
 // Generates a compact summary of what Oracle has access to in its knowledge base.
 // Injected into EVERY Oracle conversation so it knows what it knows.
-// Cached for 1 hour to avoid hitting MongoDB on every message.
+// Cached for 24 hours (invalidated on ingestion via invalidateManifestCache).
 
 const KnowledgeChunk = require('../models/KnowledgeChunk');
 
 let cachedManifest = null;
 let cacheTimestamp = 0;
-const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours — invalidated on ingestion
 
 /**
  * Generate a compact knowledge manifest for Oracle's system prompt.
@@ -24,8 +24,19 @@ async function getKnowledgeManifest() {
 
   try {
     // Aggregate: group by parentId to get document-level view
+    // IMPORTANT: $project immediately after $match to drop the 1536-dim embedding
+    // vector (~12KB per doc × 46K chunks = ~550MB). We only need metadata here.
     const docs = await KnowledgeChunk.aggregate([
       { $match: { enabled: true } },
+      {
+        $project: {
+          parentId: 1,
+          'source.name': 1,
+          category: 1,
+          tokenEstimate: 1,
+          protected: 1
+        }
+      },
       {
         $group: {
           _id: '$parentId',
