@@ -56,6 +56,36 @@ const renderMarkdown = (text) => {
   return parts.length > 0 ? parts : text;
 };
 
+// Streaming word-fade renderer — wraps each word in a span with CSS fade animation.
+// Splits by /(\s+)/ to preserve whitespace (including \n\n paragraph breaks) between words.
+// Each word span keys by index — React mounts new spans as they arrive, triggering
+// the fade animation only for new words. Already-faded words don't re-animate.
+// Does NOT run markdown parsing during streaming (bold/italic applies after completion,
+// when the message is rendered via renderMarkdown as a regular finalized message).
+const renderStreamingWords = (text) => {
+  if (!text) return text;
+
+  // Split preserving whitespace: "Day 44.\n\nThe body" → ["Day"," ","44.","\n\n","The"," ","body"]
+  const tokens = text.split(/(\s+)/);
+  const nodes = [];
+  let wordIndex = 0;
+
+  for (let i = 0; i < tokens.length; i++) {
+    const tok = tokens[i];
+    if (!tok) continue; // skip empty strings from split
+    if (/^\s+$/.test(tok)) {
+      // Pure whitespace — emit raw so pre-wrap preserves \n and paragraph breaks
+      nodes.push(tok);
+    } else {
+      nodes.push(
+        <span key={`w${wordIndex++}`} className="ai-chat-stream-word">{tok}</span>
+      );
+    }
+  }
+
+  return nodes;
+};
+
 // ============================================================
 // SHARE CARD — Canvas-generated branded PNG
 // Draws a dark glass card matching the Oracle chat aesthetic,
@@ -1251,7 +1281,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                 <div className="ai-chat-message-row">
                   <img src="/The_Oracle.png" alt="" className="ai-chat-avatar" />
                   <div className="ai-chat-message-content streaming">
-                    {renderMarkdown(streamingText)}
+                    {renderStreamingWords(streamingText)}
                   </div>
                 </div>
               </div>

@@ -430,6 +430,19 @@
   50% { opacity: 0.8; }
 }
 
+/* Streaming word fade — each word fades in as it arrives from the API.
+   Animation plays once on mount (forwards), so already-rendered words stay visible. */
+.ai-chat-stream-word {
+  display: inline;
+  opacity: 0;
+  animation: streamWordFade 400ms ease forwards;
+}
+
+@keyframes streamWordFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 /* ============================================================
    LOADING STATE
    ============================================================ */
