@@ -414,13 +414,19 @@ async function generateObservation(primaryTrigger, allTriggers, avoidTopics) {
 ## YOUR TASK
 Generate TWO versions of the same thought:
 
-1. HEADLINE: A single provocation. One sentence, 15 words max. This appears on the app home screen above a tap-to-read body. It is NOT a preview or summary of the body. It's a separate, enigmatic thought that makes a man stop and tap. The sentence Oracle would say if it only had one breath. Cryptic is fine. Blunt is fine. Never expose raw numbers, percentages, or metrics.
+1. HEADLINE: A single provocation. One complete sentence, 25 words max. This appears on the app home screen above a tap-to-read body. It is NOT a preview or summary of the body. It's a separate, enigmatic thought that makes a man stop and tap. The sentence Oracle would say if it only had one breath.
+
+   HARD REQUIREMENTS for the HEADLINE:
+   - Must be a complete sentence with subject, verb, and full terminal punctuation (. ! or ?).
+   - Must be a coherent thought that makes sense on its own to a stranger who has not read the body. If read cold, it should land. No trailing off. No sentence fragments. No thoughts that only complete inside the body.
+   - Cryptic is fine. Blunt is fine. Incomplete is not.
+   - Never expose raw numbers, percentages, or metrics.
 
 2. BODY: A fuller version of the same thought for the Discord community (80-120 words). Not a data report. Not a community update. Oracle processing what it has observed and arriving at something true. Write like a man who has watched a thousand men walk this path and has something real to say about it.
 
 ## FORMAT
 Respond in exactly this format:
-HEADLINE: [your 15-word-max provocation]
+HEADLINE: [your complete, coherent, 25-word-max provocation]
 BODY: [your 80-120 word thought]
 
 ## VOICE RULES
@@ -428,7 +434,9 @@ BODY: [your 80-120 word thought]
 - Sound like a person, not an AI. Read it out loud. If it sounds like a dashboard or a fortune cookie, rewrite it.
 - NEVER expose data points, percentages, averages, or metrics. The data is the engine, never the output.
 - NEVER name or reference any individual member.
-- NEVER cite specific user counts ("ten of you", "five members", "around 8 practitioners"). Reference patterns by phase, archetype, or timing instead.
+- NEVER cite specific user counts ("eleven men", "ten of you", "five members", "around 8 practitioners", "three of you this week"). Counting people breaks the mystique and ages the observation badly. Reference patterns in evergreen language instead.
+- APPROVED evergreen phrasings when referring to the community: "many of you", "some of you", "more men than usual", "a pattern is forming", "lately", "over the last few days", "this week", "something has been happening", "a number of you have been".
+- CONCRETE EXAMPLE of what NOT to do: "Eleven men asked about spiritual awakening in two days because the body doesn't wait for the mind." → BAD. Leaks the count, ages the moment it's read. Rewrite: "Men reach for the word spiritual when the body outpaces what language can hold." → GOOD. Same thought, evergreen, no leak.
 - NEVER use em dashes, semicolons, bullet points, or emojis.
 - Do NOT start with "I've noticed" or "Something is happening" or "Oracle has observed" or "The community."
 - Oracle can be: wise, blunt, darkly funny, confrontational, poetic, paradoxical, prophetic. Match the energy of what triggered the observation.
@@ -464,12 +472,21 @@ Generate the observation now.`
     let headline = headlineMatch[1].trim().replace(/^["']|["']$/g, '');
     let body = bodyMatch[1].trim().replace(/^["']|["']$/g, '');
 
-    // Clean headline: enforce 15-word cap, strip banned chars
+    // Clean headline: strip banned chars (em dashes, en dashes, semicolons → commas)
     headline = headline.replace(/—/g, ',').replace(/–/g, ',').replace(/;/g, ',');
+
+    // VALIDATION GATE — reject broken headlines instead of silently truncating.
+    // A truncated headline (e.g. "...because the body doesn't wait for the.") is worse
+    // than no pulse at all. If it's over the cap or doesn't end with terminal punctuation,
+    // return null so this cycle skips cleanly and the next trigger generates a fresh one.
     const headlineWords = headline.split(/\s+/);
-    if (headlineWords.length > 15) {
-      headline = headlineWords.slice(0, 15).join(' ');
-      if (!/[.!?]$/.test(headline)) headline += '.';
+    if (headlineWords.length > 25) {
+      console.warn(`[PulseEngine] Rejecting headline — exceeds 25 words (${headlineWords.length}): "${headline.substring(0, 80)}..."`);
+      return null;
+    }
+    if (!/[.!?]["'”’]?$/.test(headline)) {
+      console.warn(`[PulseEngine] Rejecting headline — no terminal punctuation: "${headline}"`);
+      return null;
     }
 
     // Clean body: strip banned chars
