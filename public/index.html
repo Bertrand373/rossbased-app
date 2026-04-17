@@ -92,18 +92,20 @@
         font-size: 16px !important;
       }
       
-      /* Minimal loader - icon centered in the SAFE AREA, not the full viewport.
-         This matches where iOS's default PWA splash places its icon (center of
-         safe area, above visual center), so the handoff from OS splash → HTML
-         loader shows no position jump. On platforms without safe-area insets
-         (desktop, Android without notches) env() resolves to 0 and the loader
-         fills the full viewport as before. */
+      /* Loader container uses a STABLE height (100lvh = largest viewport
+         height, which does not change during WebKit's viewport-settle pass).
+         This prevents the ~70px downward icon shift that appears on iOS PWA
+         cold start when the viewport initially reports a smaller height and
+         then finalizes ~50-120ms later. The icon's Y-position is locked to
+         50% of lvh, which is constant from first paint through settle.
+         Fallback to 100vh for browsers that don't support lvh (iOS <15.4). */
       #initial-loader {
         position: fixed;
-        top: env(safe-area-inset-top, 0);
-        left: env(safe-area-inset-left, 0);
-        right: env(safe-area-inset-right, 0);
-        bottom: env(safe-area-inset-bottom, 0);
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100lvh;
         display: flex;
         justify-content: center;
         align-items: center;
