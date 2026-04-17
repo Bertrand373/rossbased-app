@@ -92,13 +92,18 @@
         font-size: 16px !important;
       }
       
-      /* Minimal loader - icon only, centered, theme-aware */
+      /* Minimal loader - icon centered in the SAFE AREA, not the full viewport.
+         This matches where iOS's default PWA splash places its icon (center of
+         safe area, above visual center), so the handoff from OS splash → HTML
+         loader shows no position jump. On platforms without safe-area insets
+         (desktop, Android without notches) env() resolves to 0 and the loader
+         fills the full viewport as before. */
       #initial-loader {
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        top: env(safe-area-inset-top, 0);
+        left: env(safe-area-inset-left, 0);
+        right: env(safe-area-inset-right, 0);
+        bottom: env(safe-area-inset-bottom, 0);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -117,12 +122,6 @@
         background-color: #ffffff;
       }
       
-      /* Icon: visible and animating from the first paint.
-         Previously held at opacity:0 with a 200ms setTimeout to mask a
-         WebKit viewport-settle position shift on iOS PWAs. That "fix"
-         caused a visible black screen before the icon appeared. The
-         micro-shift from viewport-settle is a single frame — the black
-         screen was dramatically more noticeable. */
       .loader-icon {
         width: 64px;
         height: 64px;
@@ -159,8 +158,7 @@
       <img class="loader-icon" id="loader-icon" src="%PUBLIC_URL%/icon-192.png" alt="" width="64" height="64" />
     </div>
     
-    <!-- Theme-aware loader icon swap (runs synchronously right after <img> parses,
-         so any visible dark→light icon flash is sub-perceptible for light-theme users) -->
+    <!-- Theme-aware loader icon swap (runs synchronously right after <img> parses) -->
     <script>
       (function() {
         var theme = document.documentElement.getAttribute('data-theme') || 'dark';
@@ -171,7 +169,6 @@
           var ldr = document.getElementById('initial-loader');
           if (ldr) ldr.style.backgroundColor = '#ffffff';
         }
-        // Icon renders immediately via CSS — no setTimeout needed.
       })();
     </script>
     
