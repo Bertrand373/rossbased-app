@@ -19,12 +19,6 @@ const retrieveKnowledge = async (query, options = {}) => {
   const { limit = 5, maxTokens = 2000 } = options;
 
   try {
-    // Check if collection has any documents
-    const tCount = Date.now();
-    const count = await KnowledgeChunk.countDocuments({ enabled: true });
-    console.log(`[Oracle timing]   countDocuments took ${Date.now() - tCount}ms`);
-    if (count === 0) return '';
-
     let results = [];
 
     // === PRIMARY: Vector search (semantic similarity) ===
