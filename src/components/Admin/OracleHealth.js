@@ -12,6 +12,12 @@ const OracleHealth = () => {
   const [error, setError] = useState(null);
   const [showNotes, setShowNotes] = useState(false);
   const [showUsage, setShowUsage] = useState(false);
+  // Pulse card state
+  const [showBody, setShowBody] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
+  const [confirmDismiss, setConfirmDismiss] = useState(false);
+  const [dismissing, setDismissing] = useState(false);
+  const [pulseError, setPulseError] = useState(null);
 
   const token = localStorage.getItem('token');
 
@@ -40,6 +46,58 @@ const OracleHealth = () => {
     const interval = setInterval(fetchHealth, 30000);
     return () => clearInterval(interval);
   }, [fetchHealth]);
+
+  // --- Pulse admin actions ---
+  const handleRegeneratePulse = async () => {
+    if (regenerating) return;
+    setRegenerating(true);
+    setPulseError(null);
+    setConfirmDismiss(false); // Clear any pending dismiss confirm — regenerate supersedes it
+    try {
+      const res = await fetch(`${API}/api/admin/oracle/pulse/regenerate`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `HTTP ${res.status}`);
+      }
+      // Refresh health data to show the new pulse
+      await fetchHealth();
+      // Auto-expand body so Ross can immediately see what was generated
+      setShowBody(true);
+    } catch (err) {
+      setPulseError(err.message);
+    }
+    setRegenerating(false);
+  };
+
+  const handleDismissPulse = async () => {
+    if (dismissing) return;
+    // Two-step confirm
+    if (!confirmDismiss) {
+      setConfirmDismiss(true);
+      setPulseError(null);
+      return;
+    }
+    setDismissing(true);
+    try {
+      const res = await fetch(`${API}/api/admin/oracle/pulse/current`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `HTTP ${res.status}`);
+      }
+      await fetchHealth();
+      setShowBody(false);
+      setConfirmDismiss(false);
+    } catch (err) {
+      setPulseError(err.message);
+    }
+    setDismissing(false);
+  };
 
   if (loading) {
     return (
@@ -211,23 +269,87 @@ const OracleHealth = () => {
         </div>
       )}
 
-      {/* Outcomes + Pulse row */}
-      <div className="oh-row-2">
-        <div className="oh-card oh-card-compact">
-          <h3 className="oh-card-title-sm">Outcomes (Layer 2)</h3>
-          <span className="oh-big-num">{outcomes.measured}</span>
-          <span className="oh-big-sub">of {outcomes.total} measured{outcomes.pending > 0 && ` · ${outcomes.pending} pending`}</span>
-          {outcomes.readyForAggregation && (
-            <span className="oh-ready-badge">Ready for aggregation</span>
+      {/* Outcomes card */}
+      <div className="oh-card oh-card-compact">
+        <h3 className="oh-card-title-sm">Outcomes (Layer 2)</h3>
+        <span className="oh-big-num">{outcomes.measured}</span>
+        <span className="oh-big-sub">of {outcomes.total} measured{outcomes.pending > 0 && ` · ${outcomes.pending} pending`}</span>
+        {outcomes.readyForAggregation && (
+          <span className="oh-ready-badge">Ready for aggregation</span>
+        )}
+      </div>
+
+      {/* Community Pulse — full-width card with admin controls */}
+      <div className="oh-card oh-pulse-card">
+        <div className="oh-pulse-head">
+          <h3 className="oh-card-title-sm">Community Pulse</h3>
+          {communityPulse.latest && (
+            <div className="oh-pulse-meta">
+              <span className="oh-pulse-trigger">{communityPulse.latest.trigger}</span>
+              <span className="oh-pulse-age">{timeAgo(communityPulse.latest.createdAt)}</span>
+            </div>
           )}
         </div>
-        <div className="oh-card oh-card-compact">
-          <h3 className="oh-card-title-sm">Community Pulse</h3>
-          <span className={`oh-pulse-status ${communityPulse.active ? 'on' : 'off'}`}>
-            {communityPulse.active ? 'Active' : 'No Data'}
-          </span>
-          {communityPulse.active && (
-            <p className="oh-pulse-preview">{communityPulse.preview}</p>
+
+        {communityPulse.latest ? (
+          <>
+            <p className="oh-pulse-headline">{communityPulse.latest.headline}</p>
+
+            <button
+              className="oh-pulse-body-toggle"
+              onClick={() => setShowBody(!showBody)}
+            >
+              {showBody ? '▾ Hide body' : '▸ Show body'}
+            </button>
+
+            {showBody && (
+              <p className="oh-pulse-body">{communityPulse.latest.body}</p>
+            )}
+          </>
+        ) : (
+          <p className="oh-pulse-empty">No pulse yet. Regenerate to create one.</p>
+        )}
+
+        {pulseError && (
+          <div className="oh-pulse-error">{pulseError}</div>
+        )}
+
+        <div className="oh-pulse-actions">
+          <button
+            className="oh-pulse-btn oh-pulse-btn-primary"
+            onClick={handleRegeneratePulse}
+            disabled={regenerating || dismissing}
+          >
+            {regenerating ? 'Regenerating…' : 'Regenerate'}
+          </button>
+
+          {communityPulse.latest && (
+            confirmDismiss ? (
+              <>
+                <button
+                  className="oh-pulse-btn oh-pulse-btn-danger"
+                  onClick={handleDismissPulse}
+                  disabled={dismissing || regenerating}
+                >
+                  {dismissing ? 'Dismissing…' : 'Confirm dismiss'}
+                </button>
+                <button
+                  className="oh-pulse-btn oh-pulse-btn-ghost"
+                  onClick={() => setConfirmDismiss(false)}
+                  disabled={dismissing}
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button
+                className="oh-pulse-btn oh-pulse-btn-ghost"
+                onClick={handleDismissPulse}
+                disabled={regenerating}
+              >
+                Dismiss
+              </button>
+            )
           )}
         </div>
       </div>

@@ -2738,7 +2738,10 @@ app.get('/api/admin/oracle-health', authenticate, async (req, res) => {
 
     // --- COMMUNITY PULSE ---
     const { getCommunityPulse } = require('./services/communityPulse');
+    const { getLatestPulse } = require('./services/communityPulseEngine');
     const pulse = await getCommunityPulse();
+    // Also fetch the actual CommunityPulse document (the one shown on Tracker + Discord)
+    const latestPulseDoc = await getLatestPulse();
 
     // --- ORACLE USAGE TODAY (Shared Pool Visibility) ---
     const todayET = getTodayET();
@@ -2870,7 +2873,16 @@ app.get('/api/admin/oracle-health', authenticate, async (req, res) => {
       },
       communityPulse: {
         active: !!pulse,
-        preview: pulse || 'No pulse data yet'
+        preview: pulse || 'No pulse data yet',
+        // The actual pulse doc shown on Tracker + Discord (for admin regenerate/dismiss UI)
+        latest: latestPulseDoc ? {
+          id: latestPulseDoc._id.toString(),
+          headline: latestPulseDoc.headline,
+          body: latestPulseDoc.body,
+          trigger: latestPulseDoc.trigger,
+          createdAt: latestPulseDoc.createdAt,
+          postedToDiscord: !!latestPulseDoc.postedToDiscord
+        } : null
       },
       recentNotes: recentNotes.slice(0, 15),
       health: {
@@ -3065,6 +3077,60 @@ app.get('/api/admin/youtube/pipeline-report', authenticate, async (req, res) => 
     return res.json({ message: 'No pipeline report generated yet. Trigger one with POST /api/admin/youtube/pipeline', ...data });
   }
   res.json(data);
+});
+
+// ============================================
+// COMMUNITY PULSE — Admin manual controls
+// Regenerate bypasses the 18h cooldown; dismiss removes the current pulse so
+// the Tracker hero falls back to the next-most-recent (or the static fallback).
+// ============================================
+
+// POST /api/admin/oracle/pulse/regenerate — force-generate a fresh pulse
+app.post('/api/admin/oracle/pulse/regenerate', authenticate, async (req, res) => {
+  if (req.user.username.toLowerCase() !== 'rossbased' && req.user.username.toLowerCase() !== 'ross') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+  try {
+    const { evaluateAndGenerate } = require('./services/communityPulseEngine');
+    // force=true bypasses cooldown AND creates a 'manual' trigger if no other triggers fired
+    const pulse = await evaluateAndGenerate(true);
+    if (!pulse) {
+      return res.status(500).json({ error: 'Pulse generation failed. Check server logs — the validation gate may have rejected the output.' });
+    }
+    res.json({
+      success: true,
+      pulse: {
+        id: pulse._id.toString(),
+        headline: pulse.headline,
+        body: pulse.body,
+        trigger: pulse.trigger,
+        createdAt: pulse.createdAt
+      }
+    });
+  } catch (err) {
+    console.error('[Admin] Pulse regenerate error:', err);
+    res.status(500).json({ error: 'Regenerate failed', details: err.message });
+  }
+});
+
+// DELETE /api/admin/oracle/pulse/current — remove the latest pulse
+app.delete('/api/admin/oracle/pulse/current', authenticate, async (req, res) => {
+  if (req.user.username.toLowerCase() !== 'rossbased' && req.user.username.toLowerCase() !== 'ross') {
+    return res.status(403).json({ error: 'Admin only' });
+  }
+  try {
+    const CommunityPulse = require('./models/CommunityPulse');
+    const latest = await CommunityPulse.findOne().sort({ createdAt: -1 });
+    if (!latest) {
+      return res.status(404).json({ error: 'No pulse to dismiss' });
+    }
+    await CommunityPulse.deleteOne({ _id: latest._id });
+    console.log(`[Admin] Pulse dismissed: "${latest.headline.substring(0, 60)}..."`);
+    res.json({ success: true, dismissedId: latest._id.toString() });
+  } catch (err) {
+    console.error('[Admin] Pulse dismiss error:', err);
+    res.status(500).json({ error: 'Dismiss failed', details: err.message });
+  }
 });
 
 // ============================================
