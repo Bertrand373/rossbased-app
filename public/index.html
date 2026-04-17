@@ -32,6 +32,115 @@
     <!-- iOS PWA Icon -->
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/apple-touch-icon.png" />
+
+    <!-- =====================================================================
+         iOS PWA SPLASH SCREENS (apple-touch-startup-image)
+         
+         Each image is pre-generated with the icon at dead-center to match the
+         position of #initial-loader .loader-icon in index.html. Dark/light
+         variants select based on the user's iOS system appearance via the
+         prefers-color-scheme media query.
+         
+         Result: when iOS shows its splash, the icon is already in the same
+         pixel position it will occupy after the HTML loader takes over.
+         Zero jump during the splash → HTML handoff.
+         ===================================================================== -->
+
+    <!-- iPhone SE 2nd/3rd gen, 6, 7, 8 (375×667 @2x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-se-dark.png"
+      media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-se-light.png"
+      media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone 6+, 7+, 8+ (414×736 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-8plus-dark.png"
+      media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-8plus-light.png"
+      media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone X, XS, 11 Pro, 12 mini, 13 mini (375×812 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-x-dark.png"
+      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-x-light.png"
+      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone XR, 11 (414×896 @2x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-xr-dark.png"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-xr-light.png"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone XS Max, 11 Pro Max (414×896 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-xsmax-dark.png"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-xsmax-light.png"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone 12, 12 Pro, 13, 13 Pro, 14 (390×844 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-12-dark.png"
+      media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-12-light.png"
+      media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone 12 Pro Max, 13 Pro Max, 14 Plus (428×926 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-12promax-dark.png"
+      media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-12promax-light.png"
+      media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone 14 Pro, 15, 15 Pro (393×852 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-14pro-dark.png"
+      media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-14pro-light.png"
+      media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone 14 Pro Max, 15 Plus, 15 Pro Max (430×932 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-14promax-dark.png"
+      media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-14promax-light.png"
+      media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone 16, 16 Pro (402×874 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-16pro-dark.png"
+      media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-16pro-light.png"
+      media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPhone 16 Plus, 16 Pro Max (440×956 @3x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-16promax-dark.png"
+      media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/iphone-16promax-light.png"
+      media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPad 9.7", Mini (768×1024 @2x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-97-dark.png"
+      media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-97-light.png"
+      media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPad 10.2" (810×1080 @2x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-102-dark.png"
+      media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-102-light.png"
+      media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPad Pro 10.5" (834×1112 @2x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-105-dark.png"
+      media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-105-light.png"
+      media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPad Air 4/5, iPad Pro 11" (834×1194 @2x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-11-dark.png"
+      media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-11-light.png"
+      media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
+
+    <!-- iPad Pro 12.9" (1024×1366 @2x) -->
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-129-dark.png"
+      media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: dark)" />
+    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash/ipad-129-light.png"
+      media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait) and (prefers-color-scheme: light)" />
     
     <title>TitanTrack | Retention Intelligence</title>
     
@@ -94,11 +203,9 @@
       
       /* Loader container uses a STABLE height (100lvh = largest viewport
          height, which does not change during WebKit's viewport-settle pass).
-         This prevents the ~70px downward icon shift that appears on iOS PWA
-         cold start when the viewport initially reports a smaller height and
-         then finalizes ~50-120ms later. The icon's Y-position is locked to
-         50% of lvh, which is constant from first paint through settle.
-         Fallback to 100vh for browsers that don't support lvh (iOS <15.4). */
+         This prevents the downward icon shift that previously appeared on
+         iOS PWA cold start. The icon's Y-position is locked to 50% of lvh,
+         which is constant from first paint through settle. */
       #initial-loader {
         position: fixed;
         top: 0;
@@ -114,12 +221,10 @@
         background-color: #000000;
       }
       
-      /* Dark theme loader */
       html:not([data-theme="light"]) #initial-loader {
         background-color: #000000;
       }
       
-      /* Light theme loader */
       html[data-theme="light"] #initial-loader {
         background-color: #ffffff;
       }
