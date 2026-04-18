@@ -2740,6 +2740,24 @@ ${extraContext ? `\nThe seeker adds this context: "${extraContext}"` : ''}`,
   
   // Only respond if mentioned OR in allowed channel
   if (!isMentioned && !isAllowedChannel) return;
+
+  // Sanctum gate: in inner-sanctum, only respond to natural-language chat when
+  // Oracle is directly summoned (@mention or reply to one of its messages).
+  // This lets vanguards converse freely without Oracle interjecting on every
+  // message. Commands (!teach, !decode, !grimoire, !sanctum) and auto-decode
+  // already ran above and returned early if they matched.
+  if (channelName?.includes('inner-sanctum')) {
+    let isReplyToOracle = false;
+    if (message.reference?.messageId) {
+      try {
+        const referenced = await message.channel.messages.fetch(message.reference.messageId);
+        isReplyToOracle = referenced?.author?.id === client.user.id;
+      } catch {
+        // Referenced message unfetchable — treat as not replying to Oracle
+      }
+    }
+    if (!isMentioned && !isReplyToOracle) return;
+  }
   
   // Clean the message content (remove bot mention)
   let content = message.content
