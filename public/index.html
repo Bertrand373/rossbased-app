@@ -192,17 +192,21 @@
         font-size: 16px !important;
       }
       
-      /* Full-viewport background for the loader.
-         Icon is positioned absolutely (see .loader-icon below), so this
-         container only provides the solid background color — no flex
-         centering happens here. */
+      /* =================================================================
+         BROWSER MODE — flex centering inside a full-viewport container.
+         This uses the VISIBLE viewport (inset:0 snaps to visible edges in
+         iOS Safari), so the icon stays at true visual center even when
+         the URL bar is showing. Always worked correctly; restored here.
+         ================================================================= */
       #initial-loader {
         position: fixed;
         top: 0;
         left: 0;
-        width: 100vw;
-        height: 100vh;
-        height: 100lvh;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         z-index: 9999;
         transition: background-color 0.2s ease;
         background-color: #000000;
@@ -216,110 +220,89 @@
         background-color: #ffffff;
       }
       
-      /* Icon uses position:fixed + device-pinned 'top' (see @media rules below)
-         instead of flex or viewport-% centering.
-         
-         The 1.2s animation-delay is load-bearing: it keeps the icon in its
-         static base state (opacity 1, scale 1) during the iOS splash → HTML
-         handoff window. Without the delay, the pulse is already mid-cycle by
-         the time the splash dismisses, so the user sees the icon flash from
-         the splash's bright static state to whatever dim keyframe the pulse
-         happens to be on — producing the frame-level flicker visible in
-         screen recordings. With the delay, the splash dismisses into a
-         bright, static, pixel-identical icon, and the pulse begins 1.2s
-         later from the same bright state. */
       .loader-icon {
-        position: fixed;
-        top: 50%;  /* generic fallback — used by devices not in the @media list */
-        left: 50%;
         width: 64px;
         height: 64px;
         opacity: 1;
-        transform: translate(-50%, -50%) translateZ(0);
-        -webkit-transform: translate(-50%, -50%) translateZ(0);
-        animation: pulse 2s ease-in-out 1.2s infinite;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        animation: pulse 2s ease-in-out infinite;
       }
       
-      /* Pulse animation preserves the centering transform so scale() doesn't
-         knock the icon off-center. */
       @keyframes pulse {
         0%, 100% {
           opacity: 1;
-          transform: translate(-50%, -50%) translateZ(0) scale(1);
+          transform: translateZ(0) scale(1);
         }
         50% {
           opacity: 0.4;
-          transform: translate(-50%, -50%) translateZ(0) scale(0.95);
+          transform: translateZ(0) scale(0.95);
         }
       }
       
       /* =================================================================
-         DEVICE-PINNED ICON POSITIONS
+         PWA STANDALONE MODE ONLY — pin the icon to an absolute pixel
+         position per device so the iOS viewport-settle race cannot
+         affect it. In standalone mode viewport == device, so these
+         pinned values equal the true visual center of the screen.
          
-         Each rule pins the icon's Y-coordinate to exactly 50% of that
-         device's hardware height. Values match the icon center of the
-         corresponding apple-touch-startup-image splash, so splash → HTML
-         transition is pixel-identical on every supported device.
+         Not applied in browser mode (where viewport < device because
+         of the URL bar) — browser uses the flex centering above.
          ================================================================= */
+      @media (display-mode: standalone) {
+        .loader-icon {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          margin-top: -32px;
+          margin-left: -32px;
+        }
+      }
       
-      /* iPhone SE/6/7/8 — 375×667 */
-      @media (device-height: 667px) and (orientation: portrait) {
+      /* Device-specific Y-coordinate overrides (PWA only) */
+      @media (display-mode: standalone) and (device-height: 667px) and (orientation: portrait) {
         .loader-icon { top: 334px; }
       }
-      /* iPhone 6+/7+/8+ — 414×736 */
-      @media (device-height: 736px) and (orientation: portrait) {
+      @media (display-mode: standalone) and (device-height: 736px) and (orientation: portrait) {
         .loader-icon { top: 368px; }
       }
-      /* iPhone X/XS/11 Pro/12 mini/13 mini — 375×812 */
-      @media (device-height: 812px) and (orientation: portrait) {
+      @media (display-mode: standalone) and (device-height: 812px) and (orientation: portrait) {
         .loader-icon { top: 406px; }
       }
-      /* iPhone 12/13/14 — 390×844 */
-      @media (device-height: 844px) and (orientation: portrait) {
+      @media (display-mode: standalone) and (device-height: 844px) and (orientation: portrait) {
         .loader-icon { top: 422px; }
       }
-      /* iPhone 14 Pro/15/15 Pro — 393×852 */
-      @media (device-height: 852px) and (orientation: portrait) {
+      @media (display-mode: standalone) and (device-height: 852px) and (orientation: portrait) {
         .loader-icon { top: 426px; }
       }
-      /* iPhone 16/16 Pro — 402×874 */
-      @media (device-height: 874px) and (orientation: portrait) {
+      @media (display-mode: standalone) and (device-height: 874px) and (orientation: portrait) {
         .loader-icon { top: 437px; }
       }
-      /* iPhone XR/11/XS Max/11 Pro Max — 414×896 */
-      @media (device-height: 896px) and (orientation: portrait) {
+      @media (display-mode: standalone) and (device-height: 896px) and (orientation: portrait) {
         .loader-icon { top: 448px; }
       }
-      /* iPhone 12/13 Pro Max, 14 Plus — 428×926 */
-      @media (device-height: 926px) and (orientation: portrait) {
+      @media (display-mode: standalone) and (device-height: 926px) and (orientation: portrait) {
         .loader-icon { top: 463px; }
       }
-      /* iPhone 14 Pro Max/15 Plus/15 Pro Max — 430×932 */
-      @media (device-height: 932px) and (orientation: portrait) {
+      @media (display-mode: standalone) and (device-height: 932px) and (orientation: portrait) {
         .loader-icon { top: 466px; }
       }
-      /* iPhone 16 Plus/16 Pro Max — 440×956 */
-      @media (device-height: 956px) and (orientation: portrait) {
+      @media (display-mode: standalone) and (device-height: 956px) and (orientation: portrait) {
         .loader-icon { top: 478px; }
       }
-      /* iPad 9.7/Mini — 768×1024 */
-      @media (device-height: 1024px) and (orientation: portrait) {
+      @media (display-mode: standalone) and (device-height: 1024px) and (orientation: portrait) {
         .loader-icon { top: 512px; }
       }
-      /* iPad 10.2 — 810×1080 */
-      @media (device-height: 1080px) and (orientation: portrait) {
+      @media (display-mode: standalone) and (device-height: 1080px) and (orientation: portrait) {
         .loader-icon { top: 540px; }
       }
-      /* iPad Pro 10.5 — 834×1112 */
-      @media (device-height: 1112px) and (orientation: portrait) {
+      @media (display-mode: standalone) and (device-height: 1112px) and (orientation: portrait) {
         .loader-icon { top: 556px; }
       }
-      /* iPad Air/Pro 11 — 834×1194 */
-      @media (device-height: 1194px) and (orientation: portrait) {
+      @media (display-mode: standalone) and (device-height: 1194px) and (orientation: portrait) {
         .loader-icon { top: 597px; }
       }
-      /* iPad Pro 12.9 — 1024×1366 */
-      @media (device-height: 1366px) and (orientation: portrait) {
+      @media (display-mode: standalone) and (device-height: 1366px) and (orientation: portrait) {
         .loader-icon { top: 683px; }
       }
     </style>
