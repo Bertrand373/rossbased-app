@@ -1978,11 +1978,14 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
     res.setHeader('Connection', 'keep-alive');
 
     // Stream from Claude with natural pacing
+    // stop_sequences prevent the model from drifting into prompt-scaffolding mode
+    // (e.g. hallucinating "USER:" turns or "IMPORTANT INSTRUCTION FOR THIS RESPONSE:" blocks)
     const stream = await anthropic.messages.stream({
       model: ORACLE_MODEL,
       max_tokens: 1000,
       system: systemWithKnowledge,
-      messages: messages
+      messages: messages,
+      stop_sequences: ['\nUSER:', '\nSYSTEM:', '\nIMPORTANT INSTRUCTION', '\n[SYSTEM]']
     });
     __tMark('Claude stream opened');
 
