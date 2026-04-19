@@ -244,7 +244,7 @@ ${dataBlock}
 Write the complete email now. Output ONLY the email with the subject line on the first line prefixed with "SUBJECT: ".`;
 
   const response = await anthropic.messages.create({
-    model: process.env.ORACLE_MODEL || 'claude-sonnet-4-5-20250514',
+    model: process.env.EMAIL_AGENT_MODEL || 'claude-opus-4-7',
     max_tokens: 1000,
     messages: [{ role: 'user', content: emailPrompt }]
   });
@@ -274,13 +274,33 @@ Write the complete email now. Output ONLY the email with the subject line on the
 // KIT API — Create, schedule, cancel broadcasts
 // ============================================================
 
+// Convert plain-text body (with blank-line paragraph breaks) to HTML paragraphs.
+// Kit V4 renders broadcast content as HTML, so raw newlines collapse into one paragraph.
+// We wrap each paragraph in <p> tags (minimal HTML, no styling, no logos) so the email
+// still reads as a personal plain-text note but renders with proper paragraph breaks.
+function plainTextToHtmlParagraphs(text) {
+  if (!text) return '';
+  return text
+    .split(/\n\s*\n/)
+    .map(p => p.trim())
+    .filter(p => p.length > 0)
+    .map(p => {
+      const escaped = p
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      return `<p>${escaped.replace(/\n/g, '<br>')}</p>`;
+    })
+    .join('\n');
+}
+
 async function createKitBroadcast(subject, body, tagId, sendAt) {
   if (!KIT_API_KEY) throw new Error('KIT_API_KEY not set in environment');
 
   // Step 1: Create the broadcast (Kit V4 uses flat fields, NOT nested under "broadcast")
   const createPayload = {
     subject,
-    content: body,
+    content: plainTextToHtmlParagraphs(body),
     description: `Email Agent — Auto-generated ${new Date().toISOString().split('T')[0]}`,
     public: false
   };
