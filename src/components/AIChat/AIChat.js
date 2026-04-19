@@ -747,7 +747,10 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     return () => document.body.classList.remove('modal-open');
   }, [isOpen]);
 
-  // iOS PWA keyboard fix — continuously adjust panel via visualViewport
+  // iOS PWA keyboard fix — lift panel above keyboard via visualViewport
+  // Previous version only resized the panel's height, which did nothing because
+  // `position: fixed; bottom: 0;` kept the bottom glued to the screen (behind the
+  // keyboard). Setting `bottom` to the keyboard inset is what actually lifts it.
   useEffect(() => {
     if (!isOpen || !window.visualViewport) return;
     const vv = window.visualViewport;
@@ -755,26 +758,27 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     if (!panel) return;
 
     const adjust = () => {
-      const offset = window.innerHeight - vv.height - vv.offsetTop;
-      if (offset > 50) {
-        // Keyboard is open
+      const keyboardInset = window.innerHeight - vv.height - vv.offsetTop;
+      if (keyboardInset > 50) {
+        // Keyboard is open — lift the panel above it and shrink to fit
+        panel.style.bottom = `${keyboardInset}px`;
         panel.style.height = `${vv.height}px`;
-        panel.style.transform = 'translateY(0)';
       } else {
-        // Keyboard closed — reset
+        // Keyboard closed — reset to CSS defaults
+        panel.style.bottom = '';
         panel.style.height = '';
-        panel.style.transform = '';
       }
     };
 
     vv.addEventListener('resize', adjust);
     vv.addEventListener('scroll', adjust);
+    adjust(); // Run once on open in case keyboard is already up
     return () => {
       vv.removeEventListener('resize', adjust);
       vv.removeEventListener('scroll', adjust);
       if (panel) {
+        panel.style.bottom = '';
         panel.style.height = '';
-        panel.style.transform = '';
       }
     };
   }, [isOpen]);
