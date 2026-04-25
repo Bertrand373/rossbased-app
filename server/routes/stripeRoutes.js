@@ -121,7 +121,24 @@ router.post('/create-checkout', authenticate, async (req, res) => {
     
     // Create or retrieve Stripe customer
     let customerId = user.subscription?.stripeCustomerId;
-    
+
+    // Self-heal: if the stored ID points to a customer that no longer exists
+    // in Stripe (deleted, or test/live-mode mismatch from a key swap), drop it
+    // and fall through to creating a fresh one.
+    if (customerId) {
+      try {
+        const existing = await stripe.customers.retrieve(customerId);
+        if (existing.deleted) customerId = null;
+      } catch (err) {
+        if (err.code === 'resource_missing') {
+          console.warn(`Stale stripeCustomerId for ${user.username} (${customerId}) — recreating`);
+          customerId = null;
+        } else {
+          throw err;
+        }
+      }
+    }
+
     if (!customerId) {
       const customer = await stripe.customers.create({
         email: user.email || undefined,

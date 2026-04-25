@@ -108,7 +108,7 @@ export const useSubscription = (isLoggedIn) => {
       return data;
     } catch (error) {
       console.error('Checkout error:', error);
-      return null;
+      throw error;
     }
   }, []);
 
