@@ -3,7 +3,11 @@
    with subtle differentiators: status pill, feedback echo card). */
 
 /* =============================================================================
-   SHEET OVERRIDES — same z-index level as PlanModal/WhatsNew
+   SHEET LAYOUT — flex column with sticky header / scrolling middle / sticky
+   footer. Mirrors the calendar modal pattern (CalendarModals.css) so the
+   primary action stays reachable without scrolling and the header stays
+   anchored. The scrolling region uses a mask-image gradient to soft-fade
+   into the sticky regions above and below.
    ============================================================================= */
 
 .sheet-backdrop.tx-backdrop {
@@ -13,32 +17,22 @@
 .sheet-panel.tx-sheet {
   z-index: 10001;
   max-height: 85dvh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* =============================================================================
-   CONTENT WRAPPER
+   STICKY HEADER
    ============================================================================= */
 
-.tx-content {
+.tx-modal-header {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 0 8px;
-}
-
-/* =============================================================================
-   HEADER
-   ============================================================================= */
-
-.tx-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
+  padding: 0 8px 16px;
 }
 
 .tx-icon {
@@ -60,20 +54,36 @@
   margin: 0 0 8px 0;
 }
 
+/* Status reads as a quiet uppercase label — no color accent. The word itself
+   carries the semantic; matches the monochrome treatment used elsewhere. */
 .tx-status {
   font-size: 0.625rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  color: var(--text-tertiary);
 }
 
-.tx-status-fixed {
-  color: rgba(34, 197, 94, 0.85);
+/* =============================================================================
+   SCROLLING MIDDLE — content between sticky header and footer. Mask-image
+   gradient soft-fades the top and bottom 16px so scrolling content blends
+   into the sticky regions instead of clipping abruptly.
+   ============================================================================= */
+
+.tx-modal-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 8px 8px 16px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
 }
 
-.tx-status-acknowledged {
-  color: rgba(234, 179, 8, 0.8);
-}
+.tx-modal-content::-webkit-scrollbar { display: none; }
 
 /* =============================================================================
    ORIGINAL FEEDBACK ECHO — small card showing what they reported
@@ -134,10 +144,20 @@
    ============================================================================= */
 
 .tx-date {
+  display: block;
+  text-align: center;
   font-size: 0.6875rem;
   font-weight: 500;
   color: var(--text-tertiary);
-  margin-bottom: 24px;
+}
+
+/* =============================================================================
+   STICKY FOOTER — primary action stays reachable while content scrolls
+   ============================================================================= */
+
+.tx-modal-footer {
+  flex-shrink: 0;
+  padding: 16px 8px 0;
 }
 
 /* =============================================================================
@@ -168,8 +188,11 @@
    ============================================================================= */
 
 @media (max-width: 480px) {
-  .tx-content {
-    padding: 0 4px;
+  .tx-modal-header,
+  .tx-modal-content,
+  .tx-modal-footer {
+    padding-left: 4px;
+    padding-right: 4px;
   }
 
   .tx-title {

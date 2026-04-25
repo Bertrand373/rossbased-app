@@ -79,15 +79,16 @@ const TransmissionSheet = ({ pending, onAcknowledge, suppress }) => {
       >
         <div className="sheet-header" />
 
-        <div className="tx-content">
-          <div className="tx-header">
-            <img src="/tt-icon-white.png" alt="" className="tx-icon" />
-            <h2 className="tx-title">Transmission</h2>
-            <span className={`tx-status tx-status-${current.status || 'fixed'}`}>
-              {statusLabel}
-            </span>
-          </div>
+        {/* Sticky header — TT mark, title, status. Stays put while body scrolls. */}
+        <div className="tx-modal-header">
+          <img src="/tt-icon-white.png" alt="" className="tx-icon" />
+          <h2 className="tx-title">Transmission</h2>
+          <span className="tx-status">{statusLabel}</span>
+        </div>
 
+        {/* Scrolling middle — feedback echo + message body + date. Mask-image fades
+            the top/bottom edges so content reads as continuing under the sticky regions. */}
+        <div className="tx-modal-content">
           {current.feedbackText && (
             <div className="tx-original">
               <span className="tx-original-label">Your feedback</span>
@@ -104,7 +105,10 @@ const TransmissionSheet = ({ pending, onAcknowledge, suppress }) => {
           </div>
 
           {formattedDate && <span className="tx-date">{formattedDate}</span>}
+        </div>
 
+        {/* Sticky footer — primary action stays reachable without scrolling. */}
+        <div className="tx-modal-footer">
           <button className="tx-dismiss" onClick={handleAcknowledge}>
             Acknowledge
           </button>
