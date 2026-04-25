@@ -55,12 +55,14 @@ const getPlatformInfo = () => {
 // MINIMAL SVG ICONS
 // =============================================================================
 
-// Apple's Share glyph: narrow open-top box with vertical arrow breaching the top.
-// Closer proportions to the SF Symbol `square.and.arrow.up` than a generic upload icon.
+// Apple's Share glyph (SF Symbol `square.and.arrow.up`): near-square container
+// with all four corners rounded equally, top "lips" on either side of a narrow
+// notch, and a vertical arrow whose shaft penetrates exactly to the box's
+// vertical midpoint. Matches the iOS Safari toolbar Share button.
 const ShareIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M8 11v8a2 2 0 002 2h4a2 2 0 002-2v-8"/>
-    <path d="M12 16V4M9 7l3-3 3 3"/>
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 10H8a3 3 0 00-3 3v6a3 3 0 003 3h8a3 3 0 003-3v-6a3 3 0 00-3-3h-1"/>
+    <path d="M12 16V5M10 7l2-2 2 2"/>
   </svg>
 );
 
@@ -85,12 +87,12 @@ const CheckIcon = () => (
   </svg>
 );
 
-// Safari compass — circle with red/white needle (simplified)
-const SafariIcon = ({ size = 20 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-    <circle cx="12" cy="12" r="9"/>
-    <path d="M12 12l4.5-6.5L10 10z" fill="currentColor" stroke="none"/>
-    <path d="M12 12l-4.5 6.5L14 14z" fill="currentColor" stroke="none" opacity="0.45"/>
+// Generic browser window glyph — line-only, no brand marks. Used in the
+// "Open in Safari" step + warning when the user is on iOS but not in Safari.
+const BrowserIcon = ({ size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="5" width="18" height="14" rx="2"/>
+    <path d="M3 9h18"/>
   </svg>
 );
 
@@ -111,7 +113,7 @@ const getInstructionSteps = (platform, browser) => {
   // except Safari, so step 01 is "open in Safari".
   if (platform === 'ios' && browser !== 'safari') {
     return [
-      { num: '01', icon: <SafariIcon />, title: 'Open in Safari', desc: 'iOS only allows installs there' },
+      { num: '01', icon: <BrowserIcon />, title: 'Open in Safari', desc: 'iOS only allows installs there' },
       { num: '02', icon: <ShareIcon />, title: 'Tap Share', desc: 'In the Safari toolbar' },
       { num: '03', icon: <PlusIcon />, title: 'Add to Home Screen', desc: 'Then tap Add' }
     ];
@@ -139,6 +141,50 @@ const getInstructionSteps = (platform, browser) => {
     { num: '02', icon: <CheckIcon />, title: 'Confirm', desc: 'Click Install' }
   ];
 };
+
+// Compact Share Sheet mockup showing the iOS native share sheet with
+// "Add to Home Screen" highlighted, since users have to scroll/scan to
+// find it among the standard share sheet rows. Mirrors the toolbar
+// mockup's gold-pulse aesthetic.
+const ShareSheetMockup = () => (
+  <div className="install-shsheet-mockup" aria-hidden="true">
+    <div className="install-shsheet-row install-shsheet-row-dim">
+      <span>Add to Bookmarks</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 4h12v17l-6-4-6 4z"/>
+      </svg>
+    </div>
+    <div className="install-shsheet-row install-shsheet-row-dim">
+      <span>Find on Page</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="11" cy="11" r="6"/>
+        <path d="M20 20l-4-4"/>
+      </svg>
+    </div>
+
+    <div className="install-shsheet-target-wrap">
+      <div className="install-shsheet-arrow">
+        <ChevronDownAnim />
+      </div>
+      <div className="install-shsheet-row install-shsheet-row-target">
+        <span>Add to Home Screen</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+          <rect x="4" y="4" width="16" height="16" rx="3"/>
+          <path d="M12 8v8M8 12h8"/>
+        </svg>
+      </div>
+    </div>
+
+    <div className="install-shsheet-row install-shsheet-row-dim">
+      <span>More</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+        <circle cx="6" cy="12" r="1.5"/>
+        <circle cx="12" cy="12" r="1.5"/>
+        <circle cx="18" cy="12" r="1.5"/>
+      </svg>
+    </div>
+  </div>
+);
 
 // Compact Safari bottom-toolbar mockup, with a bouncing arrow drawing the
 // eye to the Share icon. Only shown when the user is actually in iOS Safari.
@@ -206,6 +252,13 @@ const InstallPrompt = ({
   const [sheetReady, setSheetReady] = useState(false);
   const panelRef = useRef(null);
 
+  // Dev/admin preview: ?install=preview bypasses all gates (platform check,
+  // dismissal cooldown, visit count threshold, and suppress prop). Lets us
+  // QA the sheet from any browser without needing to manipulate localStorage
+  // or simulate iPhone UA.
+  const isPreviewMode = typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('install') === 'preview';
+
   // Sheet open animation
   useEffect(() => {
     if (isVisible) {
@@ -244,11 +297,11 @@ const InstallPrompt = ({
   
   // Smart trigger logic
   useEffect(() => {
-    if (forceShow) {
+    if (forceShow || isPreviewMode) {
       setIsVisible(true);
       return;
     }
-    
+
     if (!platformInfo?.isInstallable) return;
     
     // Check dismissal status
@@ -309,10 +362,9 @@ const InstallPrompt = ({
     });
   };
   
-  // Don't render if conditions not met
-  if (!isVisible || !platformInfo || platformInfo.isStandalone || suppress) {
-    return null;
-  }
+  // Don't render if conditions not met (preview mode bypasses standalone + suppress)
+  if (!isVisible || !platformInfo) return null;
+  if (!isPreviewMode && (platformInfo.isStandalone || suppress)) return null;
   
   const steps = getInstructionSteps(platformInfo.platform, platformInfo.browser);
   const canUseNativeInstall = deferredPrompt && platformInfo.platform !== 'ios';
@@ -349,7 +401,7 @@ const InstallPrompt = ({
             {isIOSNonSafari && (
               <div className="install-safari-warning">
                 <div className="install-safari-warning-icon">
-                  <SafariIcon size={22} />
+                  <BrowserIcon size={22} />
                 </div>
                 <div className="install-safari-warning-text">
                   <strong>Open in Safari to install</strong>
@@ -358,8 +410,13 @@ const InstallPrompt = ({
               </div>
             )}
 
-            {/* iOS Safari: show toolbar mockup pointing at the Share icon */}
-            {isIOSSafari && <SafariToolbarMockup />}
+            {/* iOS Safari: show toolbar mockup (step 1) + share-sheet mockup (step 2) */}
+            {isIOSSafari && (
+              <>
+                <SafariToolbarMockup />
+                <ShareSheetMockup />
+              </>
+            )}
 
             {/* Manual Steps */}
             <div className="install-steps">

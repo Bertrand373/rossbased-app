@@ -31,6 +31,10 @@
   margin-bottom: 20px;
 }
 
+[data-theme="light"] .install-app-icon {
+  filter: invert(1);
+}
+
 .install-header h2 {
   font-size: 1.375rem;
   font-weight: 500;
@@ -50,56 +54,48 @@
    SAFARI WARNING BANNER — shown when user is on iOS but not in Safari
    ============================================================================= */
 
+/* Typography-forward, no card chrome — just centered text with a small line
+   icon and a divider rule below to separate from the steps list. Matches the
+   minimal aesthetic of WhatsNew / PlanModal. */
 .install-safari-warning {
   display: flex;
-  gap: 14px;
-  padding: 14px 16px;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding-bottom: 24px;
   margin-bottom: 24px;
-  background: rgba(234, 179, 8, 0.08);
-  border: 1px solid rgba(234, 179, 8, 0.25);
-  border-radius: 12px;
-  text-align: left;
+  border-bottom: 1px solid var(--border);
 }
 
 .install-safari-warning-icon {
-  flex-shrink: 0;
-  color: rgba(234, 179, 8, 0.85);
+  color: var(--text-secondary);
   display: flex;
-  align-items: flex-start;
-  padding-top: 2px;
-}
-
-.install-safari-warning-text {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  justify-content: center;
 }
 
 .install-safari-warning-text strong {
-  font-size: 0.875rem;
-  font-weight: 600;
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 500;
   color: var(--text);
   letter-spacing: -0.01em;
+  margin-bottom: 6px;
 }
 
 .install-safari-warning-text span {
+  display: block;
   font-size: 0.8125rem;
   color: var(--text-muted);
   line-height: 1.5;
-}
-
-[data-theme="light"] .install-safari-warning {
-  background: rgba(180, 130, 0, 0.08);
-  border-color: rgba(180, 130, 0, 0.3);
-}
-
-[data-theme="light"] .install-safari-warning-icon {
-  color: rgba(180, 130, 0, 0.95);
+  max-width: 280px;
 }
 
 /* =============================================================================
    SAFARI TOOLBAR MOCKUP — shown for iOS Safari users to point out the Share
-   icon they need to tap. Arrow pulses gently above the share button.
+   icon they need to tap. Static chevron above; highlighted button uses the
+   same surface-raised + secondary-border treatment as PlanModal's selected card.
    ============================================================================= */
 
 .install-toolbar-mockup {
@@ -163,7 +159,8 @@
   opacity: 0.32;
 }
 
-/* Share button gets the spotlight: full opacity + gold ring + bouncing arrow */
+/* Share button highlight — matches PlanModal's selected pattern: surface-raised
+   background + a slightly more prominent border. No color accents, no animation. */
 .install-toolbar-share-wrap {
   position: relative;
   display: flex;
@@ -173,36 +170,108 @@
 
 .install-toolbar-arrow {
   position: absolute;
-  top: -18px;
-  color: rgba(234, 179, 8, 0.9);
-  animation: install-arrow-bounce 1.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  top: -16px;
+  color: var(--text-secondary);
+  animation: install-pointer-breathe 4s ease-in-out infinite;
 }
 
 .install-toolbar-share {
   color: var(--text);
-  background: rgba(234, 179, 8, 0.14);
-  box-shadow: 0 0 0 1.5px rgba(234, 179, 8, 0.55);
-  animation: install-share-pulse 2.4s ease-in-out infinite;
+  background: var(--surface-raised);
+  box-shadow: 0 0 0 1px var(--border);
+  animation: install-spotlight-breathe 4s ease-in-out infinite;
 }
 
-@keyframes install-arrow-bounce {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(4px); }
+/* Brand animation language: subtle 4s breathe matching .btn-primary on Tracker.
+   Border opacity shifts between subtle and slightly more visible, that's all. */
+@keyframes install-spotlight-breathe {
+  0%, 100% { box-shadow: 0 0 0 1px var(--border); }
+  50%      { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.32); }
 }
 
-/* Pulse the scale rather than colors so the same keyframe works in both themes */
-@keyframes install-share-pulse {
-  0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.06); }
-}
-
-[data-theme="light"] .install-toolbar-arrow {
-  color: rgba(180, 130, 0, 0.95);
+@keyframes install-pointer-breathe {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 0.85; }
 }
 
 [data-theme="light"] .install-toolbar-share {
-  background: rgba(180, 130, 0, 0.12);
-  box-shadow: 0 0 0 1.5px rgba(180, 130, 0, 0.6);
+  animation-name: install-spotlight-breathe-light;
+}
+
+@keyframes install-spotlight-breathe-light {
+  0%, 100% { box-shadow: 0 0 0 1px var(--border); }
+  50%      { box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.32); }
+}
+
+/* =============================================================================
+   SHARE SHEET MOCKUP — iOS share sheet rows with "Add to Home Screen"
+   highlighted using the same restrained treatment as the toolbar mockup.
+   ============================================================================= */
+
+.install-shsheet-mockup {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.install-shsheet-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text-secondary);
+}
+
+.install-shsheet-row-dim {
+  opacity: 0.36;
+}
+
+.install-shsheet-target-wrap {
+  position: relative;
+  margin: 4px 0;
+}
+
+.install-shsheet-arrow {
+  position: absolute;
+  left: 50%;
+  top: -14px;
+  transform: translateX(-50%);
+  color: var(--text-secondary);
+  z-index: 1;
+  animation: install-pointer-breathe 4s ease-in-out infinite;
+}
+
+/* Shsheet row already has a real border; animate that directly to avoid
+   double outlines from a stacked box-shadow ring. */
+.install-shsheet-row-target {
+  color: var(--text);
+  background: var(--surface-raised);
+  animation: install-border-breathe 4s ease-in-out infinite;
+}
+
+@keyframes install-border-breathe {
+  0%, 100% { border-color: var(--border); }
+  50%      { border-color: rgba(255, 255, 255, 0.32); }
+}
+
+[data-theme="light"] .install-shsheet-row-target {
+  animation-name: install-border-breathe-light;
+}
+
+@keyframes install-border-breathe-light {
+  0%, 100% { border-color: var(--border); }
+  50%      { border-color: rgba(0, 0, 0, 0.32); }
 }
 
 /* =============================================================================
@@ -442,8 +511,10 @@
     transition: none;
   }
 
+  .install-toolbar-share,
   .install-toolbar-arrow,
-  .install-toolbar-share {
+  .install-shsheet-row-target,
+  .install-shsheet-arrow {
     animation: none;
   }
 }
