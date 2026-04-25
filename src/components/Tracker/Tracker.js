@@ -1454,8 +1454,6 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
               <p className="scene-picker-hint">Tap to preview. The temple shifts behind this sheet.</p>
               <div className="scene-picker-list">
                 {SCENE_META.map((s) => {
-                  const isLight = (typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'light');
-                  const swatch = (SCENE_SWATCH[s.key] && (isLight ? SCENE_SWATCH[s.key].light : SCENE_SWATCH[s.key].dark)) || 'rgb(212,175,55)';
                   const isActive = previewScene === s.key;
                   return (
                     <button
@@ -1464,7 +1462,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                       onClick={() => setPreviewScene(s.key)}
                       type="button"
                     >
-                      <span className="scene-option-swatch" style={{ background: swatch }} />
+                      <span className="scene-option-swatch" style={{ background: SCENE_SWATCH[s.key] }} />
                       <span className="scene-option-text">
                         <span className="scene-option-label">{s.label}</span>
                         <span className="scene-option-tag">{s.tag}</span>

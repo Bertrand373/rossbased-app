@@ -186,6 +186,19 @@ body {
 }
 
 /* =============================================================================
+   VIEW TRANSITIONS — smooth theme toggle crossfade
+   When the theme swaps, document.startViewTransition() captures a snapshot of
+   the page and crossfades old → new. Tune duration/easing here to match the
+   rest of the motion language (matches sheet open/close cubic-bezier).
+   ============================================================================= */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* =============================================================================
    SCROLLBAR - Minimal, barely visible
    ============================================================================= */
 

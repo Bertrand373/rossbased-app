@@ -67,16 +67,25 @@ const ThemeProvider = ({ children }) => {
     return localStorage.getItem('titantrack-theme') || 'dark';
   });
 
-  // Apply theme to document and update localStorage
+  // Apply theme to document and update localStorage.
+  // Uses the View Transitions API for a smooth crossfade where supported
+  // (Chromium + Safari 18+); falls through to a snap on older browsers.
   const setTheme = (newTheme) => {
-    setThemeState(newTheme);
-    localStorage.setItem('titantrack-theme', newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme);
-    
-    // Update theme-color meta tag for browser chrome
-    const themeColorMeta = document.getElementById('theme-color-meta');
-    if (themeColorMeta) {
-      themeColorMeta.setAttribute('content', newTheme === 'light' ? '#f4ede0' : '#000000');
+    const apply = () => {
+      setThemeState(newTheme);
+      localStorage.setItem('titantrack-theme', newTheme);
+      document.documentElement.setAttribute('data-theme', newTheme);
+
+      const themeColorMeta = document.getElementById('theme-color-meta');
+      if (themeColorMeta) {
+        themeColorMeta.setAttribute('content', newTheme === 'light' ? '#f4ede0' : '#000000');
+      }
+    };
+
+    if (typeof document !== 'undefined' && document.startViewTransition) {
+      document.startViewTransition(apply);
+    } else {
+      apply();
     }
   };
 

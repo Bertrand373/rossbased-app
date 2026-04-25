@@ -329,24 +329,22 @@
 }
 
 /* ============================================================
-   TEMPLE BACKGROUND — entry button (Streak Options sheet)
+   SANCTUM — entry row in Streak Options sheet
+   Inherits pill shape (border-radius: 9999px) and hover fill from .sheet button.
+   Override only the layout (label left, current-scene name right) and padding.
    ============================================================ */
 
 .sheet .scene-picker-entry {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
-  padding: 16px 12px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
   text-align: left;
+  padding: 16px 20px;
+  border-radius: 9999px;
 }
 
 .scene-picker-entry-label {
-  font-size: 0.9375rem;
+  font-size: 1rem;
   font-weight: 500;
   color: var(--text);
 }
@@ -358,37 +356,36 @@
 }
 
 /* ============================================================
-   SCENE PICKER — sub-sheet with live preview
+   SANCTUM PICKER — sub-sheet with live preview
    ============================================================ */
 
 .scene-picker-hint {
   font-size: 0.8125rem;
   color: var(--text-muted);
-  margin: 0 0 16px 0;
-  padding: 0 12px;
+  margin: 0 0 12px 0;
+  padding: 0 20px;
   line-height: 1.4;
+  text-align: center;
 }
 
 .scene-picker-list {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
+/* Each option behaves like a pill-shaped sheet button — label + tag stacked,
+   swatch on the left, check on the right when active. */
 .sheet .scene-option {
   display: flex;
   align-items: center;
   gap: 14px;
-  width: 100%;
-  padding: 12px;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background-color 180ms ease, border-color 180ms ease;
-  -webkit-tap-highlight-color: transparent;
+  padding: 12px 18px;
   text-align: left;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  transition: background-color 150ms ease, border-color 150ms ease;
 }
 
 .sheet .scene-option:hover {
@@ -401,11 +398,10 @@
 }
 
 .scene-option-swatch {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   flex-shrink: 0;
-  box-shadow: 0 0 12px currentColor;
   border: 1px solid var(--border);
 }
 
@@ -432,48 +428,62 @@
 }
 
 .scene-option-check {
-  font-size: 1rem;
+  font-size: 0.875rem;
   color: var(--accent-gold);
   flex-shrink: 0;
-  margin-left: 4px;
 }
 
+/* Save / Cancel — match .benefits-actions exactly (side-by-side pills).
+   Primary fills with surface-overlay, ghost is transparent with subtle border.
+   Hover brightens the border. */
 .scene-picker-actions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 10px;
-  padding-top: 8px;
-}
-
-.scene-picker-actions .btn-primary,
-.scene-picker-actions .btn-ghost {
-  width: 100%;
-  padding: 12px 16px;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
-  transition: background-color 180ms ease, opacity 180ms ease;
-  -webkit-tap-highlight-color: transparent;
+  padding-top: 16px;
 }
 
 .scene-picker-actions .btn-primary {
-  background: var(--text);
-  color: var(--background);
+  flex: 1;
+  padding: 14px 20px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  color: var(--text);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 150ms ease, opacity 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.scene-picker-actions .btn-primary:hover:not(:disabled) {
+  border-color: var(--border-prominent);
 }
 
 .scene-picker-actions .btn-primary:disabled {
-  opacity: 0.35;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .scene-picker-actions .btn-ghost {
+  flex: 1;
+  padding: 14px 20px;
   background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
   color: var(--text-secondary);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .scene-picker-actions .btn-ghost:hover {
+  border-color: var(--border);
   color: var(--text);
 }
 
