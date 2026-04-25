@@ -114,10 +114,12 @@
   --surface-overlay: rgba(58, 46, 28, 0.05);
   --surface-elevated: #efe6d4;
 
-  /* Bottom sheet glass surface — warm cream as frosted glass */
-  --sheet-bg: rgba(244, 237, 224, 0.62);
-  --sheet-border: rgba(58, 46, 28, 0.10);
-  --sheet-highlight: linear-gradient(180deg, rgba(255, 250, 240, 0.35) 0%, transparent 40%);
+  /* Bottom sheet glass surface — warm cream as frosted glass.
+     Higher opacity than dark mode because cream-on-cream needs more presence
+     than dark-glass-on-black. */
+  --sheet-bg: rgba(244, 237, 224, 0.82);
+  --sheet-border: rgba(58, 46, 28, 0.12);
+  --sheet-highlight: linear-gradient(180deg, rgba(255, 250, 240, 0.4) 0%, transparent 40%);
 
   /* Header, Nav, and Overlay backgrounds */
   --header-bg: rgba(244, 237, 224, 0.92);
@@ -182,7 +184,9 @@ body {
   background-color: var(--background);
   color: var(--text);
   line-height: 1.5;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  /* Synced with .app-header, .mobile-nav, and the View Transitions duration
+     so theme toggle moves as one piece, not body-then-chrome. */
+  transition: background-color 320ms cubic-bezier(0.16, 1, 0.3, 1), color 320ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* =============================================================================

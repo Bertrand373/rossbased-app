@@ -104,9 +104,9 @@
   }
 }
 
-/* Light mode shadow refinement */
+/* Light mode shadow — warm ink, not cold black, to match parchment */
 [data-theme="light"] .ai-chat-panel {
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 24px 80px rgba(58, 46, 28, 0.18), 0 0 0 1px rgba(58, 46, 28, 0.10);
 }
 
 /* ============================================================
@@ -169,8 +169,8 @@
 }
 
 [data-theme="light"] .ai-chat-header-wordmark {
-  filter: invert(1);
-  opacity: 0.8;
+  /* Gold ORACLE wordmark on parchment — illuminated manuscript feel */
+  opacity: 0.95;
 }
 
 .ai-chat-subtitle {
@@ -253,7 +253,7 @@
 }
 
 [data-theme="light"] .ai-chat-empty-eye {
-  filter: invert(1);
+  /* Gold Eye of Horus on parchment — no inversion */
 }
 
 @keyframes emptyEyeBreath {
@@ -273,8 +273,8 @@
 }
 
 [data-theme="light"] .ai-chat-empty-wordmark {
-  filter: invert(1);
-  opacity: 0.1;
+  /* Gold ORACLE wordmark watermark — slightly more visible on parchment */
+  opacity: 0.18;
 }
 
 /* Persistent watermark at bottom of chat body */
@@ -294,8 +294,8 @@
 }
 
 [data-theme="light"] .ai-chat-watermark-img {
-  filter: invert(1);
-  opacity: 0.06;
+  /* Gold wordmark watermark — slightly more visible on parchment than dark */
+  opacity: 0.12;
 }
 
 /* ============================================================
@@ -318,7 +318,8 @@
 }
 
 [data-theme="light"] .ai-chat-avatar {
-  filter: invert(1);
+  /* Gold Eye of Horus avatar on parchment */
+  opacity: 0.7;
 }
 
 /* ============================================================
@@ -462,7 +463,7 @@
 }
 
 [data-theme="light"] .ai-chat-loading-icon {
-  filter: invert(1);
+  /* Gold Eye of Horus — no inversion */
 }
 
 @keyframes loadingPulse {

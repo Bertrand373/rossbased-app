@@ -11,7 +11,7 @@
     <!-- Preload loader icons so they're ready the instant the <img> parses.
          Both themes are preloaded so the theme swap on light-mode users is cache-hot. -->
     <link rel="preload" as="image" href="%PUBLIC_URL%/icon-192.png" />
-    <link rel="preload" as="image" href="%PUBLIC_URL%/icon-192-black.png" />
+    <link rel="preload" as="image" href="%PUBLIC_URL%/tt-icon-black.png" />
 
     <!-- Viewport and theme -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
@@ -321,7 +321,7 @@
         var theme = document.documentElement.getAttribute('data-theme') || 'dark';
         var loaderIcon = document.getElementById('loader-icon');
         if (loaderIcon && theme === 'light') {
-          loaderIcon.src = '%PUBLIC_URL%/icon-192-black.png';
+          loaderIcon.src = '%PUBLIC_URL%/tt-icon-black.png';
           document.body.style.backgroundColor = '#f4ede0';
           var ldr = document.getElementById('initial-loader');
           if (ldr) ldr.style.backgroundColor = '#f4ede0';

@@ -599,9 +599,9 @@
   .auth-drag-pill { display: none; }
   .auth-drag-zone { padding: 8px 0 0; cursor: default; }
 
-  /* Light mode shadow */
+  /* Light mode shadow — warm ink, not cold black, for parchment */
   [data-theme="light"] .auth-panel {
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 24px 80px rgba(58, 46, 28, 0.18), 0 0 0 1px rgba(58, 46, 28, 0.10);
   }
 }
 
