@@ -47,19 +47,19 @@ const SCENES = {
 
   jade: {
     type: 'wisp',
-    count: 14,
-    accentCount: 6,
+    count: 18,
+    accentCount: 8,
     sizeMult: 1.2,
     speedMult: 0.5,
-    opacityMult: 0.85,
+    opacityMult: 1.1,
     palette: [
-      [120, 175, 145],
-      [91, 138, 115],
-      [60, 105, 85],
-      [40, 75, 58],
-      [22, 45, 32],
+      [165, 220, 190],
+      [120, 180, 150],
+      [80, 135, 110],
+      [50, 95, 75],
+      [25, 50, 35],
     ],
-    baseGrad: { direction: 'bottom', stops: [[60, 105, 85, 0.05], [40, 75, 58, 0.015], [0, 0, 0, 0]] },
+    baseGrad: { direction: 'bottom', stops: [[80, 135, 110, 0.07], [50, 95, 75, 0.02], [0, 0, 0, 0]] },
   },
 
   stars: {
@@ -85,7 +85,7 @@ export const SCENE_META = [
 // Swatch colors for the picker thumbnails — sampled from each palette's brightest stop.
 export const SCENE_SWATCH = {
   golden: 'rgb(212, 175, 55)',
-  jade:   'rgb(120, 175, 145)',
+  jade:   'rgb(165, 220, 190)',
   stars:  'rgb(255, 250, 240)',
 };
 

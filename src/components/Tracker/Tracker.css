@@ -63,12 +63,15 @@
   justify-content: space-between;
   width: 100%;
   padding: 10px 16px;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border);
   background: transparent;
   z-index: 2;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   opacity: 0;
+}
+
+.tracker.entered .tracker-meta-strip {
   animation: fadeInUp 400ms ease forwards;
 }
 
@@ -115,8 +118,11 @@
   text-align: center;
   padding: 0 24px;
   min-height: 0;
-  animation: fadeInUp 500ms ease 50ms forwards;
   opacity: 0;
+}
+
+.tracker.entered .tracker-main {
+  animation: fadeInUp 500ms ease 50ms forwards;
 }
 
 /* Streak - tappable, no visible hover/active states */
@@ -506,8 +512,11 @@
   margin-top: 28px;
   max-width: 340px;
   width: 100%;
-  animation: fadeInUp 500ms ease 100ms forwards;
   opacity: 0;
+}
+
+.tracker.entered .tracker-log-wrap {
+  animation: fadeInUp 500ms ease 100ms forwards;
 }
 
 /* ============================================================
@@ -521,10 +530,13 @@
   justify-content: center;
   width: 100%;
   padding: 12px 16px;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--border);
   background: transparent;
   z-index: 2;
   opacity: 0;
+}
+
+.tracker.entered .tracker-oracle-bar {
   animation: fadeInUp 400ms ease 200ms forwards;
 }
 

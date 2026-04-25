@@ -59,6 +59,31 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   const [previewScene, setPreviewScene] = useState(null);
   const savedScene = isValidScene(userData.backgroundScene) ? userData.backgroundScene : DEFAULT_SCENE_KEY;
   const activeScene = previewScene !== null ? previewScene : savedScene;
+
+  // Gate entrance animations on the index.html loader being removed.
+  // Without this, on first app open the CSS animations play behind the loader
+  // and finish before the user can see them. Tab-switch remounts trigger the
+  // animation again because the loader is already gone by then. By tying the
+  // .entered class to loader removal, the user always sees the entrance.
+  const [entered, setEntered] = useState(() => {
+    if (typeof document === 'undefined') return true;
+    return !document.getElementById('initial-loader');
+  });
+  useEffect(() => {
+    if (entered) return undefined;
+    if (!document.getElementById('initial-loader')) {
+      setEntered(true);
+      return undefined;
+    }
+    const observer = new MutationObserver(() => {
+      if (!document.getElementById('initial-loader')) {
+        setEntered(true);
+        observer.disconnect();
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [entered]);
   
   // Pattern alert sheet — forced open by headless AI detector
   const [showPatternAlert, setShowPatternAlert] = useState(false);
@@ -1221,7 +1246,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
 
   return (
-    <div className="tracker">
+    <div className={`tracker${entered ? ' entered' : ''}`}>
       
       {/* Atmospheric background — Sanctum scene library, premium-customizable via streak sheet */}
       <GoldenSmoke scene={activeScene} />
