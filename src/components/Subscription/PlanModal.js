@@ -109,32 +109,31 @@ const PlanModal = ({
 
   return (
     <div className={`sheet-backdrop plan-backdrop${sheetReady ? ' open' : ''}`} onClick={handleClose}>
-      <div 
+      <div
         ref={sheetPanelRef}
         className={`sheet-panel plan-sheet${sheetReady ? ' open' : ''}`}
         onClick={e => e.stopPropagation()}
       >
-        <div 
-          className="sheet-header"
-        />
+        <div className="sheet-header" />
 
-        <div className="plan-content">
-          {/* Header */}
-          <div className="plan-header">
-            <img src="/tt-icon-white.png" alt="" className="plan-icon" />
-            <h2 className="plan-title">{isGfUser ? 'Unlock Deeper Oracle Access' : selectedTier === 'ascended' ? 'Go Deeper' : 'Upgrade to Premium'}</h2>
-            <p className="plan-subtitle">{isGfUser ? `${pricing.oracleLimit} Oracle messages per day` : selectedTier === 'ascended' ? '9 Oracle messages per day' : 'Unlock the full system'}</p>
-          </div>
+        {/* Sticky header — brand, title, subtitle stay anchored at top */}
+        <div className="plan-modal-header">
+          <img src="/tt-icon-white.png" alt="" className="plan-icon" />
+          <h2 className="plan-title">{isGfUser ? 'Unlock Deeper Oracle Access' : selectedTier === 'ascended' ? 'Go Deeper' : 'Upgrade to Premium'}</h2>
+          <p className="plan-subtitle">{isGfUser ? `${pricing.oracleLimit} Oracle messages per day` : selectedTier === 'ascended' ? '9 Oracle messages per day' : 'Unlock the full system'}</p>
+        </div>
 
-          {/* Tier toggle */}
+        {/* Scrolling middle — tier toggle, features, plan cards. Mask gradient
+            soft-fades content into the sticky regions above and below. */}
+        <div className="plan-modal-content">
           <div className="plan-tier-toggle">
-            <button 
+            <button
               className={`plan-tier-btn ${selectedTier === 'practitioner' ? 'active' : ''}`}
               onClick={() => setSelectedTier('practitioner')}
             >
               Practitioner
             </button>
-            <button 
+            <button
               className={`plan-tier-btn plan-tier-ascended ${selectedTier === 'ascended' ? 'active' : ''}`}
               onClick={() => setSelectedTier('ascended')}
             >
@@ -142,7 +141,6 @@ const PlanModal = ({
             </button>
           </div>
 
-          {/* What you get */}
           <div className="plan-features">
             <div className="plan-feature">AI pattern recognition that learns you</div>
             <div className="plan-feature">Full benefit analytics and trend charts</div>
@@ -151,17 +149,16 @@ const PlanModal = ({
             <div className="plan-feature">Subliminal mind program</div>
           </div>
 
-          {/* Plan cards */}
           <div className="plan-cards">
-            <button 
+            <button
               className={`plan-card ${selectedPlan === 'monthly' ? 'selected' : ''}`}
               onClick={() => setSelectedPlan('monthly')}
             >
               <span className="plan-card-label">Monthly</span>
               <span className="plan-card-price">${pricing.monthly}<span className="plan-card-period">/mo</span></span>
             </button>
-            
-            <button 
+
+            <button
               className={`plan-card ${selectedPlan === 'yearly' ? 'selected' : ''}`}
               onClick={() => setSelectedPlan('yearly')}
             >
@@ -171,21 +168,22 @@ const PlanModal = ({
               <span className="plan-card-monthly">${pricing.monthlyEquiv}/mo</span>
             </button>
           </div>
+        </div>
 
-          {/* CTA */}
-          <button 
+        {/* Sticky footer — primary CTA + legal + dismiss stay reachable */}
+        <div className="plan-modal-footer">
+          <button
             className="plan-cta"
             onClick={handleCheckout}
             disabled={isProcessing}
           >
-            {isProcessing ? 'Processing...' : 
+            {isProcessing ? 'Processing...' :
               isNewUser && selectedTier !== 'ascended' && !isGfUser
-                ? 'Start 7-Day Free Trial' 
+                ? 'Start 7-Day Free Trial'
                 : `Continue — $${selectedPlan === 'yearly' ? pricing.yearly + '/yr' : pricing.monthly + '/mo'}`
             }
           </button>
 
-          {/* Legal */}
           <p className="plan-legal">
             {isNewUser && selectedTier !== 'ascended' && !isGfUser
               ? 'Card required. Not charged until trial ends. Cancel anytime.'
@@ -193,7 +191,6 @@ const PlanModal = ({
             }
           </p>
 
-          {/* Ghost dismiss */}
           <button className="plan-dismiss" onClick={handleClose}>
             Not now
           </button>

@@ -6,6 +6,12 @@
    SHEET OVERRIDES — same z-index level as PlanModal so it sits on top
    ============================================================================= */
 
+/* =============================================================================
+   SHEET LAYOUT — flex column with sticky header / scrolling middle / sticky
+   footer. Mirrors CalendarModals.css so the dismiss button stays reachable
+   without scrolling on long announcements.
+   ============================================================================= */
+
 .sheet-backdrop.wn-backdrop {
   z-index: 10000;
 }
@@ -13,32 +19,54 @@
 .sheet-panel.wn-sheet {
   z-index: 10001;
   max-height: 85dvh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* =============================================================================
-   CONTENT WRAPPER
+   STICKY HEADER
    ============================================================================= */
 
-.wn-content {
+.wn-modal-header {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 0 8px;
+  padding: 0 8px 16px;
 }
 
 /* =============================================================================
-   HEADER
+   SCROLLING MIDDLE — mask-image soft-fades content into the sticky regions
    ============================================================================= */
 
-.wn-header {
+.wn-modal-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 8px 8px 16px;
+  text-align: center;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16px, black calc(100% - 16px), transparent 100%);
+}
+
+.wn-modal-content::-webkit-scrollbar { display: none; }
+
+/* =============================================================================
+   STICKY FOOTER — feedback link + primary dismiss
+   ============================================================================= */
+
+.wn-modal-footer {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
+  gap: 4px;
+  padding: 16px 8px 0;
 }
 
 .wn-icon {
@@ -128,10 +156,10 @@
    ============================================================================= */
 
 .wn-date {
+  display: block;
   font-size: 0.6875rem;
   font-weight: 500;
   color: var(--text-tertiary);
-  margin-bottom: 24px;
 }
 
 /* =============================================================================
@@ -184,10 +212,13 @@
    ============================================================================= */
 
 @media (max-width: 480px) {
-  .wn-content {
-    padding: 0 4px;
+  .wn-modal-header,
+  .wn-modal-content,
+  .wn-modal-footer {
+    padding-left: 4px;
+    padding-right: 4px;
   }
-  
+
   .wn-title {
     font-size: 1.125rem;
   }

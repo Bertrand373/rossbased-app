@@ -119,34 +119,34 @@ const WhatsNew = ({ isLoggedIn, username, suppress }) => {
       className={`sheet-backdrop wn-backdrop${sheetReady ? ' open' : ''}`} 
       onClick={dismiss}
     >
-      <div 
+      <div
         ref={sheetPanelRef}
         className={`sheet-panel wn-sheet${sheetReady ? ' open' : ''}`}
         onClick={e => e.stopPropagation()}
       >
         <div className="sheet-header" />
 
-        <div className="wn-content">
-          {/* Header */}
-          <div className="wn-header">
-            <img 
-              src="/tt-icon-white.png" 
-              alt="" 
-              className="wn-icon" 
-            />
-            <h2 className="wn-title">What's New</h2>
-            <span className="wn-version">v{announcement.version}</span>
-            {announcement.status === 'draft' && (
-              <span className="wn-draft-badge">Draft Preview</span>
-            )}
-          </div>
+        {/* Sticky header — TT mark, title, version stay anchored at the top */}
+        <div className="wn-modal-header">
+          <img
+            src="/tt-icon-white.png"
+            alt=""
+            className="wn-icon"
+          />
+          <h2 className="wn-title">What's New</h2>
+          <span className="wn-version">v{announcement.version}</span>
+          {announcement.status === 'draft' && (
+            <span className="wn-draft-badge">Draft Preview</span>
+          )}
+        </div>
 
-          {/* Announcement title — only if provided */}
+        {/* Scrolling middle — announcement body + date. Mask gradient soft-fades
+            into the sticky regions above and below (matches CalendarModals). */}
+        <div className="wn-modal-content">
           {announcement.title && (
             <h3 className="wn-announcement-title">{announcement.title}</h3>
           )}
 
-          {/* Body — lines starting with # render as section headers */}
           <div className="wn-body">
             {announcement.body.split('\n').map((line, i) => {
               const trimmed = line.trim();
@@ -159,15 +159,14 @@ const WhatsNew = ({ isLoggedIn, username, suppress }) => {
             })}
           </div>
 
-          {/* Date */}
           <span className="wn-date">{formattedDate}</span>
+        </div>
 
-          {/* Feedback CTA */}
+        {/* Sticky footer — feedback link + primary dismiss stay reachable */}
+        <div className="wn-modal-footer">
           <button className="wn-feedback" onClick={handleFeedback}>
             Got feedback? Let us know
           </button>
-
-          {/* Dismiss */}
           <button className="wn-dismiss" onClick={dismiss}>
             Got it
           </button>
