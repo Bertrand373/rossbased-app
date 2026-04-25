@@ -252,6 +252,19 @@ const userSchema = new mongoose.Schema({
     forStreak: { type: Number, default: 0 },
     phase: { type: String, default: '' }
   },
+
+  // Feedback Replies — admin responses to user-submitted feedback (bugs, etc).
+  // Surfaced to the user as a "Transmission" sheet on app load. One-shot:
+  // user acknowledges, gets dismissed forever. Pushed by admin via
+  // /api/feedback-replies/admin/send.
+  feedbackReplies: [{
+    message: { type: String, required: true, maxlength: 2000 },
+    feedbackText: { type: String, default: '' },
+    feedbackType: { type: String, default: 'bug' },
+    status: { type: String, enum: ['fixed', 'acknowledged'], default: 'fixed' },
+    createdAt: { type: Date, default: Date.now },
+    acknowledgedAt: { type: Date, default: null }
+  }],
   
   // Peak State Recordings — messages from peak states shown during crisis
   peakRecordings: [{

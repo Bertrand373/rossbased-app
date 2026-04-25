@@ -1,0 +1,188 @@
+/* src/components/Transmissions/TransmissionSheet.css */
+/* Branded transmission sheet — feels native to the app (mirrors WhatsNew structure
+   with subtle differentiators: status pill, feedback echo card). */
+
+/* =============================================================================
+   SHEET OVERRIDES — same z-index level as PlanModal/WhatsNew
+   ============================================================================= */
+
+.sheet-backdrop.tx-backdrop {
+  z-index: 10000;
+}
+
+.sheet-panel.tx-sheet {
+  z-index: 10001;
+  max-height: 85dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+/* =============================================================================
+   CONTENT WRAPPER
+   ============================================================================= */
+
+.tx-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 8px;
+}
+
+/* =============================================================================
+   HEADER
+   ============================================================================= */
+
+.tx-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.tx-icon {
+  width: 44px;
+  height: 44px;
+  opacity: 0.8;
+  margin-bottom: 14px;
+}
+
+[data-theme="light"] .tx-icon {
+  filter: invert(1);
+}
+
+.tx-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin: 0 0 8px 0;
+}
+
+.tx-status {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tx-status-fixed {
+  color: rgba(34, 197, 94, 0.85);
+}
+
+.tx-status-acknowledged {
+  color: rgba(234, 179, 8, 0.8);
+}
+
+/* =============================================================================
+   ORIGINAL FEEDBACK ECHO — small card showing what they reported
+   ============================================================================= */
+
+.tx-original {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.tx-original-label {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 6px;
+}
+
+.tx-original-text {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0;
+  font-style: italic;
+}
+
+/* =============================================================================
+   BODY — admin response
+   ============================================================================= */
+
+.tx-body {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+.tx-body p {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--text);
+  margin: 0 0 12px 0;
+}
+
+.tx-body p:last-child {
+  margin-bottom: 0;
+}
+
+/* =============================================================================
+   DATE
+   ============================================================================= */
+
+.tx-date {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  margin-bottom: 24px;
+}
+
+/* =============================================================================
+   ACKNOWLEDGE — primary action
+   ============================================================================= */
+
+.tx-dismiss {
+  width: 100%;
+  padding: 14px 24px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  color: var(--text);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 200ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tx-dismiss:hover {
+  border-color: var(--text-secondary);
+}
+
+/* =============================================================================
+   MOBILE
+   ============================================================================= */
+
+@media (max-width: 480px) {
+  .tx-content {
+    padding: 0 4px;
+  }
+
+  .tx-title {
+    font-size: 1.125rem;
+  }
+}
+
+/* =============================================================================
+   REDUCED MOTION
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .tx-dismiss {
+    transition: none;
+  }
+}

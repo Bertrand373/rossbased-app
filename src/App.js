@@ -29,10 +29,12 @@ import AIChat from './components/AIChat/AIChat';
 import AdminCockpit from './components/Admin/AdminCockpit';
 import ScrollIndicator from './components/Shared/ScrollIndicator';
 import WhatsNew from './components/Announcements/WhatsNew';
+import TransmissionSheet from './components/Transmissions/TransmissionSheet';
 
 // Custom hook for user data
 import { useUserData } from './hooks/useUserData';
 import { useSubscription } from './hooks/useSubscription';
+import { useFeedbackReplies } from './hooks/useFeedbackReplies';
 import PaywallScreen from './components/Subscription/PaywallScreen';
 import PlanModal from './components/Subscription/PlanModal';
 import DiscordLinkCallback from './components/Auth/DiscordLinkCallback';
@@ -638,7 +640,14 @@ function AppContent({
   const openPlanModal = () => setShowPlanModal(true);
   
   const { theme } = useTheme();
-  
+
+  // Pending admin replies to user-submitted feedback (bug responses, etc).
+  // Surfaced as a one-shot Transmission sheet on app load.
+  const {
+    pending: feedbackReplies,
+    acknowledge: ackFeedbackReply
+  } = useFeedbackReplies(isLoggedIn, userData?.username);
+
   // Theme-aware logo
   const trackerLogo = theme === 'light' ? trackerLogoBlack : trackerLogoWhite;
 
@@ -814,6 +823,13 @@ function AppContent({
             
             {/* What's New announcement sheet — suppressed during onboarding */}
             <WhatsNew isLoggedIn={true} username={userData?.username} suppress={!userData?.hasSeenOnboarding} />
+
+            {/* Admin reply to user feedback — surfaces on app load when present */}
+            <TransmissionSheet
+              pending={feedbackReplies}
+              onAcknowledge={ackFeedbackReply}
+              suppress={!userData?.hasSeenOnboarding}
+            />
           </>
         ) : (
           <Routes>
