@@ -55,10 +55,12 @@ const getPlatformInfo = () => {
 // MINIMAL SVG ICONS
 // =============================================================================
 
-const ShareIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-    <path d="M12 2v12M8 6l4-4 4 4" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M20 14v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4" strokeLinecap="round"/>
+// Apple's Share glyph: narrow open-top box with vertical arrow breaching the top.
+// Closer proportions to the SF Symbol `square.and.arrow.up` than a generic upload icon.
+const ShareIcon = ({ size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M8 11v8a2 2 0 002 2h4a2 2 0 002-2v-8"/>
+    <path d="M12 16V4M9 7l3-3 3 3"/>
   </svg>
 );
 
@@ -83,19 +85,46 @@ const CheckIcon = () => (
   </svg>
 );
 
+// Safari compass — circle with red/white needle (simplified)
+const SafariIcon = ({ size = 20 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <circle cx="12" cy="12" r="9"/>
+    <path d="M12 12l4.5-6.5L10 10z" fill="currentColor" stroke="none"/>
+    <path d="M12 12l-4.5 6.5L14 14z" fill="currentColor" stroke="none" opacity="0.45"/>
+  </svg>
+);
+
+// Bouncing chevron used to point at the Share icon in the toolbar mockup
+const ChevronDownAnim = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 9l6 6 6-6"/>
+  </svg>
+);
+
 // =============================================================================
 // INSTRUCTION STEPS BY PLATFORM
 // =============================================================================
 
 const getInstructionSteps = (platform, browser) => {
+  // iOS in a non-Safari browser (Chrome, Firefox, in-app webviews from
+  // Discord/Instagram/Twitter, etc) — Apple blocks PWA install everywhere
+  // except Safari, so step 01 is "open in Safari".
+  if (platform === 'ios' && browser !== 'safari') {
+    return [
+      { num: '01', icon: <SafariIcon />, title: 'Open in Safari', desc: 'iOS only allows installs there' },
+      { num: '02', icon: <ShareIcon />, title: 'Tap Share', desc: 'In the Safari toolbar' },
+      { num: '03', icon: <PlusIcon />, title: 'Add to Home Screen', desc: 'Then tap Add' }
+    ];
+  }
+
   if (platform === 'ios') {
     return [
-      { num: '01', icon: <ShareIcon />, title: 'Tap Share', desc: 'Bottom of Safari' },
+      { num: '01', icon: <ShareIcon />, title: 'Tap Share', desc: 'In the Safari toolbar' },
       { num: '02', icon: <PlusIcon />, title: 'Add to Home Screen', desc: 'Scroll to find it' },
       { num: '03', icon: <CheckIcon />, title: 'Tap Add', desc: 'Top right corner' }
     ];
   }
-  
+
   if (platform === 'android') {
     return [
       { num: '01', icon: <MenuIcon />, title: 'Tap Menu', desc: 'Three dots, top right' },
@@ -103,13 +132,60 @@ const getInstructionSteps = (platform, browser) => {
       { num: '03', icon: <CheckIcon />, title: 'Confirm', desc: 'Tap Install' }
     ];
   }
-  
+
   // Desktop
   return [
     { num: '01', icon: <PlusIcon />, title: 'Click Install', desc: 'In the address bar' },
     { num: '02', icon: <CheckIcon />, title: 'Confirm', desc: 'Click Install' }
   ];
 };
+
+// Compact Safari bottom-toolbar mockup, with a bouncing arrow drawing the
+// eye to the Share icon. Only shown when the user is actually in iOS Safari.
+const SafariToolbarMockup = () => (
+  <div className="install-toolbar-mockup" aria-hidden="true">
+    <div className="install-toolbar-address">
+      <span className="install-toolbar-aa">AA</span>
+      <span className="install-toolbar-url">titantrack.app</span>
+    </div>
+
+    <div className="install-toolbar-row">
+      <div className="install-toolbar-btn install-toolbar-dim">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </div>
+      <div className="install-toolbar-btn install-toolbar-dim">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </div>
+
+      <div className="install-toolbar-share-wrap">
+        <div className="install-toolbar-arrow">
+          <ChevronDownAnim />
+        </div>
+        <div className="install-toolbar-btn install-toolbar-share">
+          <ShareIcon size={16} />
+        </div>
+      </div>
+
+      <div className="install-toolbar-btn install-toolbar-dim">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M5 4h14v17l-7-4-7 4z"/>
+        </svg>
+      </div>
+      <div className="install-toolbar-btn install-toolbar-dim">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="4" y="4" width="7" height="7" rx="1.4"/>
+          <rect x="13" y="4" width="7" height="7" rx="1.4"/>
+          <rect x="4" y="13" width="7" height="7" rx="1.4"/>
+          <rect x="13" y="13" width="7" height="7" rx="1.4"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+);
 
 // =============================================================================
 // MAIN COMPONENT
@@ -240,7 +316,9 @@ const InstallPrompt = ({
   
   const steps = getInstructionSteps(platformInfo.platform, platformInfo.browser);
   const canUseNativeInstall = deferredPrompt && platformInfo.platform !== 'ios';
-  const platformLabel = platformInfo.platform === 'ios' ? 'Safari' : 
+  const isIOSSafari = platformInfo.platform === 'ios' && platformInfo.browser === 'safari';
+  const isIOSNonSafari = platformInfo.platform === 'ios' && platformInfo.browser !== 'safari';
+  const platformLabel = platformInfo.platform === 'ios' ? 'Safari' :
                         platformInfo.platform === 'android' ? 'Chrome' : 'Browser';
   
   return (
@@ -267,10 +345,26 @@ const InstallPrompt = ({
           </div>
         ) : (
           <>
+            {/* Non-Safari iOS: warn that install requires Safari */}
+            {isIOSNonSafari && (
+              <div className="install-safari-warning">
+                <div className="install-safari-warning-icon">
+                  <SafariIcon size={22} />
+                </div>
+                <div className="install-safari-warning-text">
+                  <strong>Open in Safari to install</strong>
+                  <span>iOS only allows PWA installs from Safari. The Share button in this browser won't show "Add to Home Screen."</span>
+                </div>
+              </div>
+            )}
+
+            {/* iOS Safari: show toolbar mockup pointing at the Share icon */}
+            {isIOSSafari && <SafariToolbarMockup />}
+
             {/* Manual Steps */}
             <div className="install-steps">
               <span className="install-steps-label">{platformLabel}</span>
-              
+
               {steps.map((step, index) => (
                 <div key={index} className="install-step">
                   <div className="install-step-num">{step.num}</div>
@@ -282,7 +376,7 @@ const InstallPrompt = ({
                 </div>
               ))}
             </div>
-            
+
             {/* Footer */}
             <div className="install-footer">
               <button className="install-btn-ghost" onClick={() => handleDismiss(false)}>
