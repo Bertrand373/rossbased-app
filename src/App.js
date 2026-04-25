@@ -76,7 +76,7 @@ const ThemeProvider = ({ children }) => {
     // Update theme-color meta tag for browser chrome
     const themeColorMeta = document.getElementById('theme-color-meta');
     if (themeColorMeta) {
-      themeColorMeta.setAttribute('content', newTheme === 'light' ? '#ffffff' : '#000000');
+      themeColorMeta.setAttribute('content', newTheme === 'light' ? '#f4ede0' : '#000000');
     }
   };
 

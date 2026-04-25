@@ -105,38 +105,40 @@
    ============================================================================= */
 
 [data-theme="light"] {
-  /* Surfaces - clean white foundation */
-  --background: #ffffff;
-  --surface: #f8f8f8;
-  --surface-raised: #f0f0f0;
-  --surface-overlay: rgba(0, 0, 0, 0.06);
-  --surface-elevated: #f5f5f5;
-  
-  /* Bottom sheet glass surface */
-  --sheet-bg: rgba(255, 255, 255, 0.55);
-  --sheet-border: rgba(0, 0, 0, 0.10);
-  --sheet-highlight: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, transparent 40%);
-  
+  /* Surfaces - parchment / temple-stone foundation
+     Sun-bleached cream, not pure white. Reads as old scroll, sunlit chamber.
+     Gold-on-cream is iconic; gold-on-white is gaudy. */
+  --background: #f4ede0;
+  --surface: #ede4d2;
+  --surface-raised: #e6dac3;
+  --surface-overlay: rgba(58, 46, 28, 0.05);
+  --surface-elevated: #efe6d4;
+
+  /* Bottom sheet glass surface — warm cream as frosted glass */
+  --sheet-bg: rgba(244, 237, 224, 0.62);
+  --sheet-border: rgba(58, 46, 28, 0.10);
+  --sheet-highlight: linear-gradient(180deg, rgba(255, 250, 240, 0.35) 0%, transparent 40%);
+
   /* Header, Nav, and Overlay backgrounds */
-  --header-bg: rgba(255, 255, 255, 0.9);
-  --nav-bg: rgba(255, 255, 255, 0.95);
-  --overlay-bg: rgba(0, 0, 0, 0.38);
-  
-  /* Borders - subtle gray */
-  --border: rgba(0, 0, 0, 0.08);
-  --border-subtle: rgba(0, 0, 0, 0.04);
-  --border-prominent: rgba(0, 0, 0, 0.12);
-  
+  --header-bg: rgba(244, 237, 224, 0.92);
+  --nav-bg: rgba(244, 237, 224, 0.95);
+  --overlay-bg: rgba(58, 46, 28, 0.42);
+
+  /* Borders - warm ink, low opacity */
+  --border: rgba(58, 46, 28, 0.10);
+  --border-subtle: rgba(58, 46, 28, 0.05);
+  --border-prominent: rgba(58, 46, 28, 0.18);
+
   /* Gradients */
-  --gradient-subtle: rgba(0, 0, 0, 0.02);
-  
-  /* Text hierarchy - dark text */
-  --text: #000000;
-  --text-secondary: rgba(0, 0, 0, 0.6);
-  --text-muted: rgba(0, 0, 0, 0.4);
-  --text-tertiary: rgba(0, 0, 0, 0.25);
-  
-  /* Calendar/Status accent colors - LIGHT THEME (darker for contrast) */
+  --gradient-subtle: rgba(58, 46, 28, 0.025);
+
+  /* Text hierarchy - warm dark ink (not pure black — would feel harsh on cream) */
+  --text: #3a2e1c;
+  --text-secondary: rgba(58, 46, 28, 0.65);
+  --text-muted: rgba(58, 46, 28, 0.42);
+  --text-tertiary: rgba(58, 46, 28, 0.28);
+
+  /* Calendar/Status accent colors - LIGHT THEME (darker for contrast on cream) */
   --status-current: #059669;
   --status-current-bg: rgba(5, 150, 105, 0.12);
   --status-former: #2563eb;
@@ -147,22 +149,18 @@
   --status-wetdream: #d97706;
   --status-wetdream-bg: rgba(217, 119, 6, 0.1);
   --status-wetdream-bg-hover: rgba(217, 119, 6, 0.15);
-  
-  /* Gold accent for achievements - darker goldenrod */
-  --accent-gold: #b8860b;
-  --accent-gold-bg: rgba(184, 134, 11, 0.06);
-  --accent-gold-bg-hover: rgba(184, 134, 11, 0.1);
-  --accent-gold-border: rgba(184, 134, 11, 0.2);
-  --accent-gold-border-hover: rgba(184, 134, 11, 0.3);
-  --accent-gold-text: rgba(184, 134, 11, 0.7);
-  
-  /* Trajectory/trend colors - darker for light bg */
+
+  /* Gold accent — deeper bronze for parchment. Classical illuminated-manuscript feel. */
+  --accent-gold: #8b6914;
+  --accent-gold-bg: rgba(139, 105, 20, 0.06);
+  --accent-gold-bg-hover: rgba(139, 105, 20, 0.10);
+  --accent-gold-border: rgba(139, 105, 20, 0.22);
+  --accent-gold-border-hover: rgba(139, 105, 20, 0.32);
+  --accent-gold-text: rgba(139, 105, 20, 0.75);
+
+  /* Trajectory/trend colors - darker for cream bg */
   --trend-up: rgba(5, 150, 105, 0.9);
   --trend-down: rgba(220, 38, 38, 0.85);
-  
-  /* Theme-specific paths */
-
-
 }
 
 /* =============================================================================
@@ -264,12 +262,12 @@ div[data-hot-toast] > div {
   animation: toastIn 250ms ease-out !important;
 }
 
-/* Light theme toast shadow adjustment */
+/* Light theme toast — parchment surface, warm ink */
 [data-theme="light"] div[data-hot-toast] > div {
-  background: #ffffff !important;
-  color: #000000 !important;
-  border: 1px solid rgba(0, 0, 0, 0.1) !important;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12) !important;
+  background: #f4ede0 !important;
+  color: #3a2e1c !important;
+  border: 1px solid rgba(58, 46, 28, 0.12) !important;
+  box-shadow: 0 4px 24px rgba(58, 46, 28, 0.14) !important;
 }
 
 /* Success toast */

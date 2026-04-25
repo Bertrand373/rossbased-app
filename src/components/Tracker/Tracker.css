@@ -328,6 +328,155 @@
   background: #a08200;
 }
 
+/* ============================================================
+   TEMPLE BACKGROUND — entry button (Streak Options sheet)
+   ============================================================ */
+
+.sheet .scene-picker-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+}
+
+.scene-picker-entry-label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.scene-picker-entry-current {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+}
+
+/* ============================================================
+   SCENE PICKER — sub-sheet with live preview
+   ============================================================ */
+
+.scene-picker-hint {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin: 0 0 16px 0;
+  padding: 0 12px;
+  line-height: 1.4;
+}
+
+.scene-picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.sheet .scene-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 180ms ease, border-color 180ms ease;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+}
+
+.sheet .scene-option:hover {
+  background: var(--surface-overlay);
+}
+
+.sheet .scene-option.active {
+  background: var(--surface-overlay);
+  border-color: var(--border-prominent);
+}
+
+.scene-option-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px currentColor;
+  border: 1px solid var(--border);
+}
+
+.scene-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.scene-option-label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+
+.scene-option-tag {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+}
+
+.scene-option-check {
+  font-size: 1rem;
+  color: var(--accent-gold);
+  flex-shrink: 0;
+  margin-left: 4px;
+}
+
+.scene-picker-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+.scene-picker-actions .btn-primary,
+.scene-picker-actions .btn-ghost {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 180ms ease, opacity 180ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.scene-picker-actions .btn-primary {
+  background: var(--text);
+  color: var(--background);
+}
+
+.scene-picker-actions .btn-primary:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.scene-picker-actions .btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.scene-picker-actions .btn-ghost:hover {
+  color: var(--text);
+}
+
 .milestone {
   font-size: 0.8125rem;
   font-weight: 400;

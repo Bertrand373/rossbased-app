@@ -1749,8 +1749,8 @@
 }
 [data-theme="light"] .ac-table tbody tr:hover { background: rgba(0,0,0,0.02); }
 [data-theme="light"] .ac-table th:first-child,
-[data-theme="light"] .ac-table td:first-child { background: #ffffff; }
-[data-theme="light"] .ac-table tbody tr:hover td:first-child { background: rgba(250,250,250,1); }
+[data-theme="light"] .ac-table td:first-child { background: #f4ede0; }
+[data-theme="light"] .ac-table tbody tr:hover td:first-child { background: #ede4d2; }
 [data-theme="light"] .ac-uname { color: rgba(0,0,0,0.65); }
 [data-theme="light"] .ac-udiscord { color: rgba(0,0,0,0.2); }
 [data-theme="light"] .ac-streak-pill {

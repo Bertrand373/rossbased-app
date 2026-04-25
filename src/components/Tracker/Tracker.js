@@ -15,7 +15,7 @@ import PatternInsightCard from '../PatternInsight/PatternInsightCard';
 import EnergyAlmanac from '../EnergyAlmanac/EnergyAlmanac';
 import OnboardingGuide from '../OnboardingGuide/OnboardingGuide';
 import OraclePulse from '../OraclePulse/OraclePulse';
-import GoldenSmoke from '../GoldenSmoke/GoldenSmoke';
+import GoldenSmoke, { SCENE_META, SCENE_SWATCH, DEFAULT_SCENE_KEY, isValidScene } from '../GoldenSmoke/GoldenSmoke';
 import { getLunarData } from '../../utils/lunarData';
 
 // NEW: Import InterventionService for ML feedback loop
@@ -52,6 +52,13 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   const [showStreakOptions, setShowStreakOptions] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [resetType, setResetType] = useState(null);
+
+  // Sanctum picker — premium scene library for the Tracker background
+  // previewScene !== null means picker is open and showing a live preview
+  const [showScenePicker, setShowScenePicker] = useState(false);
+  const [previewScene, setPreviewScene] = useState(null);
+  const savedScene = isValidScene(userData.backgroundScene) ? userData.backgroundScene : DEFAULT_SCENE_KEY;
+  const activeScene = previewScene !== null ? previewScene : savedScene;
   
   // Pattern alert sheet — forced open by headless AI detector
   const [showPatternAlert, setShowPatternAlert] = useState(false);
@@ -150,14 +157,14 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
   // Bottom sheet animation: trigger .open class after mount
   useEffect(() => {
-    if (showStreakOptions || showResetConfirm || showLogLock || showDatePicker) {
+    if (showStreakOptions || showResetConfirm || showLogLock || showDatePicker || showScenePicker) {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setSheetReady(true));
       });
     } else {
       setSheetReady(false);
     }
-  }, [showStreakOptions, showResetConfirm, showLogLock, showDatePicker]);
+  }, [showStreakOptions, showResetConfirm, showLogLock, showDatePicker, showScenePicker]);
 
   // Pattern alert sheet animation
   useEffect(() => {
@@ -343,7 +350,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
 
   // Swipe-to-dismiss — non-passive native listeners so iOS respects preventDefault
   const isEditingDate = showDatePicker && !!userData.startDate;
-  const trackerSheetVisible = showStreakOptions || showResetConfirm || showLogLock || showPeakPrompt || showPatternAlert || isEditingDate;
+  const trackerSheetVisible = showStreakOptions || showResetConfirm || showLogLock || showPeakPrompt || showPatternAlert || isEditingDate || showScenePicker;
   const handleSwipeDismiss = useCallback(() => {
     setShowStreakOptions(false);
     setShowResetConfirm(false);
@@ -351,6 +358,8 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
     setShowBenefits(false);
     setShowPeakPrompt(false);
     setShowDatePicker(false);
+    setShowScenePicker(false);
+    setPreviewScene(null);
     setPeakMessage('');
     if (patternInterventionIdRef.current) {
       interventionService.recordResponse(patternInterventionIdRef.current, 'dismissed');
@@ -1214,8 +1223,8 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   return (
     <div className="tracker">
       
-      {/* Atmospheric background — golden smoke */}
-      <GoldenSmoke />
+      {/* Atmospheric background — Sanctum scene library, premium-customizable via streak sheet */}
+      <GoldenSmoke scene={activeScene} />
 
       {/* Onboarding Guide - First time only */}
       {showOnboarding && (
@@ -1379,13 +1388,27 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                         <span className="streak-gold-toggle-label">Oracle's Gold</span>
                         <span className={`streak-gold-swatch${userData.streakColorGold ? ' active' : ''}`} />
                       </div>
-                      <button 
+                      <button
                         className={`streak-gold-switch${userData.streakColorGold ? ' active' : ''}`}
                         onClick={() => updateUserData({ streakColorGold: !userData.streakColorGold })}
                       >
                         <span className="streak-gold-knob" />
                       </button>
                     </div>
+                    <div className="sheet-divider" />
+                    <button
+                      className="scene-picker-entry"
+                      onClick={() => closeSheet(() => {
+                        setShowStreakOptions(false);
+                        setPreviewScene(savedScene);
+                        setShowScenePicker(true);
+                      })}
+                    >
+                      <span className="scene-picker-entry-label">Sanctum</span>
+                      <span className="scene-picker-entry-current">
+                        {(SCENE_META.find(s => s.key === savedScene) || SCENE_META[0]).label}
+                      </span>
+                    </button>
                     <div className="sheet-divider" />
                   </>
                 )}
@@ -1409,6 +1432,69 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
               <button className="cancel" onClick={() => closeSheet(() => setShowStreakOptions(false))}>
                 Cancel
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sanctum Picker — premium scene library, with live preview */}
+      {showScenePicker && (
+        <div
+          className={`sheet-backdrop${sheetReady ? ' open' : ''}`}
+          onClick={() => closeSheet(() => { setShowScenePicker(false); setPreviewScene(null); })}
+        >
+          <div
+            ref={sheetPanelRef}
+            className={`sheet-panel tracker-sheet${sheetReady ? ' open' : ''}`}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="sheet-header" />
+            <div className="sheet">
+              <h3 className="sheet-title">Sanctum</h3>
+              <p className="scene-picker-hint">Tap to preview. The temple shifts behind this sheet.</p>
+              <div className="scene-picker-list">
+                {SCENE_META.map((s) => {
+                  const isLight = (typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'light');
+                  const swatch = (SCENE_SWATCH[s.key] && (isLight ? SCENE_SWATCH[s.key].light : SCENE_SWATCH[s.key].dark)) || 'rgb(212,175,55)';
+                  const isActive = previewScene === s.key;
+                  return (
+                    <button
+                      key={s.key}
+                      className={`scene-option${isActive ? ' active' : ''}`}
+                      onClick={() => setPreviewScene(s.key)}
+                      type="button"
+                    >
+                      <span className="scene-option-swatch" style={{ background: swatch }} />
+                      <span className="scene-option-text">
+                        <span className="scene-option-label">{s.label}</span>
+                        <span className="scene-option-tag">{s.tag}</span>
+                      </span>
+                      {isActive && <span className="scene-option-check" aria-hidden="true">✓</span>}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="scene-picker-actions">
+                <button
+                  className="btn-primary"
+                  disabled={previewScene === savedScene}
+                  onClick={() => closeSheet(() => {
+                    if (previewScene && previewScene !== savedScene) {
+                      updateUserData({ backgroundScene: previewScene });
+                    }
+                    setShowScenePicker(false);
+                    setPreviewScene(null);
+                  })}
+                >
+                  Save
+                </button>
+                <button
+                  className="btn-ghost"
+                  onClick={() => closeSheet(() => { setShowScenePicker(false); setPreviewScene(null); })}
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </div>
