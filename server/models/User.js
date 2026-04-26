@@ -126,6 +126,15 @@ const userSchema = new mongoose.Schema({
   
   // Streak display preference — Oracle's Gold color (premium/OG only)
   streakColorGold: { type: Boolean, default: false },
+
+  // Tracker background scene — Sanctum scene library (premium only).
+  // Enum mirrors GoldenSmoke.SCENES. Unknown values fall back to 'golden'
+  // client-side via isValidScene, but enum here protects DB integrity.
+  backgroundScene: {
+    type: String,
+    enum: ['golden', 'jade', 'stars'],
+    default: 'golden',
+  },
   
   // Oracle Pulse — cached daily observation on Tracker
   oraclePulse: {
