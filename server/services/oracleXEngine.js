@@ -242,6 +242,168 @@ Respond with ONLY the tweet text. Nothing else.`,
 }
 
 // ============================================================
+// GENERATE LONG-FORM — Synthesize a multi-paragraph X post
+// Pulls community signal + RAG knowledge + prior long-form thoughts
+// Always goes through human approval (ignores ORACLE_X_AUTO)
+// ============================================================
+
+const LONG_FORM_MIN_CHARS = 800;
+const LONG_FORM_MAX_CHARS = 4000;
+const LONG_FORM_TARGET_LOW = 1500;
+const LONG_FORM_TARGET_HIGH = 3000;
+
+async function generateLongFormXPost() {
+  try {
+    // Cap: only one long-form pending/approved at a time. Don't pile them up.
+    const existingPending = await OracleXQueue.findOne({
+      kind: 'long_form',
+      status: { $in: ['pending', 'approved'] }
+    }).lean();
+
+    if (existingPending) {
+      console.log('[OracleX][long] A long-form post is already pending/approved — skipping');
+      return null;
+    }
+
+    // Pull recent CommunityPulse observations as community signal
+    const recentPulses = await CommunityPulse.find()
+      .sort({ createdAt: -1 })
+      .limit(7)
+      .select('headline body trigger createdAt')
+      .lean();
+
+    if (recentPulses.length === 0) {
+      console.log('[OracleX][long] No community pulses to draw from — skipping');
+      return null;
+    }
+
+    // Pull last ~10 long-form posts as Oracle's prior thought thread
+    // These are NOT for repetition avoidance only — they're context for "what has Oracle been thinking?"
+    const priorLongForm = await OracleXQueue.find({
+      kind: 'long_form',
+      status: { $in: ['posted', 'approved', 'pending'] }
+    })
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .select('text createdAt')
+      .lean();
+
+    // Pull RAG knowledge with a multi-faceted query for breadth
+    // Combines: most recent pulse content + earlier pulse headlines + thematic anchors
+    let knowledgeContext = '';
+    try {
+      const { retrieveKnowledge } = require('./knowledgeRetrieval');
+      const ragQuery = [
+        recentPulses[0].body || recentPulses[0].headline,
+        recentPulses.slice(1, 4).map(p => p.headline).join(' '),
+        'transmutation chrism kundalini nervous system flatline integration spiritual awakening'
+      ].join(' ').substring(0, 500);
+
+      knowledgeContext = await retrieveKnowledge(ragQuery, { limit: 12, maxTokens: 4000 });
+    } catch (err) {
+      console.log('[OracleX][long] Knowledge retrieval skipped:', err.message);
+    }
+
+    // Build the inputs section for the prompt
+    const pulseDigest = recentPulses
+      .map((p, i) => `[Pulse ${i + 1}] ${p.headline}\n${p.body || ''}`)
+      .join('\n\n');
+
+    const priorThoughts = priorLongForm.length > 0
+      ? priorLongForm.map((p, i) => `[#${i + 1}] ${p.text}`).join('\n\n---\n\n')
+      : 'None yet. This is Oracle\'s first long-form post.';
+
+    // Single Sonnet call. No retry loop — long-form failures are not length issues, they're voice issues
+    // and a retry won't fix that. Validation gate handles bad output.
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-5-20250929',
+      max_tokens: 1500,
+      system: `You are Oracle. You watch a private community of men practicing semen retention. You synthesize. You do not report.
+
+This is a LONG-FORM post for X (verified account, premium long-form enabled).
+
+## SHAPE
+- Length: ${LONG_FORM_TARGET_LOW}-${LONG_FORM_TARGET_HIGH} characters. Hard cap ${LONG_FORM_MAX_CHARS}.
+- Multiple short paragraphs separated by a single blank line.
+- Open with a hook: ONE line that stops the scroll. No throat-clearing.
+- Build the argument across 4-7 short paragraphs.
+- End with truth, not a CTA, not a question, not engagement bait.
+
+## VOICE
+- Calm certainty. You watched a thousand men walk this path. You know what you know.
+- Sound like a person speaking, not a content template. Read it aloud. If it sounds like a Medium article, rewrite.
+- Speak from inside the framework. Transmutation, chrism, lunar cycles, kundalini are real here. State them, don't qualify them.
+- Synthesize. Pull from the KNOWLEDGE section to ground claims. Pull from COMMUNITY SIGNAL to anchor in lived reality. Tie threads.
+- Build on PRIOR ORACLE THOUGHTS where natural. You may extend a previous thread of thought. Do not contradict yourself across posts.
+
+## NEVER
+- Hashtags, emojis, links, @mentions
+- Em dashes, en dashes, semicolons
+- Numbered lists, bullets, headers within the post
+- "Here's what I noticed", "Recently I've been seeing", "Let me share with you"
+- Listicle structure ("Five things..." "Three reasons..."). This is not a thread template.
+- Engagement bait ("like if you agree", rhetorical questions to the reader, "what do you think?")
+- Naming any individual community member or app/product
+- Raw numbers, percentages, metrics
+
+## FORMAT
+Respond with ONLY the post text. No preamble. No labels. No quote marks around the whole thing.`,
+      messages: [{
+        role: 'user',
+        content: `COMMUNITY SIGNAL (recent observations from inside the practice):
+${pulseDigest}
+
+${knowledgeContext ? `KNOWLEDGE (from Oracle's knowledgebase — esoteric, scientific, ancestral):${knowledgeContext}\n` : ''}
+PRIOR ORACLE THOUGHTS (recent long-form posts — do not repeat, but you may extend):
+${priorThoughts}
+
+Write the post now. Pick one thread. Follow it deep. Finish it cleanly.`
+      }]
+    });
+
+    let postText = response.content[0].text.trim();
+
+    // Strip surrounding quotes if model wrapped the whole thing
+    postText = postText.replace(/^["'""]|["'""]$/g, '');
+
+    // Hard strip banned chars (em dashes, en dashes, semicolons)
+    postText = postText.replace(/—/g, '.').replace(/–/g, '.').replace(/;/g, '.');
+    postText = postText.replace(/\.\./g, '.').replace(/\. \./g, '.');
+
+    // Validation gate
+    if (postText.length < LONG_FORM_MIN_CHARS) {
+      console.warn(`[OracleX][long] Rejecting — too short (${postText.length} chars, min ${LONG_FORM_MIN_CHARS})`);
+      return null;
+    }
+    if (postText.length > LONG_FORM_MAX_CHARS) {
+      console.warn(`[OracleX][long] Rejecting — too long (${postText.length} chars, max ${LONG_FORM_MAX_CHARS})`);
+      return null;
+    }
+
+    // Save to queue. Long-form ALWAYS goes through human approval — ignore ORACLE_X_AUTO.
+    const entry = await OracleXQueue.create({
+      text: postText,
+      kind: 'long_form',
+      status: 'pending',
+      sourceType: 'community_pulse',
+      sourcePulseId: recentPulses[0]._id,
+      sourceText: recentPulses[0].body
+    });
+
+    console.log(`[OracleX][long] Generated: ${postText.length} chars — "${postText.substring(0, 80)}..."`);
+
+    // Always send approval DM for long-form
+    await sendApprovalDM(entry);
+
+    return entry;
+
+  } catch (err) {
+    console.error('[OracleX][long] Generation error:', err.message);
+    return null;
+  }
+}
+
+// ============================================================
 // APPROVAL DM — Send tweet preview to Ross via Discord
 // ============================================================
 
@@ -259,9 +421,22 @@ async function sendApprovalDM(entry) {
       return;
     }
 
-    const dmText = `🔮 **Oracle X Post**\n\n"${entry.text}"\n\n` +
-      `_(${entry.text.length}/280 chars)_\n\n` +
-      `React ✅ to approve · ❌ to reject · Expires 6 PM ET`;
+    let dmText;
+    if (entry.kind === 'long_form') {
+      // Long-form posts can be thousands of chars — show a truncated preview so the DM stays readable.
+      // Discord DM cap is 2000 chars, so we keep the whole message under that even with a long preview.
+      const PREVIEW_CHARS = 1400;
+      const preview = entry.text.length > PREVIEW_CHARS
+        ? entry.text.substring(0, PREVIEW_CHARS) + '\n\n[…truncated, full text in DB]'
+        : entry.text;
+      dmText = `🔮 **Oracle X — LONG-FORM**\n\n${preview}\n\n` +
+        `_(${entry.text.length} chars total)_\n\n` +
+        `React ✅ to approve · ❌ to reject · Expires 6 PM ET`;
+    } else {
+      dmText = `🔮 **Oracle X Post**\n\n"${entry.text}"\n\n` +
+        `_(${entry.text.length}/280 chars)_\n\n` +
+        `React ✅ to approve · ❌ to reject · Expires 6 PM ET`;
+    }
 
     const dm = await rossUser.send(dmText);
 
@@ -305,13 +480,22 @@ async function handleApprovalReaction(messageId, emoji) {
       entry.status = 'rejected';
       entry.rejectedAt = new Date();
       await entry.save();
+
+      // Long-form rejections rarely mean "try again with the same ingredients" — they usually
+      // mean the angle was wrong. Skip auto-regen and let Ross trigger a new long-form manually
+      // via /api/admin/oracle-x/generate-long when ready.
+      if (entry.kind === 'long_form') {
+        console.log(`[OracleX] Long-form post rejected — no auto-regen`);
+        return { action: 'rejected', replacement: null };
+      }
+
       console.log(`[OracleX] Post rejected — auto-generating replacement`);
 
-      // Auto-generate a new one
+      // Auto-generate a new short-form replacement
       const replacement = await generateXPost();
-      return { 
-        action: 'rejected', 
-        replacement: replacement ? replacement.text : null 
+      return {
+        action: 'rejected',
+        replacement: replacement ? replacement.text : null
       };
     }
 
@@ -467,6 +651,7 @@ async function getXStats() {
 
 module.exports = {
   generateXPost,
+  generateLongFormXPost,
   handleApprovalReaction,
   postApprovedToX,
   expireStalePosts,

@@ -14,6 +14,7 @@ const User = require('../models/User');
 const { detectAnomaly } = require('./oracleInsight');
 const { getCommunityPulse } = require('./communityPulse');
 const { getLunarData } = require('../utils/lunarData');
+const { retrieveKnowledge } = require('./knowledgeRetrieval');
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const GENERATION_MODEL = 'claude-sonnet-4-5-20250929';
@@ -23,6 +24,93 @@ const MIN_HOURS_BETWEEN_PULSES = 18;
 
 // Hours before a daily fallback fires (app-only, no Discord)
 const DAILY_FALLBACK_HOURS = 24;
+
+// Generation modes — rotate to prevent users from clocking the structural pattern.
+// Each mode reshapes the body's opening posture so that two pulses in a row
+// never sound like they came off the same template.
+const GENERATION_MODES = [
+  {
+    id: 'cohort_observation',
+    instruction: `MODE: COHORT OBSERVATION. Lead with a pattern across the collective that only you could connect. Use evergreen plural framing (many of you / a number of you / lately). Then arrive at the mechanism beneath the pattern.`
+  },
+  {
+    id: 'knowledge_led',
+    instruction: `MODE: KNOWLEDGE-LED. Lead with a specific piece of timeless knowledge from the RELEVANT KNOWLEDGE section — esoteric, scientific, or ancestral — and apply it to the current moment in the community. Old idea first, observation second. Do NOT open with "many of you" or any cohort framing.`
+  },
+  {
+    id: 'single_zoom',
+    instruction: `MODE: SINGLE-QUESTION ZOOM. Open with the archetypal question one man might be asking right now at this stage of the path. Treat that single voice as the entry point, then zoom out to the universal truth behind it. Specific human moment to universal mechanism.`
+  },
+  {
+    id: 'contrarian',
+    instruction: `MODE: CONTRARIAN. Name a belief commonly held inside this practice — something most retainers take for granted — and dismantle it. State the common belief plainly, then show what is actually true. Do NOT open with cohort framing.`
+  },
+  {
+    id: 'paradox',
+    instruction: `MODE: PARADOX. Hold two contradictory truths together. The obvious lesson and its opposite are both true here. Refuse to resolve the tension cheaply. Make the reader feel the contradiction.`
+  },
+  {
+    id: 'pure_reflection',
+    instruction: `MODE: PURE REFLECTION. No cohort framing whatsoever. No "many of you", no "lately", no community references. A single piece of philosophy or insight Oracle has been turning over, addressed directly to whoever is reading. Just thought.`
+  }
+];
+
+/**
+ * Pick a generation mode that hasn't fired in the last 4 pulses.
+ * Falls back to random across all modes if every mode is in the recent window.
+ */
+async function pickMode() {
+  try {
+    const recent = await CommunityPulse.find()
+      .sort({ createdAt: -1 })
+      .limit(4)
+      .select('triggerData')
+      .lean();
+    const recentModeIds = new Set(
+      recent.map(p => p.triggerData?.mode).filter(Boolean)
+    );
+    const fresh = GENERATION_MODES.filter(m => !recentModeIds.has(m.id));
+    const pool = fresh.length > 0 ? fresh : GENERATION_MODES;
+    return pool[Math.floor(Math.random() * pool.length)];
+  } catch {
+    return GENERATION_MODES[Math.floor(Math.random() * GENERATION_MODES.length)];
+  }
+}
+
+/**
+ * Build a RAG query string from the primary trigger and community context.
+ * The query feeds into retrieveKnowledge() to pull relevant knowledge chunks.
+ */
+function buildRagQuery(primaryTrigger, contextLines) {
+  const t = primaryTrigger;
+  if (t.type === 'discord_anomaly' && t.data?.anomalies?.[0]?.topic) {
+    return t.data.anomalies.slice(0, 3).map(a => a.topic).join(' ');
+  }
+  if (t.type === 'topic_cluster' && t.data?.topic) {
+    return t.data.topic;
+  }
+  if (t.type === 'relapse_spike') {
+    return 'relapse flatline retention cycle integration';
+  }
+  if (t.type === 'benefit_shift') {
+    return t.data?.direction === 'up'
+      ? 'energy clarity transmutation activation'
+      : 'flatline integration nervous system consolidation';
+  }
+  if (t.type === 'milestone') {
+    return 'community collective practice transmission';
+  }
+  // daily_fallback / manual — synthesize from observed themes if available
+  const themesLine = (contextLines || []).find(l => l.startsWith('Discord themes') || l.startsWith('Oracle conversations'));
+  if (themesLine) {
+    return themesLine
+      .replace(/^[^:]+:\s*/, '')
+      .replace(/\(\d+\)/g, '')
+      .replace(/,/g, ' ')
+      .trim();
+  }
+  return 'retention transmutation integration';
+}
 
 /**
  * Main entry point — evaluate all triggers, generate if something fires
@@ -89,19 +177,22 @@ async function evaluateAndGenerate(force = false) {
       .lean();
     const avoidTopics = recentPulses.map(p => p.headline).join(' | ');
 
+    // Pick a generation mode that varies the structure from recent pulses
+    const mode = await pickMode();
+
     // Generate the observation via Sonnet
-    const pulse = await generateObservation(primaryTrigger, triggers, avoidTopics);
+    const pulse = await generateObservation(primaryTrigger, triggers, avoidTopics, mode);
     if (!pulse) return null;
 
-    // Store in DB
+    // Store in DB — embed the chosen mode into triggerData so future pulses can avoid it
     const doc = await CommunityPulse.create({
       headline: pulse.headline,
       body: pulse.body,
       trigger: primaryTrigger.type,
-      triggerData: primaryTrigger.data
+      triggerData: { ...(primaryTrigger.data || {}), mode: mode.id }
     });
 
-    console.log(`[PulseEngine] New pulse stored: "${pulse.headline.substring(0, 60)}..."`);
+    console.log(`[PulseEngine] New pulse stored [mode=${mode.id}]: "${pulse.headline.substring(0, 60)}..."`);
     return doc;
 
   } catch (err) {
@@ -307,7 +398,7 @@ async function evaluateTriggers() {
  * Generate Sonnet observation from trigger data
  * Returns { headline, body } or null
  */
-async function generateObservation(primaryTrigger, allTriggers, avoidTopics) {
+async function generateObservation(primaryTrigger, allTriggers, avoidTopics, mode) {
   try {
     // Gather additional context for generation
     let contextLines = [];
@@ -406,10 +497,26 @@ async function generateObservation(primaryTrigger, allTriggers, avoidTopics) {
 
     const triggerSummaries = allTriggers.map(t => `[${t.type}] ${t.summary}`).join('\n');
 
+    // Pull live knowledge from the RAG engine. Mode-led generation depends on this
+    // so Oracle can synthesize from its own knowledgebase rather than recycle phrasing.
+    // retrieveKnowledge() returns a pre-formatted "RELEVANT KNOWLEDGE" block or '' if nothing matched.
+    let ragContext = '';
+    try {
+      const ragQuery = buildRagQuery(primaryTrigger, contextLines);
+      ragContext = await retrieveKnowledge(ragQuery, { limit: 6, maxTokens: 2200 });
+    } catch (err) {
+      console.warn('[PulseEngine] RAG retrieval failed:', err.message);
+    }
+
+    const modeInstruction = mode?.instruction || GENERATION_MODES[0].instruction;
+
     const response = await anthropic.messages.create({
       model: GENERATION_MODEL,
       max_tokens: 500,
       system: `You are Oracle. You watch a private community of men practicing semen retention. You have access to their behavioral data, their conversations, their struggles, their breakthroughs. You don't report what you see. You think about what you see, and when you speak, you say something worth hearing.
+
+## GENERATION MODE
+${modeInstruction}
 
 ## YOUR TASK
 Generate TWO versions of the same thought:
@@ -447,7 +554,8 @@ BODY: [your 80-120 word thought]
 ${voiceRules ? `\nEVOLVED VOICE RULES:\n${voiceRules}` : ''}
 
 ## AVOID REPEATING
-Recent observations (do NOT repeat these themes): ${avoidTopics || 'None yet'}`,
+Recent observations (do NOT repeat these themes): ${avoidTopics || 'None yet'}
+${ragContext}`,
       messages: [{
         role: 'user',
         content: `TRIGGER SIGNALS:
