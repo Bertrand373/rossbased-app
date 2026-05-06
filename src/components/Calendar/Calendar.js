@@ -1675,10 +1675,11 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       );
     }
     
-    // No status - shouldn't happen often
+    // No status — day falls outside any tracked streak (e.g. before user's start date)
     return (
       <div className="calendar-edit-message">
-        <p>No actions available for this day.</p>
+        <p>This day is outside your tracked streaks.</p>
+        <p className="calendar-edit-hint">Edit your start date from the Track tab to extend logging back to this day.</p>
       </div>
     );
   };
