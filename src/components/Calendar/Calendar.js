@@ -1391,15 +1391,17 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         moonIllumination: lunar.illumination
       };
       
-      // New streak starts day AFTER relapse (you don't get credit for relapse day)
-      if (!isAfter(tomorrowDate, today)) {
-        updatedStreakHistory.push({
-          start: tomorrowStr,
-          end: null,
-          days: 0
-        });
-      }
-      
+      // New streak starts day AFTER relapse (you don't get credit for relapse day).
+      // Always push — for a today-relapse the start is tomorrow, which is fine:
+      // it becomes "current" on day-rollover and Calendar.getDayStatus correctly
+      // matches days against streak.start. Skipping the push leaves the user with
+      // no current streak and dead-ends the Calendar edit-day flow.
+      updatedStreakHistory.push({
+        start: tomorrowStr,
+        end: null,
+        days: 0
+      });
+
       // NEW: Record relapse event for ML feedback loop
       try {
         interventionService.recordRelapseEvent(
@@ -1411,17 +1413,18 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       } catch (err) {
         console.log('ML feedback recording skipped:', err.message);
       }
-      
+
       // Calculate new current streak from tomorrow to today
       const tomorrowMidnight = toLocalMidnight(tomorrowStr);
       const todayMidnight = new Date();
       todayMidnight.setHours(0, 0, 0, 0);
-      const newCurrentStreak = !isAfter(tomorrowDate, today) 
-        ? differenceInDays(todayMidnight, tomorrowMidnight) + 1 
+      const newCurrentStreak = !isAfter(tomorrowDate, today)
+        ? differenceInDays(todayMidnight, tomorrowMidnight) + 1
         : 0;
-      
-      // startDate stored as date string for timezone safety
-      const newStartDate = !isAfter(tomorrowDate, today) ? tomorrowStr : format(new Date(), 'yyyy-MM-dd');
+
+      // startDate must match the new streak's start so backend calcStreakFromStartDate
+      // produces correct numbers as days roll over.
+      const newStartDate = tomorrowStr;
       
       updateUserData({
         streakHistory: updatedStreakHistory,
