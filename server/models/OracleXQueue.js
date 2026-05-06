@@ -6,11 +6,21 @@
 const mongoose = require('mongoose');
 
 const oracleXQueueSchema = new mongoose.Schema({
-  // The tweet text (≤280 characters)
+  // The post text. Short tweets cap at 280; long-form (verified accounts) up to 25K.
+  // Length is enforced per-kind in the engine, not at the schema layer.
   text: {
     type: String,
     required: true,
-    maxlength: 280
+    maxlength: 25000
+  },
+
+  // Post format. 'short' = standard tweet (≤280 chars). 'long_form' = verified long post.
+  // Existing rows lack this field and default to 'short' — no migration needed.
+  kind: {
+    type: String,
+    enum: ['short', 'long_form'],
+    default: 'short',
+    index: true
   },
 
   // Status tracks the lifecycle

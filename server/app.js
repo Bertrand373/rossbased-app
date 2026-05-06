@@ -431,7 +431,7 @@ mongoose.connect(mongoUri, {
       // ORACLE X PIPELINE (@Oracle_Observes on X/Twitter)
       // Generate daily post at 9 AM EST, post approved hourly, expire stale daily
       // ============================================
-      const { generateXPost, postApprovedToX, expireStalePosts } = require('./services/oracleXEngine');
+      const { generateXPost, generateLongFormXPost, postApprovedToX, expireStalePosts } = require('./services/oracleXEngine');
 
       // Generate new X post daily at 9 AM EST (14:00 UTC)
       cron.schedule('0 14 * * *', async () => {
@@ -443,6 +443,20 @@ mongoose.connect(mongoUri, {
           }
         } catch (e) {
           console.error('Oracle X generation cron error:', e.message);
+        }
+      });
+
+      // Generate a long-form X post weekly on Sunday at 11 AM EST (16:00 UTC)
+      // Always pending — Ross approves before it posts. Skip slot if no community signal.
+      cron.schedule('0 16 * * 0', async () => {
+        try {
+          console.log('🐦 Generating Oracle X long-form post...');
+          const entry = await generateLongFormXPost();
+          if (entry) {
+            console.log(`🐦 Oracle X long-form generated (${entry.text.length} chars, pending approval)`);
+          }
+        } catch (e) {
+          console.error('Oracle X long-form cron error:', e.message);
         }
       });
 
@@ -467,7 +481,7 @@ mongoose.connect(mongoUri, {
         }
       });
 
-      console.log('🐦 Oracle X pipeline scheduled (generate 9AM, post hourly, expire nightly)');
+      console.log('🐦 Oracle X pipeline scheduled (short 9AM daily, long-form 11AM Sun, post hourly, expire nightly)');
 
       // ============================================
       // REDDIT INGESTION PIPELINE (every 6 hours + daily summary)

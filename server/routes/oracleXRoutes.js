@@ -6,6 +6,7 @@ const express = require('express');
 const router = express.Router();
 const {
   generateXPost,
+  generateLongFormXPost,
   postApprovedToX,
   expireStalePosts,
   getXStats
@@ -45,6 +46,26 @@ router.post('/generate', async (req, res) => {
     const entry = await generateXPost();
     if (!entry) {
       return res.json({ success: false, reason: 'Already generated today or no community data' });
+    }
+    res.json({ success: true, entry });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ============================================================
+// POST /api/admin/oracle-x/generate-long
+// Manually trigger a long-form X post generation (premium/verified)
+// Always pending — long-form skips ORACLE_X_AUTO and requires approval
+// ============================================================
+router.post('/generate-long', async (req, res) => {
+  try {
+    const entry = await generateLongFormXPost();
+    if (!entry) {
+      return res.json({
+        success: false,
+        reason: 'A long-form post is already pending/approved, or generation failed validation'
+      });
     }
     res.json({ success: true, entry });
   } catch (err) {
