@@ -69,7 +69,7 @@ router.post('/google', async (req, res) => {
         email,
         password: `google_${googleId}`, // Placeholder, they'll use Google to login
         googleId,
-        startDate: null, // Let user set their own start date via DatePicker
+        startDate: new Date().toISOString().split('T')[0],
         currentStreak: 0,
         longestStreak: 0,
         isPremium: false,
@@ -88,7 +88,14 @@ router.post('/google', async (req, res) => {
         },
         emotionalEntries: [],
         relapseHistory: [],
-        benefitHistory: []
+        benefitHistory: [],
+        streakHistory: [{
+          id: 1,
+          start: new Date(),
+          end: null,
+          days: 0,
+          reason: null
+        }]
       });
       
       await user.save();
