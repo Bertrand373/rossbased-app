@@ -1724,7 +1724,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
             if (pos <= 16) phase = 'Mitotic Division';
             else if (pos <= 40) phase = 'Meiotic Division';
             else if (pos <= 64) phase = 'Maturation';
-            else phase = 'Complete Reabsorption';
+            else phase = 'Reabsorption';
             return `${phase}`;
           })()}
           <span className="tracker-meta-dot">·</span>
