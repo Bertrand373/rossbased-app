@@ -16,6 +16,7 @@ const OracleIntelligence = () => {
   const [txStats, setTxStats] = useState(null);
   const [evolutionLog, setEvolutionLog] = useState(null);
   const [rules, setRules] = useState(null);
+  const [patterns, setPatterns] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('layers');
   const [actionLoading, setActionLoading] = useState(null);
@@ -29,11 +30,12 @@ const OracleIntelligence = () => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
 
-      const [intelRes, txRes, evoRes, rulesRes] = await Promise.allSettled([
+      const [intelRes, txRes, evoRes, rulesRes, patternsRes] = await Promise.allSettled([
         fetch(`${API}/api/admin/oracle/intelligence`, { headers }),
         fetch(`${API}/api/admin/oracle/transmissions/stats`, { headers }),
         fetch(`${API}/api/admin/oracle/evolution-log?limit=10`, { headers }),
-        fetch(`${API}/api/admin/oracle/rules`, { headers })
+        fetch(`${API}/api/admin/oracle/rules`, { headers }),
+        fetch(`${API}/api/admin/oracle/patterns-feed`, { headers })
       ]);
 
       if (intelRes.status === 'fulfilled' && intelRes.value.ok) {
@@ -47,6 +49,9 @@ const OracleIntelligence = () => {
       }
       if (rulesRes.status === 'fulfilled' && rulesRes.value.ok) {
         setRules(await rulesRes.value.json());
+      }
+      if (patternsRes.status === 'fulfilled' && patternsRes.value.ok) {
+        setPatterns(await patternsRes.value.json());
       }
     } catch (e) {
       console.error('Intelligence fetch error:', e);
@@ -226,6 +231,7 @@ const OracleIntelligence = () => {
       <div className="ac-sub-nav">
         {[
           { id: 'layers', label: 'Layers' },
+          { id: 'patterns', label: 'Patterns' },
           { id: 'rules', label: 'Rules' },
           { id: 'transmissions', label: 'Transmissions' },
           { id: 'evolution', label: 'Evolution' },
@@ -280,6 +286,74 @@ const OracleIntelligence = () => {
               })}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* === PATTERNS — curation feed for shareables === */}
+      {activeSection === 'patterns' && (
+        <div className="oi-section">
+          {patterns?.patterns?.length > 0 ? (
+            <>
+              <div className="oi-stat-grid">
+                <div className="ac-card ac-card-compact">
+                  <span className="ac-big-num">{patterns.total}</span>
+                  <span className="ac-big-sub">Unique Patterns</span>
+                </div>
+                <div className="ac-card ac-card-compact">
+                  <span className="ac-big-num">{patterns.snapshotsAnalyzed}</span>
+                  <span className="ac-big-sub">Snapshots Analyzed</span>
+                </div>
+              </div>
+
+              <div className="ac-card">
+                <h3 className="ac-card-title-sm">Patterns Oracle Has Noticed</h3>
+                <p className="ac-card-sub">Cross-dimensional correlations Oracle's pattern-discovery layer has surfaced from your data. Numbered by first-seen date. Recurring patterns show occurrence count.</p>
+                <div className="oi-patterns-list">
+                  {patterns.patterns.map((p) => (
+                    <div key={p.signature} className={`oi-pattern-card${p.actionable ? '' : ' inactive'}`}>
+                      <div className="oi-pattern-header">
+                        <span className="oi-pattern-num">№{String(p.patternNumber).padStart(2, '0')}</span>
+                        <div className="oi-pattern-badges">
+                          {p.occurrenceCount > 1 && (
+                            <span className="oi-pattern-badge recurring">×{p.occurrenceCount}</span>
+                          )}
+                          <span className="oi-pattern-badge strength">
+                            strength {Math.round((p.strength || 0) * 100)}%
+                          </span>
+                          <span className="oi-pattern-badge sample">
+                            n={p.sampleSize}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="oi-pattern-desc">{p.description}</p>
+                      <div className="oi-pattern-vars">
+                        {(p.variables || []).map((v, i) => (
+                          <span key={i} className="oi-pattern-var">{v}</span>
+                        ))}
+                      </div>
+                      <div className="oi-pattern-footer">
+                        <span className="oi-pattern-date">
+                          First seen {new Date(p.firstSeen).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          {p.occurrenceCount > 1 && ` · last ${new Date(p.lastSeen).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+                        </span>
+                        {p.dataWindow?.outcomesAnalyzed > 0 && (
+                          <span className="oi-pattern-window">
+                            {p.dataWindow.outcomesAnalyzed} outcomes · {p.dataWindow.usersAnalyzed} users
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="ac-card">
+              <p className="ac-empty-msg">
+                {patterns ? 'No patterns discovered yet. Run the Discover Patterns action.' : 'Loading patterns...'}
+              </p>
+            </div>
+          )}
         </div>
       )}
 

@@ -149,6 +149,104 @@ router.get('/discover-patterns', authWrap, async (req, res) => {
   }
 });
 
+// GET /api/admin/oracle/patterns-feed
+// Curation-ready feed: flattens all historical correlations from pattern-discovery
+// records, groups recurring findings, assigns pattern numbers by first-discovery date.
+// This is the source for the admin Patterns tab and (later) shareable card generation.
+router.get('/patterns-feed', authWrap, async (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
+  try {
+    const records = await OracleEvolution.find({ type: 'pattern-discovery' })
+      .sort({ createdAt: 1 })
+      .lean();
+
+    // Normalize variables → canonical word-set signature so weekly re-runs
+    // with slightly different naming (snake_case vs camelCase, with/without
+    // value suffixes) collapse into the same pattern.
+    const signatureFor = (variables) => {
+      if (!Array.isArray(variables)) return '';
+      const words = new Set();
+      for (const v of variables) {
+        if (typeof v !== 'string') continue;
+        // Split on _, :, -, and camelCase boundaries
+        const parts = v.split(/[_:\-]|(?=[A-Z])/).filter(Boolean);
+        for (const p of parts) words.add(p.toLowerCase());
+      }
+      return [...words].sort().join('|');
+    };
+
+    const groups = new Map();
+
+    for (const rec of records) {
+      const correlations = rec.findings?.correlations || [];
+      for (const c of correlations) {
+        if (!c?.description) continue;
+        const sig = signatureFor(c.variables);
+        if (!sig) continue;
+
+        const occurrence = {
+          createdAt: rec.createdAt,
+          description: c.description,
+          variables: c.variables || [],
+          strength: c.strength || 0,
+          sampleSize: c.sampleSize || 0,
+          actionable: c.actionable !== false,
+          dataWindow: rec.dataWindow || null
+        };
+
+        if (!groups.has(sig)) {
+          groups.set(sig, {
+            signature: sig,
+            firstSeen: rec.createdAt,
+            occurrences: [occurrence]
+          });
+        } else {
+          const g = groups.get(sig);
+          g.occurrences.push(occurrence);
+          if (rec.createdAt < g.firstSeen) g.firstSeen = rec.createdAt;
+        }
+      }
+    }
+
+    // Build the flattened pattern list. Latest occurrence is the canonical
+    // wording (Oracle's most recent take). Number by first-seen ascending.
+    const patterns = [...groups.values()]
+      .map((g) => {
+        const sortedOccs = [...g.occurrences].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        const latest = sortedOccs[0];
+        const avgStrength =
+          g.occurrences.reduce((sum, o) => sum + (o.strength || 0), 0) /
+          g.occurrences.length;
+        return {
+          signature: g.signature,
+          firstSeen: g.firstSeen,
+          lastSeen: latest.createdAt,
+          occurrenceCount: g.occurrences.length,
+          description: latest.description,
+          variables: latest.variables,
+          strength: latest.strength,
+          avgStrength: Math.round(avgStrength * 100) / 100,
+          sampleSize: latest.sampleSize,
+          actionable: latest.actionable,
+          dataWindow: latest.dataWindow
+        };
+      })
+      .sort((a, b) => new Date(a.firstSeen) - new Date(b.firstSeen))
+      .map((p, i) => ({ patternNumber: i + 1, ...p }));
+
+    res.json({
+      total: patterns.length,
+      snapshotsAnalyzed: records.length,
+      patterns
+    });
+  } catch (err) {
+    console.error('Patterns feed error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ============================================================
 // LAYERS 4+6+7: Oracle Evolution Pipeline
 // ============================================================
