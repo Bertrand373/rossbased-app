@@ -265,7 +265,7 @@ router.get('/', async (req, res) => {
     });
 
     const response = await anthropic.messages.create({
-      model: 'claude-3-haiku-20240307',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 200,  // Let Haiku write complete thoughts
       system: systemPrompt,
       messages: [
@@ -351,7 +351,7 @@ router.post('/regenerate', async (req, res) => {
     });
 
     const response = await anthropic.messages.create({
-      model: 'claude-3-haiku-20240307',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 200,  // Let Haiku write complete thoughts
       system: systemPrompt,
       messages: [
@@ -495,7 +495,7 @@ Generate the synthesis now.`);
     console.log(`🔮 Generating synthesis for ${user.username} (Day ${streakDays})`);
 
     const response = await anthropic.messages.create({
-      model: 'claude-3-haiku-20240307',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 150,
       system: synthesisPrompt,
       messages: [{ role: 'user', content: userData }]
