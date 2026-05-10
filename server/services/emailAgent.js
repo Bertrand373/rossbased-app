@@ -11,6 +11,8 @@
 
 const Anthropic = require('@anthropic-ai/sdk');
 const EmailAgentState = require('../models/EmailAgentState');
+const EmailBroadcast = require('../models/EmailBroadcast');
+const EmailAgentLearning = require('../models/EmailAgentLearning');
 const User = require('../models/User');
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -160,6 +162,37 @@ async function generateEmailDraft(intel) {
   // Fetch past broadcasts to prevent repeats in subject AND content
   const pastBroadcasts = await getRecentBroadcasts();
 
+  // Fetch latest learnings (synthesis of what's worked vs what hasn't)
+  let learning = null;
+  try {
+    learning = await EmailAgentLearning.getLatest();
+  } catch (err) {
+    console.error('[EmailAgent] Failed to fetch learnings:', err.message);
+  }
+
+  let learningsBlock = '';
+  if (learning) {
+    const fmt = (arr) => (arr || []).length > 0 ? arr.map(p => `- ${p}`).join('\n') : '- (none captured)';
+    learningsBlock = `LEARNINGS FROM YOUR PAST SENDS:
+
+What's working (open-rate winners shared these patterns):
+${fmt(learning.winningPatterns)}
+
+What's not working (open-rate losers shared these patterns):
+${fmt(learning.losingPatterns)}
+
+Subject line insight: ${learning.subjectLineInsights || '(none captured)'}
+Structure insight: ${learning.structureInsights || '(none captured)'}
+Voice insight: ${learning.voiceInsights || '(none captured)'}
+
+Currently overused — patterns to AVOID this week:
+${fmt(learning.warningsForNextSend)}
+
+Use these learnings. Write something the data says will land. CRITICAL: avoid every pattern listed under "Currently overused" — those frames have been used too many weeks in a row and engagement is dropping.
+
+`;
+  }
+
   // Build data block for Claude (same format as existing buildWeeklyEmailDraft)
   let dataBlock = 'COMMUNITY INTELLIGENCE DATA:\n\n';
 
@@ -239,7 +272,7 @@ PREVIOUS EMAILS (do NOT repeat these angles, metaphors, themes, or subject struc
 ${pastBroadcasts.length > 0 ? pastBroadcasts.map(b => `- "${b.subject}" — ${b.snippet || '(no preview)'}...`).join('\n') : '- (no previous emails found)'}
 Pick a completely DIFFERENT angle, topic, metaphor, and subject line than anything above. If you notice a theme you're about to reuse (e.g. "gap", "furnace", "quiet"), STOP and find a fresh angle from the data.
 
-${dataBlock}
+${learningsBlock}${dataBlock}
 
 Write the complete email now. Output ONLY the email with the subject line on the first line prefixed with "SUBJECT: ".`;
 
@@ -402,6 +435,26 @@ async function runEmailPipeline() {
     // Still return the draft even if Kit fails — Ross can copy it manually
   }
 
+  // Persist to EmailBroadcast for performance tracking + future learning
+  if (kitBroadcastId) {
+    try {
+      await EmailBroadcast.create({
+        kitBroadcastId: String(kitBroadcastId),
+        subject,
+        body,
+        intelSnapshot: intel,
+        modelUsed: process.env.EMAIL_AGENT_MODEL || 'claude-opus-4-7',
+        sentAt: new Date()
+      });
+    } catch (err) {
+      if (err.code === 11000) {
+        console.log(`[EmailAgent] Broadcast ${kitBroadcastId} already in EmailBroadcast — skipping persist`);
+      } else {
+        console.error('[EmailAgent] EmailBroadcast persistence failed:', err.message);
+      }
+    }
+  }
+
   return {
     subject,
     body,
@@ -417,6 +470,188 @@ async function runEmailPipeline() {
       ytCommentCount: intel.ytComments.length
     }
   };
+}
+
+// ============================================================
+// PERFORMANCE MEASUREMENT — Fetch Kit stats, classify, store
+// ============================================================
+
+// Kit may report rates as decimals (0.5398) or percentages (53.98).
+// We normalize to decimal for consistent comparisons.
+function normalizeRate(value) {
+  const n = Number(value) || 0;
+  return n > 1 ? n / 100 : n;
+}
+
+async function fetchKitStatsForBroadcast(kitBroadcastId) {
+  if (!KIT_API_KEY || !kitBroadcastId) return null;
+
+  try {
+    const res = await fetch(`${KIT_API_BASE}/broadcasts/${kitBroadcastId}/stats`, {
+      headers: { 'X-Kit-Api-Key': KIT_API_KEY }
+    });
+
+    if (!res.ok) {
+      console.error(`[EmailAgent] Kit stats fetch ${kitBroadcastId} returned ${res.status}`);
+      return null;
+    }
+
+    const data = await res.json();
+    const s = data.broadcast?.stats;
+    if (!s) return null;
+
+    const recipients = Number(s.recipients) || 0;
+    if (recipients === 0) return null; // not yet sent / no audience
+
+    return {
+      recipients,
+      opens: Number(s.emails_opened) || 0,
+      openRate: normalizeRate(s.open_rate),
+      clicks: Number(s.total_clicks) || 0,
+      clickRate: normalizeRate(s.click_rate),
+      unsubs: Number(s.unsubscribes) || 0,
+      unsubRate: normalizeRate(s.unsubscribe_rate)
+    };
+  } catch (err) {
+    console.error(`[EmailAgent] fetchKitStatsForBroadcast(${kitBroadcastId}) error:`, err.message);
+    return null;
+  }
+}
+
+async function measureBroadcastPerformance(kitBroadcastId) {
+  const stats = await fetchKitStatsForBroadcast(kitBroadcastId);
+  if (!stats) return null;
+
+  const broadcast = await EmailBroadcast.findOne({ kitBroadcastId: String(kitBroadcastId) });
+  if (!broadcast) {
+    console.error(`[EmailAgent] No EmailBroadcast doc for kitBroadcastId ${kitBroadcastId}`);
+    return null;
+  }
+
+  // Rolling 5-send average — only previously measured broadcasts that were
+  // sent before this one (so backfilling oldest-first builds correctly)
+  const prior = await EmailBroadcast.find({
+    sentAt: { $lt: broadcast.sentAt },
+    performanceTier: { $ne: 'pending' }
+  }).sort({ sentAt: -1 }).limit(5).lean();
+
+  const rollingAverageOpenRate = prior.length > 0
+    ? prior.reduce((sum, b) => sum + (b.openRate || 0), 0) / prior.length
+    : 0;
+
+  const performanceDelta = prior.length > 0 ? stats.openRate - rollingAverageOpenRate : 0;
+
+  let performanceTier = 'normal';
+  if (prior.length > 0) {
+    if (performanceDelta >= 0.05) performanceTier = 'strong';
+    else if (performanceDelta <= -0.05) performanceTier = 'weak';
+  }
+
+  broadcast.recipients = stats.recipients;
+  broadcast.opens = stats.opens;
+  broadcast.openRate = stats.openRate;
+  broadcast.clicks = stats.clicks;
+  broadcast.clickRate = stats.clickRate;
+  broadcast.unsubs = stats.unsubs;
+  broadcast.unsubRate = stats.unsubRate;
+  broadcast.rollingAverageOpenRate = rollingAverageOpenRate;
+  broadcast.performanceDelta = performanceDelta;
+  broadcast.performanceTier = performanceTier;
+  broadcast.performanceMeasuredAt = new Date();
+  await broadcast.save();
+
+  return broadcast;
+}
+
+// ============================================================
+// LEARN — Synthesize patterns from top vs bottom performers
+// ============================================================
+
+async function analyzeAndLearnFromBroadcasts() {
+  try {
+    const recent = await EmailBroadcast.getRecent(12);
+    const measured = recent.filter(b => b.performanceTier !== 'pending');
+
+    if (measured.length < 5) {
+      console.log(`[EmailAgent] Not enough measured broadcasts (${measured.length}) — need 5+ to analyze`);
+      return null;
+    }
+
+    const sorted = [...measured].sort((a, b) => (b.openRate || 0) - (a.openRate || 0));
+    const top = sorted.slice(0, 3);
+    const bottom = sorted.slice(-3).reverse();
+
+    const formatBroadcast = (b) =>
+      `OPEN RATE: ${(b.openRate * 100).toFixed(1)}%\nSUBJECT: ${b.subject}\nBODY:\n${b.body}\n---`;
+
+    const analyzerPrompt = `You are analyzing weekly emails Ross sent to his subscriber list. Compare the highest-open-rate emails against the lowest-open-rate emails so future emails learn from what works.
+
+TOP PERFORMERS (highest open rates):
+
+${top.map(formatBroadcast).join('\n\n')}
+
+BOTTOM PERFORMERS (lowest open rates):
+
+${bottom.map(formatBroadcast).join('\n\n')}
+
+Identify what separates winners from losers. Look at:
+- Subject line construction (length, hook type, specificity, curiosity vs declaration)
+- Body structure (observational, reframe, instructional, contrarian, prophecy, celebratory)
+- Hook style (community-observation, direct-address, curiosity-gap, declarative)
+- Closer style (identity-statement, question, practice-list, benediction)
+- Voice, pacing, energy
+- Patterns showing fatigue from overuse (e.g. one structural template repeated week after week)
+
+The "warningsForNextSend" array is the most important field. It should call out specific patterns that are currently OVERUSED across recent sends and need a break — even if those patterns appear in some winners. The goal is to break out of structural ruts before engagement collapses.
+
+Output ONLY a single JSON object with EXACTLY these keys, no preamble, no markdown fences, no commentary:
+{
+  "winningPatterns": [string, string, ...],
+  "losingPatterns": [string, string, ...],
+  "subjectLineInsights": string,
+  "structureInsights": string,
+  "voiceInsights": string,
+  "warningsForNextSend": [string, string, ...]
+}`;
+
+    const response = await anthropic.messages.create({
+      model: process.env.EMAIL_AGENT_MODEL || 'claude-opus-4-7',
+      max_tokens: 1500,
+      messages: [{ role: 'user', content: analyzerPrompt }]
+    });
+
+    const raw = response.content[0].text.trim();
+    console.log('[EmailAgent] Analyzer raw response:', raw);
+
+    // Strip any markdown fences if Opus added them despite instructions
+    const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+
+    let parsed;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch (parseErr) {
+      console.error('[EmailAgent] Analyzer JSON parse failed:', parseErr.message);
+      return null;
+    }
+
+    const learning = await EmailAgentLearning.create({
+      winningPatterns: Array.isArray(parsed.winningPatterns) ? parsed.winningPatterns : [],
+      losingPatterns: Array.isArray(parsed.losingPatterns) ? parsed.losingPatterns : [],
+      subjectLineInsights: typeof parsed.subjectLineInsights === 'string' ? parsed.subjectLineInsights : '',
+      structureInsights: typeof parsed.structureInsights === 'string' ? parsed.structureInsights : '',
+      voiceInsights: typeof parsed.voiceInsights === 'string' ? parsed.voiceInsights : '',
+      warningsForNextSend: Array.isArray(parsed.warningsForNextSend) ? parsed.warningsForNextSend : [],
+      analyzedBroadcastIds: measured.map(b => b.kitBroadcastId),
+      topPerformerIds: top.map(b => b.kitBroadcastId),
+      bottomPerformerIds: bottom.map(b => b.kitBroadcastId),
+      analyzedAt: new Date()
+    });
+
+    return learning;
+  } catch (err) {
+    console.error('[EmailAgent] analyzeAndLearnFromBroadcasts failed:', err.message);
+    return null;
+  }
 }
 
 // ============================================================
@@ -573,5 +808,8 @@ module.exports = {
   setApprovalMode,
   setCadence,
   getAgentStatus,
+  fetchKitStatsForBroadcast,
+  measureBroadcastPerformance,
+  analyzeAndLearnFromBroadcasts,
   TIER_LABELS
 };

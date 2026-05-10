@@ -13,6 +13,8 @@
 const { EmbedBuilder } = require('discord.js');
 const emailAgent = require('./emailAgent');
 const EmailAgentState = require('../models/EmailAgentState');
+const EmailBroadcast = require('../models/EmailBroadcast');
+const EmailAgentLearning = require('../models/EmailAgentLearning');
 
 const AGENT_COLOR = 0x7C3AED; // Purple for agent messages
 
@@ -36,6 +38,11 @@ async function handleAgentCommand(message, adminDmFooter) {
     case 'cadence': return handleCadenceConfig(message, args.slice(1));
     case 'stats':
     case 'eval':    return handleEvalStats(message, adminDmFooter);
+    case 'perf':        return handlePerf(message);
+    case 'measure':     return handleMeasure(message);
+    case 'measure-all': return handleMeasureAll(message);
+    case 'analyze':     return handleAnalyze(message);
+    case 'learnings':   return handleLearnings(message);
     case 'help':
     default:        return handleHelp(message);
   }
@@ -283,6 +290,189 @@ async function handleEvalStats(message, footer) {
 }
 
 // ============================================================
+// !agent perf — Last 10 broadcasts with open rate + tier
+// ============================================================
+
+const TIER_EMOJI = { strong: '🟢', normal: '⚪', weak: '🔴', pending: '⏳' };
+
+async function handlePerf(message) {
+  try {
+    const broadcasts = await EmailBroadcast.getRecent(10);
+
+    if (broadcasts.length === 0) {
+      return message.channel.send('No broadcasts tracked yet. Run the backfill script or send a new email.');
+    }
+
+    const lines = broadcasts.map(b => {
+      const subj = (b.subject || '').slice(0, 50);
+      const rate = b.performanceTier === 'pending'
+        ? ' pending'
+        : `${(b.openRate * 100).toFixed(1).padStart(5)}%`;
+      const emoji = TIER_EMOJI[b.performanceTier] || '⏳';
+      const date = b.sentAt ? new Date(b.sentAt).toISOString().slice(0, 10) : 'N/A';
+      const recipients = (b.recipients || 0).toString().padStart(4);
+      return `${emoji} ${rate} · ${recipients}r · ${date} · ${subj}`;
+    });
+
+    const desc = '```\n' + lines.join('\n') + '\n```';
+
+    await message.channel.send({ embeds: [
+      new EmbedBuilder()
+        .setColor(AGENT_COLOR)
+        .setTitle('📈 Broadcast Performance — Last 10')
+        .setDescription(desc)
+        .setTimestamp()
+    ]});
+  } catch (err) {
+    await message.channel.send(`Perf error: ${err.message}`);
+  }
+}
+
+// ============================================================
+// !agent measure — Refresh stats for the most recent pending broadcast
+// ============================================================
+
+async function handleMeasure(message) {
+  try {
+    const pending = await EmailBroadcast.findOne({ performanceTier: 'pending' }).sort({ sentAt: -1 });
+
+    if (!pending) {
+      return message.channel.send('No pending broadcasts to measure.');
+    }
+
+    const updated = await emailAgent.measureBroadcastPerformance(pending.kitBroadcastId);
+    if (!updated) {
+      return message.channel.send(
+        `Could not fetch stats for broadcast ${pending.kitBroadcastId}. ` +
+        `Stats may not be available yet (Kit needs ~24h after send).`
+      );
+    }
+
+    const emoji = TIER_EMOJI[updated.performanceTier] || '⏳';
+    const deltaStr = (updated.performanceDelta * 100).toFixed(1);
+    const sign = updated.performanceDelta >= 0 ? '+' : '';
+
+    await message.channel.send({ embeds: [
+      new EmbedBuilder()
+        .setColor(AGENT_COLOR)
+        .setTitle('📊 Broadcast Measured')
+        .setDescription(
+          `**Subject:** ${updated.subject}\n` +
+          `**Open Rate:** ${(updated.openRate * 100).toFixed(1)}%\n` +
+          `**Tier:** ${emoji} ${updated.performanceTier} (${sign}${deltaStr}pp vs rolling avg)\n` +
+          `**Recipients:** ${updated.recipients}\n` +
+          `**Clicks:** ${updated.clicks} (${(updated.clickRate * 100).toFixed(1)}%)\n` +
+          `**Unsubs:** ${updated.unsubs}`
+        )
+        .setTimestamp()
+    ]});
+  } catch (err) {
+    await message.channel.send(`Measure error: ${err.message}`);
+  }
+}
+
+// ============================================================
+// !agent measure-all — Refresh all pending broadcasts >24h old
+// ============================================================
+
+async function handleMeasureAll(message) {
+  try {
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const pending = await EmailBroadcast.find({
+      performanceTier: 'pending',
+      sentAt: { $lt: cutoff }
+    }).sort({ sentAt: 1 }); // oldest first so rolling avg builds correctly
+
+    if (pending.length === 0) {
+      return message.channel.send('No pending broadcasts older than 24h.');
+    }
+
+    let updated = 0;
+    let failed = 0;
+    for (const b of pending) {
+      const result = await emailAgent.measureBroadcastPerformance(b.kitBroadcastId);
+      if (result) updated++;
+      else failed++;
+    }
+
+    await message.channel.send({ embeds: [
+      new EmbedBuilder()
+        .setColor(AGENT_COLOR)
+        .setTitle('📊 Bulk Measurement Complete')
+        .setDescription(`Updated: **${updated}**\nFailed: **${failed}** (stats not yet available)`)
+        .setTimestamp()
+    ]});
+  } catch (err) {
+    await message.channel.send(`Measure-all error: ${err.message}`);
+  }
+}
+
+// ============================================================
+// !agent analyze — Synthesize learnings from past sends
+// ============================================================
+
+async function handleAnalyze(message) {
+  try {
+    await message.reply({ embeds: [
+      new EmbedBuilder()
+        .setColor(AGENT_COLOR)
+        .setDescription('🔍 Analyzing past sends with Opus...')
+    ]});
+
+    const learning = await emailAgent.analyzeAndLearnFromBroadcasts();
+
+    if (!learning) {
+      return message.channel.send(
+        'Not enough measured broadcasts (need 5+), or analyzer failed. ' +
+        'Run `!agent measure-all` first, or check logs for parse errors.'
+      );
+    }
+
+    await sendLearningEmbed(message.channel, learning);
+  } catch (err) {
+    await message.channel.send(`Analyze error: ${err.message}`);
+  }
+}
+
+// ============================================================
+// !agent learnings — Show the latest learnings doc
+// ============================================================
+
+async function handleLearnings(message) {
+  try {
+    const learning = await EmailAgentLearning.getLatest();
+
+    if (!learning) {
+      return message.channel.send('No learnings yet. Run `!agent analyze` after a few sends have been measured.');
+    }
+
+    await sendLearningEmbed(message.channel, learning);
+  } catch (err) {
+    await message.channel.send(`Learnings error: ${err.message}`);
+  }
+}
+
+async function sendLearningEmbed(channel, learning) {
+  const fmt = (arr) => (arr || []).length > 0 ? arr.map(p => `• ${p}`).join('\n') : '_(none)_';
+
+  const desc =
+    `**🟢 Winning patterns:**\n${fmt(learning.winningPatterns)}\n\n` +
+    `**🔴 Losing patterns:**\n${fmt(learning.losingPatterns)}\n\n` +
+    `**⚠️ Avoid this week (currently overused):**\n${fmt(learning.warningsForNextSend)}`;
+
+  await channel.send({ embeds: [
+    new EmbedBuilder()
+      .setColor(AGENT_COLOR)
+      .setTitle('🧠 Email Agent Learnings')
+      .setDescription(desc.slice(0, 4000))
+      .setFooter({
+        text: `Analyzed ${(learning.analyzedBroadcastIds || []).length} broadcasts · ${new Date(learning.analyzedAt).toLocaleDateString()}`
+      })
+      .setTimestamp()
+  ]});
+}
+
+// ============================================================
 // !agent help
 // ============================================================
 
@@ -290,6 +480,11 @@ async function handleHelp(message) {
   const help = `**Email Agent Commands:**\n\n` +
     `\`!agent status\` — Current tier, mode, last send stats\n` +
     `\`!agent send\` — Manually trigger the pipeline NOW\n` +
+    `\`!agent perf\` — Last 10 broadcasts with open rate + tier\n` +
+    `\`!agent measure\` — Refresh stats for the most recent pending broadcast\n` +
+    `\`!agent measure-all\` — Refresh stats for all pending broadcasts >24h old\n` +
+    `\`!agent analyze\` — Re-run the learning synthesis on past sends\n` +
+    `\`!agent learnings\` — Show the latest learnings doc\n` +
     `\`!agent tier <1-4> <tag_id>\` — Set Kit tag for a warmup tier\n` +
     `\`!agent mode <approve|auto-send|draft-only>\` — Set approval mode\n` +
     `\`!agent cadence <weekly|twice-weekly>\` — Set send frequency\n` +
@@ -343,7 +538,7 @@ async function handleAgentReaction(reaction, user) {
 // ============================================================
 
 function registerEmailAgentCron(client, findAdminMember) {
-  console.log('[EmailAgent] Cron registered — Sunday noon ET');
+  console.log('[EmailAgent] Cron registered — Sunday noon ET (send) + Saturday 11am ET (learn)');
 
   function getETHour() {
     return parseInt(new Date().toLocaleString('en-US', {
@@ -367,19 +562,78 @@ function registerEmailAgentCron(client, findAdminMember) {
   }
 
   let lastAgentRunDate = null;
+  let lastLearnRunDate = null;
 
   // ---- EMAIL AGENT CRON (check every hour) ----
   setInterval(async () => {
     try {
-      const state = await EmailAgentState.getState();
       const dayOfWeek = getETDay();
       const etHour = getETHour();
+      const today = getTodayET();
+
+      // ---- Saturday 11am ET — measure + analyze + DM learnings ----
+      if (dayOfWeek === 6 && etHour === 11 && lastLearnRunDate !== today) {
+        lastLearnRunDate = today;
+        console.log('[EmailAgent] Saturday 11am cron firing — measure + analyze...');
+
+        try {
+          const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+          const pending = await EmailBroadcast.find({
+            performanceTier: 'pending',
+            sentAt: { $lt: cutoff }
+          }).sort({ sentAt: 1 });
+
+          let measured = 0;
+          for (const b of pending) {
+            const result = await emailAgent.measureBroadcastPerformance(b.kitBroadcastId);
+            if (result) measured++;
+          }
+          console.log(`[EmailAgent] Saturday cron measured ${measured} broadcasts`);
+
+          const learning = await emailAgent.analyzeAndLearnFromBroadcasts();
+
+          const admin = await findAdminMember();
+          if (admin) {
+            if (learning) {
+              const fmt = (arr) => (arr || []).length > 0 ? arr.map(p => `• ${p}`).join('\n') : '_(none)_';
+              const desc =
+                `**🟢 Winning patterns:**\n${fmt(learning.winningPatterns)}\n\n` +
+                `**🔴 Losing patterns:**\n${fmt(learning.losingPatterns)}\n\n` +
+                `**⚠️ Avoid tomorrow (currently overused):**\n${fmt(learning.warningsForNextSend)}`;
+
+              await admin.send({ embeds: [
+                new EmbedBuilder()
+                  .setColor(AGENT_COLOR)
+                  .setTitle('🧠 Saturday Learnings — Ready for tomorrow\'s draft')
+                  .setDescription(desc.slice(0, 4000))
+                  .setFooter({
+                    text: `Measured: ${measured} new · Analyzed: ${(learning.analyzedBroadcastIds || []).length} broadcasts`
+                  })
+                  .setTimestamp()
+              ]});
+            } else {
+              await admin.send({ embeds: [
+                new EmbedBuilder()
+                  .setColor(0xF59E0B)
+                  .setTitle('🧠 Saturday Learnings')
+                  .setDescription(
+                    `Measured ${measured} broadcasts. Analyzer skipped — need 5+ measured broadcasts (or parse failed). Check logs.`
+                  )
+              ]});
+            }
+          }
+        } catch (err) {
+          console.error('[EmailAgent] Saturday cron error:', err.message);
+        }
+      }
+
+      // ---- Sunday noon ET (or configured day/hour) — generate weekly email ----
+      const state = await EmailAgentState.getState();
 
       // Check if it's the right day and hour
       if (dayOfWeek !== state.sendDay) return;  // Default: 0 (Sunday)
       if (etHour !== state.sendHour) return;     // Default: 12 (noon ET)
 
-      const today = getTodayET();
       if (lastAgentRunDate === today) return;
       lastAgentRunDate = today;
 
