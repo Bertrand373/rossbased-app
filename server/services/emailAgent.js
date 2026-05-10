@@ -604,41 +604,71 @@ Identify what separates winners from losers. Look at:
 
 The "warningsForNextSend" array is the most important field. It should call out specific patterns that are currently OVERUSED across recent sends and need a break — even if those patterns appear in some winners. The goal is to break out of structural ruts before engagement collapses.
 
-Output ONLY a single JSON object with EXACTLY these keys, no preamble, no markdown fences, no commentary:
-{
-  "winningPatterns": [string, string, ...],
-  "losingPatterns": [string, string, ...],
-  "subjectLineInsights": string,
-  "structureInsights": string,
-  "voiceInsights": string,
-  "warningsForNextSend": [string, string, ...]
-}`;
+Call the submit_analysis tool with your findings. The "warningsForNextSend" field is the most important — that's what shapes next week's draft.`;
 
+    // Tool use forces structured output — the SDK validates against input_schema,
+    // so a malformed JSON parse failure is structurally impossible. Opus 4.7 doesn't
+    // support assistant prefilling, so this is the correct primitive for forced JSON.
     const response = await anthropic.messages.create({
       model: process.env.EMAIL_AGENT_MODEL || 'claude-opus-4-7',
       max_tokens: 3000,
-      messages: [
-        { role: 'user', content: analyzerPrompt },
-        { role: 'assistant', content: '{' } // prefill — force Opus to continue inside the JSON object
-      ]
+      tools: [{
+        name: 'submit_analysis',
+        description: 'Submit the synthesized analysis of past email broadcasts.',
+        input_schema: {
+          type: 'object',
+          required: [
+            'winningPatterns',
+            'losingPatterns',
+            'subjectLineInsights',
+            'structureInsights',
+            'voiceInsights',
+            'warningsForNextSend'
+          ],
+          properties: {
+            winningPatterns: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Specific patterns shared by the highest-open-rate emails.'
+            },
+            losingPatterns: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Specific patterns shared by the lowest-open-rate emails.'
+            },
+            subjectLineInsights: {
+              type: 'string',
+              description: 'What the winning subject lines do that the losing ones do not.'
+            },
+            structureInsights: {
+              type: 'string',
+              description: 'How body structure differs between winners and losers.'
+            },
+            voiceInsights: {
+              type: 'string',
+              description: 'Voice, pacing, and energy patterns that separate winners from losers.'
+            },
+            warningsForNextSend: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Patterns currently OVERUSED that should be avoided in the next send, even if they appear in some winners.'
+            }
+          }
+        }
+      }],
+      tool_choice: { type: 'tool', name: 'submit_analysis' },
+      messages: [{ role: 'user', content: analyzerPrompt }]
     });
 
-    const raw = response.content[0].text.trim();
     console.log('[EmailAgent] Analyzer stop_reason:', response.stop_reason);
-    console.log('[EmailAgent] Analyzer raw response:', raw);
 
-    // Anthropic returns only the continuation after our prefilled '{', so prepend it.
-    // Truncate at the last '}' to drop any trailing commentary Opus might add.
-    const closingIdx = raw.lastIndexOf('}');
-    const cleaned = '{' + (closingIdx >= 0 ? raw.slice(0, closingIdx + 1) : raw);
-
-    let parsed;
-    try {
-      parsed = JSON.parse(cleaned);
-    } catch (parseErr) {
-      console.error('[EmailAgent] Analyzer JSON parse failed:', parseErr.message);
+    const toolUseBlock = response.content.find(b => b.type === 'tool_use');
+    if (!toolUseBlock || !toolUseBlock.input) {
+      console.error('[EmailAgent] Analyzer returned no tool_use block');
       return null;
     }
+
+    const parsed = toolUseBlock.input;
 
     const learning = await EmailAgentLearning.create({
       winningPatterns: Array.isArray(parsed.winningPatterns) ? parsed.winningPatterns : [],
