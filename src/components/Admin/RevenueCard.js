@@ -8,9 +8,11 @@ const API = process.env.REACT_APP_API || process.env.REACT_APP_API_URL || 'https
 
 const RevenueCard = () => {
   const [data, setData] = useState(null);
+  const [convChurn, setConvChurn] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCharges, setShowCharges] = useState(false);
+  const [showSilent, setShowSilent] = useState(false);
   const [subDrilldown, setSubDrilldown] = useState(null);
   const [subDetails, setSubDetails] = useState([]);
   const [subDetailsLoading, setSubDetailsLoading] = useState(false);
@@ -21,15 +23,20 @@ const RevenueCard = () => {
 
   const fetchRevenue = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/api/admin/revenue`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!res.ok) {
-        const err = await res.json();
+      const [revRes, ccRes] = await Promise.all([
+        fetch(`${API}/api/admin/revenue`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${API}/api/admin/revenue/conversion-churn`, { headers: { 'Authorization': `Bearer ${token}` } }),
+      ]);
+      if (!revRes.ok) {
+        const err = await revRes.json();
         throw new Error(err.error || 'Failed to fetch');
       }
-      const json = await res.json();
+      const json = await revRes.json();
       setData(json);
+      if (ccRes.ok) {
+        const ccJson = await ccRes.json();
+        setConvChurn(ccJson);
+      }
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -263,6 +270,75 @@ const RevenueCard = () => {
           </div>
         )}
       </div>
+
+      {/* Conversion & Churn — last 30d trial conversion + at-risk paying users */}
+      {convChurn && (
+        <div className="rv-card">
+          <div className="rv-card-head">
+            <h3>Conversion & Churn</h3>
+            <span className="rv-badge">LAST {convChurn.conversion.windowDays}D</span>
+          </div>
+
+          <div className="rv-cc-grid">
+            <div className="rv-cc-stat">
+              <span className="rv-cc-val">
+                {convChurn.conversion.conversionRate === null
+                  ? '—'
+                  : `${convChurn.conversion.conversionRate}%`}
+              </span>
+              <span className="rv-cc-label">Trial → Paid</span>
+              <span className="rv-cc-sub">
+                {convChurn.conversion.converted} of {convChurn.conversion.trialsCompleted} completed
+                {convChurn.conversion.stillTrialing > 0 && ` · ${convChurn.conversion.stillTrialing} still trialing`}
+              </span>
+            </div>
+
+            <div className="rv-cc-stat">
+              <span className={`rv-cc-val ${convChurn.churnWatch.silentCount > 0 ? 'rv-cc-warn' : ''}`}>
+                {convChurn.churnWatch.silentCount}
+              </span>
+              <span className="rv-cc-label">Silent Payers</span>
+              <span className="rv-cc-sub">
+                {convChurn.churnWatch.mrrAtRisk > 0
+                  ? `$${(convChurn.churnWatch.mrrAtRisk / 100).toFixed(0)}/mo at risk`
+                  : 'all paying users active'}
+                {' · '}{convChurn.churnWatch.silentThresholdDays}d+ inactive
+              </span>
+            </div>
+          </div>
+
+          {convChurn.churnWatch.silentCount > 0 && (
+            <>
+              <div
+                className="rv-cc-toggle"
+                onClick={() => setShowSilent(!showSilent)}
+              >
+                <span>{showSilent ? '▾' : '▸'} Outreach list ({convChurn.churnWatch.silentCount})</span>
+              </div>
+              {showSilent && (
+                <div className="rv-cc-silent-list">
+                  {convChurn.churnWatch.users.map((u, i) => (
+                    <div key={i} className="rv-cc-silent-row">
+                      <div className="rv-cc-silent-left">
+                        <span className="rv-cc-silent-name">{u.username}</span>
+                        <span className="rv-cc-silent-email">{u.email || '—'}</span>
+                      </div>
+                      <div className="rv-cc-silent-right">
+                        <span className="rv-cc-silent-days">
+                          {u.daysSilent != null ? `${u.daysSilent}d silent` : 'never seen'}
+                        </span>
+                        <span className="rv-cc-silent-tier">
+                          {u.tier}{u.canceling ? ' · canceling' : ''}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
 
       {/* Failed Payments */}
       {failedPayments.length > 0 && (

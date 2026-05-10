@@ -259,4 +259,111 @@ router.get('/revenue/subscribers/:status', adminCheck, async (req, res) => {
   }
 });
 
+// ============================================================
+// GET /api/admin/revenue/conversion-churn
+// Trial -> paid conversion rate (last 30d) + at-risk paying users
+// (active subscribers not seen in 7+ days — outreach list)
+// ============================================================
+router.get('/revenue/conversion-churn', adminCheck, async (req, res) => {
+  try {
+    const User = require('../models/User');
+    const now = Date.now();
+    const SILENT_THRESHOLD_DAYS = 7;
+    const CONVERSION_WINDOW_DAYS = 30;
+    const windowStart = new Date(now - CONVERSION_WINDOW_DAYS * 86400000);
+    const silentCutoff = new Date(now - SILENT_THRESHOLD_DAYS * 86400000);
+
+    // Exclude admin accounts from cohort math (consistent with analyticsRoutes)
+    const baseFilter = { username: { $not: /^(ross|rossbased)$/i } };
+
+    // ── TRIAL CONVERSION (last 30 days) ──
+    // A trial counts in the cohort if its trialStartDate is within the window.
+    // It "converted" if the user now has subscription.status of active, OR
+    // canceled with currentPeriodEnd still in the future (paid through cycle).
+    const cohort = await User.find(
+      {
+        ...baseFilter,
+        'subscription.trialStartDate': { $gte: windowStart },
+      },
+      'username subscription.status subscription.trialStartDate subscription.trialEndDate subscription.currentPeriodEnd subscription.tier'
+    ).lean();
+
+    const stillTrialing = cohort.filter(u => {
+      const s = u.subscription;
+      return s.status === 'trial' && s.trialEndDate && new Date(s.trialEndDate) > new Date();
+    }).length;
+
+    const converted = cohort.filter(u => {
+      const s = u.subscription;
+      if (s.status === 'active') return true;
+      if (s.status === 'canceled' && s.currentPeriodEnd && new Date(s.currentPeriodEnd) > new Date()) return true;
+      return false;
+    }).length;
+
+    const trialsCompleted = cohort.length - stillTrialing;
+    const conversionRate = trialsCompleted > 0
+      ? Math.round((converted / trialsCompleted) * 100)
+      : null; // null = no completed trials in window yet
+
+    // ── SILENT PAYING USERS (active sub, not seen in 7+ days) ──
+    // Only flag 'active' status — canceled users are already lost, trial
+    // abandonment is pre-conversion and surfaces in conversion rate above.
+    const silent = await User.find(
+      {
+        ...baseFilter,
+        'subscription.status': 'active',
+        $or: [
+          { lastSeen: { $lt: silentCutoff } },
+          { lastSeen: { $exists: false }, updatedAt: { $lt: silentCutoff } },
+        ],
+      },
+      'username email lastSeen updatedAt subscription.tier subscription.currentPeriodEnd subscription.cancelAtPeriodEnd'
+    ).lean();
+
+    const silentPayers = silent
+      .map(u => {
+        const lastActive = u.lastSeen || u.updatedAt;
+        const daysSilent = lastActive
+          ? Math.floor((now - new Date(lastActive).getTime()) / 86400000)
+          : null;
+        const tier = u.subscription?.tier || 'practitioner';
+        const monthlyValue = tier === 'ascended' ? 1700 : 800; // cents
+        return {
+          username: u.username,
+          email: u.email || '',
+          lastSeen: lastActive,
+          daysSilent,
+          tier,
+          monthlyValue,
+          periodEnd: u.subscription?.currentPeriodEnd || null,
+          canceling: !!u.subscription?.cancelAtPeriodEnd,
+        };
+      })
+      .sort((a, b) => (b.daysSilent || 0) - (a.daysSilent || 0));
+
+    const mrrAtRisk = silentPayers.reduce((sum, u) => sum + (u.monthlyValue || 0), 0);
+
+    res.json({
+      conversion: {
+        windowDays: CONVERSION_WINDOW_DAYS,
+        trialsStarted: cohort.length,
+        stillTrialing,
+        trialsCompleted,
+        converted,
+        conversionRate, // null if no completed trials yet
+      },
+      churnWatch: {
+        silentThresholdDays: SILENT_THRESHOLD_DAYS,
+        silentCount: silentPayers.length,
+        mrrAtRisk,
+        users: silentPayers,
+      },
+      fetchedAt: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error('Conversion-churn endpoint error:', err.message);
+    res.status(500).json({ error: 'Failed to fetch conversion and churn data' });
+  }
+});
+
 module.exports = router;
