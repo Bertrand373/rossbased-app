@@ -616,15 +616,21 @@ Output ONLY a single JSON object with EXACTLY these keys, no preamble, no markdo
 
     const response = await anthropic.messages.create({
       model: process.env.EMAIL_AGENT_MODEL || 'claude-opus-4-7',
-      max_tokens: 1500,
-      messages: [{ role: 'user', content: analyzerPrompt }]
+      max_tokens: 3000,
+      messages: [
+        { role: 'user', content: analyzerPrompt },
+        { role: 'assistant', content: '{' } // prefill — force Opus to continue inside the JSON object
+      ]
     });
 
     const raw = response.content[0].text.trim();
+    console.log('[EmailAgent] Analyzer stop_reason:', response.stop_reason);
     console.log('[EmailAgent] Analyzer raw response:', raw);
 
-    // Strip any markdown fences if Opus added them despite instructions
-    const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+    // Anthropic returns only the continuation after our prefilled '{', so prepend it.
+    // Truncate at the last '}' to drop any trailing commentary Opus might add.
+    const closingIdx = raw.lastIndexOf('}');
+    const cleaned = '{' + (closingIdx >= 0 ? raw.slice(0, closingIdx + 1) : raw);
 
     let parsed;
     try {
