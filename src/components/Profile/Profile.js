@@ -690,7 +690,7 @@ const Profile = ({
                     disabled={!isEditingProfile}
                     placeholder="@username"
                   />
-                  <button 
+                  <button
                     type="button"
                     className="discord-link-btn"
                     onClick={() => {
@@ -704,6 +704,46 @@ const Profile = ({
                     Link Discord Account
                   </button>
                   <span className="form-hint">Link your Discord to verify founder status for lifetime access</span>
+                </>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label>YouTube</label>
+              {userData?.youtubeChannelId ? (
+                <div className="discord-linked-row">
+                  <span className="discord-linked-name">{userData.youtubeChannelTitle || 'Connected'}</span>
+                  <span className="discord-linked-badge">✓ Linked</span>
+                </div>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="discord-link-btn"
+                    onClick={() => {
+                      const clientId = process.env.REACT_APP_YOUTUBE_OAUTH_CLIENT_ID;
+                      if (!clientId) {
+                        toast.error('YouTube linking is not configured yet.');
+                        return;
+                      }
+                      const redirectUri = encodeURIComponent(
+                        window.location.origin + '/auth/youtube/link-callback'
+                      );
+                      const scope = encodeURIComponent('https://www.googleapis.com/auth/youtube.readonly');
+                      window.location.href =
+                        `https://accounts.google.com/o/oauth2/v2/auth` +
+                        `?client_id=${clientId}` +
+                        `&redirect_uri=${redirectUri}` +
+                        `&response_type=code` +
+                        `&scope=${scope}` +
+                        `&access_type=online` +
+                        `&prompt=select_account%20consent` +
+                        `&include_granted_scopes=true`;
+                    }}
+                  >
+                    Link YouTube Account
+                  </button>
+                  <span className="form-hint">Link YouTube so Oracle recognizes you when you @oracle in the comments under Ross's videos. Uses your daily Oracle calls.</span>
                 </>
               )}
             </div>

@@ -23,6 +23,7 @@ const BannedIP = require('./models/BannedIP');
 const notificationRoutes = require('./routes/notifications');
 const googleAuthRoutes = require('./routes/googleAuth');
 const discordAuthRoutes = require('./routes/discordAuth');
+const youtubeAuthRoutes = require('./routes/youtubeAuth');
 const mlRoutes = require('./routes/mlRoutes');
 const transmissionRoutes = require('./routes/transmissionRoutes');
 const knowledgeRoutes = require('./routes/knowledgeRoutes');
@@ -55,6 +56,7 @@ const announcementRoutes = require('./routes/announcementRoutes');
 const oracleIntroRoutes = require('./routes/oracleIntroRoutes');
 const oracleXRoutes = require('./routes/oracleXRoutes');
 const feedbackReplyRoutes = require('./routes/feedbackReplyRoutes');
+const oracleYouTubeAdminRoutes = require('./routes/oracleYouTubeAdminRoutes');
 const { expireStaleTrials, expireStaleCanceled, checkPremiumAccess, syncStripeSubscriptions } = require('./middleware/subscriptionMiddleware');
 const { checkAndSendOnboardingNotification } = require('./services/notificationService');
 const { checkSignupAbuse } = require('./services/abuseDetection');
@@ -408,6 +410,45 @@ mongoose.connect(mongoUri, {
         console.log('📺 YouTube comment fetch + content pipeline scheduled');
       } else {
         console.log('⚠️ YOUTUBE_API_KEY or YOUTUBE_CHANNEL_ID not set — YouTube integration disabled');
+      }
+
+      // ============================================
+      // ORACLE YOUTUBE WATCHER (real-time @oracle mention detection)
+      // Polls Ross's recent videos for new @oracle mentions and dispatches
+      // them into the Oracle reply pipeline. Hot videos every 2 min, cold every 15 min.
+      // ============================================
+      if (process.env.YOUTUBE_API_KEY && process.env.YOUTUBE_CHANNEL_ID && process.env.ORACLE_YT_REFRESH_TOKEN) {
+        const { pollHotVideos, pollColdVideos, refreshVideoList } = require('./services/youtubeOracleWatcher');
+
+        // Prime the video list cache + run a first poll 45s after startup
+        setTimeout(async () => {
+          try {
+            await refreshVideoList();
+            await pollHotVideos();
+          } catch (e) {
+            console.error('Oracle YT watcher initial poll error:', e.message);
+          }
+        }, 45 * 1000);
+
+        // Hot poll: top 3 videos every 2 min
+        setInterval(async () => {
+          try { await pollHotVideos(); }
+          catch (e) { console.error('Oracle YT watcher hot poll error:', e.message); }
+        }, 2 * 60 * 1000);
+
+        // Cold poll: videos 4-5 every 15 min
+        setInterval(async () => {
+          try { await pollColdVideos(); }
+          catch (e) { console.error('Oracle YT watcher cold poll error:', e.message); }
+        }, 15 * 60 * 1000);
+
+        console.log('🜂 Oracle YouTube watcher scheduled (hot=2m, cold=15m)');
+      } else {
+        const missing = [];
+        if (!process.env.YOUTUBE_API_KEY) missing.push('YOUTUBE_API_KEY');
+        if (!process.env.YOUTUBE_CHANNEL_ID) missing.push('YOUTUBE_CHANNEL_ID');
+        if (!process.env.ORACLE_YT_REFRESH_TOKEN) missing.push('ORACLE_YT_REFRESH_TOKEN');
+        console.log(`⚠️ Oracle YouTube watcher disabled — missing: ${missing.join(', ')}`);
       }
 
       // ============================================
@@ -3480,6 +3521,7 @@ app.post('/api/admin/unban-ip', authenticate, async (req, res) => {
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/auth', googleAuthRoutes);
 app.use('/api/auth', discordAuthRoutes);
+app.use('/api/auth/youtube', youtubeAuthRoutes);
 app.use('/api/ml', mlRoutes);
 app.use('/api/transmission', transmissionRoutes);
 app.use('/api/knowledge', authenticate, knowledgeRoutes);
@@ -3502,6 +3544,7 @@ app.use('/api/oracle/pins', authenticate, oraclePinRoutes);
 app.use('/api/oracle/intro', authenticate, oracleIntroRoutes);
 app.use('/api/admin/oracle-x', authenticate, oracleXRoutes);
 app.use('/api/feedback-replies', feedbackReplyRoutes);
+app.use('/api/admin/oracle-youtube', authenticate, oracleYouTubeAdminRoutes);
 app.use('/o', oracleSharePage);
 announcementRoutes.init(authenticate);
 app.use('/api/announcements', announcementRoutes);
