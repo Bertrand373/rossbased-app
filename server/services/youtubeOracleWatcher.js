@@ -8,10 +8,14 @@
 //   - Videos 4-5: every 15 min
 //   - Video list refreshed every 30 min via search.list
 //
+// Detects @oracle in BOTH top-level comments AND replies. When @oracle is
+// posted as a reply, builds thread context (parent + earlier replies) so
+// Oracle can answer the conversation it's joining, not just the one reply.
+//
 // Quota math (YouTube Data API v3, 10K units/day default):
-//   - commentThreads.list = 1 unit each. 3 vids * 30/h + 2 vids * 4/h = 2,352/day
+//   - commentThreads.list with replies = 1 unit per poll
+//   - comments.list for full reply chain when thread > 5 replies = 1 unit per long thread
 //   - search.list for video list refresh = 100 units, ~48/day = 4,800/day
-//   - That's the worst case. With caching, search refreshes can be lazy.
 //   - Posting = 50 units * ~13/day = 650/day
 //   Total: ~7,800/day worst case. Fits under 10K.
 
@@ -20,7 +24,8 @@ const YouTubeOracleReply = require('../models/YouTubeOracleReply');
 const { handleOracleMention } = require('./oracleYouTubeReply');
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
-const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID;
+const YOUTUBE_CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID;        // Ross's channel
+const ORACLE_CHANNEL_ID = process.env.ORACLE_CHANNEL_ID || '';    // Oracle's channel — used to skip its own prior replies in thread context
 const BASE_URL = 'https://www.googleapis.com/youtube/v3';
 
 // In-memory cache of Ross's recent video IDs + titles. Refreshed periodically.
@@ -77,7 +82,6 @@ async function refreshVideoList() {
 function rememberChecked(commentId) {
   recentlyChecked.add(commentId);
   if (recentlyChecked.size > RECENT_CACHE_MAX) {
-    // Drop the oldest ~25%. Set order preserves insertion, so iterate first N.
     const toDrop = Math.floor(RECENT_CACHE_MAX * 0.25);
     let i = 0;
     for (const key of recentlyChecked) {
@@ -87,8 +91,109 @@ function rememberChecked(commentId) {
   }
 }
 
+function getAuthorChannelId(commentSnippet) {
+  return commentSnippet?.authorChannelId?.value
+    || (typeof commentSnippet?.authorChannelId === 'string' ? commentSnippet.authorChannelId : null);
+}
+
+function hasOracleMention(text) {
+  if (!text) return false;
+  return /@oracle\b/i.test(text);
+}
+
 // ============================================================
-// Process one video's comments — finds new @oracle mentions
+// Fetch ALL replies for a thread (when totalReplyCount > inline 5)
+// Returns array of {id, snippet}
+// ============================================================
+async function fetchAllReplies(parentCommentId) {
+  try {
+    const data = await ytFetch('comments', {
+      part: 'snippet',
+      parentId: parentCommentId,
+      maxResults: '100',
+      textFormat: 'plainText'
+    });
+    return data.items || [];
+  } catch (err) {
+    console.error(`Oracle watcher: fetchAllReplies failed for ${parentCommentId}:`, err.message);
+    return [];
+  }
+}
+
+// ============================================================
+// Build thread context for an @oracle reply
+// Returns array of {author, text} chronological, oldest first, capped.
+// ============================================================
+async function buildThreadContext(parentTopLevel, parentCommentId, inlineReplies, atOracleReply) {
+  const items = [];
+  const atOraclePublishedAt = new Date(atOracleReply.snippet?.publishedAt || Date.now()).getTime();
+
+  // Always include the top-level comment as first context item (the conversation root)
+  if (parentTopLevel?.snippet) {
+    items.push({
+      author: parentTopLevel.snippet.authorDisplayName || 'commenter',
+      text: parentTopLevel.snippet.textDisplay || parentTopLevel.snippet.textOriginal || '',
+      authorChannelId: getAuthorChannelId(parentTopLevel.snippet),
+      publishedAt: new Date(parentTopLevel.snippet.publishedAt || 0).getTime(),
+    });
+  }
+
+  // Decide whether we need to fetch all replies or whether the inline ones cover us.
+  // commentThreads.list inline replies are typically capped at 5. If the thread is
+  // longer, fetch the full list to catch older replies that gave context.
+  const totalReplyCount = parentTopLevel?.snippet?.totalReplyCount
+    ?? (inlineReplies ? inlineReplies.length : 0);
+  let replies = inlineReplies || [];
+  if (totalReplyCount > replies.length) {
+    replies = await fetchAllReplies(parentCommentId);
+  }
+
+  for (const reply of replies) {
+    if (!reply?.snippet) continue;
+    if (reply.id === atOracleReply.id) continue;  // skip the @oracle invocation itself
+    items.push({
+      author: reply.snippet.authorDisplayName || 'commenter',
+      text: reply.snippet.textDisplay || reply.snippet.textOriginal || '',
+      authorChannelId: getAuthorChannelId(reply.snippet),
+      publishedAt: new Date(reply.snippet.publishedAt || 0).getTime(),
+    });
+  }
+
+  // Filter: only comments before the @oracle invocation
+  // Filter: skip Oracle's own prior replies in this thread
+  // Filter: skip very short / non-textual noise
+  const filtered = items.filter(item => {
+    if (item.publishedAt >= atOraclePublishedAt) return false;
+    if (ORACLE_CHANNEL_ID && item.authorChannelId === ORACLE_CHANNEL_ID) return false;
+    const clean = (item.text || '').trim();
+    if (clean.length < 10) return false;
+    const letterCount = (clean.match(/[a-zA-Z]/g) || []).length;
+    if (letterCount / clean.length < 0.4) return false;
+    return true;
+  });
+
+  // Chronological: oldest first
+  filtered.sort((a, b) => a.publishedAt - b.publishedAt);
+
+  // Cap: 10 comments max, 500 chars each, 2500 chars total
+  const MAX_ITEMS = 10;
+  const MAX_CHARS_PER_ITEM = 500;
+  const MAX_TOTAL_CHARS = 2500;
+  const result = [];
+  let totalChars = 0;
+  for (const item of filtered.slice(0, MAX_ITEMS)) {
+    let text = item.text;
+    if (text.length > MAX_CHARS_PER_ITEM) text = text.slice(0, MAX_CHARS_PER_ITEM) + '…';
+    if (totalChars + text.length > MAX_TOTAL_CHARS) break;
+    result.push({ author: item.author, text });
+    totalChars += text.length;
+  }
+  return result;
+}
+
+// ============================================================
+// Process one video's comments — finds new @oracle mentions in both
+// top-level comments AND replies, dispatches each into the pipeline.
 // ============================================================
 async function processVideoForOracleMentions(video) {
   if (!video || !video.videoId) return { checked: 0, dispatched: 0 };
@@ -96,9 +201,9 @@ async function processVideoForOracleMentions(video) {
   let data;
   try {
     data = await ytFetch('commentThreads', {
-      part: 'snippet',
+      part: 'snippet,replies',
       videoId: video.videoId,
-      order: 'time',          // newest first — we want fresh @oracle mentions fast
+      order: 'time',
       maxResults: '50',
       textFormat: 'plainText'
     });
@@ -112,62 +217,92 @@ async function processVideoForOracleMentions(video) {
   let dispatched = 0;
 
   for (const thread of threads) {
-    const comment = thread.snippet?.topLevelComment?.snippet;
-    const commentId = thread.snippet?.topLevelComment?.id;
-    if (!comment || !commentId) continue;
-    if (recentlyChecked.has(commentId)) continue;
+    const topLevel = thread.snippet?.topLevelComment;
+    const topLevelId = topLevel?.id;
+    const topLevelSnippet = topLevel?.snippet;
+    if (!topLevelSnippet || !topLevelId) continue;
 
-    checked++;
-    rememberChecked(commentId);
+    const inlineReplies = thread.replies?.comments || [];
 
-    // Fast text check — no API call for non-matches
-    const text = comment.textDisplay || comment.textOriginal || '';
-    if (!/@oracle\b/i.test(text)) continue;
-
-    // Already-handled check via DB (survives restarts)
-    const alreadyHandled = await YouTubeOracleReply.exists({ parentCommentId: commentId });
-    if (alreadyHandled) continue;
-
-    // Match the commenter to a TitanTrack user
-    const authorChannelId = comment.authorChannelId?.value
-      || (typeof comment.authorChannelId === 'string' ? comment.authorChannelId : null);
-    if (!authorChannelId) continue;
-
-    const member = await User.findOne({ youtubeChannelId: authorChannelId });
-    if (!member) {
-      // Non-member or unlinked member — silently skip (the mystery does the marketing)
-      continue;
+    // 1) Check the top-level comment for @oracle
+    if (!recentlyChecked.has(topLevelId)) {
+      checked++;
+      rememberChecked(topLevelId);
+      const topLevelText = topLevelSnippet.textDisplay || topLevelSnippet.textOriginal || '';
+      if (hasOracleMention(topLevelText)) {
+        const handled = await YouTubeOracleReply.exists({ parentCommentId: topLevelId });
+        if (!handled) {
+          await dispatchMention({
+            commentId: topLevelId,
+            commentSnippet: topLevelSnippet,
+            video,
+            threadContext: [],   // top-level mention has no thread context
+          }).then(r => { if (r) dispatched++; });
+        }
+      }
     }
 
-    // Dispatch into the Oracle reply pipeline
-    try {
-      const result = await handleOracleMention({
-        commentId,
-        videoId: video.videoId,
-        videoTitle: video.title,
-        videoTranscriptSnippet: '',  // v0: no transcript fetching yet
-        questionText: text,
-        member
-      });
-      dispatched++;
-      if (result.ok) {
-        console.log(`🜂 Oracle replied to ${member.username} on "${video.title}" (tier=${result.tier})`);
-      } else if (result.reason) {
-        console.log(`🜂 Oracle skipped reply to ${member.username} (${result.reason})`);
-      }
-    } catch (err) {
-      console.error(`Oracle watcher: dispatch failed for ${member.username}:`, err.message);
+    // 2) Check each reply for @oracle
+    for (const reply of inlineReplies) {
+      if (!reply?.id) continue;
+      if (recentlyChecked.has(reply.id)) continue;
+      checked++;
+      rememberChecked(reply.id);
+      const replyText = reply.snippet?.textDisplay || reply.snippet?.textOriginal || '';
+      if (!hasOracleMention(replyText)) continue;
+
+      const handled = await YouTubeOracleReply.exists({ parentCommentId: reply.id });
+      if (handled) continue;
+
+      const threadContext = await buildThreadContext(topLevel, topLevelId, inlineReplies, reply);
+      await dispatchMention({
+        commentId: reply.id,
+        commentSnippet: reply.snippet,
+        video,
+        threadContext,
+      }).then(r => { if (r) dispatched++; });
     }
   }
 
   return { checked, dispatched };
 }
 
+async function dispatchMention({ commentId, commentSnippet, video, threadContext }) {
+  const authorChannelId = getAuthorChannelId(commentSnippet);
+  if (!authorChannelId) return false;
+
+  const member = await User.findOne({ youtubeChannelId: authorChannelId });
+  if (!member) {
+    // Non-member or unlinked. Silent skip — the mystery does the marketing.
+    return false;
+  }
+
+  try {
+    const result = await handleOracleMention({
+      commentId,
+      videoId: video.videoId,
+      videoTitle: video.title,
+      questionText: commentSnippet.textDisplay || commentSnippet.textOriginal || '',
+      threadContext: threadContext || [],
+      member
+    });
+    if (result.ok) {
+      console.log(`🜂 Oracle replied to ${member.username} on "${video.title}" (tier=${result.tier})`);
+      return true;
+    } else if (result.reason) {
+      console.log(`🜂 Oracle skipped reply to ${member.username} (${result.reason})`);
+    }
+    return false;
+  } catch (err) {
+    console.error(`Oracle watcher: dispatch failed for ${member.username}:`, err.message);
+    return false;
+  }
+}
+
 // ============================================================
 // Public entrypoints — invoked by cron in app.js
 // ============================================================
 
-// Frequent poll: top 3 videos
 async function pollHotVideos() {
   if (!YOUTUBE_API_KEY || !YOUTUBE_CHANNEL_ID) return;
   if (Date.now() - videosLastRefreshed > VIDEO_LIST_TTL_MS) {
@@ -184,7 +319,6 @@ async function pollHotVideos() {
   }
 }
 
-// Slower poll: videos 4-5
 async function pollColdVideos() {
   if (!YOUTUBE_API_KEY || !YOUTUBE_CHANNEL_ID) return;
   if (Date.now() - videosLastRefreshed > VIDEO_LIST_TTL_MS) {
@@ -207,4 +341,5 @@ module.exports = {
   refreshVideoList,
   // Exposed for testing / admin tools
   processVideoForOracleMentions,
+  buildThreadContext,
 };

@@ -19,6 +19,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const User = require('../models/User');
 const YouTubeOracleReply = require('../models/YouTubeOracleReply');
 const { postReply } = require('./oracleYouTubePoster');
+const { getTranscript } = require('./youtubeTranscript');
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const ORACLE_MODEL = process.env.ORACLE_MODEL || 'claude-sonnet-4-5-20250514';
@@ -222,7 +223,10 @@ NEVER give medical, legal, or financial advice. If asked, redirect to the mechan
 ALWAYS reference the user's actual data (their day count, their cycle position) somewhere in the response. This is what makes Oracle different from a generic bot — and it's what other viewers will see.
 
 ## VIDEO CONTEXT
-You may be asked about something in the video. The video's title and a snippet of the transcript are provided. Use them to ground your answer in what they're actually watching.
+You may be asked about something in the video. The video's title and a snippet of the transcript are provided. Use them to ground your answer in what they're actually watching. If the transcript shows Ross said something relevant, you can reference it naturally ("what Ross is pointing at here is...") without naming a timestamp.
+
+## THREAD CONTEXT
+If the @oracle invocation is a reply inside a comment thread, the conversation that led up to it is provided. Read the whole thread. The member is asking you to weigh in on the discussion, not just answer their one reply in isolation. Acknowledge what was said when relevant, but don't address other commenters by name (you're addressing the member who summoned you, not the bystanders). Synthesize across the thread.
 
 ## CORE RETENTION KNOWLEDGE (only reference when relevant)
 
@@ -257,7 +261,7 @@ Transmutation: cold exposure, intense exercise, breathwork, meditation, creative
 // Called by the polling worker for each detected mention.
 // Returns a result object — never throws to caller.
 // ============================================================
-async function handleOracleMention({ commentId, videoId, videoTitle, videoTranscriptSnippet, questionText, member }) {
+async function handleOracleMention({ commentId, videoId, videoTitle, questionText, threadContext, member }) {
   // 0. Kill switch
   if (!isFeatureEnabled()) {
     return { skipped: true, reason: 'feature_disabled' };
@@ -296,15 +300,17 @@ async function handleOracleMention({ commentId, videoId, videoTitle, videoTransc
     return { skipped: true, reason: 'per_video_quota_exceeded', tier };
   }
 
-  // 6. Generate response
+  // 6. Generate response — fetch transcript inline so the watcher doesn't need to know about it
   let responseText;
   try {
+    const videoTranscript = await getTranscript(videoId);
     responseText = await generateOracleReply({
       member,
       tier,
       question: substance.question,
       videoTitle,
-      videoTranscriptSnippet
+      videoTranscript,
+      threadContext: threadContext || []
     });
   } catch (err) {
     await logRejection({ member, commentId, videoId, videoTitle, questionText, tier, status: 'generation_failed', error: err.message });
@@ -361,23 +367,34 @@ async function handleOracleMention({ commentId, videoId, videoTitle, videoTransc
 // ============================================================
 // generateOracleReply — single Claude call
 // ============================================================
-async function generateOracleReply({ member, tier, question, videoTitle, videoTranscriptSnippet }) {
+async function generateOracleReply({ member, tier, question, videoTitle, videoTranscript, threadContext }) {
   const userCtx = buildSlimUserContext(member);
   const streakDay = member.currentStreak || 0;
+
+  const threadSection = (threadContext && threadContext.length > 0)
+    ? `THREAD CONTEXT (the conversation Oracle is being summoned into, oldest first):\n` +
+      threadContext.map(c => `[${c.author}]: ${c.text}`).join('\n') +
+      `\n\n`
+    : '';
+
+  const transcriptSection = videoTranscript
+    ? `VIDEO TRANSCRIPT (auto-generated, may have minor errors):\n${videoTranscript}\n\n`
+    : '';
 
   const userMessage =
     `MEMBER DATA:\n${userCtx}\n\n` +
     `VIDEO TITLE: ${videoTitle || '(unknown)'}\n` +
-    (videoTranscriptSnippet ? `VIDEO CONTEXT:\n${videoTranscriptSnippet.slice(0, 1500)}\n\n` : '') +
-    `THEIR QUESTION (posted under the video):\n${question}\n\n` +
-    `Write your reply. Open with 🜂. End with the line "— Oracle · Day ${streakDay} · TitanTrack" on its own line. 60-180 words. No em dashes.`;
+    transcriptSection +
+    threadSection +
+    `THE @ORACLE INVOCATION (from the TitanTrack member, posted ${threadContext && threadContext.length ? 'as a reply in the thread above' : 'as a top-level comment under the video'}):\n${question}\n\n` +
+    `Write your reply. Open with 🜂. End with the line "— Oracle · Day ${streakDay} · TitanTrack" on its own line. 60-180 words. No em dashes in the body.`;
 
   const response = await anthropic.messages.create({
     model: ORACLE_MODEL,
     max_tokens: 600,
     system: [{ type: 'text', text: YT_SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
     messages: [{ role: 'user', content: userMessage }],
-    stop_sequences: ['\nMEMBER DATA:', '\nUSER:', '\nIMPORTANT INSTRUCTION']
+    stop_sequences: ['\nMEMBER DATA:', '\nUSER:', '\nIMPORTANT INSTRUCTION', '\nTHREAD CONTEXT:', '\nVIDEO TRANSCRIPT:']
   });
 
   const text = response.content?.[0]?.text?.trim();
