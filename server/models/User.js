@@ -93,6 +93,15 @@ const userSchema = new mongoose.Schema({
   discordUsername: { type: String, default: '' },
   showOnLeaderboard: { type: Boolean, default: false },
   announceDiscordMilestones: { type: Boolean, default: false },
+
+  // YouTube Integration
+  // Member's public YouTube channel ID — populated when they opt-in link their
+  // YouTube account in the app. Used to match a YouTube commenter back to
+  // their TitanTrack account so Oracle can reply when they @oracle in the
+  // comments under Ross's videos. Read-only scope only — we never post as them.
+  youtubeChannelId: { type: String, default: null },
+  youtubeChannelTitle: { type: String, default: '' },
+  youtubeLinkedAt: { type: Date, default: null },
   
   // Mentor System Fields
   mentorEligible: { type: Boolean, default: false },
@@ -354,6 +363,7 @@ userSchema.index({ mentorEligible: 1, verifiedMentor: 1 });
 userSchema.index({ discordId: 1 });
 userSchema.index({ googleId: 1 });
 userSchema.index({ email: 1 });
+userSchema.index({ youtubeChannelId: 1 }, { sparse: true });
 userSchema.index({ 'subscription.status': 1 });
 userSchema.index({ 'subscription.stripeCustomerId': 1 });
 userSchema.index({ 'aiUsage.lastIP': 1 });

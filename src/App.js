@@ -38,6 +38,7 @@ import { useFeedbackReplies } from './hooks/useFeedbackReplies';
 import PaywallScreen from './components/Subscription/PaywallScreen';
 import PlanModal from './components/Subscription/PlanModal';
 import DiscordLinkCallback from './components/Auth/DiscordLinkCallback';
+import YouTubeLinkCallback from './components/Auth/YouTubeLinkCallback';
 import Privacy from './components/Legal/Privacy';
 import Terms from './components/Legal/Terms';
 import Timeline from './components/Timeline/Timeline';
@@ -388,7 +389,7 @@ const ActivityTracker = ({ isLoggedIn, username }) => {
     if (!sid) { sid = Date.now().toString(36) + Math.random().toString(36).slice(2, 8); sessionStorage.setItem('tt_sid', sid); }
     // Send page view
     const page = location.pathname;
-    if (page && page !== '/auth/discord/callback' && page !== '/auth/discord/link-callback') {
+    if (page && page !== '/auth/discord/callback' && page !== '/auth/discord/link-callback' && page !== '/auth/youtube/link-callback') {
       fetch(`${API}/api/track`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -813,6 +814,9 @@ function AppContent({
                   <Route path="/auth/discord/link-callback" element={
                     <DiscordLinkCallback onLinkComplete={() => refreshSubscription()} />
                   } />
+                  <Route path="/auth/youtube/link-callback" element={
+                    <YouTubeLinkCallback onLinkComplete={() => refreshSubscription()} />
+                  } />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/privacy" element={<Privacy />} />
                   <Route path="/terms" element={<Terms />} />
@@ -845,6 +849,9 @@ function AppContent({
             <Route path="/auth/discord/callback" element={<DiscordCallback onLogin={handleLogin} />} />
             <Route path="/auth/discord/link-callback" element={
               <DiscordLinkCallback onLinkComplete={() => refreshSubscription()} />
+            } />
+            <Route path="/auth/youtube/link-callback" element={
+              <YouTubeLinkCallback onLinkComplete={() => refreshSubscription()} />
             } />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/privacy" element={<Privacy />} />
