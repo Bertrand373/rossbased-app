@@ -97,9 +97,12 @@ function passesOutputFilter(text) {
   // No slurs in output (defense-in-depth; model shouldn't but defense matters)
   const slurs = /\b(n[il1!]gg|f[aA@]gg|tr[a@]nn|k[il1!]ke|sp[il1!]c)\w*/i;
   if (slurs.test(text)) return { ok: false, reason: 'slur_in_output' };
-  // No em-dashes (Oracle voice rule)
-  if (/—/.test(text)) {
-    return { ok: false, reason: 'em_dash' };
+  // No em-dashes in body (Oracle voice rule). The footer line "— Oracle · Day N · TitanTrack"
+  // is the one allowed exception — em-dash there is a typographic separator, not prose.
+  const nonEmptyLines = text.split('\n').map(l => l.trimEnd()).filter(l => l.length > 0);
+  const bodyText = nonEmptyLines.slice(0, -1).join('\n');
+  if (/—/.test(bodyText)) {
+    return { ok: false, reason: 'em_dash_in_body' };
   }
   return { ok: true };
 }
