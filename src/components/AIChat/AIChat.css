@@ -165,6 +165,10 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  /* Eat the leftover space so the wordmark stays anchored left next to the
+     hamburger toggle. Without this, adding the toggle as a third flex child
+     re-centered the wordmark under space-between distribution. */
+  margin-right: auto;
 }
 
 .ai-chat-title {
@@ -551,6 +555,11 @@
   background: transparent;
   flex-shrink: 0;
   border-top: 1px solid var(--border-subtle);
+  /* iOS Safari caret-rendering fix — without an explicit stacking context the
+     keyboard-lift re-layout could leave the textarea's caret indicator
+     rendered at its old position in the chat body area above. */
+  position: relative;
+  z-index: 2;
 }
 
 .ai-chat-input {
@@ -568,6 +577,13 @@
   max-height: 120px;
   overflow-y: auto;
   line-height: 1.4;
+  /* Pin the caret color so iOS doesn't render its tinted-blue default that
+     was leaking outside the textarea bounds during visualViewport adjusts. */
+  caret-color: var(--text);
+  /* Force a fresh compositing layer so the caret stays attached to the
+     textarea's current layout during keyboard slide animations. */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 .ai-chat-input:focus {
@@ -1394,7 +1410,11 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
   flex-shrink: 0;
   width: 240px;
   height: 100%;
-  background: var(--sheet-bg);
+  /* Near-solid surface — the archive is a distinct mode, not a glass overlay
+     on top of the chat. Stacking glass-on-glass with identical tones did
+     nothing (the backdrop-filter had no chromatic difference to blur), so
+     text bled through. Solid black with a hint of warmth instead. */
+  background: rgba(8, 8, 10, 0.97);
   border-right: 1px solid var(--border-subtle);
   /* Slide-in animation — collapsed by default */
   margin-left: -240px;
@@ -1402,6 +1422,12 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
   overflow: hidden;
   position: relative;
   z-index: 2;
+}
+
+[data-theme="light"] .ai-chat-sidebar {
+  /* Match the parchment surface on light theme — still near-solid, no glass. */
+  background: rgba(248, 243, 228, 0.97);
+  border-right: 1px solid rgba(58, 46, 28, 0.08);
 }
 
 .ai-chat-sidebar.open {
@@ -1479,45 +1505,50 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
    no-op in case any callers reference it. */
 .ai-chat-new-thread-dash { display: none; }
 
-/* Search — same chrome family as .ai-chat-input. No focus ring, just a hair
-   of border-color shift. Icon sits inside the rounded field. */
+/* Search — flex field. Icon and input are siblings inside the rounded chrome,
+   so spacing is natural and no absolute positioning math is needed. */
 .ai-chat-sidebar-search {
   padding: 0 14px 10px;
   flex-shrink: 0;
-  position: relative;
 }
 
-.ai-chat-sidebar-search-input {
-  width: 100%;
+.ai-chat-sidebar-search-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  height: 36px;
   background-color: var(--surface-raised);
   border: 1px solid var(--border-subtle);
   border-radius: 9999px;
-  padding: 8px 14px 8px 34px;
+  transition: border-color 150ms ease;
+}
+
+.ai-chat-sidebar-search-field:focus-within {
+  border-color: var(--border);
+}
+
+.ai-chat-sidebar-search-icon {
+  color: var(--text-tertiary);
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.ai-chat-sidebar-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 0;
   font-size: 0.8125rem;
   color: var(--text);
   font-family: inherit;
   outline: none;
-  box-sizing: border-box;
-  transition: border-color 150ms ease;
-}
-
-.ai-chat-sidebar-search-input:focus {
-  border-color: var(--border);
+  min-width: 0; /* allow shrinking inside flex */
 }
 
 .ai-chat-sidebar-search-input::placeholder {
   color: var(--text-tertiary);
   font-weight: 400;
-}
-
-.ai-chat-sidebar-search-icon {
-  position: absolute;
-  left: 26px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-tertiary);
-  opacity: 0.7;
-  pointer-events: none;
 }
 
 /* Sidebar body — scrollable thread list */
@@ -1821,7 +1852,8 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
 
 @media (max-width: 767px) {
   /* Full takeover — the Oracle's archive deserves its own room.
-     Same sheet-bg + glass blur as the chat panel, but now the sole surface. */
+     Solid background, no backdrop-filter — glass-on-glass with identical
+     tones did nothing and let the chat bleed through. */
   .ai-chat-sidebar {
     position: absolute;
     top: 0;
@@ -1830,33 +1862,17 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
     width: 100%;
     max-width: none;
     border-right: none;
-    background: var(--sheet-bg);
-    backdrop-filter: blur(40px) saturate(1.2);
-    -webkit-backdrop-filter: blur(40px) saturate(1.2);
+    background: #0a0a0c;
     margin-left: -100%;
     transition: margin-left 320ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+  [data-theme="light"] .ai-chat-sidebar {
+    background: #f8f3e4; /* parchment, solid */
+  }
+
   .ai-chat-sidebar.open {
     margin-left: 0;
-  }
-
-  /* Same glass highlight as the panel itself, so it feels like the same surface. */
-  .ai-chat-sidebar::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--sheet-highlight);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .ai-chat-sidebar > * {
-    position: relative;
-    z-index: 1;
   }
 
   /* Slightly more generous header padding on mobile — mirrors the chat header */
@@ -1866,10 +1882,6 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
 
   .ai-chat-sidebar-search {
     padding: 0 16px 12px;
-  }
-
-  .ai-chat-sidebar-search-icon {
-    left: 28px;
   }
 }
 
