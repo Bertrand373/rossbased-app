@@ -1638,7 +1638,6 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
           className="ai-chat-new-thread-btn"
           onClick={createNewThread}
         >
-          <span className="ai-chat-new-thread-dash" />
           New conversation
         </button>
       </div>
@@ -2054,7 +2053,10 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
             )}
           </div>
 
-          {/* Delete-thread confirm modal — reuses the same overlay treatment as Clear */}
+          </div> {/* .ai-chat-main */}
+
+          {/* Delete-thread confirm modal — at panel root so it overlays the
+              sidebar drawer on mobile, not behind it. */}
           {confirmDeleteThreadId && (
             <div className="ai-clear-overlay" onClick={() => setConfirmDeleteThreadId(null)}>
               <div className="ai-clear-modal" onClick={e => e.stopPropagation()}>
@@ -2076,7 +2078,6 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
               </div>
             </div>
           )}
-          </div> {/* .ai-chat-main */}
         </div>
       </div>
     </>
