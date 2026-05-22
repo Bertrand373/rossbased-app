@@ -461,6 +461,14 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   const [showArchived, setShowArchived] = useState(false);
   const [confirmDeleteThreadId, setConfirmDeleteThreadId] = useState(null);
 
+  // Server-side search across all message content.
+  // null = not searching (show normal thread list). Array = results.
+  const [searchResults, setSearchResults] = useState(null);
+  const [searchLoading, setSearchLoading] = useState(false);
+  // Target message inside an opened thread (after a search-result tap).
+  // The body-scroll effect picks this up once messages load and scrolls to it.
+  const [targetMessageTs, setTargetMessageTs] = useState(null);
+
   // --- Teach Oracle (admin-only) ---
   const [teachModal, setTeachModal] = useState(null); // { userMsg, oracleMsg, existingMatches, checking }
   const [teachForm, setTeachForm] = useState({ title: '', note: '', category: 'general' });
@@ -579,6 +587,37 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     fetchUsage();
     fetchUnreadTransmissions();
   }, [isLoggedIn]);
+
+  // Debounced server-side search across all messages.
+  // <2 chars = clear search (show normal thread list).
+  useEffect(() => {
+    const q = threadSearch.trim();
+    if (q.length < 2) {
+      setSearchResults(null);
+      setSearchLoading(false);
+      return;
+    }
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    setSearchLoading(true);
+    const handle = setTimeout(async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/oracle/threads/search?q=${encodeURIComponent(q)}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) { setSearchResults([]); return; }
+        const data = await res.json();
+        setSearchResults(data.results || []);
+      } catch {
+        setSearchResults([]);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 250);
+
+    return () => clearTimeout(handle);
+  }, [threadSearch]);
 
   // Load existing pin state — so "Pinned" persists across reloads
   useEffect(() => {
@@ -825,6 +864,28 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
       }, 50);
     }
   }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Scroll to a specific message after a search-result tap.
+  // Finds [data-message-ts="..."] in the chat body, scrolls it into view,
+  // briefly flashes it. Then clears the target so we don't re-trigger.
+  useEffect(() => {
+    if (!targetMessageTs || messages.length === 0) return;
+
+    const timer = setTimeout(() => {
+      const root = chatBodyRef.current;
+      if (!root) return;
+      const node = root.querySelector(`[data-message-ts="${CSS.escape(targetMessageTs)}"]`);
+      if (node) {
+        node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        node.classList.add('message-target-flash');
+        // Class auto-removes after the CSS animation; clean up anyway
+        setTimeout(() => node.classList.remove('message-target-flash'), 1800);
+      }
+      setTargetMessageTs(null);
+    }, 80); // give the freshly-loaded list a tick to paint
+
+    return () => clearTimeout(timer);
+  }, [targetMessageTs, messages]);
 
   // Scroll to bottom when user sends a message or transmission arrives
   useEffect(() => {
@@ -1169,8 +1230,11 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   // Switch to a different thread — load its messages, update active state.
   // On mobile, switching also dismisses the sidebar so the user lands in the
   // conversation immediately (the drawer covers the chat there).
-  const switchToThread = useCallback(async (threadId) => {
+  // Optional `targetTs` jumps to a specific message after the thread loads
+  // (used by search-result taps).
+  const switchToThread = useCallback(async (threadId, targetTs = null) => {
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    if (targetTs) setTargetMessageTs(targetTs);
     if (!threadId || threadId === activeThreadId) {
       // Re-tapping the active thread should still close the drawer — the user's
       // intent is "take me back to the conversation."
@@ -1518,19 +1582,46 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     setRenameValue('');
   };
 
-  const filterThread = (t) => {
-    if (!threadSearch.trim()) return true;
-    const q = threadSearch.trim().toLowerCase();
-    return (
-      (t.title || '').toLowerCase().includes(q) ||
-      (t.preview || '').toLowerCase().includes(q)
+  // Search is now server-side (see /api/oracle/threads/search). When the user
+  // is searching, searchResults overrides the normal thread list. Otherwise
+  // sections derive purely from pin/archive state.
+  const isSearching = searchResults !== null;
+  const pinnedActive = threads.filter(t => t.isPinned && !t.isArchived);
+  const normalActive = threads.filter(t => !t.isPinned && !t.isArchived);
+  const archivedAll = threads.filter(t => t.isArchived);
+
+  // Highlight every case-insensitive occurrence of `query` in `text` with <strong>.
+  const renderHighlighted = (text, query) => {
+    if (!text || !query) return text;
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const parts = text.split(new RegExp(`(${escaped})`, 'gi'));
+    return parts.map((part, i) =>
+      part.toLowerCase() === query.toLowerCase()
+        ? <strong key={i} className="ai-chat-search-match">{part}</strong>
+        : <React.Fragment key={i}>{part}</React.Fragment>
     );
   };
 
-  const visibleThreads = threads.filter(filterThread);
-  const pinnedActive = visibleThreads.filter(t => t.isPinned && !t.isArchived);
-  const normalActive = visibleThreads.filter(t => !t.isPinned && !t.isArchived);
-  const archivedAll = visibleThreads.filter(t => t.isArchived);
+  const renderSearchResultRow = (r, idx) => (
+    <div
+      key={`${r.threadId}-${idx}`}
+      className="ai-chat-thread-row ai-chat-search-result"
+      onClick={() => {
+        setThreadMenuOpenFor(null);
+        switchToThread(r.threadId, r.messageTimestamp);
+        // Clear search input so the next sidebar open shows normal list.
+        setThreadSearch('');
+      }}
+    >
+      <div className="ai-chat-thread-row-title-line">
+        <span className="ai-chat-thread-row-title">{r.threadTitle}</span>
+      </div>
+      <span className="ai-chat-thread-row-preview ai-chat-search-snippet">
+        {renderHighlighted(r.snippet, threadSearch.trim())}
+      </span>
+      <span className="ai-chat-thread-row-time">{formatThreadTime(r.messageTimestamp)}</span>
+    </div>
+  );
 
   const renderThreadRow = (t) => {
     const isActive = t.threadId === activeThreadId;
@@ -1668,38 +1759,59 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
       </div>
 
       <div className="ai-chat-sidebar-body">
-        {threads.length === 0 && (
-          <div className="ai-chat-sidebar-empty">
-            Begin a new conversation to see it here.
-          </div>
-        )}
-
-        {pinnedActive.length > 0 && (
+        {isSearching ? (
+          // ---------- SEARCH RESULTS MODE ----------
+          searchLoading ? (
+            <div className="ai-chat-sidebar-empty">Searching…</div>
+          ) : searchResults && searchResults.length === 0 ? (
+            <div className="ai-chat-sidebar-empty">
+              No matches for "{threadSearch.trim()}"
+            </div>
+          ) : (
+            <>
+              <div className="ai-chat-thread-section-label">
+                {searchResults.length} match{searchResults.length === 1 ? '' : 'es'}
+              </div>
+              {searchResults.map(renderSearchResultRow)}
+            </>
+          )
+        ) : (
+          // ---------- NORMAL THREAD LIST ----------
           <>
-            <div className="ai-chat-thread-section-label">Pinned</div>
-            {pinnedActive.map(renderThreadRow)}
-          </>
-        )}
+            {threads.length === 0 && (
+              <div className="ai-chat-sidebar-empty">
+                Begin a new conversation to see it here.
+              </div>
+            )}
 
-        {normalActive.length > 0 && (
-          <>
-            {pinnedActive.length > 0 && <div className="ai-chat-thread-section-label">Recent</div>}
-            {normalActive.map(renderThreadRow)}
-          </>
-        )}
+            {pinnedActive.length > 0 && (
+              <>
+                <div className="ai-chat-thread-section-label">Pinned</div>
+                {pinnedActive.map(renderThreadRow)}
+              </>
+            )}
 
-        {archivedAll.length > 0 && (
-          <>
-            <button
-              className="ai-chat-archived-toggle"
-              onClick={() => setShowArchived(s => !s)}
-            >
-              <span>Archived ({archivedAll.length})</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: showArchived ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms ease' }}>
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </button>
-            {showArchived && archivedAll.map(renderThreadRow)}
+            {normalActive.length > 0 && (
+              <>
+                {pinnedActive.length > 0 && <div className="ai-chat-thread-section-label">Recent</div>}
+                {normalActive.map(renderThreadRow)}
+              </>
+            )}
+
+            {archivedAll.length > 0 && (
+              <>
+                <button
+                  className="ai-chat-archived-toggle"
+                  onClick={() => setShowArchived(s => !s)}
+                >
+                  <span>Archived ({archivedAll.length})</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: showArchived ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms ease' }}>
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+                {showArchived && archivedAll.map(renderThreadRow)}
+              </>
+            )}
           </>
         )}
       </div>
@@ -1770,7 +1882,11 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
             )}
 
             {messages.map((msg, index) => (
-              <div key={index} className={`ai-chat-message ${msg.role}${msg.isTransmission ? ' transmission' : ''}`}>
+              <div
+                key={index}
+                className={`ai-chat-message ${msg.role}${msg.isTransmission ? ' transmission' : ''}`}
+                data-message-ts={msg.timestamp || ''}
+              >
                 {msg.role === 'user' && (
                   <div className="ai-chat-message-meta">
                     <span className="ai-chat-message-label">You</span>
