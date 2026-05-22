@@ -1652,24 +1652,27 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
   opacity: 0.8;
 }
 
+/* Time + menu — defaults are touch-first (mobile is the dominant surface).
+   Menu sits at the right edge, time tucked just to its left, both visible
+   at low opacity so they never collide. Desktop hover refines below. */
 .ai-chat-thread-row-time {
   position: absolute;
   top: 14px;
-  right: 14px;
+  right: 38px; /* leaves a 32px lane for the menu icon to the right */
   font-size: 0.6875rem;
   color: var(--text-tertiary);
   opacity: 0.55;
   pointer-events: none;
   font-variant-numeric: tabular-nums;
+  transition: opacity 150ms ease;
 }
 
-/* Overflow menu trigger — appears on hover (desktop) and is always present on mobile */
 .ai-chat-thread-row-menu {
   position: absolute;
-  top: 6px;
+  top: 10px;
   right: 6px;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1678,24 +1681,42 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
   border-radius: 50%;
   color: var(--text-muted);
   cursor: pointer;
-  opacity: 0;
-  transition: opacity 150ms ease, background-color 150ms ease;
+  opacity: 0.35;
+  transition: opacity 150ms ease, background-color 150ms ease, color 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.ai-chat-thread-row:hover .ai-chat-thread-row-menu,
+.ai-chat-thread-row-menu:active,
 .ai-chat-thread-row.menu-open .ai-chat-thread-row-menu {
   opacity: 1;
-}
-
-.ai-chat-thread-row-menu:hover {
-  background-color: var(--surface-raised);
   color: var(--text);
 }
 
-/* When menu is open, hide the time so it doesn't conflict with the button */
+/* When the menu popover is OPEN, hide the time entirely — the popover
+   anchors right under the menu trigger and time would compete. */
 .ai-chat-thread-row.menu-open .ai-chat-thread-row-time {
   display: none;
+}
+
+/* Real hover devices (mouse/trackpad) — clean up to the previous treatment:
+   menu hidden until row is hovered, time anchored right, menu swaps in. */
+@media (hover: hover) {
+  .ai-chat-thread-row-time {
+    right: 14px;
+  }
+  .ai-chat-thread-row-menu {
+    opacity: 0;
+  }
+  .ai-chat-thread-row:hover .ai-chat-thread-row-menu {
+    opacity: 1;
+  }
+  .ai-chat-thread-row:hover .ai-chat-thread-row-time {
+    opacity: 0;
+  }
+  .ai-chat-thread-row-menu:hover {
+    background-color: var(--surface-raised);
+    color: var(--text);
+  }
 }
 
 /* Menu popover — floats below the row */
