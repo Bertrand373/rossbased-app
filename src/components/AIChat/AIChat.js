@@ -7,7 +7,7 @@ import useSheetSwipe from '../../hooks/useSheetSwipe';
 import toast from 'react-hot-toast';
 
 // Mixpanel tracking
-import { trackAIChatOpened, trackAIMessageSent, trackAIChatCleared, trackAILimitReached } from '../../utils/mixpanel';
+import { trackAIChatOpened, trackAIMessageSent, trackAILimitReached } from '../../utils/mixpanel';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
@@ -445,7 +445,6 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     needsOracleIntro: false
   });
   const [error, setError] = useState(null);
-  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [pinnedMessages, setPinnedMessages] = useState(new Map()); // timestamp → pinId
 
   // --- Threads (sidebar) ---
@@ -1004,35 +1003,21 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     if (!inputValue.trim() || isLoading || usage.messagesRemaining <= 0) return;
 
     // Ensure we have an active thread before sending. If none exists yet
-    // (brand new user, or all threads deleted), create one on the fly so the
-    // debounced sync has a target.
+    // (brand new user, or all threads deleted), generate an id here. We do
+    // NOT add the thread to the sidebar list — it materializes after the
+    // first PUT lands (the response brings back the canonical thread row).
     let threadIdForSend = activeThreadId;
     let isBrandNewThread = false;
     if (!threadIdForSend) {
       threadIdForSend = newThreadId();
-      const now = new Date().toISOString();
-      const placeholder = {
-        threadId: threadIdForSend,
-        title: '',
-        isPinned: false,
-        isArchived: false,
-        messageCount: 0,
-        createdAt: now,
-        updatedAt: now,
-        lastMessageAt: now,
-        preview: ''
-      };
-      setThreads(prev => {
-        const next = [placeholder, ...prev];
-        try { localStorage.setItem(getThreadsListKey(), JSON.stringify(next)); } catch {}
-        return next;
-      });
       setActiveThreadId(threadIdForSend);
       try { localStorage.setItem(getActiveThreadKey(), threadIdForSend); } catch {}
       isBrandNewThread = true;
     } else {
-      // An active thread exists. Is this the first user message in it?
-      // (Auto-title trigger condition.)
+      // An active thread is set. Brand-new if it has no real messages yet —
+      // that's how we detect "first message in this thread" for auto-title.
+      // Works for both "thread in sidebar with 0 messages" and "id set by
+      // createNewThread but not yet in sidebar" because either way messages=[].
       const nonTransmissionCount = messages.filter(m => !m.isTransmission).length;
       isBrandNewThread = nonTransmissionCount === 0;
     }
@@ -1288,25 +1273,13 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
 
   // Create a fresh thread. Optimistic: adds to local list immediately, server
   // PUT happens when the first message is sent (upsert path).
+  // Create a fresh conversation slot. NO sidebar placeholder is pushed —
+  // the thread materializes in the list only after the first message lands
+  // (via the existing debounced PUT, which upserts and returns the thread
+  // summary). This prevents orphan "New conversation" rows piling up if the
+  // user clicks the pill multiple times without sending.
   const createNewThread = useCallback(() => {
     const id = newThreadId();
-    const now = new Date().toISOString();
-    const placeholder = {
-      threadId: id,
-      title: '',
-      isPinned: false,
-      isArchived: false,
-      messageCount: 0,
-      createdAt: now,
-      updatedAt: now,
-      lastMessageAt: now,
-      preview: ''
-    };
-    setThreads(prev => {
-      const next = [placeholder, ...prev.filter(t => t.threadId !== id)];
-      try { localStorage.setItem(getThreadsListKey(), JSON.stringify(next)); } catch {}
-      return next;
-    });
     setActiveThreadId(id);
     try { localStorage.setItem(getActiveThreadKey(), id); } catch {}
     setMessages([]);
@@ -1396,22 +1369,9 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   // Keep the ref current so sendMessage can invoke it via the stable handle.
   autoTitleThreadRef.current = autoTitleThread;
 
-  // ============================================================
-  // Clear chat — now scoped to active thread (deletes the thread, creates a fresh one)
-  // ============================================================
-  const handleClearChat = () => {
-    const prevId = activeThreadId;
-    setMessages([]);
-    setShowClearConfirm(false);
-    trackAIChatCleared();
-
-    if (prevId) {
-      // Delete the thread entirely so the conversation is gone, then start fresh
-      deleteThread(prevId);
-    }
-    // After delete, deleteThread switches to next or clears active. Either way,
-    // user can just type to start a new conversation (sendMessage auto-creates).
-  };
+  // Note: the legacy in-chat "Clear chat" button was removed when threads
+  // shipped — thread deletion now lives in the sidebar's 3-dot menu, so the
+  // chat area stays uncluttered and destruction has one canonical home.
 
   // Get Oracle loading icon
   const getLoadingIcon = () => '/The_Oracle.png';
@@ -1977,16 +1937,6 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
               </div>
             )}
 
-            {/* Clear chat link - only shows when messages exist */}
-            {messages.length > 0 && !isLoading && (
-              <button 
-                className="ai-chat-clear-btn"
-                onClick={() => setShowClearConfirm(true)}
-              >
-                Clear chat
-              </button>
-            )}
-
             {messages.length > 0 && !isLoading && !streamingText && (
               <div className="ai-chat-watermark">
                 <img src="/oracle-wordmark.png" alt="" className="ai-chat-watermark-img" />
@@ -1995,20 +1945,6 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
 
             <div ref={messagesEndRef} />
           </div>
-
-          {/* Clear Chat Confirmation - Inline modal within chat panel */}
-          {showClearConfirm && (
-            <div className="ai-clear-overlay" onClick={() => setShowClearConfirm(false)}>
-              <div className="ai-clear-modal" onClick={e => e.stopPropagation()}>
-                <h2>Clear chat history?</h2>
-                <p>This will delete all messages in this conversation.</p>
-                <div className="ai-clear-actions">
-                  <button className="ai-clear-btn-danger" onClick={handleClearChat}>Clear</button>
-                  <button className="ai-clear-btn-cancel" onClick={() => setShowClearConfirm(false)}>Cancel</button>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Teach Oracle Modal (admin only) */}
           {teachModal && (
