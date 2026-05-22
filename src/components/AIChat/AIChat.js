@@ -12,18 +12,50 @@ import { trackAIChatOpened, trackAIMessageSent, trackAIChatCleared, trackAILimit
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
 // Storage keys — scoped by username so accounts don't share history
-const getChatHistoryKey = () => {
+const getUsername = () => {
   try {
     const token = localStorage.getItem('token');
-    if (token) {
-      const username = JSON.parse(atob(token.split('.')[1])).username;
-      if (username) return `titantrack_ai_chat_history_${username}`;
-    }
+    if (token) return JSON.parse(atob(token.split('.')[1])).username || null;
   } catch {}
-  return 'titantrack_ai_chat_history'; // fallback for edge cases
+  return null;
 };
-const MAX_STORED_MESSAGES = 50;
+const getThreadsListKey = () => {
+  const u = getUsername();
+  return u ? `titantrack_oracle_threads_${u}` : 'titantrack_oracle_threads';
+};
+const getActiveThreadKey = () => {
+  const u = getUsername();
+  return u ? `titantrack_oracle_active_thread_${u}` : 'titantrack_oracle_active_thread';
+};
+const getThreadMessagesKey = (threadId) => {
+  const u = getUsername();
+  return u && threadId ? `titantrack_oracle_thread_${u}_${threadId}` : null;
+};
+const MAX_STORED_MESSAGES = 200; // matches server cap per thread
 const MAX_CONTEXT_MESSAGES = 10; // Send last 10 to Claude
+
+// Stable thread id generator — uuidv4 if available, else timestamp-based fallback
+const newThreadId = () => {
+  try {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+  } catch {}
+  return `t-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+};
+
+// Format a timestamp as a relative-time string for sidebar thread rows
+const formatThreadTime = (ts) => {
+  if (!ts) return '';
+  const d = new Date(ts);
+  if (isNaN(d.getTime())) return '';
+  const now = new Date();
+  const diff = (now.getTime() - d.getTime()) / 1000;
+  if (diff < 60) return 'now';
+  if (diff < 3600) return `${Math.floor(diff / 60)}m`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
+  if (diff < 86400 * 2) return 'yesterday';
+  if (diff < 86400 * 7) return `${Math.floor(diff / 86400)}d`;
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+};
 
 // Lightweight markdown renderer for Oracle responses
 // Handles **bold**, *italic*, preserves line breaks via pre-wrap
@@ -416,6 +448,19 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [pinnedMessages, setPinnedMessages] = useState(new Map()); // timestamp → pinId
 
+  // --- Threads (sidebar) ---
+  // threads: array of { threadId, title, isPinned, isArchived, messageCount, lastMessageAt, preview }
+  // activeThreadId: current thread (null until first thread is loaded/created)
+  const [threads, setThreads] = useState([]);
+  const [activeThreadId, setActiveThreadId] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [threadSearch, setThreadSearch] = useState('');
+  const [threadMenuOpenFor, setThreadMenuOpenFor] = useState(null); // threadId
+  const [renamingThreadId, setRenamingThreadId] = useState(null);
+  const [renameValue, setRenameValue] = useState('');
+  const [showArchived, setShowArchived] = useState(false);
+  const [confirmDeleteThreadId, setConfirmDeleteThreadId] = useState(null);
+
   // --- Teach Oracle (admin-only) ---
   const [teachModal, setTeachModal] = useState(null); // { userMsg, oracleMsg, existingMatches, checking }
   const [teachForm, setTeachForm] = useState({ title: '', note: '', category: 'general' });
@@ -429,6 +474,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   const streamingMessageRef = useRef(null);
   const hasScrolledToStreamStart = useRef(false);
   const chatSyncTimer = useRef(null); // Debounced server sync
+  const autoTitleThreadRef = useRef(null); // Stable handle so sendMessage can call it without dep cycle
 
   // Admin check — only rossbased sees Teach button
   const isAdmin = (() => {
@@ -451,41 +497,87 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     }
   }, [isOpen]);
 
-  // Load chat history — server is source of truth, localStorage is fallback
+  // Load threads list + active thread messages.
+  // Order: cached threads (instant), cached active-thread messages (instant),
+  //        then GET /threads (source of truth, auto-migrates legacy history),
+  //        then GET /threads/:active (definitive messages).
   useEffect(() => {
-    if (isLoggedIn) {
-      // Load localStorage immediately (fast, offline-safe)
-      const stored = localStorage.getItem(getChatHistoryKey());
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          setMessages(parsed.slice(-MAX_STORED_MESSAGES));
-        } catch (e) {
-          console.error('Failed to parse chat history:', e);
+    if (!isLoggedIn) return;
+
+    // 1. Instant: cached threads list
+    try {
+      const cachedList = localStorage.getItem(getThreadsListKey());
+      if (cachedList) {
+        const parsed = JSON.parse(cachedList);
+        if (Array.isArray(parsed)) setThreads(parsed);
+      }
+      const cachedActive = localStorage.getItem(getActiveThreadKey());
+      if (cachedActive) {
+        setActiveThreadId(cachedActive);
+        const msgKey = getThreadMessagesKey(cachedActive);
+        if (msgKey) {
+          const cachedMsgs = localStorage.getItem(msgKey);
+          if (cachedMsgs) {
+            try {
+              const parsedMsgs = JSON.parse(cachedMsgs);
+              if (Array.isArray(parsedMsgs)) setMessages(parsedMsgs.slice(-MAX_STORED_MESSAGES));
+            } catch {}
+          }
         }
       }
-
-      // Then fetch from server (source of truth) and overwrite if available
-      const token = localStorage.getItem('token');
-      if (token) {
-        fetch(`${API_URL}/api/oracle/chat-history`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        })
-          .then(res => res.ok ? res.json() : null)
-          .then(data => {
-            if (data?.messages && data.messages.length > 0) {
-              setMessages(data.messages.slice(-MAX_STORED_MESSAGES));
-              // Update localStorage cache with server truth
-              const toCache = data.messages.filter(m => !m.isTransmission).slice(-MAX_STORED_MESSAGES);
-              localStorage.setItem(getChatHistoryKey(), JSON.stringify(toCache));
-            }
-          })
-          .catch(() => { /* offline — localStorage is already loaded */ });
-      }
-
-      fetchUsage();
-      fetchUnreadTransmissions();
+    } catch (e) {
+      console.error('Failed to load cached threads:', e);
     }
+
+    // 2. Server: fetch thread list (may trigger lazy migration server-side)
+    const token = localStorage.getItem('token');
+    if (token) {
+      fetch(`${API_URL}/api/oracle/threads`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (!data?.threads) return;
+          setThreads(data.threads);
+          try { localStorage.setItem(getThreadsListKey(), JSON.stringify(data.threads)); } catch {}
+
+          // Pick active thread: prior cached id if it still exists, else most recent
+          const cachedActive = localStorage.getItem(getActiveThreadKey());
+          const stillExists = data.threads.find(t => t.threadId === cachedActive);
+          const preferred = stillExists?.threadId || data.threads[0]?.threadId || null;
+
+          if (preferred) {
+            // Load messages for the chosen active thread
+            fetch(`${API_URL}/api/oracle/threads/${preferred}`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+            })
+              .then(r => r.ok ? r.json() : null)
+              .then(threadData => {
+                if (!threadData?.messages) return;
+                setActiveThreadId(preferred);
+                try { localStorage.setItem(getActiveThreadKey(), preferred); } catch {}
+                setMessages(threadData.messages.slice(-MAX_STORED_MESSAGES));
+                const cacheKey = getThreadMessagesKey(preferred);
+                if (cacheKey) {
+                  try {
+                    const toCache = threadData.messages.filter(m => !m.isTransmission).slice(-MAX_STORED_MESSAGES);
+                    localStorage.setItem(cacheKey, JSON.stringify(toCache));
+                  } catch {}
+                }
+              })
+              .catch(() => {});
+          } else {
+            // Brand-new user: no threads at all. Leave activeThreadId null —
+            // sendMessage will create one on the first message.
+            setActiveThreadId(null);
+            setMessages([]);
+          }
+        })
+        .catch(() => { /* offline — cached state already shown */ });
+    }
+
+    fetchUsage();
+    fetchUnreadTransmissions();
   }, [isLoggedIn]);
 
   // Load existing pin state — so "Pinned" persists across reloads
@@ -678,26 +770,51 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     }
   };
 
-  // Save chat history to localStorage + debounced server sync
+  // Save active thread's messages → localStorage + debounced server sync.
+  // Without an active thread there's nothing to persist yet (PUT would create
+  // an empty thread). Once a thread exists, every change is synced 2s after.
   useEffect(() => {
-    if (messages.length > 0) {
-      const toStore = messages.filter(m => !m.isTransmission).slice(-MAX_STORED_MESSAGES);
-      localStorage.setItem(getChatHistoryKey(), JSON.stringify(toStore));
-
-      // Debounced server sync (2s after last message change)
+    if (!activeThreadId || messages.length === 0) {
       if (chatSyncTimer.current) clearTimeout(chatSyncTimer.current);
-      chatSyncTimer.current = setTimeout(() => {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-        fetch(`${API_URL}/api/oracle/chat-history`, {
-          method: 'PUT',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: toStore })
-        }).catch(() => { /* offline — localStorage has it */ });
-      }, 2000);
+      return;
     }
+
+    const toStore = messages.filter(m => !m.isTransmission).slice(-MAX_STORED_MESSAGES);
+    const cacheKey = getThreadMessagesKey(activeThreadId);
+    if (cacheKey) {
+      try { localStorage.setItem(cacheKey, JSON.stringify(toStore)); } catch {}
+    }
+
+    if (chatSyncTimer.current) clearTimeout(chatSyncTimer.current);
+    chatSyncTimer.current = setTimeout(() => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      fetch(`${API_URL}/api/oracle/threads/${activeThreadId}`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: toStore })
+      })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data?.thread) {
+            // Update the thread row in the sidebar (lastMessageAt, preview, messageCount)
+            setThreads(prev => {
+              const map = new Map(prev.map(t => [t.threadId, t]));
+              map.set(data.thread.threadId, { ...map.get(data.thread.threadId), ...data.thread });
+              const next = Array.from(map.values()).sort((a, b) => {
+                if (!!b.isPinned !== !!a.isPinned) return (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0);
+                return new Date(b.lastMessageAt || 0) - new Date(a.lastMessageAt || 0);
+              });
+              try { localStorage.setItem(getThreadsListKey(), JSON.stringify(next)); } catch {}
+              return next;
+            });
+          }
+        })
+        .catch(() => { /* offline — localStorage has it */ });
+    }, 2000);
+
     return () => { if (chatSyncTimer.current) clearTimeout(chatSyncTimer.current); };
-  }, [messages]);
+  }, [messages, activeThreadId]);
 
   // Scroll to bottom when chat opens (land at latest message instantly)
   useEffect(() => {
@@ -824,6 +941,40 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   // Send message with streaming
   const sendMessage = useCallback(async () => {
     if (!inputValue.trim() || isLoading || usage.messagesRemaining <= 0) return;
+
+    // Ensure we have an active thread before sending. If none exists yet
+    // (brand new user, or all threads deleted), create one on the fly so the
+    // debounced sync has a target.
+    let threadIdForSend = activeThreadId;
+    let isBrandNewThread = false;
+    if (!threadIdForSend) {
+      threadIdForSend = newThreadId();
+      const now = new Date().toISOString();
+      const placeholder = {
+        threadId: threadIdForSend,
+        title: '',
+        isPinned: false,
+        isArchived: false,
+        messageCount: 0,
+        createdAt: now,
+        updatedAt: now,
+        lastMessageAt: now,
+        preview: ''
+      };
+      setThreads(prev => {
+        const next = [placeholder, ...prev];
+        try { localStorage.setItem(getThreadsListKey(), JSON.stringify(next)); } catch {}
+        return next;
+      });
+      setActiveThreadId(threadIdForSend);
+      try { localStorage.setItem(getActiveThreadKey(), threadIdForSend); } catch {}
+      isBrandNewThread = true;
+    } else {
+      // An active thread exists. Is this the first user message in it?
+      // (Auto-title trigger condition.)
+      const nonTransmissionCount = messages.filter(m => !m.isTransmission).length;
+      isBrandNewThread = nonTransmissionCount === 0;
+    }
 
     const userMessage = {
       role: 'user',
@@ -961,9 +1112,20 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
           content: fullResponse,
           timestamp: new Date().toISOString()
         }]);
-        
+
         // Track message sent
         trackAIMessageSent(sentMessageLength, fullResponse.length);
+
+        // Auto-title the thread if this was the first user message in it.
+        // Delay slightly so the PUT sync persists messages first (server reads
+        // them to generate the title). Call via ref so this useCallback doesn't
+        // need autoTitleThread in its dep array.
+        if (isBrandNewThread && threadIdForSend) {
+          setTimeout(() => {
+            const fn = autoTitleThreadRef.current;
+            if (fn) fn(threadIdForSend);
+          }, 2500);
+        }
       }
 
     } catch (err) {
@@ -982,7 +1144,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
       setIsLoading(false);
       setStreamingText('');
     }
-  }, [inputValue, isLoading, messages, usage.messagesRemaining]);
+  }, [inputValue, isLoading, messages, usage.messagesRemaining, activeThreadId]);
 
   // Handle key press
   const handleKeyDown = (e) => {
@@ -1000,20 +1162,182 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     });
   };
 
-  // Clear chat history (local + server)
-  const handleClearChat = () => {
-    setMessages([]);
-    localStorage.removeItem(getChatHistoryKey());
-    // Clear server-side too
+  // ============================================================
+  // Thread management
+  // ============================================================
+
+  // Switch to a different thread — load its messages, update active state.
+  const switchToThread = useCallback(async (threadId) => {
+    if (!threadId || threadId === activeThreadId) return;
+
+    // Cancel pending sync of previous thread — its content is already saved (debounce)
+    if (chatSyncTimer.current) clearTimeout(chatSyncTimer.current);
+
+    setActiveThreadId(threadId);
+    try { localStorage.setItem(getActiveThreadKey(), threadId); } catch {}
+
+    // Show cached messages instantly if we have them
+    const cacheKey = getThreadMessagesKey(threadId);
+    if (cacheKey) {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed)) setMessages(parsed.slice(-MAX_STORED_MESSAGES));
+        } catch {}
+      } else {
+        setMessages([]);
+      }
+    } else {
+      setMessages([]);
+    }
+
+    // Fetch authoritative messages from server
     const token = localStorage.getItem('token');
-    if (token) {
-      fetch(`${API_URL}/api/oracle/chat-history`, {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_URL}/api/oracle/threads/${threadId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data?.messages) {
+        setMessages(data.messages.slice(-MAX_STORED_MESSAGES));
+        if (cacheKey) {
+          try {
+            const toCache = data.messages.filter(m => !m.isTransmission).slice(-MAX_STORED_MESSAGES);
+            localStorage.setItem(cacheKey, JSON.stringify(toCache));
+          } catch {}
+        }
+      }
+    } catch (_) { /* offline — cached is shown */ }
+  }, [activeThreadId]);
+
+  // Create a fresh thread. Optimistic: adds to local list immediately, server
+  // PUT happens when the first message is sent (upsert path).
+  const createNewThread = useCallback(() => {
+    const id = newThreadId();
+    const now = new Date().toISOString();
+    const placeholder = {
+      threadId: id,
+      title: '',
+      isPinned: false,
+      isArchived: false,
+      messageCount: 0,
+      createdAt: now,
+      updatedAt: now,
+      lastMessageAt: now,
+      preview: ''
+    };
+    setThreads(prev => {
+      const next = [placeholder, ...prev.filter(t => t.threadId !== id)];
+      try { localStorage.setItem(getThreadsListKey(), JSON.stringify(next)); } catch {}
+      return next;
+    });
+    setActiveThreadId(id);
+    try { localStorage.setItem(getActiveThreadKey(), id); } catch {}
+    setMessages([]);
+    setError(null);
+    // Close sidebar on mobile so the user lands in the chat
+    if (window.innerWidth < 768) setSidebarOpen(false);
+    setTimeout(() => inputRef.current?.focus(), 200);
+  }, []);
+
+  // PATCH the thread (rename, pin, archive) — optimistic UI
+  const patchThread = useCallback(async (threadId, patch) => {
+    setThreads(prev => {
+      const next = prev.map(t => t.threadId === threadId ? { ...t, ...patch } : t);
+      const sorted = [...next].sort((a, b) => {
+        if (!!b.isPinned !== !!a.isPinned) return (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0);
+        return new Date(b.lastMessageAt || 0) - new Date(a.lastMessageAt || 0);
+      });
+      try { localStorage.setItem(getThreadsListKey(), JSON.stringify(sorted)); } catch {}
+      return sorted;
+    });
+
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      await fetch(`${API_URL}/api/oracle/threads/${threadId}`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(patch)
+      });
+    } catch (_) { /* offline — UI already updated, will re-sync later */ }
+  }, []);
+
+  // Delete a thread — confirms via modal, then DELETE + remove from local state
+  const deleteThread = useCallback(async (threadId) => {
+    const token = localStorage.getItem('token');
+    setThreads(prev => {
+      const next = prev.filter(t => t.threadId !== threadId);
+      try { localStorage.setItem(getThreadsListKey(), JSON.stringify(next)); } catch {}
+      return next;
+    });
+    // Drop cached messages
+    const cacheKey = getThreadMessagesKey(threadId);
+    if (cacheKey) {
+      try { localStorage.removeItem(cacheKey); } catch {}
+    }
+    // If we deleted the active thread, switch to the next available (or none)
+    if (threadId === activeThreadId) {
+      const next = threads.find(t => t.threadId !== threadId);
+      if (next) {
+        switchToThread(next.threadId);
+      } else {
+        setActiveThreadId(null);
+        setMessages([]);
+        try { localStorage.removeItem(getActiveThreadKey()); } catch {}
+      }
+    }
+    if (!token) return;
+    try {
+      await fetch(`${API_URL}/api/oracle/threads/${threadId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
-      }).catch(() => { /* silent */ });
-    }
+      });
+    } catch (_) { /* offline */ }
+  }, [activeThreadId, threads, switchToThread]);
+
+  // Auto-title — server calls Haiku to summarize the first exchange.
+  // Called from sendMessage after the first Oracle reply lands.
+  const autoTitleThread = useCallback(async (threadId) => {
+    const token = localStorage.getItem('token');
+    if (!token || !threadId) return;
+    try {
+      const res = await fetch(`${API_URL}/api/oracle/threads/${threadId}/auto-title`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data?.title) {
+        setThreads(prev => {
+          const next = prev.map(t => t.threadId === threadId ? { ...t, title: data.title } : t);
+          try { localStorage.setItem(getThreadsListKey(), JSON.stringify(next)); } catch {}
+          return next;
+        });
+      }
+    } catch (_) { /* silent */ }
+  }, []);
+  // Keep the ref current so sendMessage can invoke it via the stable handle.
+  autoTitleThreadRef.current = autoTitleThread;
+
+  // ============================================================
+  // Clear chat — now scoped to active thread (deletes the thread, creates a fresh one)
+  // ============================================================
+  const handleClearChat = () => {
+    const prevId = activeThreadId;
+    setMessages([]);
     setShowClearConfirm(false);
     trackAIChatCleared();
+
+    if (prevId) {
+      // Delete the thread entirely so the conversation is gone, then start fresh
+      deleteThread(prevId);
+    }
+    // After delete, deleteThread switches to next or clears active. Either way,
+    // user can just type to start a new conversation (sendMessage auto-creates).
   };
 
   // Get Oracle loading icon
@@ -1175,26 +1499,242 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   })();
   const oracleIsElsewhere = isLoading || !!streamingText;
 
+  // ============================================================
+  // Threads sidebar render — kept inline to stay in a single file
+  // ============================================================
+  const commitRename = (threadId) => {
+    const title = renameValue.trim().slice(0, 80);
+    if (title) patchThread(threadId, { title });
+    setRenamingThreadId(null);
+    setRenameValue('');
+  };
+
+  const filterThread = (t) => {
+    if (!threadSearch.trim()) return true;
+    const q = threadSearch.trim().toLowerCase();
+    return (
+      (t.title || '').toLowerCase().includes(q) ||
+      (t.preview || '').toLowerCase().includes(q)
+    );
+  };
+
+  const visibleThreads = threads.filter(filterThread);
+  const pinnedActive = visibleThreads.filter(t => t.isPinned && !t.isArchived);
+  const normalActive = visibleThreads.filter(t => !t.isPinned && !t.isArchived);
+  const archivedAll = visibleThreads.filter(t => t.isArchived);
+
+  const renderThreadRow = (t) => {
+    const isActive = t.threadId === activeThreadId;
+    const isMenuOpen = threadMenuOpenFor === t.threadId;
+    const isRenaming = renamingThreadId === t.threadId;
+    return (
+      <div
+        key={t.threadId}
+        className={`ai-chat-thread-row${isActive ? ' active' : ''}${t.isPinned ? ' pinned' : ''}${isMenuOpen ? ' menu-open' : ''}`}
+        onClick={() => {
+          if (isRenaming) return;
+          setThreadMenuOpenFor(null);
+          switchToThread(t.threadId);
+        }}
+      >
+        <div className="ai-chat-thread-row-title-line">
+          {isRenaming ? (
+            <input
+              className="ai-chat-thread-rename-input"
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') { e.preventDefault(); commitRename(t.threadId); }
+                if (e.key === 'Escape') { setRenamingThreadId(null); setRenameValue(''); }
+              }}
+              onBlur={() => commitRename(t.threadId)}
+              onClick={(e) => e.stopPropagation()}
+              autoFocus
+              maxLength={80}
+            />
+          ) : (
+            <span className={`ai-chat-thread-row-title${!t.title ? ' untitled' : ''}`}>
+              {t.title || 'New conversation'}
+            </span>
+          )}
+        </div>
+        {!isRenaming && (
+          <span className="ai-chat-thread-row-preview">
+            {t.preview || ' '}
+          </span>
+        )}
+        {!isRenaming && (
+          <span className="ai-chat-thread-row-time">{formatThreadTime(t.lastMessageAt)}</span>
+        )}
+        {!isRenaming && (
+          <button
+            className="ai-chat-thread-row-menu"
+            onClick={(e) => {
+              e.stopPropagation();
+              setThreadMenuOpenFor(prev => prev === t.threadId ? null : t.threadId);
+            }}
+            aria-label="Thread options"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="5" cy="12" r="1.6" />
+              <circle cx="12" cy="12" r="1.6" />
+              <circle cx="19" cy="12" r="1.6" />
+            </svg>
+          </button>
+        )}
+        {isMenuOpen && (
+          <div className="ai-chat-thread-menu" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="ai-chat-thread-menu-item"
+              onClick={() => {
+                setRenamingThreadId(t.threadId);
+                setRenameValue(t.title || '');
+                setThreadMenuOpenFor(null);
+              }}
+            >Rename</button>
+            <button
+              className="ai-chat-thread-menu-item"
+              onClick={() => {
+                patchThread(t.threadId, { isPinned: !t.isPinned });
+                setThreadMenuOpenFor(null);
+              }}
+            >{t.isPinned ? 'Unpin' : 'Pin'}</button>
+            <button
+              className="ai-chat-thread-menu-item"
+              onClick={() => {
+                patchThread(t.threadId, { isArchived: !t.isArchived });
+                setThreadMenuOpenFor(null);
+              }}
+            >{t.isArchived ? 'Unarchive' : 'Archive'}</button>
+            <button
+              className="ai-chat-thread-menu-item danger"
+              onClick={() => {
+                setConfirmDeleteThreadId(t.threadId);
+                setThreadMenuOpenFor(null);
+              }}
+            >Delete</button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderThreadsSidebar = () => (
+    <aside
+      className={`ai-chat-sidebar${sidebarOpen ? ' open' : ''}`}
+      onClick={() => { if (threadMenuOpenFor) setThreadMenuOpenFor(null); }}
+    >
+      <div className="ai-chat-sidebar-header">
+        <button
+          className="ai-chat-sidebar-collapse"
+          onClick={() => setSidebarOpen(false)}
+          aria-label="Hide conversations"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
+        <button
+          className="ai-chat-new-thread-btn"
+          onClick={createNewThread}
+        >
+          <span className="ai-chat-new-thread-dash" />
+          New conversation
+        </button>
+      </div>
+
+      <div className="ai-chat-sidebar-search">
+        <svg className="ai-chat-sidebar-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="7" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          className="ai-chat-sidebar-search-input"
+          type="text"
+          placeholder="Search conversations"
+          value={threadSearch}
+          onChange={(e) => setThreadSearch(e.target.value)}
+        />
+      </div>
+
+      <div className="ai-chat-sidebar-body">
+        {threads.length === 0 && (
+          <div className="ai-chat-sidebar-empty">
+            Begin a new conversation to see it here.
+          </div>
+        )}
+
+        {pinnedActive.length > 0 && (
+          <>
+            <div className="ai-chat-thread-section-label">Pinned</div>
+            {pinnedActive.map(renderThreadRow)}
+          </>
+        )}
+
+        {normalActive.length > 0 && (
+          <>
+            {pinnedActive.length > 0 && <div className="ai-chat-thread-section-label">Recent</div>}
+            {normalActive.map(renderThreadRow)}
+          </>
+        )}
+
+        {archivedAll.length > 0 && (
+          <>
+            <button
+              className="ai-chat-archived-toggle"
+              onClick={() => setShowArchived(s => !s)}
+            >
+              <span>Archived ({archivedAll.length})</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: showArchived ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms ease' }}>
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+            {showArchived && archivedAll.map(renderThreadRow)}
+          </>
+        )}
+      </div>
+
+      <div className="ai-chat-sidebar-watermark">
+        <img src="/oracle-wordmark.png" alt="" className="ai-chat-sidebar-watermark-img" />
+      </div>
+    </aside>
+  );
+
   return (
     <>
       {/* Chat Panel */}
       <div className={`ai-chat-overlay ${isOpen ? 'open' : ''}`} onClick={onClose}>
-        <div 
+        <div
           ref={panelRef}
-          className={`ai-chat-panel ${isOpen ? 'open' : ''}`}
+          className={`ai-chat-panel ${isOpen ? 'open' : ''}${sidebarOpen ? ' with-sidebar' : ''}`}
           onClick={(e) => e.stopPropagation()}
         >
+          {/* Threads Sidebar */}
+          {renderThreadsSidebar()}
+
+          <div className="ai-chat-main">
           {/* Header */}
-          <header 
-            className="ai-chat-header"
+          <header
+            className="ai-chat-header has-sidebar-toggle"
           >
+            <button
+              className="ai-chat-sidebar-toggle"
+              onClick={() => setSidebarOpen(s => !s)}
+              aria-label={sidebarOpen ? 'Hide conversations' : 'Show conversations'}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
             <div className="ai-chat-header-content">
               <img src="/oracle-wordmark.png" alt="Oracle" className="ai-chat-header-wordmark" />
               <span className="ai-chat-subtitle">
                 {usage.messagesRemaining >= 999 ? 'Unlimited · Admin' : `${usage.messagesRemaining} remaining · ${usage.isBetaPeriod ? 'Beta' : usage.isGrandfathered ? 'Lifetime' : usage.isPremium ? 'Premium' : `Free · ${usage.messagesLimit}/week`}`}
               </span>
             </div>
-            <button 
+            <button
               className="ai-chat-close"
               onClick={onClose}
               aria-label="Close chat"
@@ -1513,6 +2053,30 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
               </div>
             )}
           </div>
+
+          {/* Delete-thread confirm modal — reuses the same overlay treatment as Clear */}
+          {confirmDeleteThreadId && (
+            <div className="ai-clear-overlay" onClick={() => setConfirmDeleteThreadId(null)}>
+              <div className="ai-clear-modal" onClick={e => e.stopPropagation()}>
+                <h2>Delete this conversation?</h2>
+                <p>The thread and all its messages will be permanently removed.</p>
+                <div className="ai-clear-actions">
+                  <button
+                    className="ai-clear-btn-danger"
+                    onClick={() => {
+                      deleteThread(confirmDeleteThreadId);
+                      setConfirmDeleteThreadId(null);
+                    }}
+                  >Delete</button>
+                  <button
+                    className="ai-clear-btn-cancel"
+                    onClick={() => setConfirmDeleteThreadId(null)}
+                  >Cancel</button>
+                </div>
+              </div>
+            </div>
+          )}
+          </div> {/* .ai-chat-main */}
         </div>
       </div>
     </>
