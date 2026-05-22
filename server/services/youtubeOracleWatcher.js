@@ -244,15 +244,25 @@ async function processVideoForOracleMentions(video) {
 
     // 2) Check each reply for @oracle
     //    The inline replies from commentThreads.list return at most 5 replies
-    //    (and historically oldest-first). If a thread has more replies, we must
+    //    (historically oldest-first). When a thread has more replies, we must
     //    fetch the full list — otherwise newer @oracle reply mentions in position
     //    6+ are invisible to the watcher.
-    const totalReplyCount = thread.snippet?.totalReplyCount || inlineReplies.length;
+    //
+    //    Two triggers to fetch the full list:
+    //      a) totalReplyCount > inlineReplies.length (API-reported overflow), or
+    //      b) inlineReplies.length >= 5 (max inline size — there COULD be more;
+    //         totalReplyCount is sometimes cached stale by YouTube so we can't
+    //         rely on it alone)
+    const inlineCount = inlineReplies.length;
+    const totalReplyCount = thread.snippet?.totalReplyCount || inlineCount;
     let repliesToScan = inlineReplies;
-    if (totalReplyCount > inlineReplies.length) {
+    if (totalReplyCount > inlineCount || inlineCount >= 5) {
       const fullReplies = await fetchAllReplies(topLevelId);
       if (fullReplies && fullReplies.length > 0) {
         repliesToScan = fullReplies;
+        if (fullReplies.length > inlineCount) {
+          console.log(`🔍 Oracle watcher: thread ${topLevelId} on "${video.title}" — fetched ${fullReplies.length} replies (inline=${inlineCount}, totalReplyCount=${totalReplyCount})`);
+        }
       }
     }
 
