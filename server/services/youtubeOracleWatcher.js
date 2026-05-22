@@ -243,7 +243,20 @@ async function processVideoForOracleMentions(video) {
     }
 
     // 2) Check each reply for @oracle
-    for (const reply of inlineReplies) {
+    //    The inline replies from commentThreads.list return at most 5 replies
+    //    (and historically oldest-first). If a thread has more replies, we must
+    //    fetch the full list — otherwise newer @oracle reply mentions in position
+    //    6+ are invisible to the watcher.
+    const totalReplyCount = thread.snippet?.totalReplyCount || inlineReplies.length;
+    let repliesToScan = inlineReplies;
+    if (totalReplyCount > inlineReplies.length) {
+      const fullReplies = await fetchAllReplies(topLevelId);
+      if (fullReplies && fullReplies.length > 0) {
+        repliesToScan = fullReplies;
+      }
+    }
+
+    for (const reply of repliesToScan) {
       if (!reply?.id) continue;
       if (recentlyChecked.has(reply.id)) continue;
       checked++;
@@ -254,7 +267,7 @@ async function processVideoForOracleMentions(video) {
       const handled = await YouTubeOracleReply.exists({ parentCommentId: reply.id });
       if (handled) continue;
 
-      const threadContext = await buildThreadContext(topLevel, topLevelId, inlineReplies, reply);
+      const threadContext = await buildThreadContext(topLevel, topLevelId, repliesToScan, reply);
       await dispatchMention({
         commentId: reply.id,
         commentSnippet: reply.snippet,
