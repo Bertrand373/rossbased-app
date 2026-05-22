@@ -331,6 +331,7 @@ async function handleOracleMention({ commentId, videoId, videoTitle, questionTex
       threadContext: threadContext || []
     });
   } catch (err) {
+    console.error(`🜂 Oracle generation_failed for ${member.username} on reply ${commentId}:`, err.message);
     await logRejection({ member, commentId, videoId, videoTitle, questionText, tier, status: 'generation_failed', error: err.message });
     return { skipped: true, reason: 'generation_failed', error: err.message };
   }
@@ -347,6 +348,9 @@ async function handleOracleMention({ commentId, videoId, videoTitle, questionTex
   try {
     posted = await postReply(commentId, responseText);
   } catch (err) {
+    // Surface the underlying YouTube API error to console so we can debug
+    console.error(`🜂 Oracle post_failed for ${member.username} on reply ${commentId}:`, err.message);
+    if (err.body) console.error('  YouTube response body:', err.body);
     await logRejection({ member, commentId, videoId, videoTitle, questionText, responseText, tier, status: 'post_failed', error: err.message });
     return { skipped: true, reason: 'post_failed', error: err.message };
   }
