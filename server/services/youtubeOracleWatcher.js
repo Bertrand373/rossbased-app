@@ -274,16 +274,29 @@ async function processVideoForOracleMentions(video) {
       const replyText = reply.snippet?.textDisplay || reply.snippet?.textOriginal || '';
       if (!hasOracleMention(replyText)) continue;
 
+      // Diagnostic log every time @oracle is detected — proves regex matched and
+      // surfaces author info so we can debug member-match failures
+      const authorChannelId = getAuthorChannelId(reply.snippet);
+      const authorName = reply.snippet?.authorDisplayName || '(unknown)';
+      console.log(`🜂 Oracle: @oracle detected in reply ${reply.id} by ${authorName} (channelId=${authorChannelId || 'NONE'}) — "${replyText.slice(0, 80)}"`);
+
       const handled = await YouTubeOracleReply.exists({ parentCommentId: reply.id });
-      if (handled) continue;
+      if (handled) {
+        console.log(`🜂 Oracle: reply ${reply.id} already handled — skipping`);
+        continue;
+      }
 
       const threadContext = await buildThreadContext(topLevel, topLevelId, repliesToScan, reply);
-      await dispatchMention({
+      const dispatched1 = await dispatchMention({
         commentId: reply.id,
         commentSnippet: reply.snippet,
         video,
         threadContext,
-      }).then(r => { if (r) dispatched++; });
+      });
+      if (dispatched1) dispatched++;
+      else {
+        console.log(`🜂 Oracle: dispatch returned false for reply ${reply.id} by ${authorName} (no member match or error)`);
+      }
     }
   }
 
