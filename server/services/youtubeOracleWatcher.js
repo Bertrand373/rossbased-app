@@ -259,6 +259,7 @@ async function processVideoForOracleMentions(video) {
         if (!handled) {
           await dispatchMention({
             commentId: topLevelId,
+            postTargetId: topLevelId,  // top-level @oracle → reply directly under it
             commentSnippet: topLevelSnippet,
             video,
             threadContext: [],   // top-level mention has no thread context
@@ -320,6 +321,10 @@ async function processVideoForOracleMentions(video) {
       const threadContext = await buildThreadContext(topLevel, topLevelId, repliesToScan, reply);
       const dispatched1 = await dispatchMention({
         commentId: reply.id,
+        // YouTube only supports 2-level threading. Oracle's reply must target
+        // the top-level comment as parentId, not the @oracle reply itself.
+        // It becomes a sibling reply under the same top-level.
+        postTargetId: topLevelId,
         commentSnippet: reply.snippet,
         video,
         threadContext,
@@ -334,7 +339,7 @@ async function processVideoForOracleMentions(video) {
   return { checked, dispatched };
 }
 
-async function dispatchMention({ commentId, commentSnippet, video, threadContext }) {
+async function dispatchMention({ commentId, postTargetId, commentSnippet, video, threadContext }) {
   const authorChannelId = getAuthorChannelId(commentSnippet);
   if (!authorChannelId) return false;
 
@@ -347,6 +352,7 @@ async function dispatchMention({ commentId, commentSnippet, video, threadContext
   try {
     const result = await handleOracleMention({
       commentId,
+      postTargetId: postTargetId || commentId,
       videoId: video.videoId,
       videoTitle: video.title,
       questionText: commentSnippet.textDisplay || commentSnippet.textOriginal || '',
