@@ -279,7 +279,12 @@ Transmutation: cold exposure, intense exercise, breathwork, meditation, creative
 // Called by the polling worker for each detected mention.
 // Returns a result object — never throws to caller.
 // ============================================================
-async function handleOracleMention({ commentId, videoId, videoTitle, questionText, threadContext, member }) {
+async function handleOracleMention({ commentId, postTargetId, videoId, videoTitle, questionText, threadContext, member }) {
+  // postTargetId defaults to commentId for backward compat. For replies, the
+  // watcher passes the thread's top-level comment ID here so the YouTube
+  // comments.insert call gets a valid parentId (YouTube doesn't allow
+  // reply-to-a-reply — must always target a top-level comment).
+  const parentForPost = postTargetId || commentId;
   // 0. Kill switch
   if (!isFeatureEnabled()) {
     return { skipped: true, reason: 'feature_disabled' };
@@ -343,10 +348,11 @@ async function handleOracleMention({ commentId, videoId, videoTitle, questionTex
     return { skipped: true, reason: `output_${output.reason}` };
   }
 
-  // 8. Post via Oracle account
+  // 8. Post via Oracle account — must target the top-level comment, not the
+  //    @oracle reply itself. parentForPost is set up at function entry.
   let posted;
   try {
-    posted = await postReply(commentId, responseText);
+    posted = await postReply(parentForPost, responseText);
   } catch (err) {
     // Surface the underlying YouTube API error to console so we can debug
     console.error(`🜂 Oracle post_failed for ${member.username} on reply ${commentId}:`, err.message);
