@@ -1818,14 +1818,14 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
 }
 
 .ai-chat-sidebar-watermark-img {
-  width: 64px;
+  width: 88px;
   height: auto;
   object-fit: contain;
-  opacity: 0.06;
+  opacity: 0.22;
 }
 
 [data-theme="light"] .ai-chat-sidebar-watermark-img {
-  opacity: 0.12;
+  opacity: 0.32;
 }
 
 /* Header sidebar toggle (hamburger) — sits left of the wordmark */
@@ -1923,5 +1923,72 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
 
   .ai-chat-thread-menu {
     animation: none;
+  }
+
+  .message-target-flash {
+    animation: none !important;
+  }
+}
+
+/* =============================================================================
+   SEARCH — match highlight in results, target-message flash in chat
+   ============================================================================= */
+
+/* Bold + gold tint on matched query in the snippet preview */
+.ai-chat-search-match {
+  font-weight: 600;
+  color: #d4af37;
+  background: rgba(212, 175, 55, 0.08);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+[data-theme="light"] .ai-chat-search-match {
+  color: #a08400;
+  background: rgba(160, 130, 0, 0.10);
+}
+
+/* Search result snippet — allow wrap so the match always shows; tighter line. */
+.ai-chat-thread-row.ai-chat-search-result .ai-chat-search-snippet {
+  white-space: normal;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.85;
+  line-height: 1.4;
+}
+
+/* Target-message flash — brief gold wash that fades. Triggered when a search
+   result is tapped; the message you landed on is briefly illuminated. */
+.message-target-flash {
+  animation: messageTargetFlash 1700ms ease-out;
+  border-radius: 8px;
+}
+
+@keyframes messageTargetFlash {
+  0% {
+    background-color: rgba(212, 175, 55, 0.18);
+    box-shadow: 0 0 0 8px rgba(212, 175, 55, 0.12);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0 8px transparent;
+  }
+}
+
+[data-theme="light"] .message-target-flash {
+  animation-name: messageTargetFlashLight;
+}
+
+@keyframes messageTargetFlashLight {
+  0% {
+    background-color: rgba(160, 130, 0, 0.16);
+    box-shadow: 0 0 0 8px rgba(160, 130, 0, 0.08);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0 8px transparent;
   }
 }

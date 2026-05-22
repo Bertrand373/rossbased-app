@@ -161,6 +161,75 @@ router.post('/', async (req, res) => {
 });
 
 // ============================================================
+// GET /search?q=...  — full-text search across all of the user's messages
+// Returns up to 50 matching snippets with thread context.
+// MUST be declared BEFORE /:threadId so Express doesn't route "search"
+// to the per-thread handler.
+// ============================================================
+router.get('/search', async (req, res) => {
+  try {
+    const username = req.user.username;
+    const q = (req.query.q || '').toString().trim();
+    if (q.length < 2) return res.json({ results: [] });
+
+    // Walk all of user's threads. For modest user volumes this is fine;
+    // can later be swapped for a Mongo text index if we add full-text search.
+    const threads = await OracleThread.find({ username })
+      .select('threadId title isPinned isArchived messages lastMessageAt')
+      .lean();
+
+    const qLower = q.toLowerCase();
+    const results = [];
+
+    for (const thread of threads) {
+      const msgs = thread.messages || [];
+      for (let i = 0; i < msgs.length; i++) {
+        const msg = msgs[i];
+        if (!msg || typeof msg.content !== 'string') continue;
+        const lower = msg.content.toLowerCase();
+        const idx = lower.indexOf(qLower);
+        if (idx === -1) continue;
+
+        // Snippet — context window around the match.
+        const PRE = 50;
+        const POST = 90;
+        const start = Math.max(0, idx - PRE);
+        const end = Math.min(msg.content.length, idx + q.length + POST);
+        let snippet = msg.content.slice(start, end).replace(/\s+/g, ' ').trim();
+        if (start > 0) snippet = '…' + snippet;
+        if (end < msg.content.length) snippet = snippet + '…';
+
+        results.push({
+          threadId: thread.threadId,
+          threadTitle: thread.title || 'New conversation',
+          isPinned: !!thread.isPinned,
+          isArchived: !!thread.isArchived,
+          messageTimestamp: msg.timestamp || '',
+          messageRole: msg.role,
+          snippet,
+          messageIndex: i
+        });
+
+        // Cap matches per thread so one chatty thread can't dominate
+        if (results.filter(r => r.threadId === thread.threadId).length >= 3) break;
+      }
+    }
+
+    // Pinned first, then newest. Active archive can sit at the bottom (rare).
+    results.sort((a, b) => {
+      if (a.isArchived !== b.isArchived) return a.isArchived ? 1 : -1;
+      if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+      return new Date(b.messageTimestamp || 0) - new Date(a.messageTimestamp || 0);
+    });
+
+    res.json({ results: results.slice(0, 50) });
+  } catch (err) {
+    console.error('[OracleThread] search error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ============================================================
 // GET /:threadId  — fetch one thread with messages
 // ============================================================
 router.get('/:threadId', async (req, res) => {
