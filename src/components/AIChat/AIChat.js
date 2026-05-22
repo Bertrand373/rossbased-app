@@ -1643,17 +1643,19 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
       </div>
 
       <div className="ai-chat-sidebar-search">
-        <svg className="ai-chat-sidebar-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="11" cy="11" r="7" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </svg>
-        <input
-          className="ai-chat-sidebar-search-input"
-          type="text"
-          placeholder="Search conversations"
-          value={threadSearch}
-          onChange={(e) => setThreadSearch(e.target.value)}
-        />
+        <div className="ai-chat-sidebar-search-field">
+          <svg className="ai-chat-sidebar-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            className="ai-chat-sidebar-search-input"
+            type="text"
+            placeholder="Search conversations"
+            value={threadSearch}
+            onChange={(e) => setThreadSearch(e.target.value)}
+          />
+        </div>
       </div>
 
       <div className="ai-chat-sidebar-body">
