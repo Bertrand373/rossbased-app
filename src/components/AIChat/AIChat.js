@@ -1167,14 +1167,23 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   // ============================================================
 
   // Switch to a different thread — load its messages, update active state.
+  // On mobile, switching also dismisses the sidebar so the user lands in the
+  // conversation immediately (the drawer covers the chat there).
   const switchToThread = useCallback(async (threadId) => {
-    if (!threadId || threadId === activeThreadId) return;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    if (!threadId || threadId === activeThreadId) {
+      // Re-tapping the active thread should still close the drawer — the user's
+      // intent is "take me back to the conversation."
+      if (isMobile) setSidebarOpen(false);
+      return;
+    }
 
     // Cancel pending sync of previous thread — its content is already saved (debounce)
     if (chatSyncTimer.current) clearTimeout(chatSyncTimer.current);
 
     setActiveThreadId(threadId);
     try { localStorage.setItem(getActiveThreadKey(), threadId); } catch {}
+    if (isMobile) setSidebarOpen(false);
 
     // Show cached messages instantly if we have them
     const cacheKey = getThreadMessagesKey(threadId);
@@ -1723,10 +1732,11 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
               onClick={() => setSidebarOpen(s => !s)}
               aria-label={sidebarOpen ? 'Hide conversations' : 'Show conversations'}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="18" x2="21" y2="18" />
+              {/* Sidebar-panel glyph — rectangle + left rail. Semantically tighter
+                  than a hamburger ("generic menu") for "reveal conversation list". */}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="4" width="18" height="16" rx="2.5" />
+                <line x1="9" y1="4" x2="9" y2="20" />
               </svg>
             </button>
             <div className="ai-chat-header-content">
