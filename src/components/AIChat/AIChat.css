@@ -1420,7 +1420,10 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
   flex-direction: column;
   flex-shrink: 0;
   width: 240px;
-  height: 100%;
+  /* No height: 100% — on desktop the panel uses height: auto, so 100%
+     resolves to auto and the sidebar collapses to content size. Letting
+     flex-row's default align-items: stretch fill the panel's height
+     means the sidebar matches the main column. */
   /* Near-solid surface — the archive is a distinct mode, not a glass overlay
      on top of the chat. Stacking glass-on-glass with identical tones did
      nothing (the backdrop-filter had no chromatic difference to blur), so
@@ -1818,7 +1821,9 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
   color: var(--text-secondary);
 }
 
-/* Sidebar footer watermark */
+/* Sidebar footer watermark — present on mobile (where the drawer is the only
+   surface and needs the branding cue), hidden on desktop (where the main
+   chat header already shows the wordmark, so the duplication reads as noise). */
 .ai-chat-sidebar-watermark {
   display: flex;
   justify-content: center;
@@ -1826,6 +1831,10 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
   pointer-events: none;
   user-select: none;
   flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+  .ai-chat-sidebar-watermark { display: none; }
 }
 
 .ai-chat-sidebar-watermark-img {

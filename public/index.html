@@ -189,7 +189,15 @@
         -moz-user-select: text;
         -ms-user-select: text;
         user-select: text;
-        font-size: 16px !important;
+      }
+      /* iOS Safari auto-zooms on focus when input font-size is <16px. Scope
+         the zoom-prevention to mobile only — desktop has no zoom issue and
+         was forcing every designed input font-size (14px, 13px, etc.) up to
+         16px via this !important, overriding all class rules. */
+      @media (max-width: 767px) {
+        input, textarea, [contenteditable] {
+          font-size: 16px !important;
+        }
       }
       
       /* =================================================================
