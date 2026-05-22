@@ -29,10 +29,24 @@ const ORACLE_MODEL = process.env.ORACLE_MODEL || 'claude-sonnet-4-5-20250514';
 // Shared pool across surfaces (app + Discord + YouTube) via User.aiUsage.count
 // ============================================================
 const TIER_LIMITS = {
-  grandfathered: { daily: 1, perVideo: 1 },  // OG: 1/day, 1 per video
-  practitioner:  { daily: 3, perVideo: 2 },  // Practitioner: 3/day, 2 per video
-  ascended:      { daily: 9, perVideo: 3 },  // Ascended: 9/day, 3 per video
+  admin:         { daily: 999, perVideo: 999 },  // Effectively unlimited — matches in-app admin bypass
+  grandfathered: { daily: 1,   perVideo: 1   },  // OG: 1/day, 1 per video
+  practitioner:  { daily: 3,   perVideo: 2   },  // Practitioner: 3/day, 2 per video
+  ascended:      { daily: 9,   perVideo: 3   },  // Ascended: 9/day, 3 per video
 };
+
+// Admin bypass — mirrors the pattern in app.js Oracle quota logic and
+// adminRevenue.js admin check. Admins get unlimited Oracle calls across
+// all surfaces (app, Discord, YouTube). Quality filters still apply.
+function isAdminUser(user) {
+  const username = (user.username || '').toLowerCase();
+  const envAdmins = process.env.ADMIN_USERNAMES;
+  if (envAdmins) {
+    const allowed = envAdmins.split(',').map(u => u.trim().toLowerCase()).filter(Boolean);
+    if (allowed.includes(username)) return true;
+  }
+  return username === 'rossbased' || username === 'ross';
+}
 
 // Kill switch — two-layer:
 //   1. ORACLE_YT_ENABLED=false in Render env → permanent disable (survives restart)
@@ -112,8 +126,12 @@ function passesOutputFilter(text) {
 // TIER RESOLUTION — matches app.js logic
 // ============================================================
 function resolveTier(user) {
+  if (user.banned) return null;
   const sub = user.subscription || {};
-  if (sub.status === 'banned' || user.banned) return null;
+  if (sub.status === 'banned') return null;
+
+  // Admin first — always wins over subscription tier, gives effectively unlimited quota
+  if (isAdminUser(user)) return 'admin';
 
   const hasActiveStripe = !!sub.stripeSubscriptionId &&
     sub.currentPeriodEnd && new Date(sub.currentPeriodEnd) > new Date();
