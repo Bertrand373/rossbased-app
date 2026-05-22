@@ -96,9 +96,13 @@ function getAuthorChannelId(commentSnippet) {
     || (typeof commentSnippet?.authorChannelId === 'string' ? commentSnippet.authorChannelId : null);
 }
 
+// Match @oracle OR @OracleObserves. YouTube auto-expands @oracle to the
+// registered channel handle when one exists, so the stored text becomes
+// @OracleObserves (no word boundary after "oracle"). Lookahead requires
+// a non-letter or end-of-string to avoid matching @oraclekiller etc.
 function hasOracleMention(text) {
   if (!text) return false;
-  return /@oracle\b/i.test(text);
+  return /@oracle(?:observes)?(?=[^a-z]|$)/i.test(text);
 }
 
 // ============================================================
@@ -272,6 +276,12 @@ async function processVideoForOracleMentions(video) {
       checked++;
       rememberChecked(reply.id);
       const replyText = reply.snippet?.textDisplay || reply.snippet?.textOriginal || '';
+
+      // Diagnostic: any reply that mentions "oracle" anywhere — confirms what text the watcher sees
+      if (/oracle/i.test(replyText)) {
+        console.log(`🔎 Reply contains 'oracle' — id=${reply.id}, author=${reply.snippet?.authorDisplayName || '?'}, text="${replyText.slice(0, 140)}"`);
+      }
+
       if (!hasOracleMention(replyText)) continue;
 
       // Diagnostic log every time @oracle is detected — proves regex matched and
