@@ -1067,6 +1067,20 @@
   margin-top: 20px;
 }
 
+.feedback-reply-note {
+  margin: 12px 0 0;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--text-muted, #888);
+  text-align: center;
+}
+
+.feedback-reply-note strong {
+  color: var(--text, #fff);
+  font-weight: 500;
+  word-break: break-all;
+}
+
 /* Privacy sheet — scrollable content */
 .privacy-sheet {
   text-align: left;

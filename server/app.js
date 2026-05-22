@@ -2594,24 +2594,24 @@ app.post('/api/notification-preferences/:username', async (req, res) => {
 // ============================================
 app.post('/api/feedback', async (req, res) => {
   const { type, subject, message, username } = req.body;
-  
+
   if (!subject || !message) {
     return res.status(400).json({ error: 'Subject and message are required' });
   }
-  
+
   const DISCORD_WEBHOOK_URL = process.env.DISCORD_FEEDBACK_WEBHOOK;
-  
+
   if (!DISCORD_WEBHOOK_URL) {
     console.error('DISCORD_FEEDBACK_WEBHOOK not configured');
     return res.status(500).json({ error: 'Feedback system not configured' });
   }
-  
+
   // Sanitize and truncate content (Discord limits: field value 1024 chars)
   const sanitize = (str, maxLength = 1000) => {
     if (!str) return 'N/A';
     return String(str).slice(0, maxLength).trim() || 'N/A';
   };
-  
+
   // Format type for display
   const typeLabels = {
     general: '💬 General',
@@ -2620,13 +2620,30 @@ app.post('/api/feedback', async (req, res) => {
     improvement: '💡 Suggestion',
     other: '📝 Other'
   };
-  
+
+  // Look up user's contact details so Ross can reach them outside Discord
+  let userEmail = 'N/A';
+  let userDiscord = 'N/A';
+  if (username) {
+    try {
+      const user = await User.findOne({ username }).select('email discordUsername').lean();
+      if (user) {
+        userEmail = user.email || 'N/A';
+        userDiscord = user.discordUsername || 'N/A';
+      }
+    } catch (lookupErr) {
+      console.error('Feedback user lookup failed:', lookupErr.message);
+    }
+  }
+
   const safeSubject = sanitize(subject, 100);
   const safeMessage = sanitize(message, 900);
   const safeUsername = sanitize(username, 50);
+  const safeEmail = sanitize(userEmail, 100);
+  const safeDiscord = sanitize(userDiscord, 50);
   const safeType = typeLabels[type] || '💬 General';
   const timestamp = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
-  
+
   // Embed format (preferred)
   const embedPayload = {
     embeds: [{
@@ -2636,15 +2653,17 @@ app.post('/api/feedback', async (req, res) => {
         { name: 'Subject', value: safeSubject, inline: false },
         { name: 'Message', value: safeMessage, inline: false },
         { name: 'From', value: safeUsername, inline: true },
-        { name: 'Time', value: timestamp, inline: true }
+        { name: 'Email', value: safeEmail, inline: true },
+        { name: 'Discord', value: safeDiscord, inline: true },
+        { name: 'Time', value: timestamp, inline: false }
       ],
       footer: { text: 'TitanTrack App Feedback' }
     }]
   };
-  
+
   // Simple fallback format (if embed fails)
   const simplePayload = {
-    content: `**${safeType} Feedback**\n**Subject:** ${safeSubject}\n**Message:** ${safeMessage}\n**From:** ${safeUsername}\n**Time:** ${timestamp}`
+    content: `**${safeType} Feedback**\n**Subject:** ${safeSubject}\n**Message:** ${safeMessage}\n**From:** ${safeUsername}\n**Email:** ${safeEmail}\n**Discord:** ${safeDiscord}\n**Time:** ${timestamp}`
   };
   
   // Retry helper with delay

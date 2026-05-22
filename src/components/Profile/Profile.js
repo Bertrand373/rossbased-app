@@ -1267,6 +1267,10 @@ const Profile = ({
               />
             </div>
 
+            <p className="feedback-reply-note">
+              We may reply via your email on file{userData?.email ? <> (<strong>{userData.email}</strong>)</> : ''} — update it in profile if needed.
+            </p>
+
             <div className="confirm-actions">
               <button className="btn-primary" onClick={handleFeedbackSubmit}>Submit</button>
               <button className="btn-ghost" onClick={() => closeSheet(() => setShowFeedbackModal(false))}>Cancel</button>
