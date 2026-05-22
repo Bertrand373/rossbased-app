@@ -33,6 +33,12 @@ let cachedVideos = [];   // [{ videoId, title, publishedAt }]
 let videosLastRefreshed = 0;
 const VIDEO_LIST_TTL_MS = 30 * 60 * 1000;  // 30 min
 
+// Cache the uploads playlist ID. Channel's uploads playlist never changes,
+// so we look it up once and reuse forever (survives the process lifetime).
+// Using playlistItems.list (1 unit) instead of search.list (100 units) saves
+// ~99% quota on every video-list refresh.
+let cachedUploadsPlaylistId = null;
+
 // Dedup short-term cache so we don't re-attempt the same comment IDs within a run cycle
 // YouTubeOracleReply has a unique index on parentCommentId for cross-run dedup.
 const recentlyChecked = new Set();
@@ -52,24 +58,39 @@ async function ytFetch(endpoint, params) {
   return res.json();
 }
 
+// One-time lookup of the channel's uploads playlist ID.
+// Cost: channels.list = 1 unit. Result is permanent for the channel — caches in-process forever.
+async function ensureUploadsPlaylistId() {
+  if (cachedUploadsPlaylistId) return cachedUploadsPlaylistId;
+  const data = await ytFetch('channels', {
+    part: 'contentDetails',
+    id: YOUTUBE_CHANNEL_ID
+  });
+  const uploads = data.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+  if (!uploads) throw new Error('Could not resolve uploads playlist for channel');
+  cachedUploadsPlaylistId = uploads;
+  return uploads;
+}
+
 async function refreshVideoList() {
   if (!YOUTUBE_API_KEY || !YOUTUBE_CHANNEL_ID) {
     console.log('⚠️ YouTube Oracle watcher: API key or channel ID missing — skipping refresh');
     return;
   }
   try {
-    const data = await ytFetch('search', {
+    // Old approach used search.list (100 units). Switched to playlistItems.list on
+    // the channel's uploads playlist (1 unit). Same data, ~99% less quota.
+    const uploadsPlaylistId = await ensureUploadsPlaylistId();
+    const data = await ytFetch('playlistItems', {
       part: 'snippet',
-      channelId: YOUTUBE_CHANNEL_ID,
-      order: 'date',
-      type: 'video',
+      playlistId: uploadsPlaylistId,
       maxResults: '5'
     });
     cachedVideos = (data.items || [])
-      .map(v => ({
-        videoId: v.id?.videoId,
-        title: v.snippet?.title || '',
-        publishedAt: v.snippet?.publishedAt
+      .map(item => ({
+        videoId: item.snippet?.resourceId?.videoId,
+        title: item.snippet?.title || '',
+        publishedAt: item.snippet?.publishedAt
       }))
       .filter(v => !!v.videoId);
     videosLastRefreshed = Date.now();
