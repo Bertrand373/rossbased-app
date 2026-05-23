@@ -1835,3 +1835,107 @@
 .discord-link-btn:active {
   transform: scale(0.98);
 }
+
+/* ============================================================
+   RECOVERY NOTES — past anchors written during relapse recovery
+   Lives at the bottom of the Account tab when the user has history.
+   ============================================================ */
+
+.recovery-notes {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+}
+
+.recovery-notes-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 14px;
+}
+
+.recovery-notes-header h3 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: 0.005em;
+}
+
+.recovery-notes-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+}
+
+.recovery-notes-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recovery-notes-item {
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.05));
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recovery-notes-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.recovery-notes-date {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.recovery-notes-days {
+  font-size: 0.6875rem;
+  color: rgba(212, 175, 55, 0.7);
+  letter-spacing: 0.04em;
+}
+
+.recovery-notes-why {
+  font-size: 0.875rem;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  letter-spacing: 0.005em;
+}
+
+.recovery-notes-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.recovery-notes-tag {
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+  background: transparent;
+  letter-spacing: 0.01em;
+}
+
+.recovery-notes-tag-anchor {
+  color: rgba(212, 175, 55, 0.7);
+  border-color: rgba(212, 175, 55, 0.18);
+}

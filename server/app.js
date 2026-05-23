@@ -59,6 +59,7 @@ const oracleIntroRoutes = require('./routes/oracleIntroRoutes');
 const oracleXRoutes = require('./routes/oracleXRoutes');
 const feedbackReplyRoutes = require('./routes/feedbackReplyRoutes');
 const oracleYouTubeAdminRoutes = require('./routes/oracleYouTubeAdminRoutes');
+const recoveryRoutes = require('./routes/recoveryRoutes');
 const { expireStaleTrials, expireStaleCanceled, checkPremiumAccess, syncStripeSubscriptions } = require('./middleware/subscriptionMiddleware');
 const { checkAndSendOnboardingNotification } = require('./services/notificationService');
 const { checkSignupAbuse } = require('./services/abuseDetection');
@@ -1673,7 +1674,7 @@ function getClientIP(req) {
 
 // AI Chat Streaming Endpoint
 app.post('/api/ai/chat/stream', authenticate, oracleLimiter, async (req, res) => {
-  const { message, conversationHistory, timezone } = req.body;
+  const { message, conversationHistory, timezone, useRecoveryBypass } = req.body;
 
   // --- PERF TIMING (temporary — remove once bottleneck identified) ---
   // Logs each major step so we can see exactly where the pre-stream latency is.
@@ -1786,8 +1787,8 @@ app.post('/api/ai/chat/stream', authenticate, oracleLimiter, async (req, res) =>
       }
     }
 
-    // Admin or free access credit — skip all rate limits
-    if (isAdminUser || hasFreeAccess) {
+    // Admin, free-access credit, or one-shot recovery bypass — skip all rate limits
+    if (isAdminUser || hasFreeAccess || hasRecoveryBypass) {
       // no-op: fall through to Oracle response
     } else if (isBetaPeriod && currentCount >= BETA_DAILY_LIMIT) {
       return res.status(429).json({ 
@@ -1821,6 +1822,9 @@ app.post('/api/ai/chat/stream', authenticate, oracleLimiter, async (req, res) =>
     if (isAdminUser || hasFreeAccess) {
       preStreamRemaining = 999;
       userTier = isAdminUser ? 'admin' : (isAscended ? 'ascended' : userHasPremium ? 'premium' : isPureOG ? 'grandfathered' : 'free');
+    } else if (hasRecoveryBypass) {
+      preStreamRemaining = 999;
+      userTier = 'recovery';
     } else if (isBetaPeriod) {
       preStreamRemaining = BETA_DAILY_LIMIT - currentCount - 1;
       userTier = 'beta';
@@ -2065,22 +2069,39 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
       }
     }
 
-    // Update usage after successful stream
-    await User.findOneAndUpdate(
-      { username: req.user.username },
-      { 
-        $set: { 
-          'timezone': userTimezone,
-          'aiUsage.date': userLocalDate,
-          'aiUsage.count': currentCount + 1,
-          'aiUsage.lifetimeCount': currentLifetime + 1,
-          'aiUsage.lastUsed': now,
-          'aiUsage.weekStart': currentWeekStart,
-          'aiUsage.weeklyCount': isNewWeek ? 1 : currentWeeklyCount + 1,
-          'aiUsage.lastIP': clientIP || ''
+    // Update usage after successful stream.
+    // Recovery bypass: don't burn a daily/weekly slot — only decrement the bypass
+    // counter and bump lifetimeCount/lastUsed. The bonus message is truly extra.
+    if (hasRecoveryBypass) {
+      await User.findOneAndUpdate(
+        { username: req.user.username },
+        {
+          $set: {
+            'timezone': userTimezone,
+            'aiUsage.lifetimeCount': currentLifetime + 1,
+            'aiUsage.lastUsed': now,
+            'aiUsage.lastIP': clientIP || ''
+          },
+          $inc: { recoveryBypassRemaining: -1 }
         }
-      }
-    );
+      );
+    } else {
+      await User.findOneAndUpdate(
+        { username: req.user.username },
+        {
+          $set: {
+            'timezone': userTimezone,
+            'aiUsage.date': userLocalDate,
+            'aiUsage.count': currentCount + 1,
+            'aiUsage.lifetimeCount': currentLifetime + 1,
+            'aiUsage.lastUsed': now,
+            'aiUsage.weekStart': currentWeekStart,
+            'aiUsage.weeklyCount': isNewWeek ? 1 : currentWeeklyCount + 1,
+            'aiUsage.lastIP': clientIP || ''
+          }
+        }
+      );
+    }
 
     // --- ORACLE MEMORY: Generate observation note (fire-and-forget) ---
     // Uses Haiku for speed and cost. Runs async — does NOT block the user.
@@ -2272,6 +2293,11 @@ Examples:
     let messagesRemaining, effectiveLimit, effectiveUsed;
     if (isAdminUser || hasFreeAccess) {
       effectiveUsed = currentCount + 1;
+      effectiveLimit = 999;
+      messagesRemaining = 999;
+    } else if (hasRecoveryBypass) {
+      // Bypass doesn't burn a slot — report today's count unchanged.
+      effectiveUsed = currentCount;
       effectiveLimit = 999;
       messagesRemaining = 999;
     } else if (isBetaPeriod) {
@@ -3629,6 +3655,7 @@ app.use('/api/oracle/intro', authenticate, oracleIntroRoutes);
 app.use('/api/admin/oracle-x', authenticate, oracleXRoutes);
 app.use('/api/feedback-replies', feedbackReplyRoutes);
 app.use('/api/admin/oracle-youtube', authenticate, oracleYouTubeAdminRoutes);
+app.use('/api/recovery', authenticate, recoveryRoutes);
 app.use('/o', oracleSharePage);
 announcementRoutes.init(authenticate);
 app.use('/api/announcements', announcementRoutes);

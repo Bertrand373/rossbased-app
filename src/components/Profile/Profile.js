@@ -9,6 +9,7 @@ import './Profile.css';
 import '../../styles/BottomSheet.css';
 import useSheetSwipe from '../../hooks/useSheetSwipe';
 import { COUNTRIES } from '../../utils/countries';
+import { getTriggerLabel } from '../../constants/triggerConstants';
 import { useNotifications } from '../../hooks/useNotifications';
 // Theme context
 import { useTheme } from '../../App';
@@ -1056,6 +1057,46 @@ const Profile = ({
                 </button>
               )}
             </div>
+
+            {/* Recovery notes — past anchors written during the relapse-recovery flow.
+                Hidden entirely if the user has never run the flow. */}
+            {Array.isArray(userData?.recoveryHistory) && userData.recoveryHistory.length > 0 && (
+              <div className="recovery-notes">
+                <div className="recovery-notes-header">
+                  <h3>Recovery Notes</h3>
+                  <span className="recovery-notes-sub">Anchors you wrote at the moment of reset</span>
+                </div>
+                <ul className="recovery-notes-list">
+                  {[...userData.recoveryHistory].reverse().map((entry, i) => (
+                    <li key={`${entry.date}-${i}`} className="recovery-notes-item">
+                      <div className="recovery-notes-meta">
+                        <span className="recovery-notes-date">
+                          {entry.date ? format(new Date(entry.date), 'MMM d, yyyy') : '—'}
+                        </span>
+                        {entry.dayCount > 0 && (
+                          <span className="recovery-notes-days">{entry.dayCount} day{entry.dayCount === 1 ? '' : 's'} held</span>
+                        )}
+                      </div>
+                      {entry.why && <p className="recovery-notes-why">“{entry.why}”</p>}
+                      {(entry.trigger || entry.anchor) && (
+                        <div className="recovery-notes-tags">
+                          {entry.trigger && (
+                            <span className="recovery-notes-tag">
+                              {getTriggerLabel(entry.trigger)}
+                            </span>
+                          )}
+                          {entry.anchor && (
+                            <span className="recovery-notes-tag recovery-notes-tag-anchor">
+                              → {entry.anchor}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
 

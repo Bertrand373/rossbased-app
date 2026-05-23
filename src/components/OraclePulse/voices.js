@@ -37,6 +37,61 @@ const getPersonalDayNumber = (date) => {
 };
 
 const ALMANAC_LABEL = 'ALMANAC OBSERVES';
+const ANCHOR_LABEL = 'YOUR ANCHOR';
+
+// Days a user's recovery anchor takes over the OraclePulse slot before
+// reverting to the Oracle / Almanac voice rotation. After this window the
+// anchor still lives in Profile but no longer claims the home slot.
+const ANCHOR_WINDOW_DAYS = 7;
+
+const truncateForObservation = (text, max = 140) => {
+  if (!text) return '';
+  return text.length <= max ? text : text.slice(0, max - 1).trimEnd() + '…';
+};
+
+/**
+ * If the user has a fresh (≤ 7 day old) recovery entry with a written
+ * anchor, return that voice. Anchor takes priority over Oracle/Almanac
+ * — their own words trump cosmic events when they're in the recovery
+ * window.
+ *
+ * Returns null when no qualifying entry exists.
+ */
+const composeAnchorVoice = (userData, date) => {
+  const history = userData?.recoveryHistory;
+  if (!Array.isArray(history) || history.length === 0) return null;
+
+  const latest = history[history.length - 1];
+  if (!latest || !latest.why) return null;
+
+  const recoveryDate = new Date(latest.date);
+  if (isNaN(recoveryDate.getTime())) return null;
+
+  const startOfRecovery = new Date(recoveryDate);
+  startOfRecovery.setHours(0, 0, 0, 0);
+  const today = new Date(date);
+  today.setHours(0, 0, 0, 0);
+  const ageDays = Math.floor((today.getTime() - startOfRecovery.getTime()) / 86400000);
+  if (ageDays < 0 || ageDays >= ANCHOR_WINDOW_DAYS) return null;
+
+  return {
+    source: 'anchor',
+    label: ANCHOR_LABEL,
+    // Wrap in smart quotes so the home slot reads as a self-quotation.
+    observation: truncateForObservation(`“${latest.why}”`),
+    body: null,
+    voiceKey: `anchor:${recoveryDate.toISOString().slice(0, 10)}:${today.toISOString().slice(0, 10)}`,
+    anchorData: {
+      why: latest.why,
+      trigger: latest.trigger || '',
+      triggerNote: latest.triggerNote || '',
+      anchor: latest.anchor || '',
+      dayNumber: ageDays + 1,
+      windowDays: ANCHOR_WINDOW_DAYS,
+      dayCount: latest.dayCount || 0
+    }
+  };
+};
 
 // Hand-curated whisper per special-event type. Avoids the repetition that
 // would result from prefixing the event name with the lunarEvents.json
@@ -167,7 +222,12 @@ const composeAlmanacVoice = (date) => {
 // in priority order without touching OraclePulse.js again.
 // ────────────────────────────────────────────────────────────────────────────
 
-export const pickTodaysVoice = (date = new Date()) => {
+export const pickTodaysVoice = (date = new Date(), userData = null) => {
+  // Priority 1: the user's own recovery anchor (within 7 days). When they
+  // wrote a covenant during the relapse-recovery flow, that voice owns the
+  // home slot — their own words speak louder than the cosmos for the week.
+  const anchor = composeAnchorVoice(userData, date);
+  if (anchor) return anchor;
   return composeAlmanacVoice(date);
 };
 
