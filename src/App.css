@@ -199,6 +199,40 @@ h4 { font-size: 0.875rem; }
   border-radius: 50%;
 }
 
+/* Discord link in header — matches profile-circle sizing, blurple hover */
+.header-discord-link {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  border-radius: 50%;
+  text-decoration: none;
+  transition: color var(--transition-fast), background-color var(--transition-fast), transform var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.header-discord-link:hover {
+  color: #5865F2; /* Discord blurple */
+  background-color: rgba(88, 101, 242, 0.08);
+}
+
+.header-discord-link:active {
+  transform: scale(0.95);
+}
+
+.header-discord-link:focus-visible {
+  outline: 2px solid #5865F2;
+  outline-offset: 2px;
+}
+
+.header-discord-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
 /* ============================================================
    DESKTOP NAVIGATION — Premium text nav with sliding dash
    ============================================================ */
@@ -329,6 +363,15 @@ h4 { font-size: 0.875rem; }
     width: 32px;
     height: 32px;
   }
+
+  .header-discord-link {
+    width: 32px;
+    height: 32px;
+  }
+  .header-discord-icon {
+    width: 21px;
+    height: 21px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -348,9 +391,18 @@ h4 { font-size: 0.875rem; }
     width: 30px;
     height: 30px;
   }
-  
+
   .profile-circle {
     font-size: 0.6875rem;
+  }
+
+  .header-discord-link {
+    width: 30px;
+    height: 30px;
+  }
+  .header-discord-icon {
+    width: 20px;
+    height: 20px;
   }
 }
 
