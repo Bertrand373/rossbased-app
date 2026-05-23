@@ -60,7 +60,11 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
   // previewScene !== null means picker is open and showing a live preview
   const [showScenePicker, setShowScenePicker] = useState(false);
   const [previewScene, setPreviewScene] = useState(null);
-  const savedScene = isValidScene(userData.backgroundScene) ? userData.backgroundScene : DEFAULT_SCENE_KEY;
+  // Premium / OG users default to Golden Hour so they discover the realistic-video
+  // scene without having to find the picker. Their explicit pick (saved to userData)
+  // always wins — this only applies when backgroundScene is unset/invalid.
+  const sceneDefault = isPremium ? 'goldenhour' : DEFAULT_SCENE_KEY;
+  const savedScene = isValidScene(userData.backgroundScene) ? userData.backgroundScene : sceneDefault;
   const activeScene = previewScene !== null ? previewScene : savedScene;
 
   // Gate entrance animations on the index.html loader being removed.
@@ -416,11 +420,15 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
     const lunar = getLunarData(now);
     
     if (currentIdx !== -1) {
-      history[currentIdx] = { 
-        ...history[currentIdx], 
-        start: toDateString(history[currentIdx].start), // normalize legacy
-        end: todayStr, 
-        days: streak, 
+      history[currentIdx] = {
+        ...history[currentIdx],
+        // Preserve the original `start` as-is. We used to re-format it here
+        // ("normalize legacy"), but `format(new Date(legacyDate), 'yyyy-MM-dd')`
+        // silently shifts UTC-midnight Date objects back by a day in negative
+        // timezones — which then inflates currentStreak when Calendar
+        // re-opens this entry on delete-relapse.
+        end: todayStr,
+        days: streak,
         reason: 'relapse',
         moonPhase: lunar.phase,
         moonIllumination: lunar.illumination
