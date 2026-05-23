@@ -1,12 +1,14 @@
 // GoldenSmoke.js - TITANTRACK
-// Atmospheric canvas background for Tracker, Timeline, and Landing.
-// Three curated scenes share the same Wisp engine. Light mode renders nothing —
-// parchment is meant to feel clean, not animated.
-// Pure canvas — no dependencies, minimal CPU footprint.
+// Atmospheric background for Tracker, Timeline, and Landing.
+// Light mode renders nothing — parchment is meant to feel clean, not animated.
+//
+// Two render paths share the same component:
+//   - 'wisp' scenes (golden, jade) → procedural canvas, pure JS particles
+//   - 'video' scenes (goldenhour) → SanctumVideoBackplate sub-component
 //
 // Scene resolution priority (first match wins):
-//   1. URL param ?scene=golden|jade|stars  (dev override)
-//   2. `scene` prop                        (production: from userData)
+//   1. URL param ?scene=golden|jade|goldenhour  (dev override)
+//   2. `scene` prop                             (production: from userData)
 //   3. DEFAULT_SCENE = 'golden'
 //
 // Motion is paused when:
@@ -19,13 +21,13 @@ import React, { useRef, useEffect, useState } from 'react';
 // =============================================================================
 // SCENE LIBRARY
 // =============================================================================
-// Wisp scenes:
+// Wisp scenes (type: 'wisp'):
 //   - count / accentCount: particle population
 //   - sizeMult / speedMult / opacityMult: motion + scale tuning
 //   - palette: 5 RGB stops for the radial gradient (alpha is scaled per-stop)
 //   - baseGrad: bottom-up (or top-down) ambient warmth tint
-// Stars scene:
-//   - starCount + shootingStarIntervalMs + starColor
+// Video scenes (type: 'video'):
+//   - src / poster / durationSec → SanctumVideoBackplate handles render
 
 const SCENES = {
   golden: {
@@ -62,13 +64,6 @@ const SCENES = {
     baseGrad: { direction: 'bottom', stops: [[80, 135, 110, 0.07], [50, 95, 75, 0.02], [0, 0, 0, 0]] },
   },
 
-  stars: {
-    type: 'stars',
-    starCount: 90,
-    shootingStarIntervalMs: [25000, 60000],
-    starColor: [255, 250, 240],
-  },
-
   goldenhour: {
     type: 'video',
     src: '/videos/sanctum/goldenhour.mp4',
@@ -84,17 +79,15 @@ export const DEFAULT_SCENE_KEY = DEFAULT_SCENE;
 
 // Display metadata for the picker UI. Order here = picker order.
 export const SCENE_META = [
-  { key: 'golden',    label: 'Golden Smoke', tag: 'Origin temple. Warm, abundant.' },
-  { key: 'jade',      label: 'Jade Mist',    tag: 'Mineral stillness. Wide, calm.' },
-  { key: 'stars',     label: 'Starfield',    tag: 'Pinpoints. Cosmic order.' },
+  { key: 'golden',     label: 'Golden Smoke', tag: 'Origin temple. Warm, abundant.' },
+  { key: 'jade',       label: 'Jade Mist',    tag: 'Mineral stillness. Wide, calm.' },
   { key: 'goldenhour', label: 'Golden Hour',  tag: 'Sun on water. Quiet horizon.' },
 ];
 
 // Swatch colors for the picker thumbnails — sampled from each palette's brightest stop.
 export const SCENE_SWATCH = {
-  golden:    'rgb(212, 175, 55)',
-  jade:      'rgb(165, 220, 190)',
-  stars:     'rgb(255, 250, 240)',
+  golden:     'rgb(212, 175, 55)',
+  jade:       'rgb(165, 220, 190)',
   goldenhour: 'rgb(245, 175, 100)',
 };
 
@@ -199,90 +192,12 @@ class Wisp {
 }
 
 // =============================================================================
-// STAR — pinpoint with twinkle, very slow parallax drift
-// =============================================================================
-
-class Star {
-  constructor(W, H) {
-    this.reset(W, H, false);
-  }
-
-  reset(W, H, fromEdge) {
-    this.x = fromEdge ? -10 : Math.random() * W;
-    this.y = Math.random() * H;
-    this.size = Math.random() * 1.2 + 0.5;
-    this.baseOpacity = Math.random() * 0.5 + 0.35;
-    this.twinklePhase = Math.random() * Math.PI * 2;
-    this.twinkleSpeed = Math.random() * 0.015 + 0.005;
-    this.driftX = Math.random() * 0.04 + 0.01;
-  }
-
-  update(W) {
-    this.x += this.driftX;
-    this.twinklePhase += this.twinkleSpeed;
-    if (this.x > W + 10) this.x = -10;
-  }
-
-  draw(ctx, color) {
-    const alpha = this.baseOpacity * (0.6 + Math.sin(this.twinklePhase) * 0.4);
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`;
-    ctx.fill();
-  }
-}
-
-class ShootingStar {
-  constructor(W, H) {
-    const fromTop = Math.random() < 0.5;
-    this.x = Math.random() * W * 0.6 + W * 0.2;
-    this.y = fromTop ? -20 : Math.random() * H * 0.4;
-    const angle = Math.PI / 4 + (Math.random() - 0.5) * 0.3;
-    const speed = 8 + Math.random() * 4;
-    this.vx = Math.cos(angle) * speed;
-    this.vy = Math.sin(angle) * speed;
-    this.life = 1;
-    this.fade = 0.012;
-    this.trail = [];
-  }
-
-  update() {
-    this.trail.push({ x: this.x, y: this.y });
-    if (this.trail.length > 18) this.trail.shift();
-    this.x += this.vx;
-    this.y += this.vy;
-    this.life -= this.fade;
-  }
-
-  draw(ctx, color) {
-    if (this.life <= 0) return;
-    for (let i = 0; i < this.trail.length; i++) {
-      const t = this.trail[i];
-      const a = (i / this.trail.length) * this.life * 0.7;
-      ctx.beginPath();
-      ctx.arc(t.x, t.y, 1.2, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${a})`;
-      ctx.fill();
-    }
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, 1.8, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${this.life})`;
-    ctx.fill();
-  }
-
-  isDead(W, H) {
-    return this.life <= 0 || this.x > W + 50 || this.y > H + 50;
-  }
-}
-
-// =============================================================================
 // COMPONENT
 // =============================================================================
 
 const GoldenSmoke = ({ scene: sceneProp }) => {
   const canvasRef = useRef(null);
   const particlesRef = useRef([]);
-  const shootingStarsRef = useRef([]);
   const rafRef = useRef(null);
 
   // Track theme attribute on <html>; light mode = no canvas at all
@@ -317,15 +232,10 @@ const GoldenSmoke = ({ scene: sceneProp }) => {
       const H = window.innerHeight;
       const particles = [];
 
-      if (scene.type === 'stars') {
-        for (let i = 0; i < scene.starCount; i++) particles.push(new Star(W, H));
-      } else {
-        for (let i = 0; i < scene.count; i++) particles.push(new Wisp(W, H, false, scene));
-        for (let i = 0; i < scene.accentCount; i++) particles.push(new Wisp(W, H, true, scene));
-      }
+      for (let i = 0; i < scene.count; i++) particles.push(new Wisp(W, H, false, scene));
+      for (let i = 0; i < scene.accentCount; i++) particles.push(new Wisp(W, H, true, scene));
 
       particlesRef.current = particles;
-      shootingStarsRef.current = [];
     };
 
     const drawBaseGrad = (W, H) => {
@@ -341,13 +251,6 @@ const GoldenSmoke = ({ scene: sceneProp }) => {
       ctx.fillRect(0, 0, W, H);
     };
 
-    let nextShootingStarAt = 0;
-    const scheduleNextShootingStar = () => {
-      const [min, max] = scene.shootingStarIntervalMs || [25000, 60000];
-      nextShootingStarAt = performance.now() + min + Math.random() * (max - min);
-    };
-    if (scene.type === 'stars') scheduleNextShootingStar();
-
     const drawFrame = (advance) => {
       const W = window.innerWidth;
       const H = window.innerHeight;
@@ -355,29 +258,10 @@ const GoldenSmoke = ({ scene: sceneProp }) => {
 
       drawBaseGrad(W, H);
 
-      if (scene.type === 'stars') {
-        const starColor = scene.starColor || [255, 250, 240];
-        particlesRef.current.forEach(s => {
-          if (advance) s.update(W);
-          s.draw(ctx, starColor);
-        });
-
-        if (advance) {
-          if (performance.now() >= nextShootingStarAt) {
-            shootingStarsRef.current.push(new ShootingStar(W, H));
-            scheduleNextShootingStar();
-          }
-          shootingStarsRef.current = shootingStarsRef.current.filter(s => !s.isDead(W, H));
-          shootingStarsRef.current.forEach(s => { s.update(); s.draw(ctx, starColor); });
-        } else {
-          shootingStarsRef.current.forEach(s => s.draw(ctx, starColor));
-        }
-      } else {
-        particlesRef.current.forEach(w => {
-          if (advance) w.update(W, H);
-          w.draw(ctx);
-        });
-      }
+      particlesRef.current.forEach(w => {
+        if (advance) w.update(W, H);
+        w.draw(ctx);
+      });
     };
 
     const render = () => {
