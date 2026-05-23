@@ -319,8 +319,27 @@ const userSchema = new mongoose.Schema({
   weekMetrics: {
     type: [String],
     default: ['energy', 'focus', 'confidence']
-  }
-  
+  },
+
+  // Recovery Flow — captured at the moment of a logged relapse via the
+  // 5-screen guided flow (trigger → reframe → Oracle offer → anchor → action).
+  // Each entry is a covenant: what pulled them in, why they're back, and
+  // what they're doing about tomorrow. Surfaces as YOUR ANCHOR on Tracker
+  // for 7 days post-recovery, then lives in Profile history.
+  recoveryHistory: [{
+    date: { type: Date, default: Date.now },
+    trigger: { type: String, default: '' },        // from picklist
+    triggerNote: { type: String, default: '' },    // freeform, optional
+    why: { type: String, default: '' },            // their anchor
+    anchor: { type: String, default: '' },         // tomorrow's action
+    dayCount: { type: Number, default: 0 }         // streak length when they relapsed
+  }],
+
+  // One-shot Oracle message bypass granted by the recovery flow.
+  // Lets the user spend one bonus message that ignores daily/weekly limits.
+  // Decremented when chat-stream consumes it via useRecoveryBypass flag.
+  recoveryBypassRemaining: { type: Number, default: 0 }
+
 }, {
   timestamps: true
 });

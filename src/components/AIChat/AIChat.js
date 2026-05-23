@@ -1080,6 +1080,17 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
         }
       } catch (e) { /* silent */ }
 
+      // Recovery bypass — one-shot bonus message granted by the relapse-recovery
+      // flow. We consume the localStorage flag here (whether the request succeeds
+      // or not) so a stuck flag can't permanently mark every future send.
+      let useRecoveryBypass = false;
+      try {
+        if (localStorage.getItem('oracle_recovery_pending') === '1') {
+          useRecoveryBypass = true;
+          localStorage.removeItem('oracle_recovery_pending');
+        }
+      } catch { /* localStorage unavailable */ }
+
       const response = await fetch(`${API_URL}/api/ai/chat/stream`, {
         method: 'POST',
         headers: {
@@ -1089,7 +1100,8 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
         body: JSON.stringify({
           message: userMessage.content,
           conversationHistory: recentMessages.slice(0, -1), // Exclude current message
-          timezone: detectedTimezone
+          timezone: detectedTimezone,
+          useRecoveryBypass
         })
       });
 

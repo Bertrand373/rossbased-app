@@ -15,6 +15,7 @@ import PatternInsightCard from '../PatternInsight/PatternInsightCard';
 import EnergyAlmanac from '../EnergyAlmanac/EnergyAlmanac';
 import OnboardingGuide from '../OnboardingGuide/OnboardingGuide';
 import OraclePulse from '../OraclePulse/OraclePulse';
+import RecoveryFlow from '../Recovery/RecoveryFlow';
 import GoldenSmoke, { SCENE_META, SCENE_SWATCH, DEFAULT_SCENE_KEY, isValidScene } from '../GoldenSmoke/GoldenSmoke';
 import { getLunarData } from '../../utils/lunarData';
 
@@ -24,7 +25,7 @@ import interventionService from '../../services/InterventionService';
 // Mixpanel Analytics
 import { trackDailyLog, trackStreakReset } from '../../utils/mixpanel';
 
-const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
+const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle }) => {
   const navigate = useNavigate();
 
   // Timezone-safe date utility — convert any date value to "yyyy-MM-dd" for storage
@@ -52,6 +53,8 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
   const [showStreakOptions, setShowStreakOptions] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [resetType, setResetType] = useState(null);
+  const [showRecoveryFlow, setShowRecoveryFlow] = useState(false);
+  const [recoveryStreakSnapshot, setRecoveryStreakSnapshot] = useState(0);
 
   // Sanctum picker — premium scene library for the Tracker background
   // previewScene !== null means picker is open and showing a live preview
@@ -1539,9 +1542,21 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
                 }
               </p>
               <div className="confirm-actions">
-                <button 
-                  className={resetType === 'relapse' ? 'btn-danger' : 'btn-primary'} 
-                  onClick={resetType === 'wetdream' ? handleLogWetDream : handleReset}
+                <button
+                  className={resetType === 'relapse' ? 'btn-danger' : 'btn-primary'}
+                  onClick={
+                    resetType === 'wetdream'
+                      ? handleLogWetDream
+                      : () => {
+                          // Relapse: open RecoveryFlow first, zero the streak only
+                          // after the user completes or dismisses the flow.
+                          setRecoveryStreakSnapshot(streak);
+                          closeSheet(() => {
+                            setShowResetConfirm(false);
+                            setShowRecoveryFlow(true);
+                          });
+                        }
+                  }
                 >
                   {resetType === 'wetdream' ? 'Log it' : 'Reset'}
                 </button>
@@ -1592,9 +1607,28 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
       )}
 
       {/* AI Pattern Detector — headless, opens sheet when risk elevated */}
-      <PatternInsightCard 
-        userData={userData} 
+      <PatternInsightCard
+        userData={userData}
         onAlert={handlePatternAlert}
+      />
+
+      {/* Relapse Recovery Flow — five-screen covenant after a confirmed relapse */}
+      <RecoveryFlow
+        open={showRecoveryFlow}
+        streak={recoveryStreakSnapshot}
+        userData={userData}
+        onComplete={() => {
+          setShowRecoveryFlow(false);
+          handleReset();
+        }}
+        onClose={() => {
+          setShowRecoveryFlow(false);
+          handleReset();
+        }}
+        onOpenOracle={() => {
+          try { localStorage.setItem('oracle_recovery_pending', '1'); } catch {}
+          if (openOracle) openOracle();
+        }}
       />
 
       {/* Pattern Alert Sheet — AI prediction bottom sheet */}
@@ -1757,9 +1791,15 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade }) => {
         
       </main>
 
-      {/* Oracle bar — pinned bottom, matches Calendar moon bar */}
+      {/* Oracle bar — pinned bottom, matches Calendar moon bar.
+          key changes when a new recovery entry is added so the voice picker
+          re-runs (anchor voice activates immediately after RecoveryFlow). */}
       <div className="tracker-oracle-bar">
-        <OraclePulse />
+        <OraclePulse
+          key={`pulse-${userData?.recoveryHistory?.length || 0}`}
+          userData={userData}
+          openOracle={openOracle}
+        />
       </div>
       
     </div>

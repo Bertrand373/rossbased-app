@@ -772,13 +772,14 @@ function AppContent({
               <div className="main-content-wrapper">
                 <Routes>
                   <Route path="/" element={
-                    <Tracker 
-                      userData={userData} 
-                      updateUserData={updateUserData} 
+                    <Tracker
+                      userData={userData}
+                      updateUserData={updateUserData}
                       isPremium={effectivePremium}
                       setGoal={setGoal}
                       cancelGoal={cancelGoal}
                       onUpgrade={openPlanModal}
+                      openOracle={openOracle}
                     />
                   } />
                   <Route path="/calendar" element={

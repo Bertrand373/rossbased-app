@@ -10,6 +10,7 @@ import useSheetSwipe from '../../hooks/useSheetSwipe';
 import '../../styles/BottomSheet.css';
 import './OraclePulse.css';
 import { pickTodaysVoice } from './voices';
+import { getTriggerLabel } from '../../constants/triggerConstants';
 
 const API = process.env.REACT_APP_API || process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
@@ -27,19 +28,20 @@ const formatBody = (text) => {
   return paragraphs;
 };
 
-const OraclePulse = () => {
-  // Today's voice is picked once at mount. If pickTodaysVoice returns a voice
-  // (Almanac), we render it directly — no network call. If it returns null,
-  // we fall through to the Oracle community pulse fetch.
-  const todaysVoiceRef = useRef(pickTodaysVoice(new Date()));
+const OraclePulse = ({ userData, openOracle } = {}) => {
+  // Today's voice is picked once at mount. Anchor voice (the user's own
+  // recovery covenant) takes priority over Almanac, which takes priority
+  // over the default Oracle community pulse. Local voices skip the fetch.
+  const todaysVoiceRef = useRef(pickTodaysVoice(new Date(), userData));
   const isAlmanacVoice = todaysVoiceRef.current?.source === 'almanac';
+  const isAnchorVoice = todaysVoiceRef.current?.source === 'anchor';
 
   const [observation, setObservation] = useState(null);
   const [body, setBody] = useState(null);
   const [pulseId, setPulseId] = useState(null);
-  // Almanac voice has zero load latency — its data is local. Start
-  // non-loading so the slot doesn't flash empty.
-  const [loading, setLoading] = useState(!isAlmanacVoice);
+  // Almanac/anchor voices have zero load latency — their data is local.
+  // Start non-loading so the slot doesn't flash empty.
+  const [loading, setLoading] = useState(!isAlmanacVoice && !isAnchorVoice);
   const [revealCount, setRevealCount] = useState(0);
   const [animating, setAnimating] = useState(false);
   const [complete, setComplete] = useState(false);
@@ -77,9 +79,9 @@ const OraclePulse = () => {
   useSheetSwipe(sheetPanelRef, showSheet, () => closeSheet(() => setShowSheet(false)));
 
   // Fetch observation from backend (Oracle voice only).
-  // For the Almanac voice, set state directly from the picker — no fetch.
+  // For the Almanac / Anchor voices, set state directly from the picker — no fetch.
   useEffect(() => {
-    if (isAlmanacVoice) {
+    if (isAlmanacVoice || isAnchorVoice) {
       const v = todaysVoiceRef.current;
       setObservation(v.observation);
       setBody(v.body || null);
@@ -199,9 +201,10 @@ const OraclePulse = () => {
 
   const words = observation.split(' ');
   const label = todaysVoiceRef.current?.label || 'ORACLE OBSERVES';
-  // Almanac voice is always tappable (opens the Almanac sheet via event).
-  // Oracle voice is only tappable once it has body text and the reveal is done.
-  const isTappable = isAlmanacVoice
+  // Almanac voice opens the Almanac sheet via event.
+  // Anchor voice opens an internal sheet showing the user's full covenant.
+  // Oracle voice opens its own sheet — only tappable once body text is loaded.
+  const isTappable = isAlmanacVoice || isAnchorVoice
     ? complete
     : (!!body && complete);
   const handleTap = () => {
@@ -211,6 +214,16 @@ const OraclePulse = () => {
     } else {
       setShowSheet(true);
     }
+  };
+
+  const anchorData = isAnchorVoice ? todaysVoiceRef.current?.anchorData : null;
+
+  const handleAnchorTalkToOracle = () => {
+    try { localStorage.setItem('oracle_recovery_pending', '1'); } catch {}
+    closeSheet(() => {
+      setShowSheet(false);
+      if (openOracle) openOracle();
+    });
   };
 
   return (
@@ -243,15 +256,55 @@ const OraclePulse = () => {
             onClick={e => e.stopPropagation()}
           >
             <div className="sheet-header" />
-            <span className="oracle-pulse-label oracle-pulse-sheet-label">ORACLE OBSERVES</span>
-            <div className="oracle-pulse-sheet-scroll" data-no-swipe>
-              {formatBody(body).map((para, i) => (
-                <p key={i} className="oracle-pulse-body">{para}</p>
-              ))}
-            </div>
-            <div className="oracle-pulse-footer">
-              <button className="oracle-pulse-close" onClick={() => closeSheet(() => setShowSheet(false))}>Done</button>
-            </div>
+            {isAnchorVoice && anchorData ? (
+              <>
+                <span className="oracle-pulse-label oracle-pulse-sheet-label">YOUR ANCHOR</span>
+                <span className="oracle-pulse-anchor-day">
+                  Day {anchorData.dayNumber} of {anchorData.windowDays}
+                </span>
+                <div className="oracle-pulse-sheet-scroll" data-no-swipe>
+                  <p className="oracle-pulse-anchor-why">“{anchorData.why}”</p>
+                  <div className="oracle-pulse-anchor-divider" />
+                  {anchorData.trigger && (
+                    <div className="oracle-pulse-anchor-row">
+                      <span className="oracle-pulse-anchor-rowlabel">What pulled you in</span>
+                      <span className="oracle-pulse-anchor-rowvalue">
+                        {getTriggerLabel(anchorData.trigger)}
+                        {anchorData.triggerNote ? ` · ${anchorData.triggerNote}` : ''}
+                      </span>
+                    </div>
+                  )}
+                  {anchorData.anchor && (
+                    <div className="oracle-pulse-anchor-row">
+                      <span className="oracle-pulse-anchor-rowlabel">Tomorrow's anchor</span>
+                      <span className="oracle-pulse-anchor-rowvalue">{anchorData.anchor}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="oracle-pulse-footer oracle-pulse-anchor-footer">
+                  {openOracle && (
+                    <button className="oracle-pulse-anchor-cta" onClick={handleAnchorTalkToOracle}>
+                      Talk to Oracle
+                    </button>
+                  )}
+                  <button className="oracle-pulse-close" onClick={() => closeSheet(() => setShowSheet(false))}>
+                    Done
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <span className="oracle-pulse-label oracle-pulse-sheet-label">ORACLE OBSERVES</span>
+                <div className="oracle-pulse-sheet-scroll" data-no-swipe>
+                  {formatBody(body).map((para, i) => (
+                    <p key={i} className="oracle-pulse-body">{para}</p>
+                  ))}
+                </div>
+                <div className="oracle-pulse-footer">
+                  <button className="oracle-pulse-close" onClick={() => closeSheet(() => setShowSheet(false))}>Done</button>
+                </div>
+              </>
+            )}
           </div>
         </div>,
         document.body
