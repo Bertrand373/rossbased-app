@@ -9,6 +9,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
+const multer = require('multer');
 const { Resend } = require('resend');
 
 // CRITICAL: Load environment variables FIRST, before any other imports that need them
@@ -2591,9 +2592,45 @@ app.post('/api/notification-preferences/:username', async (req, res) => {
 
 // ============================================
 // FEEDBACK TO DISCORD WEBHOOK (Robust)
+// Accepts JSON (no images) or multipart/form-data with up to 3
+// image attachments under the field name "screenshots".
 // ============================================
-app.post('/api/feedback', async (req, res) => {
+const feedbackUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB per file
+    files: 3
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype && file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  }
+});
+
+// Wrap multer so its errors return clean 400s instead of crashing
+const feedbackUploadMiddleware = (req, res, next) => {
+  feedbackUpload.array('screenshots', 3)(req, res, (err) => {
+    if (!err) return next();
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: 'Each screenshot must be 5MB or smaller.' });
+    }
+    if (err.code === 'LIMIT_FILE_COUNT' || err.code === 'LIMIT_UNEXPECTED_FILE') {
+      return res.status(400).json({ error: 'Up to 3 screenshots allowed.' });
+    }
+    if (err.message === 'Only image files are allowed') {
+      return res.status(400).json({ error: err.message });
+    }
+    console.error('Feedback upload error:', err);
+    return res.status(400).json({ error: 'Upload failed. Please try again.' });
+  });
+};
+
+app.post('/api/feedback', feedbackUploadMiddleware, async (req, res) => {
   const { type, subject, message, username } = req.body;
+  const screenshots = Array.isArray(req.files) ? req.files : [];
 
   if (!subject || !message) {
     return res.status(400).json({ error: 'Subject and message are required' });
@@ -2637,12 +2674,16 @@ app.post('/api/feedback', async (req, res) => {
   }
 
   const safeSubject = sanitize(subject, 100);
-  const safeMessage = sanitize(message, 900);
+  const safeMessage = sanitize(message, 1000);
   const safeUsername = sanitize(username, 50);
   const safeEmail = sanitize(userEmail, 100);
   const safeDiscord = sanitize(userDiscord, 50);
   const safeType = typeLabels[type] || '💬 General';
   const timestamp = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
+
+  const screenshotsNote = screenshots.length
+    ? `${screenshots.length} attached`
+    : 'None';
 
   // Embed format (preferred)
   const embedPayload = {
@@ -2655,7 +2696,8 @@ app.post('/api/feedback', async (req, res) => {
         { name: 'From', value: safeUsername, inline: true },
         { name: 'Email', value: safeEmail, inline: true },
         { name: 'Discord', value: safeDiscord, inline: true },
-        { name: 'Time', value: timestamp, inline: false }
+        { name: 'Screenshots', value: screenshotsNote, inline: true },
+        { name: 'Time', value: timestamp, inline: true }
       ],
       footer: { text: 'TitanTrack App Feedback' }
     }]
@@ -2663,28 +2705,49 @@ app.post('/api/feedback', async (req, res) => {
 
   // Simple fallback format (if embed fails)
   const simplePayload = {
-    content: `**${safeType} Feedback**\n**Subject:** ${safeSubject}\n**Message:** ${safeMessage}\n**From:** ${safeUsername}\n**Email:** ${safeEmail}\n**Discord:** ${safeDiscord}\n**Time:** ${timestamp}`
+    content: `**${safeType} Feedback**\n**Subject:** ${safeSubject}\n**Message:** ${safeMessage}\n**From:** ${safeUsername}\n**Email:** ${safeEmail}\n**Discord:** ${safeDiscord}\n**Screenshots:** ${screenshotsNote}\n**Time:** ${timestamp}`
   };
-  
+
   // Retry helper with delay
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-  
-  const sendToDiscord = async (payload, attempt = 1) => {
-    try {
-      const response = await fetch(DISCORD_WEBHOOK_URL, {
-        method: 'POST',
+
+  // Build the request body for Discord. When screenshots are present we
+  // send multipart/form-data with payload_json + files[N]; otherwise plain JSON.
+  const buildRequest = (payload) => {
+    if (!screenshots.length) {
+      return {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
+      };
+    }
+    const fd = new FormData();
+    fd.append('payload_json', JSON.stringify(payload));
+    screenshots.forEach((file, i) => {
+      const blob = new Blob([file.buffer], { type: file.mimetype || 'image/png' });
+      const filename = (file.originalname || `screenshot-${i + 1}.png`).slice(-100);
+      fd.append(`files[${i}]`, blob, filename);
+    });
+    // Let fetch set the multipart boundary automatically — no Content-Type override.
+    return { body: fd };
+  };
+
+  const sendToDiscord = async (payload, attempt = 1) => {
+    try {
+      const { headers, body } = buildRequest(payload);
+      const response = await fetch(DISCORD_WEBHOOK_URL, {
+        method: 'POST',
+        ...(headers ? { headers } : {}),
+        body
       });
-      
+
       if (response.ok) {
         return { success: true };
       }
-      
+
       // Get error details
       const errorText = await response.text();
       console.error(`Discord attempt ${attempt} failed:`, response.status, errorText);
-      
+
       // Rate limited - wait and retry
       if (response.status === 429) {
         const retryAfter = response.headers.get('Retry-After') || 5;
@@ -2694,13 +2757,13 @@ app.post('/api/feedback', async (req, res) => {
           return sendToDiscord(payload, attempt + 1);
         }
       }
-      
+
       // Server error - retry with backoff
       if (response.status >= 500 && attempt < 2) {
         await delay(2000 * attempt);
         return sendToDiscord(payload, attempt + 1);
       }
-      
+
       return { success: false, status: response.status, error: errorText };
     } catch (error) {
       console.error(`Discord attempt ${attempt} error:`, error.message);
@@ -2711,18 +2774,18 @@ app.post('/api/feedback', async (req, res) => {
       return { success: false, error: error.message };
     }
   };
-  
+
   // Try embed format first
   let result = await sendToDiscord(embedPayload);
-  
+
   // If embed failed, try simple format
   if (!result.success) {
     console.log('Embed failed, trying simple format...');
     result = await sendToDiscord(simplePayload);
   }
-  
+
   if (result.success) {
-    console.log('✅ Feedback sent to Discord from:', safeUsername);
+    console.log(`✅ Feedback sent to Discord from: ${safeUsername} (${screenshots.length} screenshot${screenshots.length === 1 ? '' : 's'})`);
     res.json({ success: true, message: 'Feedback sent successfully' });
   } else {
     console.error('❌ All Discord attempts failed:', result);

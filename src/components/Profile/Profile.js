@@ -101,6 +101,24 @@ const Profile = ({
   const [feedbackType, setFeedbackType] = useState('general');
   const [feedbackSubject, setFeedbackSubject] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [feedbackImages, setFeedbackImages] = useState([]); // Array<{ file: File, previewUrl: string }>
+  const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
+  const feedbackFileInputRef = useRef(null);
+
+  const MAX_FEEDBACK_IMAGES = 3;
+  const MAX_FEEDBACK_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
+
+  // Revoke any object URLs we created when the component unmounts
+  useEffect(() => {
+    return () => {
+      feedbackImages.forEach(img => {
+        if (img.previewUrl) URL.revokeObjectURL(img.previewUrl);
+      });
+    };
+    // We intentionally don't track feedbackImages here — we only want cleanup on unmount.
+    // Individual removes handle their own URL revocation.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Debounce timer ref for auto-save
   const saveTimerRef = useRef(null);
@@ -485,35 +503,102 @@ const Profile = ({
     toast.success(newValue ? 'Oracle sync enabled' : 'Oracle sync disabled', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
   };
 
+  const handleFeedbackImagesSelected = (event) => {
+    const picked = Array.from(event.target.files || []);
+    // Reset the input so the same file can be re-picked after a remove
+    if (feedbackFileInputRef.current) feedbackFileInputRef.current.value = '';
+    if (!picked.length) return;
+
+    const remainingSlots = MAX_FEEDBACK_IMAGES - feedbackImages.length;
+    if (remainingSlots <= 0) {
+      toast.error(`You can attach up to ${MAX_FEEDBACK_IMAGES} screenshots.`);
+      return;
+    }
+
+    const accepted = [];
+    let rejectedSize = 0;
+    let rejectedType = 0;
+    for (const file of picked.slice(0, remainingSlots)) {
+      if (!file.type || !file.type.startsWith('image/')) {
+        rejectedType++;
+        continue;
+      }
+      if (file.size > MAX_FEEDBACK_IMAGE_BYTES) {
+        rejectedSize++;
+        continue;
+      }
+      accepted.push({ file, previewUrl: URL.createObjectURL(file) });
+    }
+
+    if (accepted.length) {
+      setFeedbackImages(prev => [...prev, ...accepted]);
+    }
+    if (rejectedType) toast.error('Only image files can be attached.');
+    if (rejectedSize) toast.error('Each screenshot must be 5MB or smaller.');
+    if (picked.length > remainingSlots) {
+      toast(`Only attached ${remainingSlots} of ${picked.length} — limit is ${MAX_FEEDBACK_IMAGES}.`);
+    }
+  };
+
+  const removeFeedbackImage = (index) => {
+    setFeedbackImages(prev => {
+      const next = [...prev];
+      const [removed] = next.splice(index, 1);
+      if (removed?.previewUrl) URL.revokeObjectURL(removed.previewUrl);
+      return next;
+    });
+  };
+
+  const resetFeedbackForm = () => {
+    feedbackImages.forEach(img => {
+      if (img.previewUrl) URL.revokeObjectURL(img.previewUrl);
+    });
+    setFeedbackImages([]);
+    setFeedbackMessage('');
+    setFeedbackType('general');
+  };
+
   const handleFeedbackSubmit = async () => {
+    if (feedbackSubmitting) return;
     if (!feedbackMessage.trim()) {
       toast.error('Please enter your feedback');
       return;
     }
-    
+
+    setFeedbackSubmitting(true);
     try {
+      const formData = new FormData();
+      formData.append('type', feedbackType);
+      formData.append('subject', feedbackType);
+      formData.append('message', feedbackMessage.trim());
+      formData.append('username', userData?.username || 'Anonymous');
+      feedbackImages.forEach(img => {
+        formData.append('screenshots', img.file, img.file.name);
+      });
+
       const response = await fetch(`${API_URL}/api/feedback`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: feedbackType,
-          subject: feedbackType,
-          message: feedbackMessage.trim(),
-          username: userData?.username || 'Anonymous'
-        })
+        // Don't set Content-Type — the browser will add multipart boundary
+        body: formData
       });
-      
+
       if (!response.ok) {
-        throw new Error('Failed to send feedback');
+        let msg = 'Failed to send feedback';
+        try {
+          const data = await response.json();
+          if (data?.error) msg = data.error;
+        } catch (_) { /* ignore */ }
+        throw new Error(msg);
       }
-      
-      setFeedbackMessage('');
-      setFeedbackType('general');
+
+      resetFeedbackForm();
       closeSheet(() => setShowFeedbackModal(false));
       toast.success('Feedback sent');
     } catch (error) {
       console.error('Feedback error:', error);
-      toast.error('Failed to send feedback. Please try again.');
+      toast.error(error.message || 'Failed to send feedback. Please try again.');
+    } finally {
+      setFeedbackSubmitting(false);
     }
   };
 
@@ -1263,8 +1348,50 @@ const Profile = ({
                 onChange={(e) => setFeedbackMessage(e.target.value)}
                 placeholder="Your feedback..."
                 rows={3}
-                maxLength={500}
+                maxLength={1000}
               />
+            </div>
+
+            <div className="feedback-attach">
+              <input
+                ref={feedbackFileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFeedbackImagesSelected}
+                className="feedback-file-input"
+                aria-label="Attach screenshots"
+              />
+              <button
+                type="button"
+                className="feedback-attach-btn"
+                onClick={() => feedbackFileInputRef.current?.click()}
+                disabled={feedbackImages.length >= MAX_FEEDBACK_IMAGES || feedbackSubmitting}
+              >
+                {feedbackImages.length
+                  ? `Add screenshot (${feedbackImages.length}/${MAX_FEEDBACK_IMAGES})`
+                  : 'Attach screenshots'}
+              </button>
+              <span className="feedback-attach-hint">Optional · PNG/JPG · up to 5MB each</span>
+
+              {feedbackImages.length > 0 && (
+                <div className="feedback-image-previews">
+                  {feedbackImages.map((img, idx) => (
+                    <div key={img.previewUrl} className="feedback-image-preview">
+                      <img src={img.previewUrl} alt={`Screenshot ${idx + 1}`} />
+                      <button
+                        type="button"
+                        className="feedback-image-remove"
+                        onClick={() => removeFeedbackImage(idx)}
+                        aria-label={`Remove screenshot ${idx + 1}`}
+                        disabled={feedbackSubmitting}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <p className="feedback-reply-note">
@@ -1272,8 +1399,10 @@ const Profile = ({
             </p>
 
             <div className="confirm-actions">
-              <button className="btn-primary" onClick={handleFeedbackSubmit}>Submit</button>
-              <button className="btn-ghost" onClick={() => closeSheet(() => setShowFeedbackModal(false))}>Cancel</button>
+              <button className="btn-primary" onClick={handleFeedbackSubmit} disabled={feedbackSubmitting}>
+                {feedbackSubmitting ? 'Sending…' : 'Submit'}
+              </button>
+              <button className="btn-ghost" onClick={() => closeSheet(() => setShowFeedbackModal(false))} disabled={feedbackSubmitting}>Cancel</button>
             </div>
           </div>
         </div>
