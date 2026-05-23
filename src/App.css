@@ -213,13 +213,20 @@ h4 { font-size: 0.875rem; }
   -webkit-tap-highlight-color: transparent;
 }
 
-.header-discord-link:hover {
-  color: #5865F2; /* Discord blurple */
-  background-color: rgba(88, 101, 242, 0.08);
+/* Hover only on devices that actually hover — prevents the sticky blurple
+   on iOS/Android where :hover persists after tap until the user taps elsewhere */
+@media (hover: hover) and (pointer: fine) {
+  .header-discord-link:hover {
+    color: #5865F2; /* Discord blurple */
+    background-color: rgba(88, 101, 242, 0.08);
+  }
 }
 
+/* Tap feedback on touch — :active is applied only during the tap and
+   released immediately, so no sticky color */
 .header-discord-link:active {
   transform: scale(0.95);
+  color: #5865F2;
 }
 
 .header-discord-link:focus-visible {
