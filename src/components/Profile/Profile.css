@@ -1081,13 +1081,16 @@
   word-break: break-all;
 }
 
-/* Screenshot attachment block under the feedback textarea */
-.feedback-attach {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
+/* Screenshot attachment — paperclip icon overlaying the textarea */
+.feedback-textarea-wrap {
+  position: relative;
+}
+
+.feedback-textarea-with-attach {
+  /* Reserve room in the bottom-right for the paperclip so typed text
+     never crashes into it. The textarea still scrolls if needed. */
+  padding-right: 48px !important;
+  padding-bottom: 44px !important;
 }
 
 .feedback-file-input {
@@ -1103,37 +1106,63 @@
   border: 0;
 }
 
-.feedback-attach-btn {
+.feedback-attach-icon {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--surface-overlay, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  color: var(--text-secondary, #c9c9c9);
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  background: transparent;
-  border: 1px dashed var(--border-prominent, rgba(255, 255, 255, 0.18));
-  border-radius: 9999px;
-  color: var(--text-secondary, #aaa);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  transition: border-color 150ms ease, color 150ms ease;
+  justify-content: center;
+  font-size: 1rem;
+  line-height: 0;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease, transform 120ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.feedback-attach-btn:hover:not(:disabled) {
-  border-color: var(--text-secondary, rgba(255, 255, 255, 0.35));
+.feedback-attach-icon:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
   color: var(--text, #fff);
 }
 
-.feedback-attach-btn:disabled {
-  opacity: 0.45;
+.feedback-attach-icon:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.feedback-attach-icon:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
-.feedback-attach-hint {
-  font-size: 0.7rem;
-  color: var(--text-muted, #888);
-  line-height: 1.3;
+/* Tiny badge on the icon showing how many are attached */
+.feedback-attach-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 9999px;
+  background: var(--accent-gold, #ffdd00);
+  color: #1a1a1a;
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  font-family: inherit;
+}
+
+@keyframes feedbackPreviewIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .feedback-image-previews {
@@ -1141,7 +1170,7 @@
   flex-wrap: wrap;
   gap: 10px;
   width: 100%;
-  margin-top: 2px;
+  margin-top: 12px;
 }
 
 .feedback-image-preview {
@@ -1153,6 +1182,7 @@
   border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
   background: var(--surface-overlay, #1a1a1a);
   flex: 0 0 auto;
+  animation: feedbackPreviewIn 220ms ease-out;
 }
 
 .feedback-image-preview img {

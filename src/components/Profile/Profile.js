@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import { BsPaperclip } from 'react-icons/bs';
 import './Profile.css';
 import '../../styles/BottomSheet.css';
 import useSheetSwipe from '../../hooks/useSheetSwipe';
@@ -1342,17 +1343,15 @@ const Profile = ({
               ))}
             </div>
 
-            <div className="modal-field">
+            <div className="modal-field feedback-textarea-wrap">
               <textarea
+                className="feedback-textarea-with-attach"
                 value={feedbackMessage}
                 onChange={(e) => setFeedbackMessage(e.target.value)}
                 placeholder="Your feedback..."
-                rows={3}
+                rows={4}
                 maxLength={1000}
               />
-            </div>
-
-            <div className="feedback-attach">
               <input
                 ref={feedbackFileInputRef}
                 type="file"
@@ -1364,35 +1363,45 @@ const Profile = ({
               />
               <button
                 type="button"
-                className="feedback-attach-btn"
+                className="feedback-attach-icon"
                 onClick={() => feedbackFileInputRef.current?.click()}
                 disabled={feedbackImages.length >= MAX_FEEDBACK_IMAGES || feedbackSubmitting}
+                aria-label={
+                  feedbackImages.length
+                    ? `Attach screenshots (${feedbackImages.length} of ${MAX_FEEDBACK_IMAGES} attached)`
+                    : 'Attach screenshots'
+                }
+                title={
+                  feedbackImages.length >= MAX_FEEDBACK_IMAGES
+                    ? `Max ${MAX_FEEDBACK_IMAGES} screenshots`
+                    : 'Attach screenshot · PNG/JPG · up to 5MB'
+                }
               >
-                {feedbackImages.length
-                  ? `Add screenshot (${feedbackImages.length}/${MAX_FEEDBACK_IMAGES})`
-                  : 'Attach screenshots'}
+                <BsPaperclip aria-hidden="true" />
+                {feedbackImages.length > 0 && (
+                  <span className="feedback-attach-count">{feedbackImages.length}</span>
+                )}
               </button>
-              <span className="feedback-attach-hint">Optional · PNG/JPG · up to 5MB each</span>
-
-              {feedbackImages.length > 0 && (
-                <div className="feedback-image-previews">
-                  {feedbackImages.map((img, idx) => (
-                    <div key={img.previewUrl} className="feedback-image-preview">
-                      <img src={img.previewUrl} alt={`Screenshot ${idx + 1}`} />
-                      <button
-                        type="button"
-                        className="feedback-image-remove"
-                        onClick={() => removeFeedbackImage(idx)}
-                        aria-label={`Remove screenshot ${idx + 1}`}
-                        disabled={feedbackSubmitting}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
+
+            {feedbackImages.length > 0 && (
+              <div className="feedback-image-previews">
+                {feedbackImages.map((img, idx) => (
+                  <div key={img.previewUrl} className="feedback-image-preview">
+                    <img src={img.previewUrl} alt={`Screenshot ${idx + 1}`} />
+                    <button
+                      type="button"
+                      className="feedback-image-remove"
+                      onClick={() => removeFeedbackImage(idx)}
+                      aria-label={`Remove screenshot ${idx + 1}`}
+                      disabled={feedbackSubmitting}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <p className="feedback-reply-note">
               We may reply via your email on file{userData?.email ? <> (<strong>{userData.email}</strong>)</> : ''} — update it in profile if needed.
