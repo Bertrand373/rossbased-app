@@ -68,23 +68,36 @@
   .sanctum-video--b { display: none; }
 }
 
+/* Per-scene poster fallback — container shows the still poster image
+   *behind* the videos, so the moment the Tracker tab mounts the user
+   sees the poster instead of the black container background. Eliminates
+   the "black flash" on cold tab entry before the first video frame paints. */
+.sanctum-video-backplate[data-scene="goldenhour"] {
+  background-image: url('/videos/sanctum/goldenhour-poster.jpg');
+  background-size: cover;
+  background-position: center;
+  background-color: #000; /* fallback if poster fails to load */
+}
+
 /* Per-scene tone overlays — pseudo-element sits above the videos to tame
-   contrast where bright clip moments would fight UI text (streak number, etc.).
-   Each scene gets its own gradient tuned to its composition. */
+   contrast where bright clip moments would fight UI text (streak number,
+   meta strip, Oracle quote at the bottom). Each scene gets its own gradient
+   tuned to its composition. */
 .sanctum-video-backplate[data-scene="goldenhour"]::after {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 1;
-  /* Heaviest dim through the sun-reflection band (vertical middle),
-     softer at the bottom so the warm grass silhouettes still glow. */
+  /* Heaviest dim through the sun-reflection band (~40% from top — where
+     the streak number sits). Tapers lighter at the bottom but stays deep
+     enough that the italic Oracle quote stays legible against the grass. */
   background: linear-gradient(
     180deg,
-    rgba(0, 0, 0, 0.35) 0%,
-    rgba(0, 0, 0, 0.50) 45%,
-    rgba(0, 0, 0, 0.30) 75%,
-    rgba(0, 0, 0, 0.10) 100%
+    rgba(0, 0, 0, 0.50) 0%,
+    rgba(0, 0, 0, 0.65) 40%,
+    rgba(0, 0, 0, 0.55) 70%,
+    rgba(0, 0, 0, 0.45) 100%
   );
 }
 
