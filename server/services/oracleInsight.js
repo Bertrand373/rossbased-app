@@ -593,4 +593,4 @@ ${summaryLines.join('\n\n')}`
   }
 }
 
-module.exports = { logIfRelevant, generateWeeklyInsight, generateObservations, detectAnomaly, generatePulseAlert, getPulseStats };
+module.exports = { logIfRelevant, generateWeeklyInsight, generateObservations, detectAnomaly, generatePulseAlert, getPulseStats, detectTopics };

@@ -27,6 +27,9 @@ const communityPulseSchema = new mongoose.Schema({
       'topic_cluster',         // Multiple users independently asking Oracle same thing
       'benefit_shift',         // Community-wide benefit score shift
       'milestone',             // Community milestone (streak record, user count)
+      'reddit_hot_post',       // r/semenretention post with notable engagement vs baseline
+      'reddit_theme_surge',    // Theme frequency on Reddit spiked vs prior week
+      'cross_source',          // Same theme surfacing across 2+ sources at once
       'daily_fallback',        // App-only daily pulse when no real triggers fire (never posted to Discord)
       'manual'                 // Admin-triggered via !pulse-generate
     ],
@@ -37,6 +40,30 @@ const communityPulseSchema = new mongoose.Schema({
   triggerData: {
     type: mongoose.Schema.Types.Mixed
   },
+
+  // ── Fingerprint fields used by the repetition guard ──
+  // Filled in at generation time so future pulses can avoid repeating shape, vocab, sources
+
+  // Embedding of headline+body for cosine-similarity novelty check
+  embedding: { type: [Number], default: undefined },
+
+  // Which sources the pulse cited (reddit, discord, youtube_own, youtube_niche, inapp, lunar, rag)
+  sourcesCited: [{ type: String }],
+
+  // Lead source — the one referenced first in the headline/body
+  leadSource: { type: String, default: '' },
+
+  // Wisdom tradition referenced (egyptian, taoist, vedic, hermetic, scientific, etc.)
+  traditionCited: { type: String, default: '' },
+
+  // First five words of the headline — used to ban opening-phrase reuse
+  openingPhrase: { type: String, default: '' },
+
+  // Key nouns the model leaned on (magnetism, threshold, kundalini, etc.) — cooldown list
+  keyNouns: [{ type: String }],
+
+  // Tonal register (celebratory, concerning, suspicious, mundane, contrarian, deadpan, urgent, reverent, dryly_humorous)
+  tone: { type: String, default: '' },
 
   // Discord delivery tracking
   postedToDiscord: {

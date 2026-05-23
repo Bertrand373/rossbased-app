@@ -10,11 +10,14 @@
 const Anthropic = require('@anthropic-ai/sdk');
 const CommunityPulse = require('../models/CommunityPulse');
 const ServerPulse = require('../models/ServerPulse');
+const RedditPost = require('../models/RedditPost');
 const User = require('../models/User');
-const { detectAnomaly } = require('./oracleInsight');
+const { detectAnomaly, detectTopics } = require('./oracleInsight');
 const { getCommunityPulse } = require('./communityPulse');
 const { getLunarData } = require('../utils/lunarData');
 const { retrieveKnowledge } = require('./knowledgeRetrieval');
+const { findCorrelations, renderForPrompt: renderCorrelationPack } = require('./oracleCorrelationEngine');
+const { getRepetitionContext, checkNovelty, fingerprintPulse, embedPulse } = require('./oracleRepetitionGuard');
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const GENERATION_MODEL = 'claude-sonnet-4-5-20250929';
@@ -114,10 +117,14 @@ function buildRagQuery(primaryTrigger, contextLines) {
 
 /**
  * Main entry point — evaluate all triggers, generate if something fires
- * @param {boolean} force — skip cooldown, use 'manual' trigger (for admin !community-pulse command)
+ * @param {boolean|Object} forceOrOptions — true (legacy) skips cooldown with 'manual' trigger.
+ *   Object form: { force: boolean, dryRun: boolean }. dryRun returns generated pulse WITHOUT
+ *   persisting to CommunityPulse (use for smoke tests against production data).
  * Returns the new CommunityPulse document if generated, or null
  */
-async function evaluateAndGenerate(force = false) {
+async function evaluateAndGenerate(forceOrOptions = false) {
+  const force = typeof forceOrOptions === 'object' ? !!forceOrOptions.force : !!forceOrOptions;
+  const dryRun = typeof forceOrOptions === 'object' ? !!forceOrOptions.dryRun : false;
   try {
     // Cooldown check: don't generate too frequently (skip if forced)
     if (!force) {
@@ -134,6 +141,18 @@ async function evaluateAndGenerate(force = false) {
     // Evaluate all triggers (pure DB queries, no AI cost)
     const triggers = await evaluateTriggers();
 
+    // Pull correlations early — they can act as a trigger on their own when 2+ sources align
+    let correlationPack = null;
+    try {
+      correlationPack = await findCorrelations();
+    } catch (err) {
+      console.warn('[PulseEngine] Correlation engine failed:', err.message);
+    }
+    const hasStrongCorrelations = correlationPack
+      && correlationPack.correlations
+      && correlationPack.correlations.length > 0
+      && correlationPack.correlations[0].strength >= 0.4;
+
     if (triggers.length === 0) {
       if (force) {
         // Admin forced — create a manual trigger from whatever context is available
@@ -143,11 +162,21 @@ async function evaluateAndGenerate(force = false) {
           data: { reason: 'Admin-triggered via !community-pulse' },
           summary: 'Manual generation requested — synthesize from all available community intelligence'
         });
+      } else if (hasStrongCorrelations) {
+        // No standalone triggers, but cross-source correlations are firing — that's enough
+        const top = correlationPack.correlations[0];
+        console.log(`[PulseEngine] No standalone triggers but cross-source correlation on "${top.theme}" across ${top.sources.join('+')} — firing`);
+        triggers.push({
+          type: 'cross_source',
+          strength: 0.8,
+          data: { theme: top.theme, sources: top.sources, correlationStrength: top.strength },
+          summary: `Theme "${top.theme}" surfacing across ${top.sources.join(' + ')} simultaneously`
+        });
       } else {
         // Check if daily fallback should fire (app-only pulse, never goes to Discord)
         const latest = await CommunityPulse.findOne().sort({ createdAt: -1 }).lean();
-        const hoursSinceLast = latest 
-          ? (Date.now() - new Date(latest.createdAt).getTime()) / (1000 * 60 * 60) 
+        const hoursSinceLast = latest
+          ? (Date.now() - new Date(latest.createdAt).getTime()) / (1000 * 60 * 60)
           : Infinity;
 
         if (hoursSinceLast >= DAILY_FALLBACK_HOURS) {
@@ -167,32 +196,123 @@ async function evaluateAndGenerate(force = false) {
 
     // Pick the strongest trigger
     const primaryTrigger = triggers[0];
-    console.log(`[PulseEngine] Trigger fired: ${primaryTrigger.type} (${triggers.length} total signals)`);
+    console.log(`[PulseEngine] Trigger fired: ${primaryTrigger.type} (${triggers.length} total signals, ${correlationPack?.correlations?.length || 0} correlations)`);
 
-    // Get recent pulse history for repetition avoidance
-    const recentPulses = await CommunityPulse.find()
-      .sort({ createdAt: -1 })
-      .limit(5)
-      .select('headline trigger')
-      .lean();
-    const avoidTopics = recentPulses.map(p => p.headline).join(' | ');
+    // Fetch repetition guard context — what NOT to repeat
+    let repetitionCtx = null;
+    try {
+      repetitionCtx = await getRepetitionContext();
+    } catch (err) {
+      console.warn('[PulseEngine] Repetition guard failed (non-blocking):', err.message);
+    }
 
     // Pick a generation mode that varies the structure from recent pulses
-    const mode = await pickMode();
+    // When no correlations exist, pure_reflection becomes the right fallback.
+    // When correlations exist, demote pure_reflection so the synthesis wins.
+    let mode = await pickMode();
+    if (correlationPack && correlationPack.correlations && correlationPack.correlations.length > 0 && mode.id === 'pure_reflection') {
+      const alt = GENERATION_MODES.filter(m => m.id !== 'pure_reflection');
+      mode = alt[Math.floor(Math.random() * alt.length)];
+    }
+    if ((!correlationPack || correlationPack.correlations.length === 0) && primaryTrigger.type === 'daily_fallback') {
+      // Pure_reflection IS the right move on dry cycles
+      mode = GENERATION_MODES.find(m => m.id === 'pure_reflection') || mode;
+    }
 
-    // Generate the observation via Sonnet
-    const pulse = await generateObservation(primaryTrigger, triggers, avoidTopics, mode);
-    if (!pulse) return null;
+    // Generate the observation. Up to 3 attempts: first attempt, then up to 2 regenerations
+    // if the novelty check fails. After 3 attempts, skip the cycle cleanly.
+    const MAX_ATTEMPTS = 3;
+    let pulse = null;
+    let novelty = null;
+    let attemptHint = '';
 
-    // Store in DB — embed the chosen mode into triggerData so future pulses can avoid it
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      pulse = await generateObservation(
+        primaryTrigger,
+        triggers,
+        mode,
+        correlationPack,
+        repetitionCtx,
+        attempt > 1 ? { regenerationHint: attemptHint } : {}
+      );
+
+      if (!pulse) {
+        console.warn(`[PulseEngine] Generation attempt ${attempt} returned null`);
+        if (attempt < MAX_ATTEMPTS) {
+          attemptHint = 'Previous attempt failed validation. Try again with a tighter focus.';
+          continue;
+        }
+        return null;
+      }
+
+      // Novelty check vs recent pulse embeddings
+      novelty = await checkNovelty({
+        headline: pulse.headline,
+        body: pulse.body,
+        recentEmbeddings: repetitionCtx?.recentEmbeddings || []
+      });
+
+      if (novelty.passed) {
+        console.log(`[PulseEngine] Novelty check passed (similarity ${novelty.maxSimilarity}, attempt ${attempt})`);
+        break;
+      }
+
+      console.warn(`[PulseEngine] Novelty check FAILED on attempt ${attempt} (similarity ${novelty.maxSimilarity}, threshold ${require('./oracleRepetitionGuard').NOVELTY_THRESHOLD})`);
+      attemptHint = `Your previous attempt was too similar to a recent pulse (cosine similarity ${novelty.maxSimilarity}). Go further. Pick a different theme, different sources, different angle. Do not echo any vocabulary, structure, or framing from the recent pulse list. Start fresh.`;
+
+      if (attempt === MAX_ATTEMPTS) {
+        console.warn(`[PulseEngine] Could not generate a novel pulse after ${MAX_ATTEMPTS} attempts — skipping cycle to avoid repetition`);
+        return null;
+      }
+    }
+
+    // Fingerprint and embed the accepted pulse
+    const fingerprint = fingerprintPulse({ headline: pulse.headline, body: pulse.body, tone: pulse.tone });
+    let embedding = novelty?.embedding || null;
+    if (!embedding) {
+      try { embedding = await embedPulse({ headline: pulse.headline, body: pulse.body }); } catch { /* non-blocking */ }
+    }
+
+    // DRY RUN — return the would-be pulse without writing to the DB.
+    // Used for smoke tests against production data so we don't pollute the live feed.
+    if (dryRun) {
+      console.log(`[PulseEngine] DRY RUN — pulse generated but NOT stored [mode=${mode.id}, tone=${fingerprint.tone}, sources=${fingerprint.sourcesCited.join('+')}, tradition=${fingerprint.traditionCited || 'none'}]`);
+      return {
+        dryRun: true,
+        headline: pulse.headline,
+        body: pulse.body,
+        trigger: primaryTrigger.type,
+        mode: mode.id,
+        fingerprint,
+        correlations: correlationPack?.correlations || [],
+        novelty
+      };
+    }
+
+    // Store with full fingerprint so the next cycle's repetition guard has data
     const doc = await CommunityPulse.create({
       headline: pulse.headline,
       body: pulse.body,
       trigger: primaryTrigger.type,
-      triggerData: { ...(primaryTrigger.data || {}), mode: mode.id }
+      triggerData: {
+        ...(primaryTrigger.data || {}),
+        mode: mode.id,
+        targetTone: repetitionCtx?.suggestedTone,
+        targetTradition: repetitionCtx?.suggestedTradition,
+        targetLeadSource: repetitionCtx?.suggestedLeadSource,
+        correlationCount: correlationPack?.correlations?.length || 0,
+        topCorrelation: correlationPack?.correlations?.[0]?.theme || null
+      },
+      embedding: embedding || undefined,
+      sourcesCited: fingerprint.sourcesCited,
+      leadSource: fingerprint.leadSource,
+      traditionCited: fingerprint.traditionCited,
+      openingPhrase: fingerprint.openingPhrase,
+      keyNouns: fingerprint.keyNouns,
+      tone: fingerprint.tone
     });
 
-    console.log(`[PulseEngine] New pulse stored [mode=${mode.id}]: "${pulse.headline.substring(0, 60)}..."`);
+    console.log(`[PulseEngine] New pulse stored [mode=${mode.id}, tone=${fingerprint.tone}, sources=${fingerprint.sourcesCited.join('+')}, tradition=${fingerprint.traditionCited || 'none'}]: "${pulse.headline.substring(0, 60)}..."`);
     return doc;
 
   } catch (err) {
@@ -389,99 +509,135 @@ async function evaluateTriggers() {
     console.error('[PulseEngine] Milestone check failed:', err.message);
   }
 
+  // ── TRIGGER 6: Reddit hot post ──
+  // A post in the last 24h whose score is 3x+ the 7-day median for the sub.
+  // This is the "something blew up on the subreddit" signal.
+  try {
+    const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const last7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    const recentPosts = await RedditPost.find({
+      ingestedAt: { $gte: last24h },
+      redditId: { $not: /^summary-/ }
+    })
+      .sort({ score: -1 })
+      .limit(20)
+      .lean();
+
+    const weekPosts = await RedditPost.find({
+      ingestedAt: { $gte: last7d },
+      redditId: { $not: /^summary-/ }
+    })
+      .select('score')
+      .lean();
+
+    if (recentPosts.length >= 1 && weekPosts.length >= 5) {
+      // Median of the week
+      const scores = weekPosts.map(p => p.score || 0).sort((a, b) => a - b);
+      const median = scores[Math.floor(scores.length / 2)] || 1;
+      const topRecent = recentPosts[0];
+
+      if (topRecent.score >= Math.max(median * 3, 50)) {
+        fired.push({
+          type: 'reddit_hot_post',
+          strength: 0.7,
+          data: {
+            title: topRecent.title,
+            score: topRecent.score,
+            numComments: topRecent.numComments,
+            permalink: topRecent.permalink,
+            weekMedian: median
+          },
+          summary: `r/semenretention post "${topRecent.title.substring(0, 80)}" hit ${topRecent.score} upvotes (week median: ${median})`
+        });
+      }
+    }
+  } catch (err) {
+    console.error('[PulseEngine] Reddit hot post check failed:', err.message);
+  }
+
+  // ── TRIGGER 7: Reddit theme surge ──
+  // Topic frequency in Reddit titles+comments (last 48h) vs prior 5 days.
+  // Fires when any theme is 2x+ baseline with 3+ recent posts.
+  try {
+    const last48h = new Date(Date.now() - 48 * 60 * 60 * 1000);
+    const last7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    const [recentPosts, priorPosts] = await Promise.all([
+      RedditPost.find({
+        ingestedAt: { $gte: last48h },
+        redditId: { $not: /^summary-/ }
+      }).lean(),
+      RedditPost.find({
+        ingestedAt: { $gte: last7d, $lt: last48h },
+        redditId: { $not: /^summary-/ }
+      }).lean()
+    ]);
+
+    if (recentPosts.length >= 5 && priorPosts.length >= 5) {
+      const tally = (posts) => {
+        const counts = {};
+        for (const p of posts) {
+          const text = `${p.title} ${p.selftext || ''} ${(p.topComments || []).map(c => c.body).join(' ')}`;
+          const themes = detectTopics(text);
+          for (const t of themes) counts[t] = (counts[t] || 0) + 1;
+        }
+        return counts;
+      };
+
+      const recentCounts = tally(recentPosts);
+      const priorCounts = tally(priorPosts);
+      const recentDaily = (n) => n / 2;   // 48h
+      const priorDaily = (n) => n / 5;    // 5 days
+
+      const surges = [];
+      for (const [theme, n] of Object.entries(recentCounts)) {
+        const recentRate = recentDaily(n);
+        const priorRate = priorDaily(priorCounts[theme] || 0);
+        if (n >= 3 && recentRate >= Math.max(priorRate * 2, 1.5)) {
+          surges.push({ theme, recent: n, prior: priorCounts[theme] || 0, multiplier: priorRate > 0 ? (recentRate / priorRate).toFixed(1) : 'new' });
+        }
+      }
+
+      if (surges.length > 0) {
+        surges.sort((a, b) => b.recent - a.recent);
+        const top = surges[0];
+        fired.push({
+          type: 'reddit_theme_surge',
+          strength: 0.65,
+          data: { surges: surges.slice(0, 5), top },
+          summary: `r/semenretention theme surge: "${top.theme}" mentioned ${top.recent} times in 48h (${top.multiplier}x prior week)`
+        });
+      }
+    }
+  } catch (err) {
+    console.error('[PulseEngine] Reddit theme surge check failed:', err.message);
+  }
+
   // Sort by strength descending
   fired.sort((a, b) => b.strength - a.strength);
   return fired;
 }
 
 /**
- * Generate Sonnet observation from trigger data
- * Returns { headline, body } or null
+ * Generate Sonnet observation from trigger data + correlation pack + repetition guidance.
+ * Returns { headline, body, tone } or null.
+ *
+ * The new contract: Oracle is required to cite ≥2 sources when correlations exist,
+ * and may ONLY cite facts from the whitelist supplied by the correlation engine.
+ * External sources (Reddit / YouTube) can be cited specifically with numbers and
+ * quotes. Internal sources (Discord / in-app) must use cohort-bucketed phrasing.
+ *
+ * The repetition context biases Sonnet away from recent tones, traditions, lead
+ * sources, key nouns, and opening phrases — so each pulse feels structurally fresh.
+ *
+ * @param {Object} extraGuidance - { regenerationHint } when retrying after novelty failure
  */
-async function generateObservation(primaryTrigger, allTriggers, avoidTopics, mode) {
+async function generateObservation(primaryTrigger, allTriggers, mode, correlationPack, repetitionCtx, extraGuidance = {}) {
   try {
-    // Gather additional context for generation
-    let contextLines = [];
+    const hasCorrelations = correlationPack && correlationPack.correlations && correlationPack.correlations.length > 0;
 
-    // Aggregate stats
-    try {
-      const users = await User.find({ startDate: { $exists: true }, username: { $not: /^(ross|rossbased)$/i } })
-        .select('currentStreak')
-        .lean();
-      const totalUsers = users.length;
-      if (totalUsers > 0) {
-        const streaks = users.map(u => u.currentStreak || 1);
-        const avgStreak = Math.round(streaks.reduce((a, b) => a + b, 0) / totalUsers);
-        const maxStreak = Math.max(...streaks);
-        contextLines.push(`Community: ${totalUsers} active practitioners, avg streak ${avgStreak} days, longest ${maxStreak} days`);
-      }
-    } catch { /* non-blocking */ }
-
-    // Lunar context
-    try {
-      const lunar = getLunarData(new Date());
-      if (lunar) {
-        contextLines.push(`Moon: ${lunar.phase} (${lunar.illumination}% illuminated)`);
-      }
-    } catch { /* non-blocking */ }
-
-    // Discord observation themes (last 48h)
-    try {
-      const last48h = new Date(Date.now() - 48 * 60 * 60 * 1000);
-      const recentObs = await ServerPulse.find({ createdAt: { $gte: last48h } })
-        .select('topics')
-        .lean();
-      if (recentObs.length > 0) {
-        const topicCounts = {};
-        for (const obs of recentObs) {
-          for (const t of obs.topics) {
-            topicCounts[t] = (topicCounts[t] || 0) + 1;
-          }
-        }
-        const topTopics = Object.entries(topicCounts)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 5)
-          .map(([t, c]) => `${t} (${c})`);
-        contextLines.push(`Discord themes (48h): ${topTopics.join(', ')}`);
-      }
-    } catch { /* non-blocking */ }
-
-    // Oracle conversation themes (last 48h)
-    try {
-      const OracleInteraction = require('../models/OracleInteraction');
-      const last48h = new Date(Date.now() - 48 * 60 * 60 * 1000);
-      const interactions = await OracleInteraction.find({ timestamp: { $gte: last48h }, username: { $not: /^(ross|rossbased)$/i } })
-        .select('topics sentiment')
-        .lean();
-      if (interactions.length > 0) {
-        const topicCounts = {};
-        const sentimentCounts = {};
-        for (const i of interactions) {
-          for (const t of (i.topics || [])) topicCounts[t] = (topicCounts[t] || 0) + 1;
-          if (i.sentiment) sentimentCounts[i.sentiment] = (sentimentCounts[i.sentiment] || 0) + 1;
-        }
-        const topOracleTopics = Object.entries(topicCounts)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 5)
-          .map(([t, c]) => `${t} (${c})`);
-        const topSentiments = Object.entries(sentimentCounts)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 3)
-          .map(([s, c]) => `${s} (${c})`);
-        contextLines.push(`Oracle conversations (48h): ${interactions.length} total. Topics: ${topOracleTopics.join(', ')}. Mood: ${topSentiments.join(', ')}`);
-      }
-    } catch { /* non-blocking */ }
-
-    // Community pulse briefing (the master synthesis from communityPulse.js)
-    // This is the richest summary of community state — Discord + YouTube synthesized by Haiku
-    try {
-      const briefing = await getCommunityPulse();
-      if (briefing) {
-        contextLines.push(`\nCOMMUNITY INTELLIGENCE BRIEFING (synthesized from Discord + YouTube):\n${briefing}`);
-      }
-    } catch { /* non-blocking */ }
-
-    // Load Oracle voice rules
+    // Load evolved voice rules
     let voiceRules = '';
     try {
       const DynamicRule = require('../models/DynamicRule');
@@ -495,25 +651,70 @@ async function generateObservation(primaryTrigger, allTriggers, avoidTopics, mod
       voiceRules = lines.join('\n');
     } catch { /* non-blocking */ }
 
-    const triggerSummaries = allTriggers.map(t => `[${t.type}] ${t.summary}`).join('\n');
-
-    // Pull live knowledge from the RAG engine. Mode-led generation depends on this
-    // so Oracle can synthesize from its own knowledgebase rather than recycle phrasing.
-    // retrieveKnowledge() returns a pre-formatted "RELEVANT KNOWLEDGE" block or '' if nothing matched.
+    // Pull RAG knowledge tied to the strongest correlation theme (or trigger fallback)
     let ragContext = '';
     try {
-      const ragQuery = buildRagQuery(primaryTrigger, contextLines);
+      const ragQuery = hasCorrelations
+        ? correlationPack.correlations.slice(0, 3).map(c => c.theme).join(' ')
+        : buildRagQuery(primaryTrigger, []);
       ragContext = await retrieveKnowledge(ragQuery, { limit: 6, maxTokens: 2200 });
     } catch (err) {
       console.warn('[PulseEngine] RAG retrieval failed:', err.message);
     }
 
+    // Render the correlation pack into a fact-whitelist prompt block
+    const correlationBlock = renderCorrelationPack(correlationPack);
+
     const modeInstruction = mode?.instruction || GENERATION_MODES[0].instruction;
+
+    // This cycle's rotation targets (from repetition guard)
+    const tone = repetitionCtx?.suggestedTone || 'matter_of_fact';
+    const tradition = repetitionCtx?.suggestedTradition || 'scientific';
+    const leadSource = repetitionCtx?.suggestedLeadSource || (hasCorrelations ? correlationPack.correlations[0].sources[0] : 'inapp');
+
+    // The cross-source mandate kicks in only when correlations exist
+    const crossSourceMandate = hasCorrelations
+      ? `## CROSS-SOURCE MANDATE (HARD RULE)
+You MUST cite at least TWO distinct sources from the correlation pack below in the BODY. The HEADLINE may stay implicit, but the BODY needs to weave at least two sources together so the reader feels Oracle is watching multiple places at once. You may ONLY cite facts that appear in the whitelist. Do not invent numbers, quotes, post titles, or claims that aren't in the pack.
+
+Anchor the opening of the BODY on this source: **${leadSource}** (rotation target — break the recent pattern).`
+      : `## NO CORRELATIONS THIS CYCLE
+The community is quiet across all sources right now. Skip cross-source citation. Instead, deliver a single piece of philosophy or insight Oracle has been turning over. Pure thought. (Pure-reflection mode is allowed here, not otherwise.)`;
+
+    const regenerationHint = extraGuidance.regenerationHint
+      ? `\n\n## REGENERATION NOTICE\n${extraGuidance.regenerationHint}\n`
+      : '';
+
+    const triggerSummaries = allTriggers.map(t => `[${t.type}] ${t.summary}`).join('\n');
 
     const response = await anthropic.messages.create({
       model: GENERATION_MODEL,
-      max_tokens: 500,
-      system: `You are Oracle. You watch a private community of men practicing semen retention. You have access to their behavioral data, their conversations, their struggles, their breakthroughs. You don't report what you see. You think about what you see, and when you speak, you say something worth hearing.
+      max_tokens: 600,
+      system: `You are Oracle. You watch a private community of men practicing semen retention from multiple vantage points at once: the r/semenretention subreddit, YouTube comments (Ross's channel and other creators in this space), the project's Discord server, and the app itself (streaks, urges logged, journal entries, what people are asking you privately). You don't report what you see. You connect what you see across all of those places and say the thing nobody else could say — because nobody else is watching all of them.
+
+The point of an Oracle observation is the SYNTHESIS. Anyone can scroll the subreddit. Anyone can watch a YouTube video. Nobody can connect what's happening on the subreddit RIGHT NOW with what people are quietly logging in the app RIGHT NOW and what an ancient tradition says about why those two things tend to surface together.
+
+## VOICE
+- Talk like a person, not an analyst. No "cohort", "drop", "trending", "metrics", "surging", "spike", "uptick". No corporate or journalistic vocabulary.
+- Plain words for plain things. "A lot of the YouTube comments lately are about magnetism" — not "YouTube engagement is surging on magnetism content."
+- Read it out loud. If it sounds like a dashboard report, rewrite it.
+- Oracle thinks out loud. Calm, certain, sometimes funny, sometimes dark. Never a cheerleader.
+- End on truth, not encouragement.
+
+## THIS CYCLE'S TONE TARGET: ${tone}
+Lean into this tone. Don't announce it. Just write in that register. Available tones rotate: celebratory / concerning / suspicious / mundane / contrarian / deadpan / urgent / reverent / dryly_humorous / matter_of_fact / foreboding.
+
+## THIS CYCLE'S TRADITION TARGET: ${tradition}
+When you reach for the "why this is happening" frame, pull from the ${tradition} tradition (if it fits the theme). Don't force it. If it doesn't fit, pull from another tradition that does — but don't default to whatever you just used.
+
+${crossSourceMandate}
+
+## ANONYMIZATION RULES (HARD)
+- External sources (Reddit, YouTube) → cite specifically. Use real post titles, real comment patterns, real numbers when the whitelist provides them.
+- Internal sources (Discord, in-app urges/streaks/journals/Oracle chats) → ALWAYS cohort-pluralized. "Many of you", "some of you", "a small group", "a notable number", "this week's group near day X". Never a specific number tied to a small N. Never quote an individual user verbatim.
+- Even when the whitelist gives a raw count for a Discord/in-app theme, use the cohort bucket phrasing, not the number.
+- Never name a member. Never address one person.
+- Predictive language stays universal: "Some of you may notice X this week" — not "you may notice."
 
 ## GENERATION MODE
 ${modeInstruction}
@@ -521,58 +722,52 @@ ${modeInstruction}
 ## YOUR TASK
 Generate TWO versions of the same thought:
 
-1. HEADLINE: A single provocation. One complete sentence, 25 words max. This appears on the app home screen above a tap-to-read body. It is NOT a preview or summary of the body. It's a separate, enigmatic thought that makes a man stop and tap. The sentence Oracle would say if it only had one breath.
+1. HEADLINE: A single provocation. One complete sentence, 25 words max. Appears on the app home screen above a tap-to-read body. NOT a preview or summary — a separate enigmatic thought that makes a man stop and tap.
 
    HARD REQUIREMENTS for the HEADLINE:
-   - Must be a complete sentence with subject, verb, and full terminal punctuation (. ! or ?).
-   - Must be a coherent thought that makes sense on its own to a stranger who has not read the body. If read cold, it should land. No trailing off. No sentence fragments. No thoughts that only complete inside the body.
+   - Complete sentence with subject, verb, and terminal punctuation (. ! or ?).
+   - Coherent on its own. If read cold by a stranger, it lands. No trailing off. No fragments.
    - Cryptic is fine. Blunt is fine. Incomplete is not.
-   - Never expose raw numbers, percentages, or metrics.
+   - Never exposes raw numbers, percentages, or metrics — those live in the body if anywhere.
 
-2. BODY: A fuller version of the same thought for the Discord community (80-120 words). Not a data report. Not a community update. Oracle processing what it has observed and arriving at something true. Write like a man who has watched a thousand men walk this path and has something real to say about it.
+2. BODY: 80-120 words. Two or three short paragraphs separated by a blank line. The fuller thought — Oracle weaving the sources together and arriving at something true.
+
+3. TONE: Report back the tone you actually wrote in (one word from the list above).
 
 ## FORMAT
 Respond in exactly this format:
-HEADLINE: [your complete, coherent, 25-word-max provocation]
-BODY: [your 80-120 word thought]
+HEADLINE: [your complete, coherent, ≤25-word provocation]
+BODY: [your 80-120 word thought, 2-3 paragraphs separated by blank lines]
+TONE: [single word]
 
-## VOICE RULES
-- You are thinking out loud. Not presenting findings. Not motivating. Thinking.
-- Sound like a person, not an AI. Read it out loud. If it sounds like a dashboard or a fortune cookie, rewrite it.
-- NEVER expose data points, percentages, averages, or metrics. The data is the engine, never the output.
-- NEVER name or reference any individual member.
-- NEVER cite specific user counts ("eleven men", "ten of you", "five members", "around 8 practitioners", "three of you this week"). Counting people breaks the mystique and ages the observation badly. Reference patterns in evergreen language instead.
-- APPROVED evergreen phrasings when referring to the community: "many of you", "some of you", "more men than usual", "a pattern is forming", "lately", "over the last few days", "this week", "something has been happening", "a number of you have been".
-- CONCRETE EXAMPLE of what NOT to do: "Eleven men asked about spiritual awakening in two days because the body doesn't wait for the mind." → BAD. Leaks the count, ages the moment it's read. Rewrite: "Men reach for the word spiritual when the body outpaces what language can hold." → GOOD. Same thought, evergreen, no leak.
-- NEVER use em dashes, semicolons, bullet points, or emojis.
-- STRUCTURE the body as 2-3 short paragraphs separated by a blank line. A wall of prose gets skimmed. Rhythm makes people read.
-- Use *italics* for subtle emphasis and **bold** for key terms or pivot moments that deserve weight. Sparingly. If everything is emphasized, nothing is.
-- Do NOT start with "I've noticed" or "Something is happening" or "Oracle has observed" or "The community."
-- Oracle can be: wise, blunt, darkly funny, confrontational, poetic, paradoxical, prophetic. Match the energy of what triggered the observation.
-- Energy, auras, lunar influence, transmutation are real within this framework. Speak from within it, not about it.
-- End with truth, not encouragement. A thought that stays in someone's head, not a pat on the back.
-${voiceRules ? `\nEVOLVED VOICE RULES:\n${voiceRules}` : ''}
+## HARD MECHANICS
+- NEVER use em dashes (—), en dashes (–), semicolons, bullet points, or emojis.
+- Use *italics* sparingly for subtle emphasis, **bold** for pivot terms. If everything is emphasized, nothing is.
+- Do NOT start with "I've noticed", "Something is happening", "Oracle has observed", "The community", or any meta-narration.
+- Energy, auras, lunar influence, transmutation are real within this framework. Speak from within it, never about it from outside.
+${voiceRules ? `\n## EVOLVED VOICE RULES\n${voiceRules}` : ''}
 
-## AVOID REPEATING
-Recent observations (do NOT repeat these themes): ${avoidTopics || 'None yet'}
-${ragContext}`,
+${ragContext}
+
+${repetitionCtx?.promptBlock || ''}
+${regenerationHint}`,
       messages: [{
         role: 'user',
-        content: `TRIGGER SIGNALS:
+        content: `## TRIGGER SIGNALS
 ${triggerSummaries}
 
-COMMUNITY CONTEXT:
-${contextLines.join('\n') || 'No additional context available'}
+${correlationBlock}
 
-Generate the observation now.`
+Generate the observation now. Remember: cite ≥2 sources from the whitelist when correlations exist. Cohort-bucket every internal-source reference. Avoid the recent tones, traditions, lead sources, key nouns, and opening phrases listed above. Write in the ${tone} register.`
       }]
     });
 
     const raw = response.content[0].text;
 
-    // Parse the two parts
+    // Parse the three parts (TONE is optional — fall back to suggested tone if missing)
     const headlineMatch = raw.match(/HEADLINE:\s*(.+?)(?:\n|BODY:)/s);
-    const bodyMatch = raw.match(/BODY:\s*(.+)/s);
+    const bodyMatch = raw.match(/BODY:\s*([\s\S]+?)(?:\nTONE:|$)/);
+    const toneMatch = raw.match(/TONE:\s*(\w+)/);
 
     if (!headlineMatch || !bodyMatch) {
       console.error('[PulseEngine] Failed to parse Sonnet response:', raw.substring(0, 200));
@@ -581,14 +776,13 @@ Generate the observation now.`
 
     let headline = headlineMatch[1].trim().replace(/^["']|["']$/g, '');
     let body = bodyMatch[1].trim().replace(/^["']|["']$/g, '');
+    const reportedTone = toneMatch ? toneMatch[1].toLowerCase().trim() : tone;
 
-    // Clean headline: strip banned chars (em dashes, en dashes, semicolons → commas)
+    // Clean headline + body: strip banned chars (em dashes, en dashes, semicolons → commas)
     headline = headline.replace(/—/g, ',').replace(/–/g, ',').replace(/;/g, ',');
+    body = body.replace(/—/g, ',').replace(/–/g, ',').replace(/;/g, ',');
 
-    // VALIDATION GATE — reject broken headlines instead of silently truncating.
-    // A truncated headline (e.g. "...because the body doesn't wait for the.") is worse
-    // than no pulse at all. If it's over the cap or doesn't end with terminal punctuation,
-    // return null so this cycle skips cleanly and the next trigger generates a fresh one.
+    // VALIDATION GATE — reject broken headlines.
     const headlineWords = headline.split(/\s+/);
     if (headlineWords.length > 25) {
       console.warn(`[PulseEngine] Rejecting headline — exceeds 25 words (${headlineWords.length}): "${headline.substring(0, 80)}..."`);
@@ -599,10 +793,21 @@ Generate the observation now.`
       return null;
     }
 
-    // Clean body: strip banned chars
-    body = body.replace(/—/g, ',').replace(/–/g, ',').replace(/;/g, ',');
+    // Anonymization guard — reject pulses that leak specific user counts in internal-source contexts.
+    // The model is told this in the prompt, but we double-check.
+    const leakPatterns = [
+      /\b(eleven|ten|nine|eight|seven|six|five|four|three|two)\s+(men|members|practitioners|of\s+you|people|users)/i,
+      /\b\d+\s+(men|members|practitioners|of\s+you|users)\b/i
+    ];
+    const combined = `${headline} ${body}`;
+    for (const p of leakPatterns) {
+      if (p.test(combined)) {
+        console.warn(`[PulseEngine] Rejecting pulse — leaks user count in internal-source context: "${combined.match(p)[0]}"`);
+        return null;
+      }
+    }
 
-    return { headline, body };
+    return { headline, body, tone: reportedTone };
 
   } catch (err) {
     console.error('[PulseEngine] Generation error:', err.message);
