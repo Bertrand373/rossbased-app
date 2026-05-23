@@ -28,6 +28,66 @@
   z-index: 0;
 }
 
+/* Video-backplate scenes (e.g. Hearth/fireplace).
+   Two stacked <video> loops, second offset by half-duration, opacity keyframes
+   fade each one out during its 0.5s seam window so the other always carries the
+   visual. Result: no visible loop seam even on clips that don't loop perfectly. */
+.sanctum-video-backplate {
+  background: #000;
+  overflow: hidden;
+}
+
+.sanctum-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  animation: sanctum-video-cycle var(--sanctum-video-duration, 9s) linear infinite;
+  /* GPU compositing hints — keeps opacity transitions smooth on lower-end mobile
+     by promoting the video to its own layer instead of compositing each frame. */
+  will-change: opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.sanctum-video--b {
+  animation-delay: calc(var(--sanctum-video-duration, 9s) / -2);
+}
+
+@keyframes sanctum-video-cycle {
+  0%   { opacity: 0; }
+  6%   { opacity: 1; }
+  94%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sanctum-video { animation: none; opacity: 1; }
+  .sanctum-video--b { display: none; }
+}
+
+/* Per-scene tone overlays — pseudo-element sits above the videos to tame
+   contrast where bright clip moments would fight UI text (streak number, etc.).
+   Each scene gets its own gradient tuned to its composition. */
+.sanctum-video-backplate[data-scene="goldenhour"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  /* Heaviest dim through the sun-reflection band (vertical middle),
+     softer at the bottom so the warm grass silhouettes still glow. */
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.35) 0%,
+    rgba(0, 0, 0, 0.50) 45%,
+    rgba(0, 0, 0, 0.30) 75%,
+    rgba(0, 0, 0, 0.10) 100%
+  );
+}
+
 /* Smoke bleeds through header and nav on Tracker tab */
 /* transition-duration: 0ms = instant on entering tracker */
 /* Base 400ms transition on .app-header/.mobile-nav handles smooth fade back on leaving */

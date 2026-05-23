@@ -68,6 +68,13 @@ const SCENES = {
     shootingStarIntervalMs: [25000, 60000],
     starColor: [255, 250, 240],
   },
+
+  goldenhour: {
+    type: 'video',
+    src: '/videos/sanctum/goldenhour.mp4',
+    poster: '/videos/sanctum/goldenhour-poster.jpg',
+    durationSec: 10,
+  },
 };
 
 const DEFAULT_SCENE = 'golden';
@@ -77,16 +84,18 @@ export const DEFAULT_SCENE_KEY = DEFAULT_SCENE;
 
 // Display metadata for the picker UI. Order here = picker order.
 export const SCENE_META = [
-  { key: 'golden', label: 'Golden Smoke', tag: 'Origin temple. Warm, abundant.' },
-  { key: 'jade',   label: 'Jade Mist',    tag: 'Mineral stillness. Wide, calm.' },
-  { key: 'stars',  label: 'Starfield',    tag: 'Pinpoints. Cosmic order.' },
+  { key: 'golden',    label: 'Golden Smoke', tag: 'Origin temple. Warm, abundant.' },
+  { key: 'jade',      label: 'Jade Mist',    tag: 'Mineral stillness. Wide, calm.' },
+  { key: 'stars',     label: 'Starfield',    tag: 'Pinpoints. Cosmic order.' },
+  { key: 'goldenhour', label: 'Golden Hour',  tag: 'Sun on water. Quiet horizon.' },
 ];
 
 // Swatch colors for the picker thumbnails — sampled from each palette's brightest stop.
 export const SCENE_SWATCH = {
-  golden: 'rgb(212, 175, 55)',
-  jade:   'rgb(165, 220, 190)',
-  stars:  'rgb(255, 250, 240)',
+  golden:    'rgb(212, 175, 55)',
+  jade:      'rgb(165, 220, 190)',
+  stars:     'rgb(255, 250, 240)',
+  goldenhour: 'rgb(245, 175, 100)',
 };
 
 const resolveSceneKey = (sceneProp) => {
@@ -410,12 +419,114 @@ const GoldenSmoke = ({ scene: sceneProp }) => {
 
   if (theme === 'light') return null;
 
+  // Video scenes render their own backplate (real footage) instead of the canvas.
+  // The canvas effect above bails when canvasRef.current is null, so no cleanup needed.
+  const activeSceneKey = resolveSceneKey(sceneProp);
+  const activeScene = SCENES[activeSceneKey];
+  if (activeScene.type === 'video') {
+    return (
+      <SanctumVideoBackplate
+        sceneKey={activeSceneKey}
+        src={activeScene.src}
+        poster={activeScene.poster}
+        durationSec={activeScene.durationSec}
+      />
+    );
+  }
+
   return (
     <canvas
       ref={canvasRef}
       className="golden-smoke"
       aria-hidden="true"
     />
+  );
+};
+
+// =============================================================================
+// VIDEO BACKPLATE — real footage scene (e.g. fireplace)
+// =============================================================================
+// Two stacked <video> elements with the second offset by half the clip duration.
+// CSS keyframes fade each one out during its 0.5s loop-seam window so the other
+// always carries the visual → no visible seam, even if the clip itself doesn't
+// loop perfectly. Pauses when the tab is hidden or reduced-motion is set.
+
+const SanctumVideoBackplate = ({ sceneKey, src, poster, durationSec }) => {
+  const videoARef = useRef(null);
+  const videoBRef = useRef(null);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const vA = videoARef.current;
+    const vB = videoBRef.current;
+    const container = containerRef.current;
+    if (!vA || !vB || !container) return undefined;
+
+    const reduceMotion = prefersReducedMotion();
+
+    const applyDuration = () => {
+      const dur = (vA.duration && Number.isFinite(vA.duration)) ? vA.duration : (durationSec || 9);
+      // Offset B by half the duration so its loop seam falls in the middle of A's safe zone (and vice versa).
+      vB.currentTime = dur / 2;
+      container.style.setProperty('--sanctum-video-duration', `${dur}s`);
+      if (reduceMotion) {
+        vA.pause();
+        vB.pause();
+      } else {
+        vA.play().catch(() => {});
+        vB.play().catch(() => {});
+      }
+    };
+
+    if (vA.readyState >= 1) {
+      applyDuration();
+    } else {
+      vA.addEventListener('loadedmetadata', applyDuration, { once: true });
+    }
+
+    const handleVisibility = () => {
+      if (reduceMotion) return;
+      if (document.hidden) {
+        vA.pause();
+        vB.pause();
+      } else {
+        vA.play().catch(() => {});
+        vB.play().catch(() => {});
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      vA.removeEventListener('loadedmetadata', applyDuration);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [src, durationSec]);
+
+  return (
+    <div ref={containerRef} className="golden-smoke sanctum-video-backplate" data-scene={sceneKey} aria-hidden="true">
+      <video
+        ref={videoARef}
+        className="sanctum-video sanctum-video--a"
+        src={src}
+        poster={poster}
+        muted
+        playsInline
+        loop
+        preload="auto"
+        disableRemotePlayback
+      />
+      <video
+        ref={videoBRef}
+        className="sanctum-video sanctum-video--b"
+        src={src}
+        poster={poster}
+        muted
+        playsInline
+        loop
+        preload="auto"
+        disableRemotePlayback
+      />
+    </div>
   );
 };
 
