@@ -503,7 +503,13 @@ const SanctumVideoBackplate = ({ sceneKey, src, poster, durationSec }) => {
   }, [src, durationSec]);
 
   return (
-    <div ref={containerRef} className="golden-smoke sanctum-video-backplate" data-scene={sceneKey} aria-hidden="true">
+    <div
+      ref={containerRef}
+      className="golden-smoke sanctum-video-backplate"
+      data-scene={sceneKey}
+      style={poster ? { backgroundImage: `url(${poster})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
+      aria-hidden="true"
+    >
       <video
         ref={videoARef}
         className="sanctum-video sanctum-video--a"

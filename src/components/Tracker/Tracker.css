@@ -68,16 +68,11 @@
   .sanctum-video--b { display: none; }
 }
 
-/* Per-scene poster fallback — container shows the still poster image
-   *behind* the videos, so the moment the Tracker tab mounts the user
-   sees the poster instead of the black container background. Eliminates
-   the "black flash" on cold tab entry before the first video frame paints. */
-.sanctum-video-backplate[data-scene="goldenhour"] {
-  background-image: url('/videos/sanctum/goldenhour-poster.jpg');
-  background-size: cover;
-  background-position: center;
-  background-color: #000; /* fallback if poster fails to load */
-}
+/* Per-scene poster fallback is applied via inline style from JS
+   (see SanctumVideoBackplate) — keeps the runtime asset path out of
+   the CSS bundle so CRA's webpack doesn't try to resolve it as a
+   module import at build time. The base .sanctum-video-backplate
+   above already paints #000 as the safety fallback. */
 
 /* Per-scene tone overlays — pseudo-element sits above the videos to tame
    contrast where bright clip moments would fight UI text (streak number,
