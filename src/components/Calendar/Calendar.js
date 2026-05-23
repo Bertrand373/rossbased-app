@@ -136,6 +136,21 @@ const toDateString = (val) => {
   return format(new Date(val), 'yyyy-MM-dd');
 };
 
+// Safe stored-date → string conversion. Mirrors toLocalMidnight's legacy
+// handling: strings pass through, legacy Date/ISO values are treated as
+// UTC midnight (extract UTC components) so we don't shift the day in
+// negative timezones. Use this when reading start/end values out of
+// streakHistory and writing them back into startDate-style string fields.
+const safeStoredDateString = (val) => {
+  if (!val) return null;
+  if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+  const d = new Date(val);
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
 const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
@@ -1444,65 +1459,87 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   // Delete a relapse from calendar
   const handleDeleteRelapse = () => {
     if (!selectedDate || !updateUserData) return;
-    
+
     let updatedStreakHistory = [...(userData.streakHistory || [])];
     const selectedMidnight = toLocalMidnight(selectedDate);
-    
+
     // Find the relapse entry for this date
     const relapseIndex = updatedStreakHistory.findIndex(streak => {
       if (!streak.end || streak.reason !== 'relapse') return false;
       const endDay = toLocalMidnight(streak.end);
       return endDay && endDay.getTime() === selectedMidnight.getTime();
     });
-    
+
     if (relapseIndex === -1) {
       toast.error('Relapse not found');
       return;
     }
-    
+
     const relapseEntry = updatedStreakHistory[relapseIndex];
-    
-    // Find the streak that started after this relapse (if any)
+
+    // Find the streak entry that was created as a result of this relapse.
+    // Two conventions exist in the codebase:
+    //   - Calendar.handleTriggerSelection writes { start: relapseDate + 1 day }
+    //   - Tracker.handleReset writes        { start: relapseDate (same day) }
+    // Match either so we always merge the orphan back into the prior streak.
     const dayAfterRelapse = addDays(selectedMidnight, 1);
     const nextStreakIndex = updatedStreakHistory.findIndex(streak => {
       if (!streak.start) return false;
       const streakStart = toLocalMidnight(streak.start);
-      return streakStart && streakStart.getTime() === dayAfterRelapse.getTime();
+      if (!streakStart) return false;
+      return (
+        streakStart.getTime() === dayAfterRelapse.getTime() ||
+        streakStart.getTime() === selectedMidnight.getTime()
+      );
     });
-    
+
     // Merge: extend the relapse entry to continue (remove its end)
-    // and remove the subsequent streak if it exists
+    // and remove the subsequent streak if it exists.
+    // Preserve original start formats — re-running toDateString on legacy
+    // UTC-midnight Date objects shifts them back by a day in negative TZs.
     if (nextStreakIndex !== -1) {
-      // There's a streak after this relapse - merge them
       const nextStreak = updatedStreakHistory[nextStreakIndex];
-      
-      const mergedStart = toDateString(relapseEntry.start);
-      const mergedEnd = nextStreak.end ? toDateString(nextStreak.end) : null;
-      
+      const mergedEnd = nextStreak.end || null;
+
       updatedStreakHistory[relapseIndex] = {
-        start: mergedStart,
+        start: relapseEntry.start,
         end: mergedEnd,
-        days: mergedEnd 
-          ? differenceInDays(toLocalMidnight(mergedEnd), toLocalMidnight(mergedStart)) + 1
+        days: mergedEnd
+          ? differenceInDays(toLocalMidnight(mergedEnd), toLocalMidnight(relapseEntry.start)) + 1
           : null
       };
-      
-      // Remove the subsequent streak
+
       updatedStreakHistory.splice(nextStreakIndex, 1);
     } else {
-      // No streak after - just remove the end to make it active again
+      // No streak after — just reopen the relapse entry.
       updatedStreakHistory[relapseIndex] = {
-        start: toDateString(relapseEntry.start),
+        ...relapseEntry,
         end: null,
-        days: null
+        days: null,
+        reason: undefined,
+        trigger: undefined
       };
     }
-    
+
+    // Defensive cleanup: if prior buggy cycles left multiple open entries
+    // in history, collapse them. Keep only the earliest open entry — that's
+    // the user's actual ongoing streak — and drop the rest.
+    const openEntries = updatedStreakHistory
+      .map((s, idx) => ({ s, idx }))
+      .filter(({ s }) => !s.end);
+    if (openEntries.length > 1) {
+      openEntries.sort((a, b) =>
+        toLocalMidnight(a.s.start).getTime() - toLocalMidnight(b.s.start).getTime()
+      );
+      const keepIdx = openEntries[0].idx;
+      updatedStreakHistory = updatedStreakHistory.filter((s, idx) => s.end || idx === keepIdx);
+    }
+
     // Recalculate current streak
     const todayMidnight = new Date();
     todayMidnight.setHours(0, 0, 0, 0);
     const activeStreak = updatedStreakHistory.find(s => !s.end);
-    const newCurrentStreak = activeStreak 
+    const newCurrentStreak = activeStreak
       ? differenceInDays(todayMidnight, toLocalMidnight(activeStreak.start)) + 1
       : 0;
     
@@ -1517,7 +1554,9 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       streakHistory: updatedStreakHistory,
       currentStreak: newCurrentStreak,
       longestStreak: newLongestStreak,
-      startDate: activeStreak ? toDateString(activeStreak.start) : format(new Date(), 'yyyy-MM-dd'),
+      // safeStoredDateString preserves legacy UTC-midnight starts without
+      // the day-shift that toDateString's format() call introduces.
+      startDate: activeStreak ? safeStoredDateString(activeStreak.start) : format(new Date(), 'yyyy-MM-dd'),
       relapseCount: Math.max((userData.relapseCount || 1) - 1, 0)
     });
     
