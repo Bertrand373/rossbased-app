@@ -219,6 +219,10 @@
 
 /* ============================================================
    ANCHOR VOICE — sheet content shown for 7 days post-recovery
+   Mirrors the existing Oracle sheet vocabulary: small uppercase
+   labels in --text-muted, body in italic --text-secondary,
+   action button mirrors .btn-primary from App.css.
+   No new color introductions.
    ============================================================ */
 
 .oracle-pulse-anchor-day {
@@ -226,9 +230,9 @@
   text-align: center;
   margin-top: -16px;
   margin-bottom: 4px;
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 500;
-  color: rgba(212, 175, 55, 0.55);
+  color: var(--text-muted);
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }
@@ -236,18 +240,18 @@
 .oracle-pulse-anchor-why {
   font-size: 1.125rem;
   font-style: italic;
-  font-weight: 300;
-  color: rgba(212, 175, 55, 0.92);
+  font-weight: 400;
+  color: var(--text);
   line-height: 1.55;
-  margin: 8px 4px 14px;
+  margin: 14px 4px 18px;
   letter-spacing: 0.005em;
   text-align: center;
 }
 
 .oracle-pulse-anchor-divider {
   height: 1px;
-  background: var(--sheet-border, rgba(255, 255, 255, 0.08));
-  margin: 18px 8px;
+  background: var(--sheet-border, var(--border-subtle));
+  margin: 14px 8px;
 }
 
 .oracle-pulse-anchor-row {
@@ -277,25 +281,25 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  padding-top: 16px;
 }
 
 .oracle-pulse-anchor-cta {
   width: 100%;
   padding: 14px 22px;
-  background: rgba(212, 175, 55, 0.08);
-  border: 1px solid rgba(212, 175, 55, 0.55);
-  border-radius: 999px;
-  color: rgba(212, 175, 55, 0.95);
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  color: var(--text);
   font-size: 0.9375rem;
-  font-weight: 500;
+  font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  letter-spacing: 0.02em;
-  transition: background-color 200ms ease, border-color 200ms ease;
+  letter-spacing: 0.005em;
+  transition: border-color 150ms ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .oracle-pulse-anchor-cta:hover {
-  background: rgba(212, 175, 55, 0.14);
-  border-color: rgba(212, 175, 55, 0.8);
+  border-color: rgba(255, 255, 255, 0.25);
 }

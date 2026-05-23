@@ -1,8 +1,8 @@
 // src/components/Recovery/RecoveryFlow.js
 //
-// Five-screen guided flow that intercepts a relapse reset on the Tracker.
-// Captures trigger → reframes the streak → offers a free Oracle session →
-// records the user's anchor (why) → locks in tomorrow's action.
+// Four-screen guided flow that intercepts a relapse reset on the Tracker.
+// Captures trigger → reframes the streak → records the user's anchor →
+// locks in tomorrow's action (with an optional bonus Oracle handoff).
 //
 // On completion, POSTs to /api/recovery and calls onComplete so the
 // caller can perform the actual streak reset. The flow is fully skippable
@@ -31,6 +31,7 @@ const ANCHOR_ACTIONS = [
 
 const MAX_WHY = 280;
 const MAX_NOTE = 280;
+const TOTAL_STEPS = 4;
 
 const RecoveryFlow = ({ open, streak, userData, onComplete, onClose, onOpenOracle }) => {
   const [step, setStep] = useState(1);
@@ -145,24 +146,16 @@ const RecoveryFlow = ({ open, streak, userData, onComplete, onClose, onOpenOracl
 
   const StepProgress = () => (
     <div className="recovery-progress" aria-hidden="true">
-      {[1, 2, 3, 4, 5].map(n => (
-        <span key={n} className={`recovery-progress-dot${n <= step ? ' active' : ''}`} />
+      {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
+        <span key={i} className={`recovery-progress-dot${i + 1 <= step ? ' active' : ''}`} />
       ))}
     </div>
   );
 
-  const SkipLink = ({ label = 'Skip' }) => (
-    <button
-      type="button"
-      className="recovery-skip"
-      onClick={() => {
-        if (step < 5) setStep(step + 1);
-        else submit();
-      }}
-    >
-      {label}
-    </button>
-  );
+  const skipNext = () => {
+    if (step < TOTAL_STEPS) setStep(step + 1);
+    else submit();
+  };
 
   const renderStep = () => {
     if (step === 1) {
@@ -192,8 +185,8 @@ const RecoveryFlow = ({ open, streak, userData, onComplete, onClose, onOpenOracl
             rows={2}
           />
           <div className="recovery-actions">
-            <button className="recovery-primary" onClick={() => setStep(2)}>Continue</button>
-            <SkipLink />
+            <button className="btn-ghost" type="button" onClick={skipNext}>Skip</button>
+            <button className="btn-primary" type="button" onClick={() => setStep(2)}>Continue</button>
           </div>
         </>
       );
@@ -204,43 +197,16 @@ const RecoveryFlow = ({ open, streak, userData, onComplete, onClose, onOpenOracl
       return (
         <>
           <span className="recovery-eyebrow">The climb</span>
-          <h2 className="recovery-title recovery-title-large">{reframe.headline}</h2>
+          <h2 className="recovery-headline">{reframe.headline}</h2>
           <p className="recovery-reframe">{reframe.line}</p>
-          <div className="recovery-actions">
-            <button className="recovery-primary" onClick={() => setStep(3)}>Keep going</button>
+          <div className="recovery-actions recovery-actions-single">
+            <button className="btn-primary" type="button" onClick={() => setStep(3)}>Keep going</button>
           </div>
         </>
       );
     }
 
     if (step === 3) {
-      // ── ORACLE OFFER ───────────────────────────────────────────
-      return (
-        <>
-          <span className="recovery-eyebrow">Bonus</span>
-          <h2 className="recovery-title">Talk it through with the Oracle?</h2>
-          <p className="recovery-sub">One message on the house. Doesn't count toward your daily limit.</p>
-          <div className="recovery-actions recovery-actions-stack">
-            <button
-              className="recovery-primary"
-              onClick={() => setStep(4)}
-              data-defer-oracle
-            >
-              First — write my anchor
-            </button>
-            <button
-              className="recovery-ghost"
-              onClick={() => setStep(4)}
-            >
-              Save it for later
-            </button>
-          </div>
-          <p className="recovery-fineprint">You'll get the chance to open Oracle right after locking in your anchor.</p>
-        </>
-      );
-    }
-
-    if (step === 4) {
       // ── ANCHOR (WHY) ──────────────────────────────────────────
       return (
         <>
@@ -258,20 +224,21 @@ const RecoveryFlow = ({ open, streak, userData, onComplete, onClose, onOpenOracl
           />
           <div className="recovery-counter">{why.length}/{MAX_WHY}</div>
           <div className="recovery-actions">
+            <button className="btn-ghost" type="button" onClick={skipNext}>Skip</button>
             <button
-              className="recovery-primary"
+              className="btn-primary"
+              type="button"
               disabled={!why.trim()}
-              onClick={() => setStep(5)}
+              onClick={() => setStep(4)}
             >
               Continue
             </button>
-            <SkipLink />
           </div>
         </>
       );
     }
 
-    // Step 5 — TOMORROW'S ACTION
+    // ── TOMORROW'S ACTION ──────────────────────────────────────
     return (
       <>
         <span className="recovery-eyebrow">Tomorrow</span>
@@ -306,20 +273,23 @@ const RecoveryFlow = ({ open, streak, userData, onComplete, onClose, onOpenOracl
             autoFocus
           />
         )}
-        <div className="recovery-actions recovery-actions-stack">
+        <p className="recovery-bonus-note">One bonus Oracle message available — doesn't count toward your daily limit.</p>
+        <div className="recovery-actions">
           <button
-            className="recovery-primary"
-            disabled={submitting}
-            onClick={() => submit({ openOracleAfter: true })}
-          >
-            Lock in &amp; open Oracle
-          </button>
-          <button
-            className="recovery-ghost"
+            className="btn-ghost"
+            type="button"
             disabled={submitting}
             onClick={() => submit({ openOracleAfter: false })}
           >
             Lock in
+          </button>
+          <button
+            className="btn-primary"
+            type="button"
+            disabled={submitting}
+            onClick={() => submit({ openOracleAfter: true })}
+          >
+            Open Oracle
           </button>
         </div>
       </>
