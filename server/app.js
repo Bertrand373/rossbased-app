@@ -1788,7 +1788,7 @@ app.post('/api/ai/chat/stream', authenticate, oracleLimiter, async (req, res) =>
     }
 
     // Admin, free-access credit, or one-shot recovery bypass — skip all rate limits
-    if (isAdminUser || hasFreeAccess || hasRecoveryBypass) {
+    if (isAdminUser || hasFreeAccess || useRecoveryBypass) {
       // no-op: fall through to Oracle response
     } else if (isBetaPeriod && currentCount >= BETA_DAILY_LIMIT) {
       return res.status(429).json({ 
@@ -1822,7 +1822,7 @@ app.post('/api/ai/chat/stream', authenticate, oracleLimiter, async (req, res) =>
     if (isAdminUser || hasFreeAccess) {
       preStreamRemaining = 999;
       userTier = isAdminUser ? 'admin' : (isAscended ? 'ascended' : userHasPremium ? 'premium' : isPureOG ? 'grandfathered' : 'free');
-    } else if (hasRecoveryBypass) {
+    } else if (useRecoveryBypass) {
       preStreamRemaining = 999;
       userTier = 'recovery';
     } else if (isBetaPeriod) {
@@ -2072,7 +2072,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
     // Update usage after successful stream.
     // Recovery bypass: don't burn a daily/weekly slot — only decrement the bypass
     // counter and bump lifetimeCount/lastUsed. The bonus message is truly extra.
-    if (hasRecoveryBypass) {
+    if (useRecoveryBypass) {
       await User.findOneAndUpdate(
         { username: req.user.username },
         {
@@ -2295,7 +2295,7 @@ Examples:
       effectiveUsed = currentCount + 1;
       effectiveLimit = 999;
       messagesRemaining = 999;
-    } else if (hasRecoveryBypass) {
+    } else if (useRecoveryBypass) {
       // Bypass doesn't burn a slot — report today's count unchanged.
       effectiveUsed = currentCount;
       effectiveLimit = 999;
