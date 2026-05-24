@@ -70,6 +70,13 @@ const SCENES = {
     poster: '/videos/sanctum/goldenhour-poster.jpg',
     durationSec: 10,
   },
+
+  woodfire: {
+    type: 'video',
+    src: '/videos/sanctum/woodfire.mp4',
+    poster: '/videos/sanctum/woodfire-poster.jpg',
+    durationSec: 10,
+  },
 };
 
 const DEFAULT_SCENE = 'golden';
@@ -82,6 +89,7 @@ export const SCENE_META = [
   { key: 'golden',     label: 'Golden Smoke', tag: 'Origin temple. Warm, abundant.' },
   { key: 'jade',       label: 'Jade Mist',    tag: 'Mineral stillness. Wide, calm.' },
   { key: 'goldenhour', label: 'Golden Hour',  tag: 'Sun on water. Quiet horizon.' },
+  { key: 'woodfire',   label: 'Woodfire',     tag: 'Forest hearth. Pine and smoke.' },
 ];
 
 // Swatch colors for the picker thumbnails — sampled from each palette's brightest stop.
@@ -89,6 +97,7 @@ export const SCENE_SWATCH = {
   golden:     'rgb(212, 175, 55)',
   jade:       'rgb(165, 220, 190)',
   goldenhour: 'rgb(245, 175, 100)',
+  woodfire:   'rgb(200, 100, 40)',
 };
 
 const resolveSceneKey = (sceneProp) => {
