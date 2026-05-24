@@ -411,14 +411,20 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
     setTimeout(handleSwipeDismiss, 300);
   });
 
-  // Reset streak (relapse) - keep toast, this is significant
-  const handleReset = () => {
+  // Reset streak (relapse) - keep toast, this is significant.
+  // Optional args carry the just-saved recovery covenant (from RecoveryFlow):
+  //   recoveryEntry  — the {date, trigger, why, anchor, dayCount} object
+  //   newBypassCount — recoveryBypassRemaining returned by the server
+  // Including them in this same updateUserData call lets OraclePulse remount
+  // with the anchor voice immediately — its key depends on
+  // userData.recoveryHistory.length.
+  const handleReset = (recoveryEntry = null, newBypassCount = null) => {
     const now = new Date();
     const todayStr = toDateString(now);
     const history = [...(userData.streakHistory || [])];
     const currentIdx = history.findIndex(s => !s.end);
     const lunar = getLunarData(now);
-    
+
     if (currentIdx !== -1) {
       history[currentIdx] = {
         ...history[currentIdx],
@@ -437,13 +443,20 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
     // ONE-BASED COUNTING: New streak starts at Day 1 (today)
     history.push({ start: todayStr, end: null, days: 1 });
 
-    updateUserData({
+    const updatePayload = {
       currentStreak: 1,
       startDate: todayStr,
       streakHistory: history,
-      lastRelapse: todayStr, 
-      relapseCount: (userData.relapseCount || 0) + 1 
-    });
+      lastRelapse: todayStr,
+      relapseCount: (userData.relapseCount || 0) + 1
+    };
+    if (recoveryEntry) {
+      updatePayload.recoveryHistory = [...(userData.recoveryHistory || []), recoveryEntry];
+    }
+    if (typeof newBypassCount === 'number') {
+      updatePayload.recoveryBypassRemaining = newBypassCount;
+    }
+    updateUserData(updatePayload);
 
     // NEW: Notify InterventionService for ML feedback loop
     // This marks any pending interventions within 48-hour window as "failed"
@@ -1620,16 +1633,33 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
         onAlert={handlePatternAlert}
       />
 
-      {/* Relapse Recovery Flow — five-screen covenant after a confirmed relapse */}
+      {/* Relapse Recovery Flow — four-screen covenant after a confirmed relapse */}
       <RecoveryFlow
         open={showRecoveryFlow}
         streak={recoveryStreakSnapshot}
         userData={userData}
-        onComplete={() => {
+        onComplete={(payload, response) => {
           setShowRecoveryFlow(false);
-          handleReset();
+          // Use the server's stored entry when available; fall back to the
+          // local payload if the POST failed (offline / flaky network). Either
+          // way the entry lands in local userData so OraclePulse remounts
+          // with the anchor voice immediately.
+          const entry = response?.entry || {
+            date: new Date().toISOString(),
+            trigger: payload?.trigger || '',
+            triggerNote: payload?.triggerNote || '',
+            why: payload?.why || '',
+            anchor: payload?.anchor || '',
+            dayCount: payload?.dayCount || 0
+          };
+          const newBypass = typeof response?.recoveryBypassRemaining === 'number'
+            ? response.recoveryBypassRemaining
+            : (userData.recoveryBypassRemaining || 0) + 1;
+          handleReset(entry, newBypass);
         }}
         onClose={() => {
+          // Closed mid-flow without submitting — still reset the streak but
+          // don't append a recovery entry (none was captured).
           setShowRecoveryFlow(false);
           handleReset();
         }}
