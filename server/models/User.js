@@ -338,7 +338,22 @@ const userSchema = new mongoose.Schema({
   // One-shot Oracle message bypass granted by the recovery flow.
   // Lets the user spend one bonus message that ignores daily/weekly limits.
   // Decremented when chat-stream consumes it via useRecoveryBypass flag.
-  recoveryBypassRemaining: { type: Number, default: 0 }
+  recoveryBypassRemaining: { type: Number, default: 0 },
+
+  // Circle — the user's accountability group (3-5 people, invite-only).
+  // One circle per user to prevent fragmentation. circleId is null until
+  // they create or join one. Membership is also stored in Circle.members
+  // for fast lookups; this field is the inverse pointer so the Tracker
+  // can show the circle without an extra join query.
+  circleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Circle', default: null },
+
+  // Per-user Circle preferences. Both default true so the feature is
+  // visible and useful out of the box; users can opt down individual
+  // pieces from the manage-circle menu.
+  circlePrefs: {
+    shareNote: { type: Boolean, default: true },         // include the optional 140-char note when broadcasting
+    autoShareCheckIn: { type: Boolean, default: true }   // prompt to share after each daily log
+  }
 
 }, {
   timestamps: true

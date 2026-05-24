@@ -1,5 +1,5 @@
 // App.js - TITANTRACK MODERN MINIMAL
-import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
+import React, { useState, useEffect, useRef, useCallback, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster, toast } from 'react-hot-toast';
 import './App.css';
@@ -45,6 +45,9 @@ import Timeline from './components/Timeline/Timeline';
 
 // AMBIENT AI HOOKS - Auto-train only (risk indicator removed, floating card handles alerts)
 import { useAutoTrain } from './hooks/useAutoTrain';
+import { CircleProvider } from './hooks/useCircle';
+import CircleStack from './components/Circle/CircleStack';
+import CircleSheet from './components/Circle/CircleSheet';
 
 // Mixpanel Analytics
 import { initMixpanel, identifyUser, trackAppOpen, trackPageView, trackLogout, resetMixpanel } from './utils/mixpanel';
@@ -602,36 +605,38 @@ function App() {
 
   return (
     <ThemeProvider>
-      <AppContent 
-        isLoggedIn={isLoggedIn}
-        userData={userData}
-        isPremium={isPremium}
-        updateUserData={updateUserData}
-        setGoal={setGoal}
-        cancelGoal={cancelGoal}
-        logout={logout}
-        handleLogin={handleLogin}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        shouldNavigateToTracker={shouldNavigateToTracker}
-        setShouldNavigateToTracker={setShouldNavigateToTracker}
-        showAIChat={showAIChat}
-        setShowAIChat={setShowAIChat}
-        openOracle={openOracle}
-        oracleHasUnread={oracleHasUnread}
-        setOracleHasUnread={setOracleHasUnread}
-        isMobile={isMobile}
-        hasSubscription={hasSubscription}
-        isGrandfathered={isGrandfathered}
-        isTrial={isTrial}
-        trialDaysLeft={trialDaysLeft}
-        subLoading={subLoading}
-        hasUsedTrial={hasUsedTrial}
-        subscriptionStatus={subscriptionStatus}
-        createCheckout={createCheckout}
-        openPortal={openPortal}
-        refreshSubscription={refreshSubscription}
-      />
+      <CircleProvider isLoggedIn={isLoggedIn}>
+        <AppContent
+          isLoggedIn={isLoggedIn}
+          userData={userData}
+          isPremium={isPremium}
+          updateUserData={updateUserData}
+          setGoal={setGoal}
+          cancelGoal={cancelGoal}
+          logout={logout}
+          handleLogin={handleLogin}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          shouldNavigateToTracker={shouldNavigateToTracker}
+          setShouldNavigateToTracker={setShouldNavigateToTracker}
+          showAIChat={showAIChat}
+          setShowAIChat={setShowAIChat}
+          openOracle={openOracle}
+          oracleHasUnread={oracleHasUnread}
+          setOracleHasUnread={setOracleHasUnread}
+          isMobile={isMobile}
+          hasSubscription={hasSubscription}
+          isGrandfathered={isGrandfathered}
+          isTrial={isTrial}
+          trialDaysLeft={trialDaysLeft}
+          subLoading={subLoading}
+          hasUsedTrial={hasUsedTrial}
+          subscriptionStatus={subscriptionStatus}
+          createCheckout={createCheckout}
+          openPortal={openPortal}
+          refreshSubscription={refreshSubscription}
+        />
+      </CircleProvider>
     </ThemeProvider>
   );
 }
@@ -674,7 +679,12 @@ function AppContent({
   // Plan modal state - single upgrade flow for the entire app
   const [showPlanModal, setShowPlanModal] = useState(false);
   const openPlanModal = () => setShowPlanModal(true);
-  
+
+  // Circle sheet state — owned at app level so any surface can open it
+  // (header CircleStack on every tab, post-log CheckInSheet, etc).
+  const [showCircleSheet, setShowCircleSheet] = useState(false);
+  const openCircleSheet = useCallback(() => setShowCircleSheet(true), []);
+
   const { theme } = useTheme();
 
   // Pending admin replies to user-submitted feedback (bug responses, etc).
@@ -764,6 +774,7 @@ function AppContent({
               {!isMobile && <HeaderNavigation onOracleClick={openOracle} />}
               
               <div className="header-actions">
+                <CircleStack onClick={openCircleSheet} />
                 <DiscordButton />
                 <ProfileButton userData={userData} />
               </div>
@@ -870,6 +881,13 @@ function AppContent({
               pending={feedbackReplies}
               onAcknowledge={ackFeedbackReply}
               suppress={!userData?.hasSeenOnboarding}
+            />
+
+            <CircleSheet
+              open={showCircleSheet}
+              onClose={() => setShowCircleSheet(false)}
+              viewerUsername={userData?.username}
+              currentStreak={userData?.currentStreak || 0}
             />
           </>
         ) : (
