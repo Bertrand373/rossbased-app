@@ -118,9 +118,15 @@ const RecoveryFlow = ({ open, streak, userData, onComplete, onClose, onOpenOracl
       dayCount: streak || 0
     };
 
+    // Server returns { success, entry, recoveryBypassRemaining }. We pass that
+    // through to onComplete so the Tracker can merge the entry into local
+    // userData in the same updateUserData call as the streak reset — which
+    // bumps the OraclePulse remount key and makes YOUR ANCHOR appear without
+    // requiring a navigate/refresh.
+    let responseData = null;
     try {
       const token = localStorage.getItem('token');
-      await fetch(`${API_URL}/api/recovery`, {
+      const res = await fetch(`${API_URL}/api/recovery`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -128,14 +134,18 @@ const RecoveryFlow = ({ open, streak, userData, onComplete, onClose, onOpenOracl
         },
         body: JSON.stringify(payload)
       });
+      if (res.ok) {
+        responseData = await res.json();
+      }
     } catch (err) {
       // Non-blocking — recovery flow still completes locally so the user
-      // doesn't get stuck on a flaky network.
+      // doesn't get stuck on a flaky network. onComplete still fires; the
+      // Tracker will fall back to a locally-constructed entry below.
       console.warn('Recovery save failed (non-blocking):', err);
     }
 
     closeFlow(() => {
-      if (onComplete) onComplete(payload);
+      if (onComplete) onComplete(payload, responseData);
       if (openOracleAfter && onOpenOracle) onOpenOracle(payload);
     });
   }, [submitting, trigger, triggerNote, why, finalAnchor, streak, closeFlow, onComplete, onOpenOracle]);
