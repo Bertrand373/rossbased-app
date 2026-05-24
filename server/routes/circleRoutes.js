@@ -114,9 +114,61 @@ function computeBenefitSummary(user) {
   return parts.join(' · ') + '.';
 }
 
+// Build the same client-facing circle shape that /mine returns: members
+// hydrated with profile + reported state, plus viewerReportedToday.
+// Used by GET /mine AND by POST /circles + POST /circles/join so the
+// client can set its state directly from the action response without a
+// follow-up refresh round-trip (which was racing the create flow).
+async function buildFullCirclePayload(circle, viewerUsername, date) {
+  const memberUsernames = circle.members.map(m => m.username);
+  const [profiles, checkIns] = await Promise.all([
+    buildMemberProfiles(memberUsernames),
+    CircleCheckIn.find({ circleId: circle._id, date }).lean()
+  ]);
+  const checkInByUser = Object.fromEntries(checkIns.map(c => [c.username, c]));
+
+  const members = circle.members.map(m => {
+    const profile = profiles[m.username] || {
+      username: m.username,
+      displayName: m.username,
+      avatarUrl: null,
+      initial: (m.username || '?').charAt(0).toUpperCase(),
+      currentStreak: 0
+    };
+    const check = checkInByUser[m.username] || null;
+    return {
+      ...profile,
+      role: m.role,
+      joinedAt: m.joinedAt,
+      reported: !!check,
+      note: check?.note || '',
+      benefitSummary: check?.benefitSummary || '',
+      streakDayAtCheckIn: check?.streakDay ?? null,
+      checkedInAt: check?.createdAt || null
+    };
+  });
+
+  return {
+    ...serializeCircle(circle),
+    members,
+    viewerReportedToday: !!checkInByUser[viewerUsername]
+  };
+}
+
+// Resolve the date the client should use for today's check-in window.
+// Accepts a yyyy-MM-dd string in req.body or req.query, falls back to
+// UTC today. Centralized so create/join/mine all agree on the key.
+function resolveLocalDate(req) {
+  const fromBody = req.body?.date;
+  const fromQuery = req.query?.date;
+  const cand = fromBody || fromQuery;
+  if (typeof cand === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(cand)) return cand;
+  return new Date().toISOString().slice(0, 10);
+}
+
 // ────────────────────────────────────────────────────────────────────────
 // POST /api/circles — create a new circle
-// Body: { name: string }
+// Body: { name: string, date?: 'yyyy-MM-dd' (for today's check-in window) }
 // ────────────────────────────────────────────────────────────────────────
 router.post('/', async (req, res) => {
   try {
@@ -153,7 +205,11 @@ router.post('/', async (req, res) => {
 
     await User.updateOne({ username }, { $set: { circleId: circle._id } });
 
-    res.json({ ok: true, circle: serializeCircle(circle) });
+    // Return the full hydrated shape so the client can setCircle directly
+    // (no follow-up GET needed; eliminates the create→stale-header race).
+    const date = resolveLocalDate(req);
+    const payload = await buildFullCirclePayload(circle, username, date);
+    res.json({ ok: true, circle: payload });
   } catch (err) {
     console.error('Circle create error:', err);
     res.status(500).json({ error: err.message });
@@ -203,7 +259,11 @@ router.post('/join', async (req, res) => {
     }
 
     await User.updateOne({ username }, { $set: { circleId: updated._id } });
-    res.json({ ok: true, circle: serializeCircle(updated) });
+
+    // Return the full hydrated shape so the client can setCircle directly.
+    const date = resolveLocalDate(req);
+    const payload = await buildFullCirclePayload(updated, username, date);
+    res.json({ ok: true, circle: payload });
   } catch (err) {
     console.error('Circle join error:', err);
     res.status(500).json({ error: err.message });
@@ -217,9 +277,7 @@ router.post('/join', async (req, res) => {
 router.get('/mine', async (req, res) => {
   try {
     const username = req.user.username;
-    const date = typeof req.query.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(req.query.date)
-      ? req.query.date
-      : new Date().toISOString().slice(0, 10);
+    const date = resolveLocalDate(req);
 
     const me = await User.findOne({ username }, { circleId: 1 }).lean();
     if (!me?.circleId) return res.json({ ok: true, circle: null });
@@ -231,43 +289,8 @@ router.get('/mine', async (req, res) => {
       return res.json({ ok: true, circle: null });
     }
 
-    const memberUsernames = circle.members.map(m => m.username);
-    const [profiles, checkIns] = await Promise.all([
-      buildMemberProfiles(memberUsernames),
-      CircleCheckIn.find({ circleId: circle._id, date }).lean()
-    ]);
-
-    const checkInByUser = Object.fromEntries(checkIns.map(c => [c.username, c]));
-
-    const members = circle.members.map(m => {
-      const profile = profiles[m.username] || {
-        username: m.username,
-        displayName: m.username,
-        avatarUrl: null,
-        initial: (m.username || '?').charAt(0).toUpperCase(),
-        currentStreak: 0
-      };
-      const check = checkInByUser[m.username] || null;
-      return {
-        ...profile,
-        role: m.role,
-        joinedAt: m.joinedAt,
-        reported: !!check,
-        note: check?.note || '',
-        benefitSummary: check?.benefitSummary || '',
-        streakDayAtCheckIn: check?.streakDay ?? null,
-        checkedInAt: check?.createdAt || null
-      };
-    });
-
-    res.json({
-      ok: true,
-      circle: {
-        ...serializeCircle(circle),
-        members,
-        viewerReportedToday: !!checkInByUser[username]
-      }
-    });
+    const payload = await buildFullCirclePayload(circle, username, date);
+    res.json({ ok: true, circle: payload });
   } catch (err) {
     console.error('Circle mine error:', err);
     res.status(500).json({ error: err.message });

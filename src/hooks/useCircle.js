@@ -52,26 +52,36 @@ export function CircleProvider({ children, isLoggedIn }) {
   const [loading, setLoading] = useState(false);
   const mountedRef = useRef(true);
 
+  // Version token for refresh. Each refresh call bumps this; the response
+  // handler only commits state if its token is still the latest. Without
+  // this, two concurrent refreshes (e.g. action + focus event) could
+  // resolve out of order and the stale one would clobber the fresh state.
+  const refreshTokenRef = useRef(0);
+
   useEffect(() => () => { mountedRef.current = false; }, []);
 
   const todayLocal = getLocalDateString();
 
-  // Single read path. Anything that mutates state should call this
-  // afterward so the UI snaps to the truth.
+  // Single read path. Mutations now also setCircle directly from their
+  // response (see createCircle/joinByCode/leave/submitCheckIn/removeCheckIn
+  // below), so refresh is mainly for app-open, tab-focus, and recovery.
   const refresh = useCallback(async () => {
     if (!isLoggedIn) {
       setCircle(null);
       return null;
     }
+    const token = ++refreshTokenRef.current;
     setLoading(true);
     try {
       const data = await apiFetch(`/api/circles/mine?date=${getLocalDateString()}`);
-      if (!mountedRef.current) return data;
+      // Discard if a newer refresh started after us — prevents stale
+      // responses from overwriting fresh state.
+      if (!mountedRef.current || token !== refreshTokenRef.current) return data;
       setCircle(data?.circle || null);
       return data;
     } catch (err) {
       console.warn('Circle fetch failed:', err.message);
-      if (mountedRef.current) setCircle(null);
+      if (mountedRef.current && token === refreshTokenRef.current) setCircle(null);
       return null;
     } finally {
       if (mountedRef.current) setLoading(false);
@@ -91,30 +101,47 @@ export function CircleProvider({ children, isLoggedIn }) {
     return () => window.removeEventListener('focus', onFocus);
   }, [isLoggedIn, refresh]);
 
+  // Mutations setCircle directly from the response so the UI updates
+  // in the same render cycle as the action — no second round-trip, no
+  // race with focus-triggered refreshes. Bumping refreshTokenRef on
+  // each direct write makes any in-flight refresh ignore its response
+  // (since its captured token is now stale).
+  const applyCircle = useCallback((next) => {
+    refreshTokenRef.current++;
+    setCircle(next);
+  }, []);
+
   const createCircle = useCallback(async (name) => {
-    const data = await apiFetch('/api/circles', { method: 'POST', body: { name } });
-    await refresh();
+    const data = await apiFetch('/api/circles', {
+      method: 'POST',
+      body: { name, date: getLocalDateString() }
+    });
+    if (data?.circle) applyCircle(data.circle);
     return data;
-  }, [refresh]);
+  }, [applyCircle]);
 
   const joinByCode = useCallback(async (code) => {
-    const data = await apiFetch('/api/circles/join', { method: 'POST', body: { code } });
-    await refresh();
+    const data = await apiFetch('/api/circles/join', {
+      method: 'POST',
+      body: { code, date: getLocalDateString() }
+    });
+    if (data?.circle) applyCircle(data.circle);
     return data;
-  }, [refresh]);
+  }, [applyCircle]);
 
   const leave = useCallback(async () => {
     const data = await apiFetch('/api/circles/leave', { method: 'DELETE' });
-    setCircle(null);
-    await refresh();
+    applyCircle(null);
     return data;
-  }, [refresh]);
+  }, [applyCircle]);
 
   const submitCheckIn = useCallback(async ({ note = '', streakDay = 0 } = {}) => {
     const data = await apiFetch('/api/circles/check-in', {
       method: 'POST',
       body: { date: getLocalDateString(), note, streakDay }
     });
+    // Check-in response only carries the new check-in row; we need a
+    // refresh for the full member shape (others' reported state, etc).
     await refresh();
     return data;
   }, [refresh]);
