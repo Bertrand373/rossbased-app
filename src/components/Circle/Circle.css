@@ -12,7 +12,18 @@
    HEADER STACK
    ============================================================ */
 
+/* ────────────────────────────────────────────────────────────
+   Slot-based stack. Width is stable: minimum 3 slots, grows up
+   to 5 as the circle fills. Every slot is the same size; "empty"
+   slots get a dashed ring style, "member" slots get the avatar.
+   Mobile bumps the size down slightly so 5-wide still breathes
+   next to Discord + Profile on narrow screens.
+   ──────────────────────────────────────────────────────────── */
+
 .circle-stack {
+  --circle-avatar-size: 26px;
+  --circle-avatar-overlap: 8px;
+
   appearance: none;
   display: inline-flex;
   align-items: center;
@@ -28,44 +39,20 @@
   transform: scale(0.96);
 }
 
-/* Empty state — single dashed ring with "+" */
-.circle-stack-empty-ring {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 1px dashed var(--border-prominent);
-  color: var(--text-muted);
-  transition: border-color 200ms ease, color 200ms ease;
-}
-
-.circle-stack-empty:hover .circle-stack-empty-ring {
-  border-color: var(--text-secondary);
-  color: var(--text-secondary);
-}
-
-.circle-stack-empty-plus {
-  font-size: 0.875rem;
-  font-weight: 400;
-  line-height: 1;
-  transform: translateY(-1px);
-}
-
-/* Stacked avatars — overlapping, mount staggers from left */
+/* Every slot — both members and empty seats. Uniform sizing keeps
+   overlap math predictable and prevents jank when slots fill. */
 .circle-stack-avatar {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: var(--circle-avatar-size);
+  height: var(--circle-avatar-size);
   border-radius: 50%;
   background: var(--surface-overlay);
-  border: 1.5px solid var(--background, #000);  /* outer dark gap — separates overlapping rings */
-  box-shadow: 0 0 0 1px var(--border-subtle);     /* inner subtle ring */
-  margin-left: -8px;
+  border: 1.5px solid var(--background, #000);   /* outer dark separator so overlapping rings stay distinct */
+  box-shadow: 0 0 0 1px var(--border-subtle);    /* inner subtle ring */
+  margin-left: calc(var(--circle-avatar-overlap) * -1);
   overflow: hidden;
   opacity: 0;
   animation: circle-stack-fadein 320ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -76,6 +63,45 @@
   margin-left: 0;
 }
 
+/* Empty slot — dashed instead of solid, no fill, no inner ring. */
+.circle-stack-avatar.empty {
+  background: transparent;
+  border-color: var(--background, #000);          /* keep the separator gap */
+  box-shadow: 0 0 0 1px var(--border-prominent);
+  /* Render the dashed ring as a pseudo-element so the outer 1.5px
+     separator gap still works on overlapping siblings. */
+}
+
+.circle-stack-avatar.empty::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  border: 1px dashed var(--border-prominent);
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* The + glyph (only on the first empty slot when there's no circle).
+   Subtle — it's a quiet hint, not a shouting CTA. */
+.circle-stack-plus {
+  font-size: 0.875rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--text-muted);
+  transform: translateY(-1px);
+  transition: color 200ms ease;
+}
+
+.circle-stack.is-prompt:hover .circle-stack-avatar.empty::after {
+  opacity: 1;
+  border-color: var(--text-secondary);
+}
+
+.circle-stack.is-prompt:hover .circle-stack-plus {
+  color: var(--text-secondary);
+}
+
 /* Reported today — gold inner ring. Single pulse on first paint. */
 .circle-stack-avatar.reported {
   box-shadow: 0 0 0 1.5px rgba(212, 175, 55, 0.7);
@@ -84,8 +110,8 @@
     circle-stack-pulse 900ms cubic-bezier(0.16, 1, 0.3, 1) 380ms;
 }
 
-/* All members reported — quiet stack-wide glow */
-.circle-stack.all-reported .circle-stack-avatar {
+/* All members reported — quiet stack-wide glow (only on filled slots) */
+.circle-stack.all-reported .circle-stack-avatar:not(.empty) {
   box-shadow: 0 0 0 1.5px rgba(212, 175, 55, 0.85);
 }
 
@@ -112,6 +138,25 @@
   0%   { box-shadow: 0 0 0 1.5px rgba(212, 175, 55, 0.7); }
   50%  { box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.45); }
   100% { box-shadow: 0 0 0 1.5px rgba(212, 175, 55, 0.7); }
+}
+
+/* Mobile — tighten so a full 5-wide stack stays comfortable next
+   to Discord + Profile on narrow screens (320–480px).
+   Math at 480px: 22px × 5 - 6px × 4 = 86px total, plus the 8-10px
+   header-actions gaps and Discord(30) + Profile(30) ≈ 156px;
+   the smallest device (320px) has ~152px of right-side budget,
+   so this fits with a hair to spare. */
+@media (max-width: 480px) {
+  .circle-stack {
+    --circle-avatar-size: 22px;
+    --circle-avatar-overlap: 6px;
+  }
+  .circle-stack-plus {
+    font-size: 0.75rem;
+  }
+  .circle-stack-initial {
+    font-size: 0.5625rem;
+  }
 }
 
 /* ============================================================
