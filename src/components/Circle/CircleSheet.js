@@ -36,18 +36,31 @@ const CircleSheet = ({ open, onClose, viewerUsername, currentStreak }) => {
   const [submitting, setSubmitting] = useState(false);
   const [showManage, setShowManage] = useState(false);
 
+  // Capture "started in empty flow" at open time. Without this, the
+  // moment a user finishes Create (which populates `circle` in context),
+  // this component would flip from rendering CircleEmptySheet to the
+  // full circle view — yanking the code-reveal screen out from under
+  // them. We keep them in CircleEmptySheet for the full duration of
+  // the open, regardless of when `circle` populates.
+  const [startedEmpty, setStartedEmpty] = useState(false);
+
   useEffect(() => {
     if (open) {
       // Pull fresh data every time the sheet opens — members may have
       // checked in since the last render.
       refresh();
+      // Snapshot empty-ness exactly once per open. The intentional miss
+      // of `circle` in the dep array is what keeps the flow stable.
+      setStartedEmpty(!circle);
       requestAnimationFrame(() => requestAnimationFrame(() => setSheetReady(true)));
     } else {
       setSheetReady(false);
       setShowCheckInEditor(false);
       setShowManage(false);
       setNoteDraft('');
+      setStartedEmpty(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, refresh]);
 
   const closeSheet = useCallback((cb) => {
@@ -57,9 +70,11 @@ const CircleSheet = ({ open, onClose, viewerUsername, currentStreak }) => {
 
   useSheetSwipe(sheetPanelRef, open, () => closeSheet(() => onClose && onClose()));
 
-  // ─── Empty state — no circle yet ─────────────────────────────────
-  // CircleEmptySheet handles its own portal/animation; we just defer.
-  if (open && !circle) {
+  // ─── Empty / create-join flow ─────────────────────────────────
+  // Stay in the empty-sheet for the entire lifecycle of this open if
+  // the user started there — that lets the post-create "code reveal"
+  // step render without being unmounted by the context refresh.
+  if (open && (startedEmpty || !circle)) {
     return <CircleEmptySheet open={open} onClose={onClose} />;
   }
 
