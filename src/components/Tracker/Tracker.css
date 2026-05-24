@@ -96,6 +96,25 @@
   );
 }
 
+.sanctum-video-backplate[data-scene="woodfire"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  /* Woodfire is inverted from Golden Hour — the dark forest sits at top
+     (light dim), the bright flames sit at the bottom (heaviest dim, so
+     the Oracle quote stays readable against the orange fire). Middle band
+     is the smoke column — moderate dim under the streak number. */
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.30) 0%,
+    rgba(0, 0, 0, 0.40) 40%,
+    rgba(0, 0, 0, 0.50) 70%,
+    rgba(0, 0, 0, 0.60) 100%
+  );
+}
+
 /* Smoke bleeds through header and nav on Tracker tab */
 /* transition-duration: 0ms = instant on entering tracker */
 /* Base 400ms transition on .app-header/.mobile-nav handles smooth fade back on leaving */
