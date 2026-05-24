@@ -89,7 +89,7 @@ export const SCENE_META = [
   { key: 'golden',     label: 'Golden Smoke', tag: 'Origin temple. Warm, abundant.' },
   { key: 'jade',       label: 'Jade Mist',    tag: 'Mineral stillness. Wide, calm.' },
   { key: 'goldenhour', label: 'Golden Hour',  tag: 'Sun on water. Quiet horizon.' },
-  { key: 'woodfire',   label: 'Woodfire',     tag: 'Forest hearth. Pine and smoke.' },
+  { key: 'woodfire',   label: 'Woodfire',     tag: 'Coals and ash. Living embers.' },
 ];
 
 // Swatch colors for the picker thumbnails — sampled from each palette's brightest stop.

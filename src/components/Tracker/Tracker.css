@@ -102,16 +102,19 @@
   inset: 0;
   pointer-events: none;
   z-index: 1;
-  /* Woodfire is inverted from Golden Hour — the dark forest sits at top
-     (light dim), the bright flames sit at the bottom (heaviest dim, so
-     the Oracle quote stays readable against the orange fire). Middle band
-     is the smoke column — moderate dim under the streak number. */
+  /* Macro embers composition — light-grey ashy smoke fills the top half
+     (medium-bright, fights white header text) and bright orange flames +
+     glowing embers fill the bottom half (brightest part of the frame).
+     Unlike Golden Hour or the previous forest Woodfire, there is no
+     naturally dark region — heavy dim sustained across 45-80% to keep
+     the streak number AND Oracle quote readable. Tapered slightly at
+     the very bottom so the embers still glow through. */
   background: linear-gradient(
     180deg,
-    rgba(0, 0, 0, 0.30) 0%,
-    rgba(0, 0, 0, 0.40) 40%,
-    rgba(0, 0, 0, 0.50) 70%,
-    rgba(0, 0, 0, 0.60) 100%
+    rgba(0, 0, 0, 0.50) 0%,
+    rgba(0, 0, 0, 0.65) 45%,
+    rgba(0, 0, 0, 0.65) 80%,
+    rgba(0, 0, 0, 0.55) 100%
   );
 }
 
