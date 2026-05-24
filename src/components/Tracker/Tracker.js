@@ -16,6 +16,8 @@ import EnergyAlmanac from '../EnergyAlmanac/EnergyAlmanac';
 import OnboardingGuide from '../OnboardingGuide/OnboardingGuide';
 import OraclePulse from '../OraclePulse/OraclePulse';
 import RecoveryFlow from '../Recovery/RecoveryFlow';
+import CheckInSheet from '../Circle/CheckInSheet';
+import { useCircle } from '../../hooks/useCircle';
 import GoldenSmoke, { SCENE_META, SCENE_SWATCH, DEFAULT_SCENE_KEY, isValidScene } from '../GoldenSmoke/GoldenSmoke';
 import { getLunarData } from '../../utils/lunarData';
 
@@ -55,6 +57,10 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
   const [resetType, setResetType] = useState(null);
   const [showRecoveryFlow, setShowRecoveryFlow] = useState(false);
   const [recoveryStreakSnapshot, setRecoveryStreakSnapshot] = useState(0);
+  // Circle post-log check-in prompt — opens after a successful daily log
+  // when the user is in a circle and hasn't reported today.
+  const [showCheckInSheet, setShowCheckInSheet] = useState(false);
+  const { circle: viewerCircle } = useCircle();
 
   // Sanctum picker — premium scene library for the Tracker background
   // previewScene !== null means picker is open and showing a live preview
@@ -1176,18 +1182,33 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
       setPostLogInsight(null);
       closeBenefits(() => {
         setShowBenefits(false);
-        
+
         const coreAvg = (rounded.energy + rounded.focus + rounded.confidence + rounded.aura + rounded.sleep + rounded.workout) / 6;
+        let willShowPeak = false;
         if (coreAvg >= 7) {
           const recordings = userData.peakRecordings || [];
           const lastRecording = recordings.length > 0 ? recordings[recordings.length - 1] : null;
-          const daysSinceLast = lastRecording 
-            ? Math.floor((Date.now() - new Date(lastRecording.date).getTime()) / (1000 * 60 * 60 * 24)) 
+          const daysSinceLast = lastRecording
+            ? Math.floor((Date.now() - new Date(lastRecording.date).getTime()) / (1000 * 60 * 60 * 24))
             : Infinity;
-          
+
           if (daysSinceLast >= 7) {
             setTimeout(() => setShowPeakPrompt(true), 400);
+            willShowPeak = true;
           }
+        }
+
+        // Circle check-in prompt — fires only when peak prompt won't, so
+        // we never stack two sheets on top of each other after a log.
+        // Eligibility: user is in a circle, hasn't reported today, and
+        // hasn't disabled the auto-share preference.
+        if (
+          !willShowPeak &&
+          viewerCircle &&
+          !viewerCircle.viewerReportedToday &&
+          (userData.circlePrefs?.autoShareCheckIn !== false)
+        ) {
+          setTimeout(() => setShowCheckInSheet(true), 400);
         }
       });
     }, 2000);
@@ -1631,6 +1652,15 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
       <PatternInsightCard
         userData={userData}
         onAlert={handlePatternAlert}
+      />
+
+      {/* Circle Check-In — opens after a daily log when eligible.
+          See saveBenefits() for the firing logic and gating. */}
+      <CheckInSheet
+        open={showCheckInSheet}
+        onClose={() => setShowCheckInSheet(false)}
+        viewerUsername={userData?.username}
+        currentStreak={streak}
       />
 
       {/* Relapse Recovery Flow — four-screen covenant after a confirmed relapse */}
