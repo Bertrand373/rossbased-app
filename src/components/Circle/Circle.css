@@ -63,23 +63,26 @@
   margin-left: 0;
 }
 
-/* Empty slot — dashed instead of solid, no fill, no inner ring. */
+/* Empty slot — truly outline-only. No fill, no inner ring, no dark
+   separator border (the dashed ring IS the visible element; adjacent
+   empty slots can overlap without needing a gap since they're already
+   transparent). Lower opacity so empty seats read as subordinate
+   placeholders next to filled member avatars. */
 .circle-stack-avatar.empty {
   background: transparent;
-  border-color: var(--background, #000);          /* keep the separator gap */
-  box-shadow: 0 0 0 1px var(--border-prominent);
-  /* Render the dashed ring as a pseudo-element so the outer 1.5px
-     separator gap still works on overlapping siblings. */
+  border-color: transparent;
+  box-shadow: none;
+  opacity: 0.55;
+  transition: opacity 200ms ease;
 }
 
 .circle-stack-avatar.empty::after {
   content: '';
   position: absolute;
-  inset: -1px;
+  inset: 0;
   border-radius: 50%;
-  border: 1px dashed var(--border-prominent);
+  border: 1px dashed var(--text-tertiary);
   pointer-events: none;
-  opacity: 0.85;
 }
 
 /* The + glyph (only on the first empty slot when there's no circle).
@@ -93,8 +96,11 @@
   transition: color 200ms ease;
 }
 
+.circle-stack.is-prompt:hover .circle-stack-avatar.empty {
+  opacity: 0.85;
+}
+
 .circle-stack.is-prompt:hover .circle-stack-avatar.empty::after {
-  opacity: 1;
   border-color: var(--text-secondary);
 }
 
