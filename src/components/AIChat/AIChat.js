@@ -430,7 +430,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   // marginaliaNote:   the OracleNote currently being edited in the sheet
   // libraryOpen:      whether the Commonplace Book sheet is open
   const [highlightPalette, setHighlightPalette] = useState({
-    visible: false, x: 0, y: 0, range: null, message: null
+    visible: false, x: 0, y: 0, placement: 'above', range: null, message: null
   });
   const [marginaliaNote, setMarginaliaNote] = useState(null);
   const [libraryOpen, setLibraryOpen] = useState(false);
@@ -1602,13 +1602,39 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
       const panel = panelRef.current;
       if (!panel || rect.width === 0) return;
       const panelRect = panel.getBoundingClientRect();
-      const x = rect.left + rect.width / 2 - panelRect.left;
-      const y = rect.top - panelRect.top - 10;
+
+      // Approximate palette dimensions for clamping. The palette is sized
+      // by its content, but these are tight enough that any small drift
+      // costs us a few pixels of edge margin — not a hard clip.
+      const PALETTE_HALF_W = 96;
+      const PALETTE_H = 40;
+      const EDGE = 8;
+      const TAIL = 10; // distance between palette and selection rect
+
+      // X: center on selection, then clamp inside the panel so the palette
+      // never extends off-screen on the left or right edge.
+      const rawX = rect.left + rect.width / 2 - panelRect.left;
+      const x = Math.max(
+        PALETTE_HALF_W + EDGE,
+        Math.min(panelRect.width - PALETTE_HALF_W - EDGE, rawX)
+      );
+
+      // Y: prefer above the selection (so the palette doesn't cover the
+      // text you're acting on). If the selection is near the top and there
+      // isn't room above, flip below — iOS's native menu usually goes
+      // *above* the selection in that case, so going below also reduces
+      // collisions with the Copy/Look Up/Translate popover.
+      const topInPanel = rect.top - panelRect.top;
+      const bottomInPanel = rect.bottom - panelRect.top;
+      const fitsAbove = topInPanel >= PALETTE_H + TAIL + EDGE;
+      const placement = fitsAbove ? 'above' : 'below';
+      const y = fitsAbove ? topInPanel - TAIL : bottomInPanel + TAIL;
 
       setHighlightPalette({
         visible: true,
         x,
         y,
+        placement,
         message,
         selection: {
           text,
@@ -2331,6 +2357,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
             visible={highlightPalette.visible}
             x={highlightPalette.x}
             y={highlightPalette.y}
+            placement={highlightPalette.placement}
             onPickColor={handlePickColor}
             onAddNote={handleAddNoteFromPalette}
             onClose={closeHighlightPalette}
