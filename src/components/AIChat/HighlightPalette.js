@@ -12,7 +12,7 @@ const COLORS = [
   { id: 'sage',  label: 'Sage'  },
 ];
 
-export default function HighlightPalette({ visible, x, y, onPickColor, onAddNote, onClose }) {
+export default function HighlightPalette({ visible, x, y, placement = 'above', onPickColor, onAddNote, onClose }) {
   const ref = useRef(null);
 
   // Lifecycle is managed by the parent's selectionchange listener: palette
@@ -24,6 +24,11 @@ export default function HighlightPalette({ visible, x, y, onPickColor, onAddNote
   // to interact with native selection UI. Removing the outside-touch
   // handler lets the iOS menu and our palette coexist; the palette only
   // dismisses when selection actually clears (selectionchange in parent).
+  //
+  // `placement` ('above' | 'below') comes from the parent's positioner. We
+  // prefer above so the palette doesn't cover the text being acted on, but
+  // flip below when the selection is near the top — that's also where iOS
+  // tends to put its Copy/Look Up menu, so flipping cuts down on overlap.
 
   if (!visible) return null;
 
@@ -31,7 +36,7 @@ export default function HighlightPalette({ visible, x, y, onPickColor, onAddNote
   return (
     <div
       ref={ref}
-      className="oracle-palette"
+      className={`oracle-palette oracle-palette--${placement}`}
       style={{ left: `${x}px`, top: `${y}px` }}
       onMouseDown={(e) => e.preventDefault()} // don't blur the selection on tap
     >
