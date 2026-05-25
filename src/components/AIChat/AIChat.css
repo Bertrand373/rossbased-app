@@ -197,8 +197,11 @@
 }
 
 [data-theme="light"] .ai-chat-header-wordmark {
-  /* Gold ORACLE wordmark on parchment — illuminated manuscript feel */
+  /* Recolor the gold wordmark to dark ink on cream — brightness(0) zeros
+     out RGB while preserving the PNG alpha → solid black wordmark,
+     visually equivalent to #141d1d. Gold-on-cream was hard to read. */
   opacity: 0.95;
+  filter: brightness(0);
 }
 
 .ai-chat-subtitle {

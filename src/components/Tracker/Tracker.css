@@ -118,6 +118,35 @@
   );
 }
 
+/* ===========================================================================
+   LIGHT-MODE VIDEO OVERLAYS
+   ===========================================================================
+   Same alpha curves as the dark-mode gradients above, but cream-colored
+   (rgba(244, 237, 224, x) — matches --background in [data-theme="light"]).
+   Effect: in light mode the video tints toward parchment instead of dimming
+   toward black, preserving the cream/parchment vibe while keeping dark text
+   legible on top. Higher specificity than the base rules so this wins when
+   the html data-theme is "light". */
+[data-theme="light"] .sanctum-video-backplate[data-scene="goldenhour"]::after {
+  background: linear-gradient(
+    180deg,
+    rgba(244, 237, 224, 0.55) 0%,
+    rgba(244, 237, 224, 0.70) 40%,
+    rgba(244, 237, 224, 0.60) 70%,
+    rgba(244, 237, 224, 0.50) 100%
+  );
+}
+
+[data-theme="light"] .sanctum-video-backplate[data-scene="woodfire"]::after {
+  background: linear-gradient(
+    180deg,
+    rgba(244, 237, 224, 0.55) 0%,
+    rgba(244, 237, 224, 0.70) 45%,
+    rgba(244, 237, 224, 0.70) 80%,
+    rgba(244, 237, 224, 0.60) 100%
+  );
+}
+
 /* Smoke bleeds through header and nav on Tracker tab */
 /* transition-duration: 0ms = instant on entering tracker */
 /* Base 400ms transition on .app-header/.mobile-nav handles smooth fade back on leaving */
