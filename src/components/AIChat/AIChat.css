@@ -2416,6 +2416,24 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
   to   { transform: translateY(0); }
 }
 
+/* Exit animations — applied via .closing class set by the React component
+   for EXIT_DURATION_MS before unmount. Mirror the entrance timings so the
+   open/close motion feels paired, not patched-on. */
+.oracle-marginalia-overlay.closing {
+  animation: oracleMarginaliaFadeOut 240ms ease forwards;
+}
+.oracle-marginalia-sheet.closing {
+  animation: oracleMarginaliaDown 280ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+@keyframes oracleMarginaliaFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes oracleMarginaliaDown {
+  from { transform: translateY(0); }
+  to   { transform: translateY(100%); }
+}
+
 /* Desktop — centered card, not bottom-pinned */
 @media (min-width: 768px) {
   .oracle-marginalia-overlay {
@@ -2431,6 +2449,14 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
   @keyframes oracleMarginaliaFadeIn {
     from { opacity: 0; transform: translateY(8px) scale(0.98); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  /* Desktop closing — fade + slight downward drift instead of full slide */
+  .oracle-marginalia-sheet.closing {
+    animation: oracleMarginaliaScaleOut 240ms ease forwards;
+  }
+  @keyframes oracleMarginaliaScaleOut {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to   { opacity: 0; transform: translateY(8px) scale(0.98); }
   }
 }
 
@@ -2635,6 +2661,18 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
     border: 1px solid var(--sheet-border, rgba(255, 255, 255, 0.08));
     animation-name: oracleMarginaliaFadeIn;
   }
+  .oracle-library.closing {
+    animation: oracleMarginaliaScaleOut 240ms ease forwards;
+  }
+}
+
+/* Exit animations for the Notes Library sheet — mirror the MarginaliaSheet
+   pattern so both sheets feel like the same family of motion. */
+.oracle-library-overlay.closing {
+  animation: oracleMarginaliaFadeOut 240ms ease forwards;
+}
+.oracle-library.closing {
+  animation: oracleMarginaliaDown 280ms cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
 .oracle-library-grip {
@@ -2901,22 +2939,37 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
 }
 
 /* ============================================================================
-   HEADER — Library toggle button
+   HEADER — Notes button (pencil icon + label)
+   Matches the floating HighlightPalette's Note button so users recognize the
+   two affordances as the same thing: pencil glyph + "Notes" label.
    ============================================================================ */
 .ai-chat-library-toggle {
   background: transparent;
   border: none;
   color: var(--text-secondary, rgba(255, 255, 255, 0.6));
   cursor: pointer;
-  padding: 6px;
-  border-radius: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
   margin-right: 4px;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.005em;
   transition: background-color 140ms ease, color 140ms ease;
 }
 .ai-chat-library-toggle:hover {
   background: var(--surface-overlay, rgba(255, 255, 255, 0.05));
   color: var(--text, #fff);
+}
+.ai-chat-library-toggle:active {
+  transform: scale(0.96);
+}
+/* Hide label on very narrow viewports — icon-only fallback keeps the
+   header from wrapping or shoving the close X off-screen. */
+@media (max-width: 360px) {
+  .ai-chat-library-toggle span { display: none; }
+  .ai-chat-library-toggle { padding: 6px; }
 }
