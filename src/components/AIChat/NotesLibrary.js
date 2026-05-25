@@ -162,16 +162,49 @@ export default function NotesLibrary({
 
         <div className="oracle-library-body">
           {loading && notes.length === 0 && (
-            <div className="oracle-library-loading">Gathering your marginalia…</div>
+            <div className="oracle-library-loading">Gathering your notes…</div>
           )}
 
           {!loading && notes.length === 0 && (
             <div className="oracle-library-empty">
+              {/* Hero pencil — same glyph as the chat-header Notes button so the
+                  empty state visually echoes the control that just opened it. */}
+              <div className="oracle-library-empty-icon" aria-hidden="true">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                </svg>
+              </div>
+
               <p className="oracle-library-empty-title">Nothing marked yet.</p>
               <p className="oracle-library-empty-sub">
-                Select any passage from Oracle's response and choose a color or write a note.
-                Your highlights collect here — a private commonplace book of what mattered.
+                A private commonplace book of what mattered, kept in the margins
+                of the Oracle's hand.
               </p>
+
+              <div className="oracle-library-howto">
+                <p className="oracle-library-howto-label">How to mark a passage</p>
+                <ol className="oracle-library-howto-steps">
+                  <li>
+                    <span className="oracle-howto-num">1</span>
+                    <span className="oracle-howto-text">
+                      Select any text in an Oracle response.
+                    </span>
+                  </li>
+                  <li>
+                    <span className="oracle-howto-num">2</span>
+                    <span className="oracle-howto-text">
+                      Pick a color, or tap <em>Note</em> to write something.
+                    </span>
+                  </li>
+                  <li>
+                    <span className="oracle-howto-num">3</span>
+                    <span className="oracle-howto-text">
+                      Find them all here, grouped by thread.
+                    </span>
+                  </li>
+                </ol>
+              </div>
             </div>
           )}
 
