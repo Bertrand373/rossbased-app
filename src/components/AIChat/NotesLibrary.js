@@ -4,6 +4,7 @@
 // Tapping a note jumps to the source message in the chat.
 
 import React, { useEffect, useState, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 
 const COLORS = ['amber', 'rose', 'azure', 'sage'];
 
@@ -90,7 +91,16 @@ export default function NotesLibrary({
     await onDeleteNote(n._id, n.messageTimestamp, n.threadId);
   };
 
-  return (
+  // Portal to document.body — escapes the .ai-chat-panel parent's
+  // `transform: translateY(0)` containing block. Without this, iOS Safari
+  // sizes the `position: fixed` overlay relative to the 85vh chat panel
+  // instead of the viewport, clipping the top of the 92vh Library sheet
+  // (and with it, the header — title, count, close button). On desktop
+  // the chat panel is wide enough that the clip wasn't visible, but on
+  // mobile portrait the entire library header disappeared.
+  if (typeof document === 'undefined') return null;
+
+  return ReactDOM.createPortal(
     <div className="oracle-library-overlay" onClick={onClose}>
       <div className="oracle-library" onClick={(e) => e.stopPropagation()}>
         <div className="oracle-library-grip" />
@@ -225,6 +235,7 @@ export default function NotesLibrary({
           ))}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

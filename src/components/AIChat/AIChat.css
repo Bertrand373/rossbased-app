@@ -2681,42 +2681,38 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
   text-transform: uppercase;
 }
 .oracle-library-close {
-  /* Previously a 30px tap target with an outline X — too easy to miss,
-     especially in light mode where dark-brown-on-cream low-opacity reads
-     as decoration not affordance. Now a circular tinted button (36px)
-     with a clear stroke so users know it's tappable. */
-  background: var(--surface-overlay, rgba(255, 255, 255, 0.06));
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
-  color: var(--text-secondary, rgba(255, 255, 255, 0.75));
+  /* Matches .ai-chat-close vocabulary exactly — transparent bg, no border,
+     36px tap target, low-opacity outline X. Discoverability was never the
+     actual bug; the previous polish PR over-styled this with a tinted
+     button to compensate for the real issue (header clipped by transform
+     containing block on mobile, see NotesLibrary.js portal fix). */
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
   cursor: pointer;
   width: 36px;
   height: 36px;
+  padding: 0;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+  transition: color 140ms ease, background-color 140ms ease;
 }
 .oracle-library-close:hover {
-  background: var(--surface-overlay, rgba(255, 255, 255, 0.12));
-  border-color: var(--border-prominent, rgba(255, 255, 255, 0.18));
-  color: var(--text, #fff);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
 }
 .oracle-library-close:active {
   transform: scale(0.92);
 }
 
-/* Light mode: warm-tinted circle with darker ink so it reads as a clear
-   tap target on the parchment sheet (instead of disappearing into it). */
 [data-theme="light"] .oracle-library-close {
-  background: rgba(58, 46, 28, 0.08);
-  border-color: rgba(58, 46, 28, 0.18);
-  color: rgba(58, 46, 28, 0.75);
+  color: rgba(58, 46, 28, 0.5);
 }
 [data-theme="light"] .oracle-library-close:hover {
-  background: rgba(58, 46, 28, 0.14);
-  border-color: rgba(58, 46, 28, 0.3);
+  background: rgba(58, 46, 28, 0.06);
   color: var(--text);
 }
 
