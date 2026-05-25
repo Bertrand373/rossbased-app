@@ -126,9 +126,12 @@
   opacity: 0.95;
 }
 
-/* Gold Eye of Horus on parchment — inverting would turn gold to purple */
+/* Light mode: recolor the gold Eye of Horus to dark ink. brightness(0)
+   zeros out RGB while preserving the PNG alpha mask → solid black
+   silhouette (~#000), visually equivalent to #141d1d at icon size. */
 [data-theme="light"] .mobile-nav-oracle-img {
-  opacity: 0.7;
+  opacity: 0.85;
+  filter: brightness(0);
 }
 
 @media (hover: hover) {

@@ -310,10 +310,10 @@ const GoldenSmoke = ({ scene: sceneProp }) => {
     };
   }, [sceneProp, theme]);
 
-  if (theme === 'light') return null;
-
-  // Video scenes render their own backplate (real footage) instead of the canvas.
-  // The canvas effect above bails when canvasRef.current is null, so no cleanup needed.
+  // Video scenes render their own backplate (real footage) in BOTH dark
+  // and light mode — the cream-tinted overlay in light mode keeps the video
+  // subtle (parchment-with-image vibe) while preserving dark text contrast.
+  // Procedural canvas scenes (wisps) still skip light mode entirely — see below.
   const activeSceneKey = resolveSceneKey(sceneProp);
   const activeScene = SCENES[activeSceneKey];
   if (activeScene.type === 'video') {
@@ -326,6 +326,10 @@ const GoldenSmoke = ({ scene: sceneProp }) => {
       />
     );
   }
+
+  // Procedural canvas scenes: light mode renders nothing. Parchment is meant
+  // to feel clean, not animated. The canvas effect bails too (see above).
+  if (theme === 'light') return null;
 
   return (
     <canvas
