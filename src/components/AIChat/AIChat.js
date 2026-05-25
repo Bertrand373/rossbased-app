@@ -1989,14 +1989,17 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
             <button
               className="ai-chat-library-toggle"
               onClick={() => setLibraryOpen(true)}
-              aria-label="Open marginalia"
-              title="Marginalia"
+              aria-label="Open notes"
+              title="Notes"
             >
-              {/* Open-book glyph for the Commonplace Book view */}
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M2 4.5C5 3.5 8.5 3.5 12 5c3.5-1.5 7-1.5 10-.5v15c-3-1-6.5-1-10 .5-3.5-1.5-7-1.5-10-.5Z" />
-                <path d="M12 5v15" />
+              {/* Pencil glyph + 'Notes' label — same vocabulary as the
+                  in-message highlight palette's Note button so the two
+                  affordances read as the same thing. */}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
               </svg>
+              <span>Notes</span>
             </button>
             <button
               className="ai-chat-close"

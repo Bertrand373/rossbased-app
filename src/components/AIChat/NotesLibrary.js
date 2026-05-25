@@ -3,8 +3,14 @@
 // Groups notes by source thread, renders each as a serif passage + marginalia.
 // Tapping a note jumps to the source message in the chat.
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import ReactDOM from 'react-dom';
+import useSheetSwipe from '../../hooks/useSheetSwipe';
+
+// How long the slide-down + fade-out animation runs before the component
+// actually unmounts. Must stay in sync with the CSS keyframes
+// (.oracle-library.closing + .oracle-library-overlay.closing).
+const EXIT_DURATION_MS = 280;
 
 const COLORS = ['amber', 'rose', 'azure', 'sage'];
 
@@ -38,6 +44,31 @@ export default function NotesLibrary({
   const [draftText, setDraftText] = useState('');
   const [draftColor, setDraftColor] = useState('amber');
 
+  // Mount/unmount with exit animation. shouldRender stays true for the
+  // EXIT_DURATION_MS window after `open` flips to false so the sheet can
+  // slide down smoothly before being removed from the DOM.
+  const [shouldRender, setShouldRender] = useState(open);
+  const [isClosing, setIsClosing] = useState(false);
+  useEffect(() => {
+    if (open) {
+      setShouldRender(true);
+      setIsClosing(false);
+    } else if (shouldRender) {
+      setIsClosing(true);
+      const t = setTimeout(() => {
+        setShouldRender(false);
+        setIsClosing(false);
+      }, EXIT_DURATION_MS);
+      return () => clearTimeout(t);
+    }
+    return undefined;
+  }, [open, shouldRender]);
+
+  // Swipe-down to dismiss. Notes are all already persisted server-side,
+  // so swiping is purely "close the sheet" — no save semantics needed.
+  const sheetRef = useRef(null);
+  useSheetSwipe(sheetRef, open && !isClosing, onClose);
+
   const refresh = useCallback(async () => {
     setLoading(true);
     const data = await fetchLibrary({ limit: 200, skip: 0 });
@@ -58,7 +89,7 @@ export default function NotesLibrary({
     return () => window.removeEventListener('oracle-notes-changed', handler);
   }, [open, refresh]);
 
-  if (!open) return null;
+  if (!shouldRender) return null;
 
   // Group by thread, preserving the order notes appeared in
   const grouped = [];
@@ -101,8 +132,8 @@ export default function NotesLibrary({
   if (typeof document === 'undefined') return null;
 
   return ReactDOM.createPortal(
-    <div className="oracle-library-overlay" onClick={onClose}>
-      <div className="oracle-library" onClick={(e) => e.stopPropagation()}>
+    <div className={`oracle-library-overlay${isClosing ? ' closing' : ''}`} onClick={onClose}>
+      <div ref={sheetRef} className={`oracle-library${isClosing ? ' closing' : ''}`} onClick={(e) => e.stopPropagation()}>
         <div className="oracle-library-grip" />
 
         <header className="oracle-library-header">
@@ -111,7 +142,7 @@ export default function NotesLibrary({
               <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
             </svg>
-            <h2 className="oracle-library-title">Marginalia</h2>
+            <h2 className="oracle-library-title">Notes</h2>
           </div>
           <span className="oracle-library-count">
             {total > 0 ? `${total} ${total === 1 ? 'note' : 'notes'}` : ''}

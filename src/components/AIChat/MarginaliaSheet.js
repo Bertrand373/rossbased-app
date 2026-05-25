@@ -3,6 +3,8 @@
 // highlight. Centered card on desktop; bottom sheet on mobile.
 
 import React, { useEffect, useRef, useState } from 'react';
+import ReactDOM from 'react-dom';
+import useSheetSwipe from '../../hooks/useSheetSwipe';
 
 const COLORS = [
   { id: 'amber', label: 'Amber' },
@@ -12,6 +14,10 @@ const COLORS = [
 ];
 
 const MAX_LEN = 1000;
+
+// Same exit-animation window as NotesLibrary — must stay in sync with the
+// CSS keyframes on .oracle-marginalia-sheet.closing + overlay.closing.
+const EXIT_DURATION_MS = 280;
 
 export default function MarginaliaSheet({ open, note, onSave, onDelete, onClose }) {
   const [text, setText] = useState('');
@@ -34,7 +40,55 @@ export default function MarginaliaSheet({ open, note, onSave, onDelete, onClose 
     }
   }, [open, note]);
 
-  if (!open || !note) return null;
+  // Mount/unmount with exit animation — keep mounted EXIT_DURATION_MS after
+  // the parent flips `open` to false so the sheet can slide down smoothly.
+  const [shouldRender, setShouldRender] = useState(open);
+  const [isClosing, setIsClosing] = useState(false);
+  useEffect(() => {
+    if (open) {
+      setShouldRender(true);
+      setIsClosing(false);
+    } else if (shouldRender) {
+      setIsClosing(true);
+      const t = setTimeout(() => {
+        setShouldRender(false);
+        setIsClosing(false);
+      }, EXIT_DURATION_MS);
+      return () => clearTimeout(t);
+    }
+    return undefined;
+  }, [open, shouldRender]);
+
+  // Keep refs / dirty calculation accessible to the swipe-dismiss handler.
+  // We declare them above the useSheetSwipe call so the closure captures
+  // the current text/color values when the swipe completes.
+  const sheetRef = useRef(null);
+  const textRef = useRef(text);
+  const colorRef = useRef(color);
+  useEffect(() => { textRef.current = text; }, [text]);
+  useEffect(() => { colorRef.current = color; }, [color]);
+
+  // Swipe-down behavior matches iOS Notes: if the draft has changes, save
+  // them (no work lost); if nothing changed, just dismiss. Either way the
+  // parent's onClose fires after the swipe completes.
+  const handleSwipeDismiss = () => {
+    if (!note) { onClose && onClose(); return; }
+    const nextText = textRef.current;
+    const nextColor = colorRef.current;
+    const isDirty =
+      (nextText !== (note.note || '')) ||
+      (nextColor !== (note.color || 'amber'));
+    if (isDirty) {
+      // Fire-and-forget save — sheet is dismissing regardless. The server
+      // request continues in the background; if it fails the existing
+      // toast/error UI in useOracleNotes handles it.
+      Promise.resolve(onSave({ color: nextColor, note: nextText })).catch(() => {});
+    }
+    onClose && onClose();
+  };
+  useSheetSwipe(sheetRef, open && !isClosing, handleSwipeDismiss);
+
+  if (!shouldRender || !note) return null;
 
   const dirty = (text !== (note.note || '')) || (color !== (note.color || 'amber'));
   const remaining = MAX_LEN - text.length;
@@ -58,10 +112,13 @@ export default function MarginaliaSheet({ open, note, onSave, onDelete, onClose 
     onClose && onClose();
   };
 
-  return (
-    <div className="oracle-marginalia-overlay" onClick={onClose}>
+  if (typeof document === 'undefined') return null;
+
+  return ReactDOM.createPortal(
+    <div className={`oracle-marginalia-overlay${isClosing ? ' closing' : ''}`} onClick={onClose}>
       <div
-        className={`oracle-marginalia-sheet oracle-marginalia--${color}`}
+        ref={sheetRef}
+        className={`oracle-marginalia-sheet oracle-marginalia--${color}${isClosing ? ' closing' : ''}`}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-label="Edit note"
@@ -116,6 +173,7 @@ export default function MarginaliaSheet({ open, note, onSave, onDelete, onClose 
           >{dirty ? 'Save' : 'Done'}</button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

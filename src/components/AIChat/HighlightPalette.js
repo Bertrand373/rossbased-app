@@ -3,7 +3,7 @@
 // message. Offers 4 ink colors + a Note button. Positioned absolutely against
 // the chat panel using x/y coordinates supplied by the parent.
 
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 
 const COLORS = [
   { id: 'amber', label: 'Amber' },
@@ -15,19 +15,15 @@ const COLORS = [
 export default function HighlightPalette({ visible, x, y, onPickColor, onAddNote, onClose }) {
   const ref = useRef(null);
 
-  // Dismiss on outside pointer-down. Selection clears naturally as part of this.
-  useEffect(() => {
-    if (!visible) return;
-    const handler = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) onClose && onClose();
-    };
-    document.addEventListener('mousedown', handler);
-    document.addEventListener('touchstart', handler, { passive: true });
-    return () => {
-      document.removeEventListener('mousedown', handler);
-      document.removeEventListener('touchstart', handler);
-    };
-  }, [visible, onClose]);
+  // Lifecycle is managed by the parent's selectionchange listener: palette
+  // shows on non-empty selection, hides when selection clears. Previously we
+  // ALSO dismissed on any outside touchstart — but on iOS that also fires
+  // when the user taps the system Copy/Look Up/Translate menu OR drags the
+  // blue selection handles, both of which sit outside our palette bounds.
+  // The result: palette + selection both nuked the moment the user tried
+  // to interact with native selection UI. Removing the outside-touch
+  // handler lets the iOS menu and our palette coexist; the palette only
+  // dismisses when selection actually clears (selectionchange in parent).
 
   if (!visible) return null;
 
