@@ -204,6 +204,22 @@
   filter: brightness(0);
 }
 
+/* Light mode: recolor every Eye-of-Horus / oracle-pin instance in the chat
+   to dark ink (same brightness(0) trick — zeros RGB, preserves PNG alpha).
+   Gold-on-cream is illegible; dark-on-cream reads cleanly as illuminated
+   manuscript ink. Each selector below corresponds to a place an Oracle
+   PNG is rendered inline. */
+[data-theme="light"] .ai-chat-avatar,
+[data-theme="light"] .ai-chat-empty-eye,
+[data-theme="light"] .ai-chat-loading-icon,
+[data-theme="light"] .oracle-error-eye,
+[data-theme="light"] .ai-teach-eye,
+[data-theme="light"] .ai-teach-dedup-eye,
+[data-theme="light"] .ai-chat-pin-icon,
+[data-theme="light"] .ai-chat-sidebar-watermark-img {
+  filter: brightness(0);
+}
+
 .ai-chat-subtitle {
   font-size: 0.75rem;
   color: var(--text-muted);
