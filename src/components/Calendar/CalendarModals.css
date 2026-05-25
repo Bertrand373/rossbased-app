@@ -1839,7 +1839,21 @@
 }
 
 [data-theme="light"] .oracle-pins-heading-icon {
-  filter: brightness(0.6);
+  /* brightness(0) → solid dark silhouette on cream. Was brightness(0.6),
+     which left a faint gold tint that's still illegible on parchment. */
+  filter: brightness(0);
+}
+
+/* Light-mode override: the gold pill bg + gold text are illegible on cream.
+   Swap to a neutral dark-on-warm-tint that matches the rest of the modal. */
+[data-theme="light"] .oracle-pins-count {
+  background: rgba(20, 29, 29, 0.08);
+  color: var(--text-secondary);
+}
+
+/* Light-mode override: gold border-left becomes dark border on cream. */
+[data-theme="light"] .oracle-pin-card {
+  border-left-color: rgba(20, 29, 29, 0.25);
 }
 
 .oracle-pins-count {

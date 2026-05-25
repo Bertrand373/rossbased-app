@@ -1413,8 +1413,10 @@ body:has(.week-view-grid) {
 }
 
 [data-theme="light"] .day-oracle-pin {
-  filter: brightness(0.7);
-  opacity: 0.35;
+  /* Gold-on-cream is illegible — brightness(0) flips the PNG to a solid
+     dark silhouette (alpha preserved). Same trick as Oracle eyes in nav/chat. */
+  filter: brightness(0);
+  opacity: 0.45;
 }
 
 /* Week view — inline with other indicators */
@@ -1427,8 +1429,8 @@ body:has(.week-view-grid) {
 }
 
 [data-theme="light"] .week-oracle-pin {
-  filter: brightness(0.7);
-  opacity: 0.4;
+  filter: brightness(0);
+  opacity: 0.5;
 }
 
 @media (max-width: 480px) {
