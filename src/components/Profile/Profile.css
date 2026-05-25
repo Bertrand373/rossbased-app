@@ -1433,6 +1433,14 @@
   object-fit: contain;
 }
 
+/* Light mode: the source PNG is the white-on-transparent variant; flip
+   white pixels to black with brightness(0) while preserving the alpha mask
+   so the icon sits clean on cream (no white square). Same recolor trick
+   used for the Oracle logos in MobileNavigation + AIChat. */
+[data-theme="light"] .about-logo {
+  filter: brightness(0);
+}
+
 .about-title {
   font-size: 1.125rem;
   font-weight: 600;

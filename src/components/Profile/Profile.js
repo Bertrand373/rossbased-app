@@ -1328,9 +1328,9 @@ const Profile = ({
           <div className="about-section">
             {/* Brand */}
             <div className="about-brand">
-              <img 
-                src={theme === 'light' ? '/icon-192-black.png' : '/icon-192.png'} 
-                alt="TitanTrack" 
+              <img
+                src="/icon-192.png"
+                alt="TitanTrack"
                 className="about-logo"
               />
               <span className="about-title">TitanTrack</span>
