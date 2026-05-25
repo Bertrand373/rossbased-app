@@ -173,16 +173,32 @@ h4 { font-size: 0.875rem; }
   transform: scale(0.95);
 }
 
-/* Active state - subtle opacity only, no ring */
+/* Active state — for the avatar case, the ring + halo below carry the
+   signal (see .has-avatar.active). For the no-avatar fallback the
+   inverted-color rule does the work. Keep opacity at 1 — the previous
+   0.85 dimmed the photo without communicating "active" clearly enough. */
 .profile-circle.active {
-  opacity: 0.85;
+  opacity: 1;
 }
 
-/* When has avatar image */
+/* When has avatar image — give it a subtle theme-adaptive gold ring so
+   it sits cohesively with the rest of the chrome (Oracle wordmark, gold
+   accents) instead of floating as a bare photo. Uses the same accent
+   vars that already adapt to dark/light theme. */
 .profile-circle.has-avatar {
   padding: 0;
   overflow: hidden;
   background-color: transparent;
+  box-shadow: 0 0 0 1.5px var(--accent-gold-border);
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+/* Active state for the avatar — brighter, more solid ring + soft outer
+   halo. Unmistakable "you're in Profile right now" feedback. */
+.profile-circle.has-avatar.active {
+  box-shadow:
+    0 0 0 1.5px var(--accent-gold),
+    0 0 0 5px var(--accent-gold-bg);
 }
 
 /* Fallback initial letter - keep inverted style when active */

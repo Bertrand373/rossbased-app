@@ -18,8 +18,19 @@
 }
 
 .app-content:has(.stats-page) {
-  overflow: hidden;
+  overflow: hidden !important;
+  overscroll-behavior: none;
+  touch-action: manipulation;
   padding-bottom: 0 !important;
+}
+
+/* Lock the whole document chain — without these, mobile browsers still
+   rubber-band the viewport even when .app-content is overflow:hidden.
+   Same pattern Tracker uses for its "fully scroll-locked" feel. */
+html:has(.stats-page),
+body:has(.stats-page) {
+  overflow: hidden !important;
+  overscroll-behavior: none;
 }
 
 @media (min-width: 1025px) {
