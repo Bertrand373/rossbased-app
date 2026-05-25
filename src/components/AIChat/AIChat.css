@@ -2764,21 +2764,112 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
 .oracle-library-loading,
 .oracle-library-empty {
   text-align: center;
-  padding: 56px 16px;
+  padding: 48px 20px 56px;
   color: var(--text-tertiary, rgba(255, 255, 255, 0.4));
 }
+.oracle-library-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Hero pencil — same glyph family as the chat-header Notes button so
+   the empty state echoes the control that opened it. */
+.oracle-library-empty-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--surface-overlay, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.55));
+  margin-bottom: 20px;
+}
+
 .oracle-library-empty-title {
   font-family: 'Georgia', 'Cormorant Garamond', 'Times New Roman', serif;
-  font-size: 1.05rem;
+  font-size: 1.125rem;
   font-style: italic;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  color: var(--text-secondary, rgba(255, 255, 255, 0.78));
   margin: 0 0 10px;
 }
 .oracle-library-empty-sub {
   font-size: 0.85rem;
   line-height: 1.65;
-  max-width: 360px;
-  margin: 0 auto;
+  max-width: 320px;
+  margin: 0 0 28px;
+}
+
+/* How-it-works guide — three numbered steps. Lives only in the empty
+   state, so users see it exactly when they need it. Neutral verb ("Select")
+   covers both mobile long-press and desktop click-drag — no platform fork. */
+.oracle-library-howto {
+  width: 100%;
+  max-width: 320px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.05));
+  text-align: left;
+}
+.oracle-library-howto-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  color: var(--text-tertiary, rgba(255, 255, 255, 0.5));
+  text-align: center;
+  margin: 0 0 18px;
+}
+.oracle-library-howto-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.oracle-library-howto-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.65));
+}
+.oracle-howto-num {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--surface-overlay, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-feature-settings: 'lnum';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.75));
+  margin-top: 1px;
+}
+.oracle-howto-text em {
+  font-style: italic;
+  color: var(--text, #fff);
+  font-weight: 500;
+}
+
+/* Light mode — warm-tan tokens matching the parchment palette so the
+   icon circle + step numerals read cleanly on cream. */
+[data-theme="light"] .oracle-library-empty-icon {
+  background: rgba(58, 46, 28, 0.06);
+  border-color: rgba(58, 46, 28, 0.12);
+  color: rgba(58, 46, 28, 0.55);
+}
+[data-theme="light"] .oracle-howto-num {
+  background: rgba(58, 46, 28, 0.06);
+  border-color: rgba(58, 46, 28, 0.14);
+  color: rgba(58, 46, 28, 0.7);
 }
 
 .oracle-library-thread {
