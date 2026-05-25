@@ -247,6 +247,61 @@
 }
 
 /* ============================================================
+   STICKY THREAD TITLE
+   ============================================================
+   Floats below the main header, slides in when the user scrolls UP through
+   thread history, hides when scrolling DOWN toward the latest message.
+   Backdrop-blur keeps message text underneath subtly visible (iOS pattern). */
+
+.ai-chat-sticky-title {
+  position: absolute;
+  top: 64px; /* sits just under the main header on desktop */
+  left: 0;
+  right: 0;
+  z-index: 5;
+  padding: 9px 56px;
+  background: rgba(20, 20, 20, 0.72);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border-bottom: 1px solid var(--border-subtle);
+  transform: translateY(-110%);
+  transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 220ms ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Mobile: pill indicator pushes the header down, so the sticky title sits a
+   bit lower too. */
+@media (max-width: 767px) {
+  .ai-chat-sticky-title {
+    top: 72px;
+    padding: 9px 48px;
+  }
+}
+
+.ai-chat-sticky-title.visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.ai-chat-sticky-title-text {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  text-align: center;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-theme="light"] .ai-chat-sticky-title {
+  background: rgba(244, 237, 224, 0.85);
+}
+
+/* ============================================================
    MESSAGES AREA
    ============================================================ */
 
@@ -2030,4 +2085,795 @@ body[data-oracle-unread="true"] .nav-link-oracle::after {
     background-color: transparent;
     box-shadow: 0 0 0 8px transparent;
   }
+}
+
+/* =============================================================================
+   ORACLE NOTES — highlights + marginalia + library
+   Premium "commonplace book" feature: select Oracle text, mark it with a soft
+   marker stroke, attach a private note, revisit everything in the Library.
+   ============================================================================= */
+
+/* ----- ink color tokens ----- */
+/* Dark mode — luminous but not neon */
+.ai-chat-message.assistant .ai-chat-message-content {
+  --ink-amber: rgba(255, 205, 110, 0.45);
+  --ink-amber-edge: rgba(255, 205, 110, 0.25);
+  --ink-amber-shadow: rgba(255, 205, 110, 0.55);
+  --ink-rose: rgba(255, 145, 175, 0.42);
+  --ink-rose-edge: rgba(255, 145, 175, 0.22);
+  --ink-rose-shadow: rgba(255, 145, 175, 0.52);
+  --ink-azure: rgba(155, 195, 245, 0.42);
+  --ink-azure-edge: rgba(155, 195, 245, 0.22);
+  --ink-azure-shadow: rgba(155, 195, 245, 0.52);
+  --ink-sage: rgba(165, 215, 175, 0.42);
+  --ink-sage-edge: rgba(165, 215, 175, 0.22);
+  --ink-sage-shadow: rgba(165, 215, 175, 0.52);
+}
+
+[data-theme="light"] .ai-chat-message.assistant .ai-chat-message-content {
+  /* Light mode — slightly more saturated to register against cream paper */
+  --ink-amber: rgba(248, 188, 50, 0.40);
+  --ink-amber-edge: rgba(248, 188, 50, 0.22);
+  --ink-amber-shadow: rgba(248, 188, 50, 0.55);
+  --ink-rose: rgba(232, 110, 145, 0.36);
+  --ink-rose-edge: rgba(232, 110, 145, 0.20);
+  --ink-rose-shadow: rgba(232, 110, 145, 0.50);
+  --ink-azure: rgba(98, 158, 220, 0.36);
+  --ink-azure-edge: rgba(98, 158, 220, 0.20);
+  --ink-azure-shadow: rgba(98, 158, 220, 0.50);
+  --ink-sage: rgba(108, 170, 122, 0.36);
+  --ink-sage-edge: rgba(108, 170, 122, 0.20);
+  --ink-sage-shadow: rgba(108, 170, 122, 0.50);
+}
+
+/* ----- enable text selection inside Oracle messages ----- */
+/* User-side messages stay non-selectable to keep the chat read-only-feeling. */
+.ai-chat-message.assistant .ai-chat-message-content {
+  -webkit-user-select: text;
+  user-select: text;
+  cursor: text;
+}
+
+/* ----- the marker stroke itself ----- */
+/* Off-axis gradient + transparent tips → tapered ends like a real ink marker.
+   Color at 50% slightly hotter than edges → wet-ink look without going neon. */
+.oracle-highlight {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 100% 100%;
+  padding: 0.08em 0.18em;
+  margin: 0 -0.18em;
+  border-radius: 0.18em;
+  color: inherit;
+  cursor: pointer;
+  transition: filter 180ms ease;
+  /* Each line break gets its own marker stroke — that's the desired look */
+  -webkit-box-decoration-break: clone;
+          box-decoration-break: clone;
+}
+
+.oracle-highlight:hover {
+  filter: brightness(1.08) saturate(1.1);
+}
+
+/* "has-note" — a note is attached. Subtle dotted underline as a marginalia indicator. */
+.oracle-highlight.has-note {
+  text-decoration: underline dotted currentColor;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+/* Color variants — soft-edged linear gradient gives the tapered marker look */
+.oracle-highlight--amber {
+  background-image: linear-gradient(105deg,
+    transparent 0.5%,
+    var(--ink-amber-edge) 2%,
+    var(--ink-amber) 8%,
+    var(--ink-amber) 50%,
+    var(--ink-amber) 92%,
+    var(--ink-amber-edge) 98%,
+    transparent 99.5%);
+}
+.oracle-highlight--rose {
+  background-image: linear-gradient(105deg,
+    transparent 0.5%,
+    var(--ink-rose-edge) 2%,
+    var(--ink-rose) 8%,
+    var(--ink-rose) 50%,
+    var(--ink-rose) 92%,
+    var(--ink-rose-edge) 98%,
+    transparent 99.5%);
+}
+.oracle-highlight--azure {
+  background-image: linear-gradient(105deg,
+    transparent 0.5%,
+    var(--ink-azure-edge) 2%,
+    var(--ink-azure) 8%,
+    var(--ink-azure) 50%,
+    var(--ink-azure) 92%,
+    var(--ink-azure-edge) 98%,
+    transparent 99.5%);
+}
+.oracle-highlight--sage {
+  background-image: linear-gradient(105deg,
+    transparent 0.5%,
+    var(--ink-sage-edge) 2%,
+    var(--ink-sage) 8%,
+    var(--ink-sage) 50%,
+    var(--ink-sage) 92%,
+    var(--ink-sage-edge) 98%,
+    transparent 99.5%);
+}
+
+/* Draw-in animation — the marker "strokes" across the text left to right */
+.oracle-highlight {
+  animation: oracleMarkerStroke 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes oracleMarkerStroke {
+  from { background-size: 0% 100%; }
+  to   { background-size: 100% 100%; }
+}
+
+/* Jump-from-library pulse — brief glow + slight size bloom */
+.oracle-highlight--pulse {
+  animation: oracleMarkerPulse 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes oracleMarkerPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(255,205,110,0); filter: brightness(1); }
+  20%  { box-shadow: 0 0 0 6px rgba(255,205,110,0.18); filter: brightness(1.25) saturate(1.15); }
+  100% { box-shadow: 0 0 0 0 rgba(255,205,110,0); filter: brightness(1); }
+}
+.oracle-highlight--rose.oracle-highlight--pulse {
+  animation-name: oracleMarkerPulseRose;
+}
+@keyframes oracleMarkerPulseRose {
+  0%   { box-shadow: 0 0 0 0 rgba(255,145,175,0); filter: brightness(1); }
+  20%  { box-shadow: 0 0 0 6px rgba(255,145,175,0.18); filter: brightness(1.25) saturate(1.15); }
+  100% { box-shadow: 0 0 0 0 rgba(255,145,175,0); filter: brightness(1); }
+}
+.oracle-highlight--azure.oracle-highlight--pulse {
+  animation-name: oracleMarkerPulseAzure;
+}
+@keyframes oracleMarkerPulseAzure {
+  0%   { box-shadow: 0 0 0 0 rgba(155,195,245,0); filter: brightness(1); }
+  20%  { box-shadow: 0 0 0 6px rgba(155,195,245,0.18); filter: brightness(1.25) saturate(1.15); }
+  100% { box-shadow: 0 0 0 0 rgba(155,195,245,0); filter: brightness(1); }
+}
+.oracle-highlight--sage.oracle-highlight--pulse {
+  animation-name: oracleMarkerPulseSage;
+}
+@keyframes oracleMarkerPulseSage {
+  0%   { box-shadow: 0 0 0 0 rgba(165,215,175,0); filter: brightness(1); }
+  20%  { box-shadow: 0 0 0 6px rgba(165,215,175,0.18); filter: brightness(1.25) saturate(1.15); }
+  100% { box-shadow: 0 0 0 0 rgba(165,215,175,0); filter: brightness(1); }
+}
+
+/* Respect reduced-motion: skip the animations, jump to final state */
+@media (prefers-reduced-motion: reduce) {
+  .oracle-highlight,
+  .oracle-highlight--pulse {
+    animation: none;
+  }
+}
+
+/* ============================================================================
+   HIGHLIGHT PALETTE — floating ink-picker shown on text selection
+   ============================================================================ */
+.oracle-palette {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 11px;
+  background: var(--sheet-bg, rgba(20, 20, 24, 0.92));
+  border: 1px solid var(--sheet-border, rgba(255, 255, 255, 0.08));
+  border-radius: 999px;
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+          backdrop-filter: blur(20px) saturate(1.3);
+  z-index: 100020;
+  animation: oraclePaletteIn 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+@keyframes oraclePaletteIn {
+  from { opacity: 0; transform: translate(-50%, -90%) scale(0.92); }
+  to   { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+}
+
+/* Tail/arrow pointing at the selection */
+.oracle-palette::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-1px);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--sheet-bg, rgba(20, 20, 24, 0.92));
+  filter: drop-shadow(0 1px 0 var(--sheet-border, rgba(255, 255, 255, 0.08)));
+}
+
+.oracle-palette-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+.oracle-palette-dot:hover,
+.oracle-palette-dot:focus-visible {
+  transform: scale(1.18);
+  outline: none;
+}
+.oracle-palette-dot:active {
+  transform: scale(0.95);
+}
+
+.oracle-palette-dot--amber { background: radial-gradient(circle at 35% 30%, #ffe39a, #f7b94a 75%); }
+.oracle-palette-dot--rose  { background: radial-gradient(circle at 35% 30%, #ffb6cf, #ec7497 75%); }
+.oracle-palette-dot--azure { background: radial-gradient(circle at 35% 30%, #bcd6f7, #6498d6 75%); }
+.oracle-palette-dot--sage  { background: radial-gradient(circle at 35% 30%, #c6e6cf, #6dac82 75%); }
+
+.oracle-palette-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--border, rgba(255, 255, 255, 0.12));
+}
+
+.oracle-palette-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: var(--text, #fff);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background-color 140ms ease;
+}
+.oracle-palette-note:hover {
+  background: var(--accent-gold-bg-hover, rgba(255, 255, 255, 0.06));
+}
+
+/* ============================================================================
+   MARGINALIA SHEET — write/edit a note attached to a highlight
+   ============================================================================ */
+.oracle-marginalia-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-bg, rgba(0, 0, 0, 0.5));
+  -webkit-backdrop-filter: blur(8px);
+          backdrop-filter: blur(8px);
+  z-index: 100030;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: oracleMarginaliaFade 220ms ease;
+}
+@keyframes oracleMarginaliaFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.oracle-marginalia-sheet {
+  width: 100%;
+  max-width: 460px;
+  background: var(--sheet-bg, rgba(20, 20, 24, 0.95));
+  border-top: 1px solid var(--sheet-border, rgba(255, 255, 255, 0.08));
+  border-radius: 22px 22px 0 0;
+  padding: 12px 22px 28px;
+  -webkit-backdrop-filter: blur(40px) saturate(1.3);
+          backdrop-filter: blur(40px) saturate(1.3);
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.5);
+  animation: oracleMarginaliaUp 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  max-height: 88vh;
+  overflow-y: auto;
+}
+@keyframes oracleMarginaliaUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* Desktop — centered card, not bottom-pinned */
+@media (min-width: 768px) {
+  .oracle-marginalia-overlay {
+    align-items: center;
+  }
+  .oracle-marginalia-sheet {
+    border-radius: 18px;
+    border: 1px solid var(--sheet-border, rgba(255, 255, 255, 0.08));
+    border-top: 1px solid var(--sheet-border, rgba(255, 255, 255, 0.08));
+    padding: 26px 28px;
+    animation-name: oracleMarginaliaFadeIn;
+  }
+  @keyframes oracleMarginaliaFadeIn {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+}
+
+.oracle-marginalia-grip {
+  width: 38px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--text-tertiary, rgba(255, 255, 255, 0.2));
+  margin: 0 auto 18px;
+}
+@media (min-width: 768px) {
+  .oracle-marginalia-grip { display: none; }
+}
+
+/* The highlighted passage — serif italic blockquote with a color bar */
+.oracle-marginalia-passage {
+  position: relative;
+  padding: 8px 0 14px 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.05));
+}
+.oracle-marginalia-passage blockquote {
+  margin: 0;
+  font-family: 'Georgia', 'Cormorant Garamond', 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  letter-spacing: 0.01em;
+}
+.oracle-marginalia-bar {
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 14px;
+  width: 3px;
+  border-radius: 2px;
+}
+.oracle-marginalia-bar--amber { background: var(--ink-amber-shadow, #f7b94a); }
+.oracle-marginalia-bar--rose  { background: var(--ink-rose-shadow, #ec7497); }
+.oracle-marginalia-bar--azure { background: var(--ink-azure-shadow, #6498d6); }
+.oracle-marginalia-bar--sage  { background: var(--ink-sage-shadow, #6dac82); }
+
+/* Inherit ink color variables on the sheet so the bar resolves */
+.oracle-marginalia-sheet {
+  --ink-amber-shadow: rgba(255, 205, 110, 0.7);
+  --ink-rose-shadow: rgba(255, 145, 175, 0.7);
+  --ink-azure-shadow: rgba(155, 195, 245, 0.7);
+  --ink-sage-shadow: rgba(165, 215, 175, 0.7);
+}
+[data-theme="light"] .oracle-marginalia-sheet {
+  --ink-amber-shadow: #c89516;
+  --ink-rose-shadow: #c75478;
+  --ink-azure-shadow: #4882c1;
+  --ink-sage-shadow: #5b9871;
+}
+
+.oracle-marginalia-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary, rgba(255, 255, 255, 0.4));
+  margin-bottom: 8px;
+}
+
+.oracle-marginalia-textarea {
+  width: 100%;
+  min-height: 110px;
+  background: var(--surface-overlay, rgba(255, 255, 255, 0.025));
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-family: 'Georgia', 'Cormorant Garamond', 'Times New Roman', serif;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--text, #fff);
+  resize: vertical;
+  outline: none;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+.oracle-marginalia-textarea:focus {
+  border-color: var(--accent-gold-border, rgba(255, 221, 0, 0.25));
+  background: var(--accent-gold-bg, rgba(255, 221, 0, 0.03));
+}
+.oracle-marginalia-textarea::placeholder {
+  color: var(--text-tertiary, rgba(255, 255, 255, 0.3));
+  font-style: italic;
+}
+
+.oracle-marginalia-count {
+  text-align: right;
+  font-size: 0.68rem;
+  color: var(--text-tertiary, rgba(255, 255, 255, 0.3));
+  margin-top: 4px;
+  margin-bottom: 14px;
+}
+
+.oracle-marginalia-colors {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 22px;
+  justify-content: center;
+}
+.oracle-marginalia-color {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  transition: transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.oracle-marginalia-color:hover { transform: scale(1.15); }
+.oracle-marginalia-color.active {
+  transform: scale(1.18);
+  box-shadow: 0 0 0 2px var(--background, #000), 0 0 0 4px var(--text, #fff);
+}
+.oracle-marginalia-color--amber { background: radial-gradient(circle at 35% 30%, #ffe39a, #f7b94a 75%); }
+.oracle-marginalia-color--rose  { background: radial-gradient(circle at 35% 30%, #ffb6cf, #ec7497 75%); }
+.oracle-marginalia-color--azure { background: radial-gradient(circle at 35% 30%, #bcd6f7, #6498d6 75%); }
+.oracle-marginalia-color--sage  { background: radial-gradient(circle at 35% 30%, #c6e6cf, #6dac82 75%); }
+
+.oracle-marginalia-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.oracle-marginalia-delete,
+.oracle-marginalia-save {
+  background: transparent;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  padding: 9px 18px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+.oracle-marginalia-delete:hover:not(:disabled) {
+  color: var(--status-relapse, #f87171);
+  border-color: var(--status-relapse, #f87171);
+}
+.oracle-marginalia-save {
+  background: var(--text, #fff);
+  border-color: var(--text, #fff);
+  color: var(--background, #000);
+}
+.oracle-marginalia-save:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+.oracle-marginalia-save:disabled,
+.oracle-marginalia-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   NOTES LIBRARY — Commonplace Book
+   ============================================================================ */
+.oracle-library-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-bg, rgba(0, 0, 0, 0.55));
+  -webkit-backdrop-filter: blur(8px);
+          backdrop-filter: blur(8px);
+  z-index: 100025;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: oracleMarginaliaFade 220ms ease;
+}
+
+.oracle-library {
+  width: 100%;
+  max-width: 560px;
+  height: 92vh;
+  background: var(--sheet-bg, rgba(20, 20, 24, 0.95));
+  border-top: 1px solid var(--sheet-border, rgba(255, 255, 255, 0.08));
+  border-radius: 22px 22px 0 0;
+  -webkit-backdrop-filter: blur(40px) saturate(1.3);
+          backdrop-filter: blur(40px) saturate(1.3);
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.5);
+  animation: oracleMarginaliaUp 340ms cubic-bezier(0.22, 1, 0.36, 1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+@media (min-width: 768px) {
+  .oracle-library-overlay {
+    align-items: center;
+  }
+  .oracle-library {
+    height: 84vh;
+    max-height: 760px;
+    border-radius: 18px;
+    border: 1px solid var(--sheet-border, rgba(255, 255, 255, 0.08));
+    animation-name: oracleMarginaliaFadeIn;
+  }
+}
+
+.oracle-library-grip {
+  width: 38px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--text-tertiary, rgba(255, 255, 255, 0.2));
+  margin: 8px auto 0;
+  flex-shrink: 0;
+}
+@media (min-width: 768px) {
+  .oracle-library-grip { display: none; }
+}
+
+.oracle-library-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.05));
+  flex-shrink: 0;
+}
+.oracle-library-title-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: 1;
+}
+.oracle-library-icon {
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+}
+.oracle-library-title {
+  font-family: 'Georgia', 'Cormorant Garamond', 'Times New Roman', serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--text, #fff);
+  margin: 0;
+}
+.oracle-library-count {
+  font-size: 0.72rem;
+  color: var(--text-tertiary, rgba(255, 255, 255, 0.4));
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.oracle-library-close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+.oracle-library-close:hover {
+  background: var(--surface-overlay, rgba(255, 255, 255, 0.05));
+  color: var(--text, #fff);
+}
+
+.oracle-library-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 22px 32px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.oracle-library-loading,
+.oracle-library-empty {
+  text-align: center;
+  padding: 56px 16px;
+  color: var(--text-tertiary, rgba(255, 255, 255, 0.4));
+}
+.oracle-library-empty-title {
+  font-family: 'Georgia', 'Cormorant Garamond', 'Times New Roman', serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  margin: 0 0 10px;
+}
+.oracle-library-empty-sub {
+  font-size: 0.85rem;
+  line-height: 1.65;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.oracle-library-thread {
+  margin-top: 22px;
+}
+.oracle-library-thread:first-child { margin-top: 4px; }
+
+.oracle-library-thread-title {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary, rgba(255, 255, 255, 0.4));
+  margin: 0 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border-subtle, rgba(255, 255, 255, 0.06));
+}
+
+.oracle-library-entry {
+  padding: 14px 0 16px;
+  border-bottom: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.04));
+}
+.oracle-library-entry:last-child { border-bottom: none; }
+
+.oracle-library-passage {
+  position: relative;
+  margin: 0 0 10px;
+  padding: 4px 0 4px 16px;
+  cursor: pointer;
+  font-family: 'Georgia', 'Cormorant Garamond', 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text, #fff);
+  letter-spacing: 0.01em;
+  transition: color 140ms ease;
+}
+.oracle-library-passage:hover {
+  color: var(--accent-gold, #ffdd00);
+}
+.oracle-library-bar {
+  position: absolute;
+  left: 0; top: 4px; bottom: 4px;
+  width: 3px;
+  border-radius: 2px;
+}
+.oracle-library-bar--amber { background: var(--ink-amber-shadow, #f7b94a); }
+.oracle-library-bar--rose  { background: var(--ink-rose-shadow, #ec7497); }
+.oracle-library-bar--azure { background: var(--ink-azure-shadow, #6498d6); }
+.oracle-library-bar--sage  { background: var(--ink-sage-shadow, #6dac82); }
+
+.oracle-library {
+  --ink-amber-shadow: rgba(255, 205, 110, 0.7);
+  --ink-rose-shadow: rgba(255, 145, 175, 0.7);
+  --ink-azure-shadow: rgba(155, 195, 245, 0.7);
+  --ink-sage-shadow: rgba(165, 215, 175, 0.7);
+}
+[data-theme="light"] .oracle-library {
+  --ink-amber-shadow: #c89516;
+  --ink-rose-shadow: #c75478;
+  --ink-azure-shadow: #4882c1;
+  --ink-sage-shadow: #5b9871;
+}
+
+.oracle-library-note {
+  margin: 6px 0 0 16px;
+  font-size: 0.85rem;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.75));
+  white-space: pre-wrap;
+}
+
+.oracle-library-edit {
+  margin: 8px 0 0 16px;
+}
+.oracle-library-edit-textarea {
+  width: 100%;
+  min-height: 90px;
+  background: var(--surface-overlay, rgba(255, 255, 255, 0.025));
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: 'Georgia', 'Cormorant Garamond', 'Times New Roman', serif;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text, #fff);
+  resize: vertical;
+  outline: none;
+}
+.oracle-library-edit-textarea:focus {
+  border-color: var(--accent-gold-border, rgba(255, 221, 0, 0.25));
+}
+.oracle-library-edit-colors {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+.oracle-library-edit-color {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.oracle-library-edit-color:hover { transform: scale(1.18); }
+.oracle-library-edit-color.active {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 2px var(--sheet-bg, #000), 0 0 0 3px var(--text, #fff);
+}
+.oracle-library-edit-color--amber { background: radial-gradient(circle at 35% 30%, #ffe39a, #f7b94a 75%); }
+.oracle-library-edit-color--rose  { background: radial-gradient(circle at 35% 30%, #ffb6cf, #ec7497 75%); }
+.oracle-library-edit-color--azure { background: radial-gradient(circle at 35% 30%, #bcd6f7, #6498d6 75%); }
+.oracle-library-edit-color--sage  { background: radial-gradient(circle at 35% 30%, #c6e6cf, #6dac82 75%); }
+
+.oracle-library-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-left: 16px;
+}
+.oracle-library-date {
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary, rgba(255, 255, 255, 0.4));
+}
+.oracle-library-foot-actions {
+  display: flex;
+  gap: 6px;
+}
+.oracle-library-foot-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-tertiary, rgba(255, 255, 255, 0.5));
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 5px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 140ms ease, border-color 140ms ease, background-color 140ms ease;
+}
+.oracle-library-foot-btn:hover {
+  color: var(--text, #fff);
+  border-color: var(--border, rgba(255, 255, 255, 0.12));
+}
+.oracle-library-foot-btn--primary {
+  color: var(--text-secondary, rgba(255, 255, 255, 0.85));
+  border-color: var(--border, rgba(255, 255, 255, 0.12));
+}
+.oracle-library-foot-btn--primary:hover {
+  color: var(--accent-gold, #ffdd00);
+  border-color: var(--accent-gold-border-hover, rgba(255, 221, 0, 0.3));
+  background: var(--accent-gold-bg, rgba(255, 221, 0, 0.03));
+}
+
+/* ============================================================================
+   HEADER — Library toggle button
+   ============================================================================ */
+.ai-chat-library-toggle {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+.ai-chat-library-toggle:hover {
+  background: var(--surface-overlay, rgba(255, 255, 255, 0.05));
+  color: var(--text, #fff);
 }

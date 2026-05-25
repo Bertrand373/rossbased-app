@@ -4,6 +4,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './AIChat.css';
 import useSheetSwipe from '../../hooks/useSheetSwipe';
+import useOracleNotes from '../../hooks/useOracleNotes';
+import { useScrollDirection } from '../../hooks/useScrollDirection';
+import { renderOracleContent } from './renderOracleContent';
+import HighlightPalette from './HighlightPalette';
+import MarginaliaSheet from './MarginaliaSheet';
+import NotesLibrary from './NotesLibrary';
 import toast from 'react-hot-toast';
 
 // Mixpanel tracking
@@ -57,36 +63,8 @@ const formatThreadTime = (ts) => {
   return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
 };
 
-// Lightweight markdown renderer for Oracle responses
-// Handles **bold**, *italic*, preserves line breaks via pre-wrap
-const renderMarkdown = (text) => {
-  if (!text) return text;
-  
-  const parts = [];
-  // Bold first (**), then italic (*) — alternation order matters
-  const regex = /\*\*(.+?)\*\*|\*(.+?)\*/gs;
-  let lastIndex = 0;
-  let match;
-  let key = 0;
-
-  while ((match = regex.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index));
-    }
-    if (match[1]) {
-      parts.push(<strong key={`b${key++}`}>{match[1]}</strong>);
-    } else if (match[2]) {
-      parts.push(<em key={`i${key++}`}>{match[2]}</em>);
-    }
-    lastIndex = regex.lastIndex;
-  }
-
-  if (lastIndex < text.length) {
-    parts.push(text.slice(lastIndex));
-  }
-
-  return parts.length > 0 ? parts : text;
-};
+// Oracle message rendering — bold/italic markdown PLUS inline highlight
+// overlays from saved Oracle Notes. See ./renderOracleContent.js.
 
 // Streaming word-fade renderer — wraps each word in a span with CSS fade animation.
 // Splits by /(\s+)/ to preserve whitespace (including \n\n paragraph breaks) between words.
@@ -447,6 +425,16 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   const [error, setError] = useState(null);
   const [pinnedMessages, setPinnedMessages] = useState(new Map()); // timestamp → pinId
 
+  // --- Oracle Notes (highlights + marginalia) ---
+  // highlightPalette: floating color picker shown when user selects Oracle text
+  // marginaliaNote:   the OracleNote currently being edited in the sheet
+  // libraryOpen:      whether the Commonplace Book sheet is open
+  const [highlightPalette, setHighlightPalette] = useState({
+    visible: false, x: 0, y: 0, range: null, message: null
+  });
+  const [marginaliaNote, setMarginaliaNote] = useState(null);
+  const [libraryOpen, setLibraryOpen] = useState(false);
+
   // --- Threads (sidebar) ---
   // threads: array of { threadId, title, isPinned, isArchived, messageCount, lastMessageAt, preview }
   // activeThreadId: current thread (null until first thread is loaded/created)
@@ -476,6 +464,11 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const chatBodyRef = useRef(null);
+  // Sticky thread title — slides in when user scrolls UP through history,
+  // hides when scrolling DOWN toward the latest message. iOS Mail / Twitter
+  // pattern. Hidden entirely near the top so it doesn't double up with the
+  // main header wordmark.
+  const { direction: scrollDirection, scrollTop: bodyScrollTop } = useScrollDirection(chatBodyRef);
   const panelRef = useRef(null);
   const hasTrackedOpen = useRef(false);
   const streamingMessageRef = useRef(null);
@@ -492,6 +485,20 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
       return ['rossbased', 'ross'].includes(payload.username?.toLowerCase());
     } catch { return false; }
   })();
+
+  // Oracle Notes — fetches notes for the active thread, exposes CRUD,
+  // and routes 403 (premium required) into the plan modal.
+  const {
+    notesByMessage,
+    createNote,
+    updateNote,
+    deleteNote,
+    fetchLibrary
+  } = useOracleNotes({
+    threadId: activeThreadId,
+    isOpen,
+    onPremiumRequired: openPlanModal
+  });
 
   // Track chat opened (once per open)
   useEffect(() => {
@@ -1532,6 +1539,156 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
     }
   };
 
+  // ===== Oracle Notes: selection capture + handlers =====
+
+  // Listen for selections inside Oracle messages and surface the highlight
+  // palette. Selection offsets are computed in plain text — the DOM's
+  // textContent matches plainTextOf(message.content) by construction.
+  useEffect(() => {
+    if (!isOpen) return;
+    let timer = null;
+
+    const handler = () => {
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || sel.rangeCount === 0) {
+        setHighlightPalette(prev => prev.visible ? { ...prev, visible: false } : prev);
+        return;
+      }
+      const range = sel.getRangeAt(0);
+      const text = range.toString();
+      if (!text || !text.trim()) {
+        setHighlightPalette(prev => prev.visible ? { ...prev, visible: false } : prev);
+        return;
+      }
+
+      const nodeOf = (n) => n.nodeType === Node.TEXT_NODE ? n.parentElement : n;
+      const startEl = nodeOf(range.startContainer);
+      const endEl = nodeOf(range.endContainer);
+      if (!startEl || !endEl) return;
+
+      const startMsg = startEl.closest('.ai-chat-message.assistant');
+      const endMsg = endEl.closest('.ai-chat-message.assistant');
+      if (!startMsg || startMsg !== endMsg) {
+        setHighlightPalette(prev => prev.visible ? { ...prev, visible: false } : prev);
+        return;
+      }
+
+      const messageTs = startMsg.getAttribute('data-message-ts');
+      if (!messageTs) return; // streaming message — no timestamp yet
+
+      const contentEl = startMsg.querySelector('.ai-chat-message-content');
+      if (!contentEl
+        || !contentEl.contains(range.startContainer)
+        || !contentEl.contains(range.endContainer)) {
+        setHighlightPalette(prev => prev.visible ? { ...prev, visible: false } : prev);
+        return;
+      }
+
+      const preRange = document.createRange();
+      preRange.setStart(contentEl, 0);
+      preRange.setEnd(range.startContainer, range.startOffset);
+      const startOffset = preRange.toString().length;
+      const endOffset = startOffset + text.length;
+
+      const message = messages.find(m => m.timestamp === messageTs);
+      if (!message) return;
+
+      const fullText = contentEl.textContent || '';
+      const CTX = 30;
+      const contextBefore = fullText.slice(Math.max(0, startOffset - CTX), startOffset);
+      const contextAfter = fullText.slice(endOffset, Math.min(fullText.length, endOffset + CTX));
+
+      const rect = range.getBoundingClientRect();
+      const panel = panelRef.current;
+      if (!panel || rect.width === 0) return;
+      const panelRect = panel.getBoundingClientRect();
+      const x = rect.left + rect.width / 2 - panelRect.left;
+      const y = rect.top - panelRect.top - 10;
+
+      setHighlightPalette({
+        visible: true,
+        x,
+        y,
+        message,
+        selection: {
+          text,
+          startOffset,
+          endOffset,
+          contextBefore,
+          contextAfter
+        }
+      });
+    };
+
+    const debounced = () => {
+      clearTimeout(timer);
+      timer = setTimeout(handler, 180);
+    };
+
+    document.addEventListener('selectionchange', debounced);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('selectionchange', debounced);
+    };
+  }, [isOpen, messages]);
+
+  const closeHighlightPalette = useCallback(() => {
+    setHighlightPalette(prev => ({ ...prev, visible: false }));
+    try { window.getSelection().removeAllRanges(); } catch {}
+  }, []);
+
+  // Create a new highlight from the current palette selection.
+  // Premium gating is enforced server-side; the hook routes 403s to openPlanModal.
+  const createHighlightFromPalette = useCallback(async (color) => {
+    const { message, selection } = highlightPalette;
+    if (!message || !selection) return null;
+    const thread = threads.find(t => t.threadId === activeThreadId);
+    const note = await createNote({
+      threadId: activeThreadId,
+      threadTitle: thread?.title || '',
+      messageTimestamp: message.timestamp,
+      startOffset: selection.startOffset,
+      endOffset: selection.endOffset,
+      highlightedText: selection.text,
+      contextBefore: selection.contextBefore,
+      contextAfter: selection.contextAfter,
+      color: color || 'amber',
+      note: ''
+    });
+    closeHighlightPalette();
+    return note;
+  }, [highlightPalette, threads, activeThreadId, createNote, closeHighlightPalette]);
+
+  const handlePickColor = useCallback(async (color) => {
+    await createHighlightFromPalette(color);
+  }, [createHighlightFromPalette]);
+
+  const handleAddNoteFromPalette = useCallback(async () => {
+    const note = await createHighlightFromPalette('amber');
+    if (note) setMarginaliaNote(note);
+  }, [createHighlightFromPalette]);
+
+  const handleHighlightClick = useCallback((noteId) => {
+    let found = null;
+    for (const arr of notesByMessage.values()) {
+      const n = arr.find(x => x._id === noteId);
+      if (n) { found = n; break; }
+    }
+    if (found) setMarginaliaNote(found);
+  }, [notesByMessage]);
+
+  const handleSaveMarginalia = useCallback(async (patch) => {
+    if (!marginaliaNote) return;
+    const updated = await updateNote(marginaliaNote._id, patch);
+    if (updated) setMarginaliaNote(updated);
+  }, [marginaliaNote, updateNote]);
+
+  const handleDeleteCurrentMarginalia = useCallback(async () => {
+    if (!marginaliaNote) return;
+    await deleteNote(marginaliaNote._id, marginaliaNote.messageTimestamp, marginaliaNote.threadId);
+    setMarginaliaNote(null);
+  }, [marginaliaNote, deleteNote]);
+
   // Don't render if not logged in
   if (!isLoggedIn) return null;
 
@@ -1830,6 +1987,18 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
               </span>
             </div>
             <button
+              className="ai-chat-library-toggle"
+              onClick={() => setLibraryOpen(true)}
+              aria-label="Open marginalia"
+              title="Marginalia"
+            >
+              {/* Open-book glyph for the Commonplace Book view */}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 4.5C5 3.5 8.5 3.5 12 5c3.5-1.5 7-1.5 10-.5v15c-3-1-6.5-1-10 .5-3.5-1.5-7-1.5-10-.5Z" />
+                <path d="M12 5v15" />
+              </svg>
+            </button>
+            <button
               className="ai-chat-close"
               onClick={onClose}
               aria-label="Close chat"
@@ -1840,6 +2009,25 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
               </svg>
             </button>
           </header>
+
+          {/* Sticky thread title — slides in below the header when the user
+              scrolls UP through history (so they can see which thread they're
+              in mid-scroll), hides when scrolling DOWN toward the latest
+              message. Suppressed when at the top (main wordmark is right there)
+              or when the active thread has no title. */}
+          {(() => {
+            const activeThread = threads.find(t => t.threadId === activeThreadId);
+            const title = activeThread?.title;
+            const isVisible = !!title && bodyScrollTop > 120 && scrollDirection === 'up';
+            return (
+              <div
+                className={`ai-chat-sticky-title${isVisible ? ' visible' : ''}`}
+                aria-hidden={!isVisible}
+              >
+                <span className="ai-chat-sticky-title-text">{title}</span>
+              </div>
+            );
+          })()}
 
           {/* Messages */}
           <div className="ai-chat-body" ref={chatBodyRef}>
@@ -1871,7 +2059,11 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                       <img src="/The_Oracle.png" alt="" className={`ai-chat-avatar${index === lastAssistantIndex && !oracleIsElsewhere ? '' : ' ai-chat-avatar-past'}`} />
                       <div className="ai-chat-message-content">
                         {msg.isTransmission && <span className="ai-chat-transmission-label" />}
-                        {renderMarkdown(msg.content)}
+                        {renderOracleContent(
+                          msg.content,
+                          notesByMessage.get(msg.timestamp),
+                          { onHighlightClick: handleHighlightClick }
+                        )}
                       </div>
                     </div>
                     <div className="ai-chat-actions">
@@ -2130,6 +2322,42 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
           </div>
 
           </div> {/* .ai-chat-main */}
+
+          {/* Oracle Notes — selection palette, marginalia sheet, library */}
+          <HighlightPalette
+            visible={highlightPalette.visible}
+            x={highlightPalette.x}
+            y={highlightPalette.y}
+            onPickColor={handlePickColor}
+            onAddNote={handleAddNoteFromPalette}
+            onClose={closeHighlightPalette}
+          />
+          <MarginaliaSheet
+            open={!!marginaliaNote}
+            note={marginaliaNote}
+            onSave={handleSaveMarginalia}
+            onDelete={handleDeleteCurrentMarginalia}
+            onClose={() => setMarginaliaNote(null)}
+          />
+          <NotesLibrary
+            open={libraryOpen}
+            onClose={() => setLibraryOpen(false)}
+            fetchLibrary={fetchLibrary}
+            onUpdateNote={updateNote}
+            onDeleteNote={deleteNote}
+            onJumpToNote={(note) => {
+              setLibraryOpen(false);
+              switchToThread(note.threadId, note.messageTimestamp);
+              // After scroll settles, briefly pulse the highlight
+              setTimeout(() => {
+                const el = document.querySelector(`[data-note-id="${note._id}"]`);
+                if (el) {
+                  el.classList.add('oracle-highlight--pulse');
+                  setTimeout(() => el.classList.remove('oracle-highlight--pulse'), 1800);
+                }
+              }, 600);
+            }}
+          />
 
           {/* Delete-thread confirm modal — at panel root so it overlays the
               sidebar drawer on mobile, not behind it. */}
