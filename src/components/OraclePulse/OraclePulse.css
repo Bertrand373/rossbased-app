@@ -26,7 +26,10 @@
 }
 
 [data-theme="light"] .oracle-pulse-label.gold {
-  color: rgba(160, 130, 0, 0.4);
+  /* Was rgba(160, 130, 0, 0.4) — darker gold but still gold, still illegible
+     on cream. Match the muted-text palette so the Oracle "tag" reads as a
+     subtle italic label, not a gold accent (gold-on-cream just disappears). */
+  color: var(--text-tertiary);
 }
 
 /* Observation text */
@@ -47,7 +50,10 @@
 }
 
 [data-theme="light"] .oracle-pulse-text.oracle-gold {
-  color: rgba(160, 130, 0, 0.65);
+  /* Oracle "premium voice" text — was rgba(160, 130, 0, 0.65) (darker gold,
+     still illegible). Match secondary text so the italic still feels
+     "Oracle-spoken" without leaning on gold that disappears into cream. */
+  color: var(--text-secondary);
 }
 
 /* Word-by-word fade — each word starts invisible, fades in */
