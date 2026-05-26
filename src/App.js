@@ -48,6 +48,7 @@ import { useAutoTrain } from './hooks/useAutoTrain';
 import { CircleProvider } from './hooks/useCircle';
 import CircleStack from './components/Circle/CircleStack';
 import CircleSheet from './components/Circle/CircleSheet';
+import MeSheet from './components/MeSheet/MeSheet';
 
 // Mixpanel Analytics
 import { initMixpanel, identifyUser, trackAppOpen, trackPageView, trackLogout, resetMixpanel } from './utils/mixpanel';
@@ -110,43 +111,27 @@ const ThemeProvider = ({ children }) => {
   );
 };
 
-// Discord Button - opens the community server
-// On mobile with Discord installed, Discord's invite page auto-handoffs to the app
-// via Universal Links / App Links. No manual discord:// scheme needed.
-const DiscordButton = () => (
-  <a
-    href="https://discord.gg/RDFC5eUtuA"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="header-discord-link"
-    aria-label="Join the TitanTrack Discord community"
-    title="Join the Discord"
-  >
-    <svg
-      viewBox="0 0 24 24"
-      className="header-discord-icon"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        fill="currentColor"
-        d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"
-      />
-    </svg>
-  </a>
-);
-
 // Profile Button - Discord avatar with initial fallback
-const ProfileButton = ({ userData }) => {
-  const navigate = useNavigate();
+//
+// PR #1 cleanup: this used to sit next to a separate DiscordButton in the
+// header-actions row. Discord now lives inside the Me sheet as the
+// Community tile, so the top-right reduces to CircleStack + ProfileButton.
+//
+// The avatar no longer routes straight to /profile — it opens the Me sheet,
+// which acts as a launcher (Community / Settings / TTTV when it ships).
+// /profile is still reached via the Settings tile inside the sheet.
+const ProfileButton = ({ userData, onOpen }) => {
   const location = useLocation();
+  // Active ring still appears when the user is on /profile (reached via the
+  // Me sheet's Settings tile). The Me sheet itself is a transient launcher,
+  // not a destination, so opening it doesn't trigger the active state.
   const isActive = location.pathname === '/profile';
-  
+
   // Get first initial from username or email as fallback
-  const initial = userData?.username?.charAt(0)?.toUpperCase() || 
-                  userData?.email?.charAt(0)?.toUpperCase() || 
+  const initial = userData?.username?.charAt(0)?.toUpperCase() ||
+                  userData?.email?.charAt(0)?.toUpperCase() ||
                   '?';
-  
+
   // Build Discord avatar URL if available
   const getDiscordAvatarUrl = () => {
     const { discordId, discordAvatar } = userData || {};
@@ -156,14 +141,14 @@ const ProfileButton = ({ userData }) => {
     }
     return null;
   };
-  
+
   const avatarUrl = getDiscordAvatarUrl();
-  
+
   return (
-    <button 
-      className={`profile-circle ${isActive ? 'active' : ''} ${avatarUrl ? 'has-avatar' : ''}`} 
-      onClick={() => navigate('/profile')} 
-      aria-label="Profile"
+    <button
+      className={`profile-circle ${isActive ? 'active' : ''} ${avatarUrl ? 'has-avatar' : ''}`}
+      onClick={() => onOpen && onOpen()}
+      aria-label="Open profile menu"
     >
       {avatarUrl ? (
         <img src={avatarUrl} alt="" className="profile-circle-img" />
@@ -685,6 +670,14 @@ function AppContent({
   const [showCircleSheet, setShowCircleSheet] = useState(false);
   const openCircleSheet = useCallback(() => setShowCircleSheet(true), []);
 
+  // Me sheet state — the polished foyer behind the profile avatar.
+  // Replaces the old "tap avatar → navigate to /profile" behavior. Holds
+  // tiles for Community (Discord), Settings (still routes to /profile),
+  // and Library. TTTV tile will be added when the /tv route ships.
+  const [showMeSheet, setShowMeSheet] = useState(false);
+  const openMeSheet = useCallback(() => setShowMeSheet(true), []);
+  const closeMeSheet = useCallback(() => setShowMeSheet(false), []);
+
   const { theme } = useTheme();
 
   // Pending admin replies to user-submitted feedback (bug responses, etc).
@@ -775,8 +768,7 @@ function AppContent({
               
               <div className="header-actions">
                 <CircleStack onClick={openCircleSheet} />
-                <DiscordButton />
-                <ProfileButton userData={userData} />
+                <ProfileButton userData={userData} onOpen={openMeSheet} />
               </div>
             </header>
             
@@ -888,6 +880,15 @@ function AppContent({
               onClose={() => setShowCircleSheet(false)}
               viewerUsername={userData?.username}
               currentStreak={userData?.currentStreak || 0}
+            />
+
+            <MeSheet
+              open={showMeSheet}
+              onClose={closeMeSheet}
+              userData={userData}
+              isPremium={effectivePremium}
+              onLogout={logout}
+              onOpenNotes={() => { closeMeSheet(); setShowAIChat(true); }}
             />
           </>
         ) : (
