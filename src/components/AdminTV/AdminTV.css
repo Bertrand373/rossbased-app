@@ -1,0 +1,493 @@
+/* src/components/AdminTV/AdminTV.css
+   Producer-side admin page. Desktop-first (Ross uploads from a laptop most
+   of the time) but degrades cleanly on mobile (single-column stack). Uses
+   the app's design tokens so it sits next to AdminCockpit visually. */
+
+.admin-tv {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+  color: var(--text);
+  font-family: var(--sans, -apple-system, BlinkMacSystemFont, system-ui, sans-serif);
+}
+
+/* ============================================================
+   HEAD
+   ============================================================ */
+
+.admin-tv-head {
+  margin-bottom: 28px;
+}
+
+.admin-tv-title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  margin: 0 0 4px;
+  color: var(--text);
+}
+
+.admin-tv-tagline {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin: 0;
+}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+
+.admin-tv-section {
+  margin-bottom: 40px;
+}
+
+.admin-tv-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0 0 12px;
+}
+
+/* ============================================================
+   DROPZONE
+   ============================================================ */
+
+.admin-tv-dropzone {
+  border: 1.5px dashed var(--border-prominent);
+  border-radius: 16px;
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.015);
+  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.admin-tv-dropzone:hover,
+.admin-tv-dropzone:focus-visible {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--accent-gold-border);
+  outline: none;
+}
+
+.admin-tv-dropzone.active {
+  background: rgba(255, 221, 0, 0.04);
+  border-color: var(--accent-gold);
+  transform: scale(1.005);
+}
+
+[data-theme="light"] .admin-tv-dropzone {
+  background: rgba(58, 46, 28, 0.02);
+}
+[data-theme="light"] .admin-tv-dropzone:hover {
+  background: rgba(58, 46, 28, 0.04);
+}
+
+.admin-tv-dropzone-icon {
+  font-size: 28px;
+  color: var(--accent-gold);
+  margin-bottom: 12px;
+  opacity: 0.85;
+}
+
+.admin-tv-dropzone-text {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.admin-tv-dropzone-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   STAGE — preview + form side-by-side on desktop, stacked on mobile
+   ============================================================ */
+
+.admin-tv-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 280px) 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .admin-tv-stage {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-tv-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-tv-preview-video {
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  background: #000;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  object-fit: cover;
+}
+
+.admin-tv-preview-meta {
+  display: flex;
+  gap: 6px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.admin-tv-warning {
+  margin-top: 4px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  color: var(--warning);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* ============================================================
+   FORM
+   ============================================================ */
+
+.admin-tv-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.admin-tv-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-tv-field-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  font-weight: 600;
+}
+
+.admin-tv-input {
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.admin-tv-input:focus {
+  outline: none;
+  border-color: var(--accent-gold-border-hover, rgba(255, 221, 0, 0.3));
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.admin-tv-input-narrow {
+  max-width: 140px;
+}
+
+.admin-tv-fieldset {
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 14px 16px 16px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-tv-fieldset-legend {
+  padding: 0 6px;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--accent-gold-text);
+}
+
+.admin-tv-fieldset-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: -4px 0 0;
+  line-height: 1.4;
+}
+
+.admin-tv-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.admin-tv-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--accent-gold);
+}
+
+/* ============================================================
+   FORM ACTIONS — pills, matching the app vocabulary
+   ============================================================ */
+
+.admin-tv-form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.admin-tv-btn {
+  padding: 10px 22px;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--transition-fast), border-color var(--transition-fast), opacity var(--transition-fast);
+}
+
+.admin-tv-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.admin-tv-btn-ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.admin-tv-btn-ghost:hover:not(:disabled) {
+  background: var(--surface-overlay);
+  color: var(--text);
+}
+
+.admin-tv-btn-primary {
+  background: var(--accent-gold);
+  color: #000;
+  font-weight: 600;
+}
+
+.admin-tv-btn-primary:hover:not(:disabled) {
+  background: var(--primary-light, #ffe94d);
+}
+
+/* ============================================================
+   EPISODE LIST
+   ============================================================ */
+
+.admin-tv-empty {
+  padding: 32px 20px;
+  text-align: center;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.admin-tv-empty-error {
+  color: var(--danger);
+  border-color: rgba(255, 59, 48, 0.18);
+}
+
+.admin-tv-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-tv-row {
+  display: grid;
+  grid-template-columns: 56px 1fr auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  transition: border-color var(--transition-fast);
+}
+
+.admin-tv-row:hover {
+  border-color: var(--border);
+}
+
+.admin-tv-row.draft {
+  opacity: 0.85;
+}
+
+.admin-tv-row-poster {
+  width: 56px;
+  height: 84px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+  flex-shrink: 0;
+}
+
+.admin-tv-row-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.admin-tv-row-poster-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+
+.admin-tv-row-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-tv-row-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.admin-tv-row-ep {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-gold-text);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.admin-tv-row-name {
+  color: var(--text);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-tv-row-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.admin-tv-row-status {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.admin-tv-status {
+  padding: 4px 9px;
+  border-radius: 9999px;
+}
+
+.admin-tv-status-published {
+  background: rgba(52, 211, 153, 0.10);
+  color: var(--status-current, #34d399);
+}
+
+.admin-tv-status-draft {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+}
+
+.admin-tv-row-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.admin-tv-row-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: 50%;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+  font-size: 12px;
+}
+
+.admin-tv-row-btn:hover {
+  background: var(--surface-overlay);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.admin-tv-row-btn-danger:hover {
+  background: rgba(255, 59, 48, 0.08);
+  border-color: rgba(255, 59, 48, 0.25);
+  color: var(--danger);
+}
+
+/* ============================================================
+   MOBILE TUNING
+   ============================================================ */
+
+@media (max-width: 540px) {
+  .admin-tv {
+    padding: 24px 16px 60px;
+  }
+
+  .admin-tv-row {
+    grid-template-columns: 48px 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 12px;
+  }
+
+  .admin-tv-row-poster {
+    width: 48px;
+    height: 72px;
+    grid-row: span 2;
+  }
+
+  .admin-tv-row-status {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .admin-tv-row-actions {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    align-self: center;
+    flex-direction: column;
+  }
+}
