@@ -289,7 +289,40 @@
 .ac-nav-btn.active svg { opacity: 1; }
 .ac-nav-btn.active .ac-nav-label { color: #ffffff; }
 
-/* ===== SUB-NAV (Intelligence tab) ===== */
+/* ===== PER-TAB TITLE BLOCK =====
+   Title + tagline pattern pulled forward from TTTV so every tab opens with
+   "you're here, here's why" before the content. Sits between the nav and
+   the section content, separated by a hairline. */
+.ac-tab-head {
+  margin: -8px 4px 22px;
+  padding: 4px 0 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.ac-tab-title {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  color: #ffffff;
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.ac-tab-tagline {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0;
+  letter-spacing: 0.01em;
+}
+
+[data-theme="light"] .ac-tab-head { border-bottom-color: rgba(58, 46, 28, 0.10); }
+[data-theme="light"] .ac-tab-title { color: rgba(0, 0, 0, 0.85); }
+[data-theme="light"] .ac-tab-tagline { color: rgba(0, 0, 0, 0.55); }
+
+/* ===== SUB-NAV (Intelligence + Oracle tabs) =====
+   Same vocabulary as the main tab nav now: horizontal scroll on narrow
+   viewports (no clipping), flex distribution on desktop, restrained gold
+   tint on active state to keep typographic consistency across the chrome. */
 .ac-sub-nav {
   display: flex;
   gap: 2px;
@@ -297,28 +330,41 @@
   background: rgba(255,255,255,0.015);
   border: 1px solid rgba(255,255,255,0.04);
   border-radius: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
+
+.ac-sub-nav::-webkit-scrollbar { display: none; }
 
 .ac-sub-btn {
-  flex: 1;
+  flex-shrink: 0;
   background: none;
   border: none;
-  color: rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.30);
   font-size: 11px;
   font-weight: 600;
-  padding: 7px 10px;
+  padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
   white-space: nowrap;
   letter-spacing: 0.2px;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.ac-sub-btn:hover { color: rgba(255,255,255,0.45); }
+@media (min-width: 768px) {
+  .ac-sub-btn { flex: 1; }
+}
 
+.ac-sub-btn:hover { color: rgba(255,255,255,0.55); }
+
+/* Gold-tinted active — subtler than the main nav (sub-navs are secondary
+   navigation, shouldn't compete visually with the parent tabs). */
 .ac-sub-btn.active {
-  background: rgba(255,255,255,0.06);
-  color: rgba(255,255,255,0.85);
+  background: rgba(255, 221, 0, 0.06);
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255, 221, 0, 0.14);
 }
 
 /* ===== SECTION BRAND HEADERS (Oracle, Revenue) ===== */
@@ -507,13 +553,18 @@
 }
 
 /* Health colors */
-.ac-h-good .ac-c4-val { color: rgba(34,197,94,0.9); }
-.ac-h-ok .ac-c4-val { color: rgba(234,179,8,0.85); }
-.ac-h-low .ac-c4-val { color: rgba(239,68,68,0.75); }
+/* Overview metric health colors — softened to match the calendar status
+   palette already used throughout the app (#34d399, #fbbf24, #f87171).
+   Previous bright Tailwind green at 0.9 alpha was dominating the chrome
+   and creating false hierarchy: every "good" metric screamed louder than
+   the gold accent that's supposed to be the brand signal. */
+.ac-h-good .ac-c4-val { color: rgba(52, 211, 153, 0.82); }
+.ac-h-ok   .ac-c4-val { color: rgba(251, 191, 36, 0.82); }
+.ac-h-low  .ac-c4-val { color: rgba(248, 113, 113, 0.78); }
 
-.ac-h-good .ac-c4-label::before { background: rgba(34,197,94,0.6); box-shadow: 0 0 6px rgba(34,197,94,0.2); }
-.ac-h-ok .ac-c4-label::before { background: rgba(234,179,8,0.5); box-shadow: 0 0 6px rgba(234,179,8,0.15); }
-.ac-h-low .ac-c4-label::before { background: rgba(239,68,68,0.5); box-shadow: 0 0 6px rgba(239,68,68,0.15); }
+.ac-h-good .ac-c4-label::before { background: rgba(52, 211, 153, 0.55); box-shadow: 0 0 6px rgba(52, 211, 153, 0.18); }
+.ac-h-ok   .ac-c4-label::before { background: rgba(251, 191, 36, 0.5); box-shadow: 0 0 6px rgba(251, 191, 36, 0.15); }
+.ac-h-low  .ac-c4-label::before { background: rgba(248, 113, 113, 0.5); box-shadow: 0 0 6px rgba(248, 113, 113, 0.15); }
 
 /* ===== INFO TOGGLE + TIP ===== */
 .ac-info {
@@ -1842,13 +1893,23 @@
 
 /* ===== ANNOUNCEMENTS / UPDATES TAB ===== */
 
+/* Wrap the announcement editor in a section card so the form doesn't sit
+   naked on the page. Matches the .ac-card visual language used elsewhere
+   in admin (subtle bg + hairline border + generous radius). */
 .ac-ann-editor {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  padding: 22px 22px 20px;
   margin-bottom: 24px;
+}
+
+[data-theme="light"] .ac-ann-editor {
+  background: rgba(58, 46, 28, 0.03);
+  border-color: rgba(58, 46, 28, 0.08);
 }
 
 .ac-ann-heading {
@@ -1886,7 +1947,8 @@
 }
 
 .ac-ann-input:focus {
-  border-color: rgba(255,255,255,0.15);
+  border-color: rgba(255, 221, 0, 0.30);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .ac-ann-textarea {
@@ -1904,26 +1966,29 @@
 }
 
 .ac-ann-textarea:focus {
-  border-color: rgba(255,255,255,0.15);
+  border-color: rgba(255, 221, 0, 0.30);
+  background: rgba(255, 255, 255, 0.05);
 }
 
+/* Primary submit — pilled to match the app's button vocabulary
+   (Log Today, TTTV upload, etc). */
 .ac-ann-publish {
-  padding: 12px 20px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 8px;
-  color: #ffffff;
+  padding: 11px 24px;
+  background: rgba(255, 221, 0, 0.92);
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  color: #000000;
   font-size: 13px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 0.15s, opacity 0.15s;
   margin-top: 4px;
+  align-self: flex-start;
 }
 
 .ac-ann-publish:hover:not(:disabled) {
-  background: rgba(255,255,255,0.12);
-  border-color: rgba(255,255,255,0.2);
+  background: rgba(255, 233, 77, 1);
 }
 
 .ac-ann-publish:disabled {
@@ -1951,18 +2016,21 @@
   margin: 0 0 10px 0;
 }
 
+/* Ghost secondary — pilled to match. Less weight than the primary publish
+   pill above so the visual hierarchy is clear. */
 .ac-ann-draft-btn {
-  padding: 9px 16px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 8px;
-  color: rgba(255,255,255,0.5);
+  padding: 9px 20px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  color: rgba(255, 255, 255, 0.65);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
   margin-top: 10px;
+  align-self: flex-start;
 }
 
 .ac-ann-draft-btn:hover:not(:disabled) {
