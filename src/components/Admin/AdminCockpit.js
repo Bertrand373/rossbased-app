@@ -125,6 +125,25 @@ const RetentionChart = ({ data }) => {
 };
 
 // ============================================================
+// TAB METADATA
+// One source of truth for the 7 tabs — used by the nav, the brand
+// chip (dynamic "ADMIN · TABNAME"), and the per-tab title block.
+// `label` is the short nav copy; `title` is the longer page header
+// (e.g. "Intelligence" expands the short "Intel" tab label).
+// `tagline` is the one-line "you're here, here's why" subtitle.
+// TTTV is null because AdminTV renders its own title internally.
+// ============================================================
+const ADMIN_TABS = [
+  { id: 'overview',     label: 'Overview', title: 'Overview',     tagline: 'Health of the product, at a glance.' },
+  { id: 'intelligence', label: 'Intel',    title: 'Intelligence', tagline: 'What members are actually using.' },
+  { id: 'users',        label: 'Users',    title: 'Users',        tagline: 'Roster, filters, and lifecycle state.' },
+  { id: 'revenue',      label: 'Revenue',  title: 'Revenue',      tagline: 'Stripe truth, no spin.' },
+  { id: 'oracle',       label: 'Oracle',   title: 'Oracle',       tagline: 'AI system health and knowledge base.' },
+  { id: 'updates',      label: 'Updates',  title: 'Updates',      tagline: 'Ship notes for members.' },
+  { id: 'tttv',         label: 'TTTV',     title: null,           tagline: null },
+];
+
+// ============================================================
 // MAIN COMPONENT
 // ============================================================
 const AdminCockpit = () => {
@@ -510,6 +529,9 @@ const AdminCockpit = () => {
   };
 
   if (authError) return <div className="ac-wrap"><div className="ac-error">{authError}</div></div>;
+  // Current tab metadata — drives the brand chip and the per-tab title.
+  const currentTab = ADMIN_TABS.find(t => t.id === tab) || ADMIN_TABS[0];
+
   if (loading) return (
     <div className="ac-wrap">
       <div className="ac-loading">
@@ -527,7 +549,7 @@ const AdminCockpit = () => {
         <div className="ac-header-top">
           <div className="ac-brand">
             <img src="/tt-icon-white.png" alt="TitanTrack" className="ac-brand-icon" />
-            <span className="ac-brand-chip">ADMIN</span>
+            <span className="ac-brand-chip">ADMIN · {currentTab.label.toUpperCase()}</span>
           </div>
           <div className="ac-header-right">
             {lastRefresh && (
@@ -594,20 +616,24 @@ const AdminCockpit = () => {
 
       {/* ===== NAV WITH ICONS ===== */}
       <div className="ac-nav">
-        {[
-          { id: 'overview', label: 'Overview' },
-          { id: 'intelligence', label: 'Intel' },
-          { id: 'users', label: 'Users' },
-          { id: 'revenue', label: 'Revenue' },
-          { id: 'oracle', label: 'Oracle' },
-          { id: 'updates', label: 'Updates' },
-          { id: 'tttv', label: 'TTTV' },
-        ].map(t => (
+        {ADMIN_TABS.map(t => (
           <button key={t.id} className={`ac-nav-btn ${tab === t.id ? 'active' : ''}`} onClick={() => setTab(t.id)}>
             <span className="ac-nav-label">{t.label}</span>
           </button>
         ))}
       </div>
+
+      {/* ===== PER-TAB TITLE BLOCK =====
+          Pulls the "title + tagline" pattern forward from TTTV so every tab
+          establishes "you're here, here's why" before content begins. TTTV
+          renders its own title inside AdminTV, so we skip the block when
+          tagline is null. */}
+      {currentTab.tagline && (
+        <div className="ac-tab-head">
+          <h1 className="ac-tab-title">{currentTab.title}</h1>
+          <p className="ac-tab-tagline">{currentTab.tagline}</p>
+        </div>
+      )}
 
       {/* ===== OVERVIEW ===== */}
       {tab === 'overview' && overview && retention && (
