@@ -175,6 +175,46 @@ body:has(.sheet-backdrop.open) {
 }
 
 /* ============================================================
+   DESKTOP X CLOSE — shared affordance
+   ============================================================
+   For sheets that need a discoverable dismiss on desktop. Hidden
+   on mobile because swipe-down + backdrop already cover that job;
+   a third affordance would be redundant. Drop it into the panel
+   and the absolute positioning handles the rest. */
+
+.sheet-close-desktop {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  z-index: 3;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sheet-close-desktop:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .sheet-close-desktop:hover {
+  background: rgba(58, 46, 28, 0.06);
+}
+
+@media (max-width: 767px) {
+  .sheet-close-desktop { display: none; }
+}
+
+/* ============================================================
    REDUCED MOTION
    ============================================================ */
 

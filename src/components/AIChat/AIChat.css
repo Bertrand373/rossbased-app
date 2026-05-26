@@ -246,6 +246,13 @@
   color: var(--text-secondary);
 }
 
+/* Hide the X on mobile — swipe-down handles dismiss there. The X is a
+   desktop convention (no swipe gesture available); on mobile it competes
+   with the swipe affordance and steals header chrome. */
+@media (max-width: 767px) {
+  .ai-chat-close { display: none; }
+}
+
 /* ============================================================
    STICKY THREAD TITLE
    ============================================================

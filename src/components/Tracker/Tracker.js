@@ -1445,9 +1445,22 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
       {showStreakOptions && (
         <div className={`sheet-backdrop${sheetReady ? ' open' : ''}`} onClick={() => closeSheet(() => setShowStreakOptions(false))}>
           <div ref={sheetPanelRef} className={`sheet-panel tracker-sheet${sheetReady ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
-            <div 
+            <div
               className="sheet-header"
             />
+            {/* Desktop-only X close — mobile uses swipe-down. Hidden via
+                shared .sheet-close-desktop media query in BottomSheet.css. */}
+            <button
+              type="button"
+              className="sheet-close-desktop"
+              onClick={() => closeSheet(() => setShowStreakOptions(false))}
+              aria-label="Close"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
             <div className="sheet">
               <h3 className="sheet-title">Streak Options</h3>
               <div className="sheet-content">
@@ -1492,16 +1505,17 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
                   Log wet dream
                 </button>
                 <div className="sheet-divider" />
-                <button 
-                  className="danger" 
+                <button
+                  className="danger"
                   onClick={() => closeSheet(() => { setShowStreakOptions(false); setResetType('relapse'); setShowResetConfirm(true); })}
                 >
                   Reset streak
                 </button>
               </div>
-              <button className="cancel" onClick={() => closeSheet(() => setShowStreakOptions(false))}>
-                Cancel
-              </button>
+              {/* Cancel removed: backdrop tap (always), swipe-down (mobile), and
+                  the X (desktop) already cover dismissal. Nothing in this sheet
+                  needs an explicit "discard changes" semantic — toggles and
+                  pickers auto-save. */}
             </div>
           </div>
         </div>

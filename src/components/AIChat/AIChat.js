@@ -1879,6 +1879,11 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
       className={`ai-chat-sidebar${sidebarOpen ? ' open' : ''}`}
       onClick={() => { if (threadMenuOpenFor) setThreadMenuOpenFor(null); }}
     >
+      {/* Swipe-pill at the very top — matches the main Oracle sheet so the
+          sidebar doesn't feel like a separate surface that can't be dismissed.
+          Mobile only via .sheet-header media query; no-op on desktop. */}
+      <div className="sheet-header" />
+
       <div className="ai-chat-sidebar-header">
         <button
           className="ai-chat-sidebar-collapse"
@@ -1971,9 +1976,6 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
         )}
       </div>
 
-      <div className="ai-chat-sidebar-watermark">
-        <img src="/oracle-wordmark.png" alt="" className="ai-chat-sidebar-watermark-img" />
-      </div>
     </aside>
   );
 
