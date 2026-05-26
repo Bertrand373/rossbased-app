@@ -3,10 +3,13 @@
    of the time) but degrades cleanly on mobile (single-column stack). Uses
    the app's design tokens so it sits next to AdminCockpit visually. */
 
+/* Embedded inside AdminCockpit as a tab — keep horizontal padding restrained
+   since AdminCockpit's container already provides page-level margin. Vertical
+   padding stays so sections breathe. */
 .admin-tv {
   max-width: 920px;
   margin: 0 auto;
-  padding: 32px 24px 80px;
+  padding: 8px 0 40px;
   color: var(--text);
   font-family: var(--sans, -apple-system, BlinkMacSystemFont, system-ui, sans-serif);
 }
