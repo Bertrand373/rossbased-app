@@ -315,6 +315,9 @@
   border-color: rgba(255, 59, 48, 0.18);
 }
 
+/* Episode list is bounded — bigger libraries scroll internally rather than
+   pushing the upload zone off-screen. The container around it stays a
+   stable page chrome; scrolling lives inside. */
 .admin-tv-list {
   list-style: none;
   padding: 0;
@@ -322,6 +325,27 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-height: 480px;
+  overflow-y: auto;
+  /* Show a thin scrollbar only when actually scrolling — never floats over
+     row content because of the trailing padding. */
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.10) transparent;
+}
+
+.admin-tv-list::-webkit-scrollbar {
+  width: 6px;
+}
+.admin-tv-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.admin-tv-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: 3px;
+}
+.admin-tv-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .admin-tv-row {
