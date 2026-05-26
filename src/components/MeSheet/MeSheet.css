@@ -1,0 +1,281 @@
+/* src/components/MeSheet/MeSheet.css
+   Styles ONLY for the inner content of the Me sheet. The backdrop, panel
+   chrome (blur, slide motion, pill), and swipe behavior all come from
+   BottomSheet.css — we ride on the shared sheet system.
+   Everything here is namespaced under .me-sheet (or its .me-* descendants)
+   so it can't leak into other sheets. */
+
+/* ============================================================
+   PANEL OVERRIDES
+   The base .sheet-panel sits flush-bottom and has its own padding.
+   We don't override the geometry — only what's inside.
+   ============================================================ */
+
+.me-sheet {
+  /* nothing — keep base sheet behavior */
+}
+
+/* ============================================================
+   IDENTITY STRIP
+   ============================================================ */
+
+.me-identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 4px 4px 22px;
+}
+
+.me-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--surface-overlay);
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  font-weight: 500;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.me-avatar.has-avatar {
+  background-color: transparent;
+  box-shadow: 0 0 0 1.5px var(--accent-gold-border);
+}
+
+.me-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.me-avatar-initial {
+  user-select: none;
+}
+
+.me-identity-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.me-name {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+  letter-spacing: 0.005em;
+}
+
+.me-status {
+  font-size: 12px;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+}
+
+/* ============================================================
+   TILES — Community + Settings (TTTV joins later)
+   Same metric system as the rest of the sheet: 12px radii, subtle
+   surface, hairline border. Press state mirrors the profile button.
+   ============================================================ */
+
+.me-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.me-tile {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 14px 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.me-tile:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--border);
+}
+
+.me-tile:active {
+  transform: scale(0.97);
+}
+
+[data-theme="light"] .me-tile {
+  background: rgba(58, 46, 28, 0.04);
+}
+
+[data-theme="light"] .me-tile:hover {
+  background: rgba(58, 46, 28, 0.06);
+}
+
+.me-tile-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+[data-theme="light"] .me-tile-icon {
+  background: rgba(58, 46, 28, 0.06);
+}
+
+.me-discord-glyph {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.me-tile-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.005em;
+}
+
+.me-tile-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+}
+
+/* ============================================================
+   SECTION LABEL — eyebrow above grouped rows
+   ============================================================ */
+
+.me-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 4px 4px 10px;
+}
+
+/* ============================================================
+   LIST ROW — Library entry
+   ============================================================ */
+
+.me-list-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 6px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--transition-fast);
+}
+
+.me-list-item:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="light"] .me-list-item:hover {
+  background: rgba(58, 46, 28, 0.03);
+}
+
+.me-list-item:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.me-list-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 221, 0, 0.10);
+  color: var(--accent-gold);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.me-list-text {
+  flex: 1;
+  letter-spacing: 0.005em;
+}
+
+.me-list-chevron {
+  color: var(--text-tertiary);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+}
+
+/* ============================================================
+   SIGN OUT — destructive-tinted, restrained
+   ============================================================ */
+
+.me-signout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px 16px;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  color: rgba(248, 113, 113, 0.85);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.me-signout:hover {
+  background: rgba(248, 113, 113, 0.04);
+  border-color: rgba(248, 113, 113, 0.2);
+}
+
+.me-signout:active {
+  background: rgba(248, 113, 113, 0.08);
+}
+
+.me-signout-icon {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+/* ============================================================
+   SMALL SCREEN TUNING
+   The base sheet already caps at 400px and centers — we just nudge
+   the identity strip down a hair on shorter phones.
+   ============================================================ */
+
+@media (max-height: 700px) {
+  .me-identity { padding-bottom: 16px; }
+  .me-tiles { margin-bottom: 16px; }
+  .me-signout { margin-top: 14px; }
+}
