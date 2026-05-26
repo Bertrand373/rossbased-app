@@ -27,6 +27,7 @@ import MobileNavigation from './components/Navigation/MobileNavigation';
 import InstallPrompt from './components/InstallPrompt/InstallPrompt';
 import AIChat from './components/AIChat/AIChat';
 import AdminCockpit from './components/Admin/AdminCockpit';
+import AdminTV from './components/AdminTV/AdminTV';
 import ScrollIndicator from './components/Shared/ScrollIndicator';
 import WhatsNew from './components/Announcements/WhatsNew';
 import TransmissionSheet from './components/Transmissions/TransmissionSheet';
@@ -841,6 +842,9 @@ function AppContent({
                   } />
                   <Route path="/admin" element={
                     <AdminCockpit />
+                  } />
+                  <Route path="/admin/tv" element={
+                    <AdminTV />
                   } />
                   <Route path="/auth/discord/link-callback" element={
                     <DiscordLinkCallback onLinkComplete={() => refreshSubscription()} />
