@@ -1,12 +1,13 @@
 // src/components/Admin/AdminCockpit.js
 // TitanTrack Admin — Elite branded dashboard
-// 6 tabs: Overview · Intelligence · Users · Revenue · Oracle · Updates
+// 7 tabs: Overview · Intelligence · Users · Revenue · Oracle · Updates · TTTV
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import KnowledgeBase from './KnowledgeBase';
 import OracleHealth from './OracleHealth';
 import RevenueCard from './RevenueCard';
 import OracleIntelligence from './OracleIntelligence';
+import AdminTV from '../AdminTV/AdminTV';
 import './AdminCockpit.css';
 
 const API = process.env.REACT_APP_API || process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
@@ -600,6 +601,7 @@ const AdminCockpit = () => {
           { id: 'revenue', label: 'Revenue' },
           { id: 'oracle', label: 'Oracle' },
           { id: 'updates', label: 'Updates' },
+          { id: 'tttv', label: 'TTTV' },
         ].map(t => (
           <button key={t.id} className={`ac-nav-btn ${tab === t.id ? 'active' : ''}`} onClick={() => setTab(t.id)}>
             <span className="ac-nav-label">{t.label}</span>
@@ -1387,6 +1389,14 @@ const AdminCockpit = () => {
             </div>
           )}
         </div>
+      )}
+
+      {/* ===== TTTV ===== */}
+      {/* Embedded producer-side video tool. AdminTV is self-contained
+          (own state, own API calls, own styling) — we just slot it in as
+          the 7th tab here instead of giving it a standalone /admin/tv route. */}
+      {tab === 'tttv' && (
+        <AdminTV />
       )}
 
     </div>
