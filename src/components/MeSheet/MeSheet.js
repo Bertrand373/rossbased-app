@@ -30,7 +30,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { FaCog, FaBookmark, FaSignOutAlt, FaChevronRight } from 'react-icons/fa';
+import { FaCog, FaBookmark, FaSignOutAlt, FaChevronRight, FaPlay } from 'react-icons/fa';
 import useSheetSwipe from '../../hooks/useSheetSwipe';
 import '../../styles/BottomSheet.css';
 import './MeSheet.css';
@@ -112,6 +112,13 @@ const MeSheet = ({ open, onClose, userData, isPremium, onLogout, onOpenNotes }) 
     });
   };
 
+  const handleTTTV = () => {
+    closeSheet(() => {
+      onClose && onClose();
+      navigate('/tv');
+    });
+  };
+
   const handleLibrary = () => {
     closeSheet(() => {
       onClose && onClose();
@@ -155,14 +162,24 @@ const MeSheet = ({ open, onClose, userData, isPremium, onLogout, onOpenNotes }) 
           </div>
         </div>
 
-        {/* Tiles. TTTV intentionally absent in PR #1 — added when /tv route
-            ships so its first appearance is a real reveal. */}
-        <div className="me-tiles">
+        {/* Tiles. TTTV appears for premium members only — non-premium see
+            two tiles (Community + Settings); the TTTV tile lights up when
+            their subscription unlocks it. The grid auto-adjusts via the
+            modifier class so we don't end up with a stretched 2-tile row
+            once there are 3 items. */}
+        <div className={`me-tiles me-tiles-${isPremium ? '3' : '2'}`}>
           <button type="button" className="me-tile" onClick={handleCommunity}>
             <div className="me-tile-icon"><DiscordGlyph /></div>
             <div className="me-tile-label">Community</div>
             <div className="me-tile-sub">Discord</div>
           </button>
+          {isPremium && (
+            <button type="button" className="me-tile me-tile-tttv" onClick={handleTTTV}>
+              <div className="me-tile-icon"><FaPlay /></div>
+              <div className="me-tile-label">TTTV</div>
+              <div className="me-tile-sub">Watch</div>
+            </button>
+          )}
           <button type="button" className="me-tile" onClick={handleSettings}>
             <div className="me-tile-icon"><FaCog /></div>
             <div className="me-tile-label">Settings</div>
