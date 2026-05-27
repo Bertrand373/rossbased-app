@@ -812,7 +812,18 @@ const TVFeed = ({ isPremium }) => {
           <div
             key={video._id || index}
             className={`tv-feed-slot${index === currentIndex ? ' active' : ''}`}
-            style={{ top: `${index * 100}%` }}
+            style={{
+              top: `${index * 100}%`,
+              // Poster lives on the slot bg instead of the <video poster=>
+              // attribute. Same image but it renders BEHIND the video element,
+              // so there's no "poster shows → video plays" flash. The video
+              // is transparent until its frames are ready, then covers the
+              // bg seamlessly. (Was a real flicker between transitions.)
+              backgroundImage: video.posterUrl ? `url(${video.posterUrl})` : undefined,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundColor: '#000',
+            }}
           >
             <video
               ref={(el) => {
@@ -821,7 +832,6 @@ const TVFeed = ({ isPremium }) => {
               }}
               className="tv-feed-video"
               src={video.storageUrl}
-              poster={video.posterUrl || undefined}
               preload="auto"
               autoPlay={index === currentIndex}
               // Last video doesn't loop so we can detect end-of-session via
@@ -876,15 +886,17 @@ const TVFeed = ({ isPremium }) => {
         </div>
       )}
 
-      {/* Persistent quiet brand mark — top center, low opacity. The kind
-          of detail TikTok structurally can't do (they have no brand for
-          the player). Fades with the rest of the chrome on idle. */}
-      <img
-        src="/tttv-logo-white.png"
-        alt=""
-        className="tv-feed-brand"
-        aria-hidden="true"
-      />
+      {/* Persistent quiet brand mark — top center. Wrapped in a subtle
+          dark pill so it reads on any video frame (was getting lost on
+          lighter ones). Same scrim+blur vocabulary as the corner buttons,
+          just elongated. Fades with the rest of the chrome on idle. */}
+      <div className="tv-feed-brand-pill" aria-hidden="true">
+        <img
+          src="/tttv-logo-white.png"
+          alt=""
+          className="tv-feed-brand"
+        />
+      </div>
 
       {/* Top-corner controls. Both auto-hide with the rest of the chrome
           after 2.8s of no interaction; tap on video brings them back. */}
