@@ -18,7 +18,7 @@
 // video crosses 80% playback. Server-side history is a future hop.
 
 import React from 'react';
-import { FaTimes, FaPlay } from 'react-icons/fa';
+import { FaPlay } from 'react-icons/fa';
 import './TVGrid.css';
 
 function formatDuration(sec) {
@@ -69,13 +69,18 @@ const TVGrid = ({ videos, onPlay, onExit }) => {
           alt="TitanTrack TV"
           className="tv-grid-header-mark"
         />
+        {/* System X — same 18×18 SVG used in sheet-close-desktop across
+            Tracker / CircleSheet. Inlined to match existing pattern. */}
         <button
           className="tv-grid-exit"
           onClick={onExit}
           aria-label="Close"
           type="button"
         >
-          <FaTimes />
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
         </button>
       </header>
 
