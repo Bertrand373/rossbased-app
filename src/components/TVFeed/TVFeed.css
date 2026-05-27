@@ -299,7 +299,7 @@
    ============================================================ */
 .tv-feed.chrome-hidden .tv-feed-exit,
 .tv-feed.chrome-hidden .tv-feed-mute,
-.tv-feed.chrome-hidden .tv-feed-brand,
+.tv-feed.chrome-hidden .tv-feed-brand-pill,
 .tv-feed.chrome-hidden .tv-feed-dots,
 .tv-feed.chrome-hidden .tv-feed-swipe-hint {
   opacity: 0;
@@ -308,6 +308,7 @@
 
 .tv-feed-exit,
 .tv-feed-mute,
+.tv-feed-brand-pill,
 .tv-feed-dots,
 .tv-feed-swipe-hint {
   transition: opacity 280ms ease, background 150ms ease, color 150ms ease;
@@ -359,18 +360,21 @@
 /* ============================================================
    END-OF-SESSION CARD — graceful close of a curated session
    ============================================================
-   Overlays the last video when it plays through. Pure black scrim with
-   the TTTV mark, headline, subtitle, and a CTA back to the grid. Same
-   editorial voice as the coming-soon screen — felt like one piece. */
+   Overlays the last video when it plays through. Pure black — no warm
+   radial here, no gold accents. This is the one screen that earns its
+   absolute restraint: it's a closing moment, the visual equivalent of a
+   final breath. Everything else in TTTV is alive; this is the pause.
+   Type vocabulary: serif "End of session." (same family as state titles,
+   editorial voice), sans eyebrow + sub + CTA (matches app chrome).
+   Gold is intentionally absent — the brand mark + serif headline carry
+   the identity without needing a color hit. */
 .tv-feed-end {
   position: absolute;
   inset: 0;
   z-index: 10;
-  background:
-    radial-gradient(ellipse 60% 35% at 50% 42%, rgba(255, 221, 0, 0.05) 0%, transparent 70%),
-    rgba(0, 0, 0, 0.94);
-  backdrop-filter: blur(20px) saturate(1.2);
-  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  background: rgba(0, 0, 0, 0.96);
+  backdrop-filter: blur(24px) saturate(1.1);
+  -webkit-backdrop-filter: blur(24px) saturate(1.1);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -386,56 +390,63 @@
 }
 
 .tv-feed-end-mark {
-  width: clamp(100px, 26vw, 140px);
+  width: clamp(96px, 24vw, 128px);
   height: auto;
   object-fit: contain;
-  margin-bottom: 24px;
-  opacity: 0.94;
+  margin-bottom: 28px;
+  opacity: 0.88;
   animation: tv-feed-mark-breathe 4.5s ease-in-out infinite;
 }
 
 .tv-feed-end-eyebrow {
   font-size: 10px;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--accent-gold-text, rgba(255, 221, 0, 0.5));
-  margin-bottom: 14px;
+  color: rgba(255, 255, 255, 0.42);
+  font-weight: 500;
+  margin-bottom: 16px;
 }
 
 .tv-feed-end-title {
   font-family: 'Iowan Old Style', 'Cormorant Garamond', 'Georgia', serif;
-  font-size: 30px;
+  font-size: 32px;
   font-weight: 400;
-  color: #ffffff;
-  margin: 0 0 12px;
-  letter-spacing: 0.005em;
-  line-height: 1.1;
+  color: rgba(255, 255, 255, 0.96);
+  margin: 0 0 14px;
+  letter-spacing: -0.005em;
+  line-height: 1.08;
 }
 
 .tv-feed-end-sub {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.48);
   line-height: 1.55;
-  margin: 0 0 32px;
+  margin: 0 0 36px;
+  max-width: 320px;
+  letter-spacing: 0.005em;
 }
 
+/* CTA matches the app's "quiet secondary" button vocabulary — white-on-
+   transparent pill with a hairline border. No accent color; the X to
+   close lives in the corner anyway, so this button is the soft path. */
 .tv-feed-end-btn {
   background: transparent;
-  border: 1px solid rgba(255, 221, 0, 0.32);
-  color: var(--accent-gold, #ffdd00);
-  padding: 12px 28px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.92);
+  padding: 11px 26px;
   border-radius: 9999px;
   font-size: 13px;
   font-weight: 500;
   font-family: inherit;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.015em;
   cursor: pointer;
-  transition: background 150ms ease, border-color 150ms ease;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
 .tv-feed-end-btn:hover {
-  background: rgba(255, 221, 0, 0.06);
-  border-color: rgba(255, 221, 0, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.36);
+  color: #ffffff;
 }
 
 /* ============================================================
