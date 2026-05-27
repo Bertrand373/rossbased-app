@@ -192,11 +192,27 @@ router.get('/videos', adminCheck, async (req, res) => {
 
 // ============================================================
 // GET /api/tttv/feed
-// Members: published videos in feed order. PR #3 will add a premium gate
-// on top of this — for now any signed-in user can fetch.
+// Published videos in feed order.
+//
+// TEMPORARY DOGFOOD GATE — while Ross iterates on the player, only admins
+// get the actual feed. Everyone else gets an empty array, which makes
+// /tv render the "Arriving soon." coming-soon state. When ready for
+// public release, delete the isAdmin block and let the query run for
+// everyone.
 // ============================================================
 router.get('/feed', async (req, res) => {
   try {
+    const username = (req.user?.username || '').toLowerCase();
+    const envAdmins = (process.env.ADMIN_USERNAMES || '')
+      .split(',').map(u => u.trim().toLowerCase()).filter(Boolean);
+    const isAdmin = envAdmins.length
+      ? envAdmins.includes(username)
+      : (username === 'rossbased' || username === 'ross');
+
+    if (!isAdmin) {
+      return res.json([]);
+    }
+
     const videos = await TttvVideo.find({ isPublished: true })
       .sort({ order: -1, publishedAt: -1 })
       .lean();

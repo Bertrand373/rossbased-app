@@ -152,7 +152,9 @@ const TVFeed = ({ isPremium }) => {
     const stack = stackRef.current;
     if (!stack) return;
     stack.style.transition = `transform ${SNAP_DURATION_MS}ms ${SNAP_EASING}`;
-    stack.style.transform = `translate3d(0, ${-currentIndex * 100}vh, 0)`;
+    // Consistent px units everywhere — mixing vh and px in transforms
+    // makes Safari interpolate weirdly mid-snap. Snap = absolute px.
+    stack.style.transform = `translate3d(0, ${-currentIndex * window.innerHeight}px, 0)`;
   }, [currentIndex]);
 
   useEffect(() => {
@@ -358,6 +360,10 @@ const TVFeed = ({ isPremium }) => {
     const onTouchMove = (e) => {
       const drag = dragStateRef.current;
       if (!drag.active) return;
+      // preventDefault BEFORE Safari claims the gesture (~10px) so native
+      // vertical scroll doesn't fight our finger-follow drag. Requires
+      // passive: false on the listener.
+      if (e.cancelable) e.preventDefault();
       drag.deltaY = e.touches[0].clientY - drag.startY;
 
       // Rubber-band at edges so the user feels resistance instead of
@@ -425,8 +431,9 @@ const TVFeed = ({ isPremium }) => {
     };
 
     container.addEventListener('touchstart', onTouchStart, { passive: true });
-    container.addEventListener('touchmove', onTouchMove, { passive: true });
+    container.addEventListener('touchmove', onTouchMove, { passive: false });
     container.addEventListener('touchend', onTouchEnd, { passive: true });
+    container.addEventListener('touchcancel', onTouchEnd, { passive: true });
     container.addEventListener('wheel', onWheel, { passive: true });
     window.addEventListener('keydown', onKey);
 
@@ -434,10 +441,11 @@ const TVFeed = ({ isPremium }) => {
       container.removeEventListener('touchstart', onTouchStart);
       container.removeEventListener('touchmove', onTouchMove);
       container.removeEventListener('touchend', onTouchEnd);
+      container.removeEventListener('touchcancel', onTouchEnd);
       container.removeEventListener('wheel', onWheel);
       window.removeEventListener('keydown', onKey);
     };
-  }, [goNext, goPrev, handleExit, handleMuteToggle]);
+  }, [goNext, goPrev, handleExit, handleMuteToggle, snapStack, videos.length, currentIndex]);
 
   // ─── Render: non-premium ──────────────────────────────────
   if (!isPremium) {
@@ -534,7 +542,7 @@ const TVFeed = ({ isPremium }) => {
           <div
             key={video._id || index}
             className={`tv-feed-slot${index === currentIndex ? ' active' : ''}`}
-            style={{ top: `${index * 100}vh` }}
+            style={{ top: `${index * 100}%` }}
           >
             <video
               ref={(el) => {
