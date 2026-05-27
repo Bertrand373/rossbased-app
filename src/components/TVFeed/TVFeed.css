@@ -36,13 +36,17 @@
 
 /* Each slot is a viewport-sized container at its absolute index position.
    Only the active slot's video is actively playing; prev/next are mounted
-   so the browser preloads them in parallel. */
+   so the browser preloads them in parallel.
+   Height uses 100% (of the .tv-feed parent which is fixed inset:0) instead
+   of 100vh because iOS Safari's 100vh includes the URL bar area, which
+   makes the slot taller than the actual visible viewport and pushes content
+   off-screen mid-drag. 100% tracks the real player height. */
 .tv-feed-slot {
   position: absolute;
   left: 0;
   right: 0;
   width: 100%;
-  height: 100vh;
+  height: 100%;
 }
 
 /* Full-bleed video — object-fit: cover for TikTok/Reels-style takeover.
