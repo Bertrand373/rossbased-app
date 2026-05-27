@@ -330,6 +330,16 @@ const TVFeed = ({ isPremium }) => {
         onClick={handleVideoTap}
       />
 
+      {/* Scrims — gradient + backdrop-blur zones that guarantee legibility
+          of overlay chrome on ANY video frame. The bottom scrim is always
+          on (supports the always-visible title); the top scrim fades with
+          the corner controls when chrome auto-hides. The mask + blur combo
+          (the "frosted floor" pattern) is what Apple TV+, Netflix, premium
+          players all use — softer than a hard gradient, anchors text without
+          looking like a box. */}
+      <div className="tv-feed-scrim-top" aria-hidden="true" />
+      <div className="tv-feed-scrim-bottom" aria-hidden="true" />
+
       {/* Pause overlay — frosted play glyph fades into center when paused.
           Same vocabulary as the corner buttons (scrim + blur) just scaled
           up. Vanishes on play. */}
