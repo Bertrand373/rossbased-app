@@ -319,6 +319,80 @@
 }
 
 /* ============================================================
+   RIGHT-SIDE ACTION STACK — Save + Share
+   ============================================================
+   TikTok/Reels/Shorts pattern adapted for TTTV. No like/dislike/comment
+   counts (premium = no engagement signaling). Just the verbs that matter:
+   Save (bookmark moment) and Share (native share / clipboard).
+   Positioned bottom-right above the title, vertical column with breathing
+   room. Each button is icon-above-label.
+   ============================================================ */
+.tv-feed-actions {
+  position: absolute;
+  right: 12px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 96px);
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  transition: opacity 280ms ease;
+}
+
+.tv-feed-action {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: #fff;
+}
+
+.tv-feed-action-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.36);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 18px;
+  transition: background 150ms ease, color 150ms ease, transform 100ms ease;
+}
+
+.tv-feed-action:hover .tv-feed-action-icon {
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+}
+
+.tv-feed-action:active .tv-feed-action-icon {
+  transform: scale(0.92);
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.tv-feed-action-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.78);
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Auto-hide with the rest of the chrome. */
+.tv-feed.chrome-hidden .tv-feed-actions {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ============================================================
    AUTO-HIDE: progress wrap + dots fade with the rest of the chrome.
    The progress bar still updates underneath (just visually invisible);
    on tap it reveals again with the current playback position intact.
@@ -336,12 +410,12 @@
    TITLE OVERLAY — serif bottom-left, the TTTV signature
    ============================================================ */
 /* Title positioned ABOVE the bottom progress bar (which is at safe-area
-   + 0px and ~24px tall). Adding 16px of gap so the title doesn't sit
-   directly on the progress bar. */
+   + 0px and ~24px tall). Right margin gives the right-side action stack
+   room to breathe (stack is ~56px wide including the icon container). */
 .tv-feed-info {
   position: absolute;
   left: 22px;
-  right: 60px;
+  right: 80px;
   bottom: calc(env(safe-area-inset-bottom, 0px) + 40px);
   z-index: 4;
   pointer-events: none;
