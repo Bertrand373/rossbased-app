@@ -716,11 +716,16 @@ function AppContent({
           zIndex: 9999,  // Above modals
         }}
         toastOptions={{
-          // Visual surface (frosted glass, layered shadow, 14px radius, weighted entrance)
-          // lives in src/index.css — see "TOAST NOTIFICATIONS" section. Per-call icon
-          // overrides (e.g. gold for Oracle/ceremony) come from ToastIcons.js.
           duration: 2500,
           style: {
+            background: '#1a1a1a',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '12px',
+            color: '#ffffff',
+            fontSize: '0.875rem',
+            fontWeight: '500',
+            padding: '14px 20px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
             maxWidth: isMobile ? 'calc(100vw - 32px)' : '380px',
           },
           success: {
@@ -729,6 +734,10 @@ function AppContent({
           },
           error: {
             duration: 3500,
+            style: {
+              background: '#1a1a1a',
+              border: '1px solid rgba(255, 59, 48, 0.15)',
+            },
             icon: <AnimatedX color="#ff3b30" />,
           },
         }}

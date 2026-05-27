@@ -264,45 +264,35 @@ div[data-hot-toast] {
 }
 
 div[data-hot-toast] > div {
-  /* Frosted glass surface — vibrancy + saturation lift behind translucent fill */
-  background: rgba(18, 18, 18, 0.72) !important;
-  backdrop-filter: blur(24px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  background: var(--surface) !important;
   color: var(--text) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 14px !important;
-  /* Layered shadow: tight contact + diffuse ambient + inner top highlight (glass edge) */
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.5),
-    0 12px 40px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
-  padding: 15px 18px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5) !important;
+  padding: 14px 18px !important;
   font-weight: 500 !important;
   font-size: 0.875rem !important;
   min-width: 280px !important;
   max-width: 380px !important;
   font-family: inherit !important;
   line-height: 1.5 !important;
-  animation: toast-enter-weighted 320ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+  animation: toastIn 250ms ease-out !important;
 }
 
 /* Light theme toast — parchment surface, warm ink */
 [data-theme="light"] div[data-hot-toast] > div {
-  background: rgba(244, 237, 224, 0.78) !important;
+  background: #f4ede0 !important;
   color: #3a2e1c !important;
   border: 1px solid rgba(58, 46, 28, 0.12) !important;
-  box-shadow:
-    0 1px 2px rgba(58, 46, 28, 0.08),
-    0 12px 40px rgba(58, 46, 28, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 4px 24px rgba(58, 46, 28, 0.14) !important;
 }
 
-/* Success toast — green edge bar pairs with the animated check icon */
+/* Success toast */
 div[data-hot-toast] > div[role="status"] {
   border-left: 3px solid var(--success) !important;
 }
 
-/* Error toast — red edge bar pairs with the animated X icon */
+/* Error toast */
 div[data-hot-toast] > div[role="alert"] {
   border-left: 3px solid var(--danger) !important;
 }
@@ -313,7 +303,7 @@ div[data-hot-toast] > div:not([role]) {
 }
 
 /* Gold-tier toast — ceremony moments (Oracle sync, lifetime access, milestones).
-   Overrides the role-based edge bar so the bar and animated icon stay consistent. */
+   Overrides the role-based edge bar so the left edge matches the gold icon. */
 div[data-hot-toast] > div.toast-gold,
 div[data-hot-toast] > div[role="status"].toast-gold,
 div[data-hot-toast] > div[role="alert"].toast-gold {
@@ -321,29 +311,29 @@ div[data-hot-toast] > div[role="alert"].toast-gold {
 }
 
 /* Toast icons — size + spacing only.
-   Stroke colors are set per-icon via React props (AnimatedCheck/AnimatedX), so
-   we deliberately do NOT force `color` here — that would clobber the gold variant. */
+   Stroke colors are set per-icon via React props on AnimatedCheck/AnimatedX,
+   so we deliberately do NOT set `color` here — that would clobber gold. */
 div[data-hot-toast] svg {
   margin-right: 12px !important;
-  width: 20px !important;
-  height: 20px !important;
+  width: 18px !important;
+  height: 18px !important;
   flex-shrink: 0 !important;
 }
 
-@keyframes toast-enter-weighted {
+@keyframes toastIn {
   from {
-    transform: translateY(-12px) scale(0.98);
+    transform: translateY(-16px);
     opacity: 0;
   }
   to {
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
     opacity: 1;
   }
 }
 
-/* Stroke-draw animation for AnimatedCheck / AnimatedX (Apple/Stripe pattern).
+/* Stroke-draw animation for AnimatedCheck / AnimatedX.
    Each path starts with stroke-dashoffset:100 (paired with pathLength:100) and
-   animates to 0, tracing the shape in. */
+   animates to 0, tracing the check/X in. */
 @keyframes toast-draw-stroke {
   to {
     stroke-dashoffset: 0;
