@@ -92,6 +92,10 @@ const TVFeed = ({ isPremium }) => {
   const [isScrubbing, setIsScrubbing] = useState(false);
   const progressBarRef = useRef(null);
   const wasPlayingBeforeScrubRef = useRef(true);
+  // End-of-session card — fires when the LAST video plays to completion
+  // (only that video has loop=false). Premium feel: bounded session ends
+  // gracefully instead of looping forever.
+  const [showEndCard, setShowEndCard] = useState(false);
 
   // Always start with the body scroll locked — TVFeed is a takeover view.
   // Restored on unmount so the user lands back in normal scroll state.
@@ -230,16 +234,29 @@ const TVFeed = ({ isPremium }) => {
   }, [currentIndex, videos]);
 
   // ─── Navigation handlers ──────────────────────────────────
+  // Haptic on commit — 8ms feels like the "click" iOS uses for picker
+  // wheels. Subtle, just enough to confirm the gesture landed.
+  const haptic = () => {
+    if (navigator.vibrate) {
+      try { navigator.vibrate(8); } catch {/* unsupported */}
+    }
+  };
+
   const goNext = useCallback(() => {
     setCurrentIndex(i => {
       if (i + 1 >= videos.length) return i; // clamp; don't loop the session
+      haptic();
       setShowSwipeHint(false);
       return i + 1;
     });
   }, [videos.length]);
 
   const goPrev = useCallback(() => {
-    setCurrentIndex(i => Math.max(0, i - 1));
+    setCurrentIndex(i => {
+      if (i <= 0) return i;
+      haptic();
+      return i - 1;
+    });
   }, []);
 
   // Exit: from player → back to grid (clears ?play). From grid → exit
@@ -298,6 +315,90 @@ const TVFeed = ({ isPremium }) => {
       video.removeEventListener('pause', onPause);
     };
   }, [currentIndex]);
+
+  // ─── End-of-session detection ─────────────────────────────
+  // The last video has loop={false} (see slot render). When it plays to
+  // completion, fire the end-of-session overlay. Other videos loop, so
+  // 'ended' never fires for them — only the explicit last-video case.
+  useEffect(() => {
+    if (videos.length === 0) return;
+    if (currentIndex !== videos.length - 1) {
+      setShowEndCard(false);
+      return;
+    }
+    const video = videoRefs.current[currentIndex];
+    if (!video) return;
+    const onEnded = () => setShowEndCard(true);
+    video.addEventListener('ended', onEnded);
+    return () => video.removeEventListener('ended', onEnded);
+  }, [currentIndex, videos.length]);
+
+  // ─── Media Session API (lock-screen + control-center metadata) ─
+  // Tells iOS / Android what's playing so the lock screen shows the
+  // poster + title + play/pause/next/prev controls. Re-runs on every
+  // index change so each episode's metadata is current.
+  useEffect(() => {
+    if (!('mediaSession' in navigator)) return;
+    if (videos.length === 0) return;
+    const current = videos[currentIndex];
+    if (!current) return;
+
+    try {
+      navigator.mediaSession.metadata = new window.MediaMetadata({
+        title: current.title || `Episode ${current.episode}`,
+        artist: 'TitanTrack TV',
+        album: `Curated by Ross · Episode ${current.episode}`,
+        artwork: current.posterUrl
+          ? [{ src: current.posterUrl, sizes: '512x512', type: 'image/jpeg' }]
+          : [],
+      });
+    } catch {/* MediaMetadata unsupported */}
+
+    const setHandler = (action, fn) => {
+      try { navigator.mediaSession.setActionHandler(action, fn); } catch {}
+    };
+    setHandler('play', () => videoRefs.current[currentIndex]?.play().catch(() => {}));
+    setHandler('pause', () => videoRefs.current[currentIndex]?.pause());
+    setHandler('nexttrack', goNext);
+    setHandler('previoustrack', goPrev);
+
+    return () => {
+      ['play', 'pause', 'nexttrack', 'previoustrack'].forEach(a => setHandler(a, null));
+    };
+  }, [currentIndex, videos, goNext, goPrev]);
+
+  // ─── Wake Lock (screen doesn't dim during playback) ────────
+  // Acquired on mount, released on unmount. Also re-acquired when the
+  // tab becomes visible again — wakeLock auto-releases when the tab
+  // goes hidden, so visibility changes need a re-grab.
+  useEffect(() => {
+    if (!('wakeLock' in navigator)) return;
+    let lock = null;
+    let cancelled = false;
+
+    const acquire = async () => {
+      try {
+        const w = await navigator.wakeLock.request('screen');
+        if (cancelled) {
+          await w.release();
+          return;
+        }
+        lock = w;
+      } catch {/* user gesture not yet given, or unsupported */}
+    };
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible' && !lock) acquire();
+    };
+
+    acquire();
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      cancelled = true;
+      document.removeEventListener('visibilitychange', onVisibility);
+      if (lock) lock.release().catch(() => {});
+    };
+  }, []);
 
   const handleVideoTap = useCallback(() => {
     const video = videoRefs.current[currentIndex];
@@ -706,7 +807,10 @@ const TVFeed = ({ isPremium }) => {
               poster={video.posterUrl || undefined}
               preload="auto"
               autoPlay={index === currentIndex}
-              loop
+              // Last video doesn't loop so we can detect end-of-session via
+              // the 'ended' event. Everything else loops indefinitely (user
+              // moves on via swipe).
+              loop={index !== videos.length - 1}
               playsInline
               muted={isMuted}
               onClick={index === currentIndex ? handleVideoTap : undefined}
@@ -832,6 +936,36 @@ const TVFeed = ({ isPremium }) => {
       {/* Swipe hint removed — bottom progress bar + vertical layout
           already signal "video, swipe vertically" via universal muscle
           memory (TikTok/Reels). Don't reinvent the wheel. */}
+
+      {/* End-of-session card — overlays the last video when it plays
+          through to completion. Curated sessions END instead of looping
+          forever; this is what makes TTTV feel premium-bounded rather
+          than algorithmic-infinite. */}
+      {showEndCard && (
+        <div className="tv-feed-end" role="dialog" aria-modal="true">
+          <img
+            src="/tttv-logo-white.png"
+            alt=""
+            className="tv-feed-end-mark"
+            aria-hidden="true"
+          />
+          <div className="tv-feed-end-eyebrow">TITANTRACK · TV</div>
+          <h2 className="tv-feed-end-title">End of session.</h2>
+          <p className="tv-feed-end-sub">
+            You've watched everything in today's library.
+          </p>
+          <button
+            type="button"
+            className="tv-feed-end-btn"
+            onClick={() => {
+              setShowEndCard(false);
+              setSearchParams({});
+            }}
+          >
+            Back to episodes
+          </button>
+        </div>
+      )}
     </div>
   );
 };
