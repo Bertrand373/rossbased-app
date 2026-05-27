@@ -676,19 +676,32 @@
 }
 
 /* ============================================================
-   LOADING SPINNER
-   ============================================================ */
-.tv-feed-spinner {
-  width: 32px;
-  height: 32px;
-  border: 2px solid rgba(255, 255, 255, 0.12);
-  border-top-color: #ffdd00;
-  border-radius: 50%;
-  animation: tv-feed-spin 0.9s linear infinite;
+   SPLASH — intentional TTTV intro on /tv mount
+   ============================================================
+   Replaces the generic loading spinner. The mark fades + scales in
+   on a cubic curve, breathes gently while data loads, then the grid
+   takes over via its own entry animation. Reads as a deliberate
+   intro instead of a wait state. */
+.tv-feed-splash {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000000;
 }
 
-@keyframes tv-feed-spin {
-  to { transform: rotate(360deg); }
+.tv-feed-splash-mark {
+  width: clamp(110px, 28vw, 150px);
+  height: auto;
+  object-fit: contain;
+  opacity: 0;
+  animation:
+    tv-feed-splash-in 520ms cubic-bezier(0.16, 1, 0.3, 1) forwards,
+    tv-feed-mark-breathe 4.5s ease-in-out 520ms infinite;
+}
+
+@keyframes tv-feed-splash-in {
+  0%   { opacity: 0; transform: scale(0.94); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 /* ============================================================

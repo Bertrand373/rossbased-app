@@ -65,40 +65,24 @@
 }
 
 /* ============================================================
-   INTRO — eyebrow + tagline
-   ============================================================ */
-
-.tv-grid-intro {
-  text-align: center;
-  margin: 4px 0 22px;
-}
-
-.tv-grid-eyebrow {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--accent-gold-text, rgba(255, 221, 0, 0.5));
-  margin-bottom: 6px;
-}
-
-.tv-grid-tagline {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.55);
-  letter-spacing: 0.01em;
-}
-
-/* ============================================================
-   CARDS GRID
+   CARDS GRID — straight to content after header, no intro chatter
    ============================================================ */
 
 .tv-grid-cards {
   list-style: none;
-  margin: 0;
+  margin: 4px 0 0;
   padding: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+  /* Subtle entry: cards rise into place rather than popping in,
+     which would feel jarring after the splash mark fades. */
+  animation: tv-grid-cards-in 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes tv-grid-cards-in {
+  0%   { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 @media (min-width: 720px) {
@@ -165,58 +149,9 @@
   font-size: 26px;
 }
 
-/* ============================================================
-   EPISODE BADGE — top-right, matches Atlas tier-badge composition
-   (label above, big value, colored dotted underline)
-   ============================================================ */
-
-.tv-grid-card-badge {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 2;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 8px;
-  padding: 6px 10px 7px;
-  text-align: center;
-  font-family: inherit;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  min-width: 42px;
-}
-
-.tv-grid-card-badge-label {
-  font-size: 8px;
-  letter-spacing: 0.18em;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.55);
-  text-transform: uppercase;
-}
-
-.tv-grid-card-badge-num {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--accent-gold, #ffdd00);
-  letter-spacing: 0.01em;
-  line-height: 1;
-}
-
-.tv-grid-card-badge-rule {
-  width: 28px;
-  height: 1.5px;
-  margin-top: 3px;
-  border-radius: 1px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--accent-gold, #ffdd00) 0 3px,
-    transparent 3px 6px
-  );
-  opacity: 0.85;
-}
+/* Episode badge removed — was Atlas-verbatim. Episode # lives in the
+   meta line under the title now (.tv-grid-card-meta-ep). The card chrome
+   is poster + title + meta. Less is more. */
 
 /* ============================================================
    WATCHED PILL — top-left
@@ -254,30 +189,48 @@
 
 .tv-grid-card-info {
   position: absolute;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
   z-index: 2;
   pointer-events: none;
 }
 
+/* Title gets the full card width now that the corner badge is gone.
+   Wraps to 2 lines only if needed; single-line confident otherwise.
+   Bumped up to 15px from 13px since it has more room to breathe. */
 .tv-grid-card-title {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: #ffffff;
-  line-height: 1.2;
-  letter-spacing: -0.005em;
-  margin-bottom: 3px;
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
 }
 
+/* Meta line — episode # (gold-text) + separator + duration. Replaces
+   the removed corner badge but at a fraction of the visual cost. */
 .tv-grid-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.68);
+  color: rgba(255, 255, 255, 0.65);
   letter-spacing: 0.02em;
   font-weight: 500;
+}
+
+.tv-grid-card-meta-ep {
+  color: var(--accent-gold-text, rgba(255, 221, 0, 0.62));
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.tv-grid-card-meta-sep {
+  color: rgba(255, 255, 255, 0.35);
 }
