@@ -79,14 +79,10 @@ const TVGrid = ({ videos, onPlay, onExit }) => {
         </button>
       </header>
 
-      {/* Eyebrow + tagline. Same editorial voice as the coming-soon screen,
-          establishes context for the grid below. */}
-      <div className="tv-grid-intro">
-        <div className="tv-grid-eyebrow">SESSIONS</div>
-        <div className="tv-grid-tagline">
-          {videos.length} {videos.length === 1 ? 'episode' : 'episodes'} curated by Ross
-        </div>
-      </div>
+      {/* Header → straight to cards. The intro "SESSIONS / N episodes
+          curated by Ross" was meta nobody cares about. Premium libraries
+          (Mubi, Criterion) don't tell you how many films they have either —
+          the grid itself speaks. Restraint over chatter. */}
 
       {/* 2-column card grid. order: -1 in the API sort gives newest-first;
           the order field also lets us reorder in admin. */}
@@ -119,27 +115,26 @@ const TVGrid = ({ videos, onPlay, onExit }) => {
                   </div>
                 )}
 
-                {/* Top-right episode badge — matches the Atlas tier badge
-                    placement so the surfaces feel related. */}
-                <div className="tv-grid-card-badge">
-                  <span className="tv-grid-card-badge-label">EP</span>
-                  <span className="tv-grid-card-badge-num">{ep}</span>
-                  <span className="tv-grid-card-badge-rule" />
-                </div>
+                {/* Corner badge removed — was Atlas-verbatim. Episode #
+                    moved to the meta line below the title where it sits
+                    quietly with the duration instead of competing with
+                    the poster for the corner real estate. */}
 
                 {/* Watched pill — only when seen. Quiet, top-left. */}
                 {isWatched && (
                   <div className="tv-grid-card-watched">WATCHED</div>
                 )}
 
-                {/* Bottom scrim + text. Scrim handles legibility on bright
-                    posters; mask ramps the blur so it dissolves into the
-                    poster without a hard edge (same pattern as the feed). */}
+                {/* Bottom scrim + text. Title gets the full card width now
+                    that the badge is gone — wraps to 2 lines if needed,
+                    confident single-line otherwise. */}
                 <div className="tv-grid-card-scrim" aria-hidden="true" />
                 <div className="tv-grid-card-info">
                   <div className="tv-grid-card-title">{video.title}</div>
                   <div className="tv-grid-card-meta">
-                    {formatDuration(video.durationSec)}
+                    <span className="tv-grid-card-meta-ep">EP {ep}</span>
+                    <span className="tv-grid-card-meta-sep">·</span>
+                    <span>{formatDuration(video.durationSec)}</span>
                   </div>
                 </div>
               </button>

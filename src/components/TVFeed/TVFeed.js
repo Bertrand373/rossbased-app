@@ -96,6 +96,14 @@ const TVFeed = ({ isPremium }) => {
   // (only that video has loop=false). Premium feel: bounded session ends
   // gracefully instead of looping forever.
   const [showEndCard, setShowEndCard] = useState(false);
+  // Splash minimum duration — even if the feed loads instantly we hold
+  // the TTTV mark for 450ms so the transition from Me-sheet tap to grid
+  // reads as a deliberate intro instead of a flash. Premium = pacing.
+  const [minSplashDone, setMinSplashDone] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setMinSplashDone(true), 450);
+    return () => clearTimeout(t);
+  }, []);
 
   // Always start with the body scroll locked — TVFeed is a takeover view.
   // Restored on unmount so the user lands back in normal scroll state.
@@ -709,10 +717,19 @@ const TVFeed = ({ isPremium }) => {
   }
 
   // ─── Render: loading ──────────────────────────────────────
-  if (loading) {
+  // Premium "intentional intro" splash. The TTTV mark fades + scales in
+  // on a cubic curve, sits a beat with the breathing animation, then the
+  // grid takes over. Even when the network fetch is instant we hold the
+  // splash for at least 450ms (see minSplashDone) so the transition
+  // never feels like a flicker — it reads as a deliberate intro instead.
+  if (loading || !minSplashDone) {
     return (
-      <div className="tv-feed tv-feed-state tv-feed-loading">
-        <div className="tv-feed-spinner" aria-label="Loading TTTV" />
+      <div className="tv-feed tv-feed-splash" aria-label="Loading TitanTrack TV">
+        <img
+          src="/tttv-logo-white.png"
+          alt=""
+          className="tv-feed-splash-mark"
+        />
       </div>
     );
   }
