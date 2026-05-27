@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import toast from 'react-hot-toast';
+import { goldCheckIcon, GOLD_TOAST_CLASS } from '../Toast/ToastIcons';
 import './MindProgram.css';
 
 // ============================================================
@@ -234,7 +235,8 @@ const MindProgram = ({ isPremium, userData, updateUserData, openPlanModal, onSho
     updateUserData({ mindProgram: updated });
 
     if (isNowComplete) {
-      toast.success('Based30 complete — 30 nights');
+      // Gold icon — Based30 completion is a major milestone ceremony
+      toast.success('Based30 complete — 30 nights', { icon: goldCheckIcon, className: GOLD_TOAST_CLASS });
     } else {
       toast.success(`Night ${newNights} logged`);
     }

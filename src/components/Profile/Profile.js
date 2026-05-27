@@ -5,6 +5,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import { BsPaperclip } from 'react-icons/bs';
+import { goldCheckIcon, GOLD_TOAST_CLASS } from '../Toast/ToastIcons';
 import './Profile.css';
 import '../../styles/BottomSheet.css';
 import useSheetSwipe from '../../hooks/useSheetSwipe';
@@ -502,7 +503,8 @@ const Profile = ({
     const newValue = !discordOracleSync;
     setDiscordOracleSync(newValue);
     updateUserData({ discordOracleSync: newValue });
-    toast.success(newValue ? 'Oracle sync enabled' : 'Oracle sync disabled', { duration: 1500, style: { background: '#1a1a1a', color: '#fff', fontSize: '14px' } });
+    // Gold icon — Oracle-themed toggle
+    toast.success(newValue ? 'Oracle sync enabled' : 'Oracle sync disabled', { duration: 1500, icon: goldCheckIcon, className: GOLD_TOAST_CLASS });
   };
 
   const handleFeedbackImagesSelected = (event) => {

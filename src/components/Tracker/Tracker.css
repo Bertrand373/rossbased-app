@@ -208,6 +208,21 @@
   );
 }
 
+/* Mobile-only crop shift for the Lone Watch scene — landscape source has the
+   samurai silhouette in the right third of the frame. Default center crop on
+   mobile portrait keeps the moon visible but cuts the samurai out entirely.
+   Shift `object-position` to align the right edge of the scaled video with
+   the right edge of the container → mobile sees the samurai + cliff + moon
+   bleeding in from the left, instead of just the moon. Bonus: streak number
+   now lands over the samurai silhouette (very dark) instead of the moon
+   glow, improving contrast for the gold "2600". Desktop keeps default
+   center crop so the full composition reads. */
+@media (max-width: 767px) {
+  .sanctum-video-backplate[data-scene="samurai"] .sanctum-video {
+    object-position: right center;
+  }
+}
+
 /* Smoke bleeds through header and nav on Tracker tab */
 /* transition-duration: 0ms = instant on entering tracker */
 /* Base 400ms transition on .app-header/.mobile-nav handles smooth fade back on leaving */

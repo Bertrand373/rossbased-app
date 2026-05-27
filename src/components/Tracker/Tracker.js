@@ -5,6 +5,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import { goldCheckIcon, GOLD_TOAST_CLASS } from '../Toast/ToastIcons';
 
 import './Tracker.css';
 import '../../styles/BottomSheet.css';
@@ -123,7 +124,8 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
       sessionStorage.removeItem('login_toast');
       sessionStorage.removeItem('login_toast_duration');
       // Small delay ensures Toaster is fully mounted and visible
-      setTimeout(() => toast.success(msg, { duration }), 300);
+      // Gold icon — login celebration is a ceremony moment
+      setTimeout(() => toast.success(msg, { duration, icon: goldCheckIcon, className: GOLD_TOAST_CLASS }), 300);
     }
   }, []);
   
@@ -312,7 +314,8 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
       const duration = parseInt(sessionStorage.getItem('login_toast_duration') || '2500', 10);
       sessionStorage.removeItem('login_toast');
       sessionStorage.removeItem('login_toast_duration');
-      setTimeout(() => toast.success(msg, { duration }), 600);
+      // Gold icon — login celebration is a ceremony moment
+      setTimeout(() => toast.success(msg, { duration, icon: goldCheckIcon, className: GOLD_TOAST_CLASS }), 600);
     }
   };
 

@@ -4,6 +4,7 @@
 
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { goldCheckIcon, GOLD_TOAST_CLASS } from '../Toast/ToastIcons';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
@@ -55,7 +56,8 @@ const DiscordLinkCallback = ({ onLinkComplete }) => {
         sessionStorage.removeItem(codeKey);
         
         if (data.isGrandfathered) {
-          toast.success('Discord linked! Lifetime access granted.', { duration: 4000 });
+          // Gold icon — lifetime access is the OG tier ceremony moment
+          toast.success('Discord linked! Lifetime access granted.', { duration: 4000, icon: goldCheckIcon, className: GOLD_TOAST_CLASS });
         } else {
           toast.success('Discord linked successfully');
         }
