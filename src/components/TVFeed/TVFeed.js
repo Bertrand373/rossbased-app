@@ -27,7 +27,8 @@
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { FaTimes, FaPlay, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
+import { FaTimes, FaPlay, FaVolumeMute, FaVolumeUp, FaBookmark, FaShareAlt } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 import { listFeed } from '../../services/tttvService';
 import TVGrid, { markWatched } from '../TVGrid/TVGrid';
 import './TVFeed.css';
@@ -308,6 +309,78 @@ const TVFeed = ({ isPremium }) => {
     }
     revealChrome();
   }, [currentIndex, revealChrome]);
+
+  // ─── Save current moment ──────────────────────────────────
+  // Bookmarks the exact timestamp the user is at (so the entry remembers
+  // "this 12-second mark of Episode 3"). localStorage for v1 — future
+  // integration with NotesLibrary will let saved moments appear in the
+  // same Highlights & Notes library as Oracle text quotes (one library,
+  // two sources). Capped at 100 entries to keep localStorage sane.
+  const handleSave = useCallback(() => {
+    const video = videoRefs.current[currentIndex];
+    const current = videos[currentIndex];
+    if (!video || !current) return;
+    try {
+      const raw = localStorage.getItem('tttv_saved_moments');
+      const list = raw ? JSON.parse(raw) : [];
+      // Don't double-save the same moment if user mashes the button —
+      // dedupe on (videoId, atSec rounded to seconds).
+      const atSec = Math.floor(video.currentTime || 0);
+      const dedupeKey = `${current._id}@${atSec}`;
+      const exists = list.some(m => `${m.videoId}@${Math.floor(m.atSec)}` === dedupeKey);
+      if (exists) {
+        toast('Already saved');
+      } else {
+        list.unshift({
+          videoId: current._id,
+          atSec: video.currentTime || 0,
+          title: current.title,
+          episode: current.episode,
+          savedAt: Date.now(),
+        });
+        if (list.length > 100) list.length = 100;
+        localStorage.setItem('tttv_saved_moments', JSON.stringify(list));
+        toast.success('Saved to Library');
+      }
+    } catch {
+      toast.error("Couldn't save");
+    }
+    revealChrome();
+  }, [currentIndex, videos, revealChrome]);
+
+  // ─── Share current episode ────────────────────────────────
+  // Web Share API on mobile gives the native iOS share sheet (text to a
+  // buddy, copy link, etc.). On desktop or unsupported browsers, falls
+  // back to clipboard copy. URL includes ?play=<id> so the recipient
+  // lands directly on the episode.
+  const handleShare = useCallback(async () => {
+    const current = videos[currentIndex];
+    if (!current) return;
+    const url = `${window.location.origin}/tv?play=${current._id}`;
+    revealChrome();
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `TitanTrack TV · ${current.title}`,
+          text: `Watching "${current.title}" on TitanTrack TV`,
+          url,
+        });
+      } catch (err) {
+        // User cancelled (AbortError) — silent. Other errors fall through.
+        if (err.name !== 'AbortError') {
+          try {
+            await navigator.clipboard.writeText(url);
+            toast.success('Link copied');
+          } catch { toast.error("Couldn't share"); }
+        }
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        toast.success('Link copied');
+      } catch { toast.error("Couldn't share"); }
+    }
+  }, [currentIndex, videos, revealChrome]);
 
   // ─── Scrub seek ────────────────────────────────────────────
   // Tap on the progress bar = jump to position. Drag along the bar =
@@ -703,17 +776,34 @@ const TVFeed = ({ isPremium }) => {
         {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
       </button>
 
-      {/* Feed dots — right edge, position indicator for the curated session */}
-      {videos.length > 1 && (
-        <div className="tv-feed-dots" aria-hidden="true">
-          {videos.map((_, i) => (
-            <span
-              key={i}
-              className={`tv-feed-dot${i === currentIndex ? ' active' : ''}`}
-            />
-          ))}
-        </div>
-      )}
+      {/* Feed dots removed — the grid view + bottom progress bar already
+          tell the user where they are in the session, and the action stack
+          owns the right edge now. Position indicator was redundant. */}
+
+      {/* Right-side action stack — Save + Share. TikTok/Reels/Shorts have
+          this column; we adapt with TTTV-appropriate verbs (no like/dislike
+          counts — saving is the only verb). Buttons auto-hide with the rest
+          of the chrome; tap on video reveals them. */}
+      <div className="tv-feed-actions">
+        <button
+          type="button"
+          className="tv-feed-action"
+          onClick={(e) => { e.stopPropagation(); handleSave(); }}
+          aria-label="Save moment to Library"
+        >
+          <span className="tv-feed-action-icon"><FaBookmark /></span>
+          <span className="tv-feed-action-label">Save</span>
+        </button>
+        <button
+          type="button"
+          className="tv-feed-action"
+          onClick={(e) => { e.stopPropagation(); handleShare(); }}
+          aria-label="Share episode"
+        >
+          <span className="tv-feed-action-icon"><FaShareAlt /></span>
+          <span className="tv-feed-action-label">Share</span>
+        </button>
+      </div>
 
       {/* Oracle overlay — the TTTV differentiator. When an episode has
           oracleOverlay.text set in admin, at oracleOverlay.atSec the line
