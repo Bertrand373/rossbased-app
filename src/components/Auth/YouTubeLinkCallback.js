@@ -4,6 +4,7 @@
 
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { goldCheckIcon, GOLD_TOAST_CLASS } from '../Toast/ToastIcons';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
@@ -54,7 +55,8 @@ const YouTubeLinkCallback = ({ onLinkComplete }) => {
         setStatus('success');
         sessionStorage.removeItem(codeKey);
 
-        toast.success(`YouTube linked — Oracle will recognize you in the comments.`, { duration: 4000 });
+        // Gold icon — Oracle-themed
+        toast.success(`YouTube linked — Oracle will recognize you in the comments.`, { duration: 4000, icon: goldCheckIcon, className: GOLD_TOAST_CLASS });
 
         if (onLinkComplete) onLinkComplete(data);
 
