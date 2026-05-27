@@ -62,11 +62,18 @@ const TVFeed = ({ isPremium }) => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [showChrome, setShowChrome] = useState(true);
   const chromeTimeoutRef = useRef(null);
-  // Real-time playback position (0-100) for the top progress bar, and
+  // Real-time playback position (0-100) for the bottom progress bar, and
   // visibility of the Oracle overlay (italic-serif line that fades in
   // at the timestamp the episode specifies).
   const [progress, setProgress] = useState(0);
   const [oracleVisible, setOracleVisible] = useState(false);
+  // Scrub state — when user drags the progress bar, we pause the video
+  // and update currentTime live so they see the frame at their finger.
+  // Resumes play on release. wasPlayingBeforeScrubRef remembers whether
+  // they were playing before so we don't auto-resume a paused video.
+  const [isScrubbing, setIsScrubbing] = useState(false);
+  const progressBarRef = useRef(null);
+  const wasPlayingBeforeScrubRef = useRef(true);
 
   // Always start with the body scroll locked — TVFeed is a takeover view.
   // Restored on unmount so the user lands back in normal scroll state.
@@ -256,6 +263,67 @@ const TVFeed = ({ isPremium }) => {
     revealChrome();
   }, [currentIndex, revealChrome]);
 
+  // ─── Scrub seek ────────────────────────────────────────────
+  // Tap on the progress bar = jump to position. Drag along the bar =
+  // live scrub (currentTime updates as the finger moves). Pauses the
+  // video during scrub so the user sees the frame they're landing on,
+  // resumes on release — unless they had it paused before, in which
+  // case we leave it paused.
+  const seekToClientX = useCallback((clientX) => {
+    const bar = progressBarRef.current;
+    const video = videoRefs.current[currentIndex];
+    if (!bar || !video || !video.duration) return;
+    const rect = bar.getBoundingClientRect();
+    const fraction = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    try {
+      video.currentTime = video.duration * fraction;
+      setProgress(fraction * 100);
+    } catch {/* iOS quirk on rapid seeks */}
+  }, [currentIndex]);
+
+  const handleScrubStart = useCallback((e) => {
+    e.stopPropagation();
+    const video = videoRefs.current[currentIndex];
+    if (!video) return;
+    wasPlayingBeforeScrubRef.current = !video.paused;
+    try { video.pause(); } catch {}
+    setIsScrubbing(true);
+    revealChrome();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    seekToClientX(clientX);
+  }, [currentIndex, revealChrome, seekToClientX]);
+
+  // Document-level scrub move/end so the user can drag outside the bar
+  // without losing the gesture. Active only while isScrubbing.
+  useEffect(() => {
+    if (!isScrubbing) return;
+
+    const onMove = (e) => {
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      seekToClientX(clientX);
+    };
+    const onUp = () => {
+      setIsScrubbing(false);
+      const video = videoRefs.current[currentIndex];
+      if (video && wasPlayingBeforeScrubRef.current) {
+        video.play().catch(() => {});
+      }
+    };
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', onMove, { passive: true });
+    document.addEventListener('touchend', onUp);
+    document.addEventListener('touchcancel', onUp);
+    return () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend', onUp);
+      document.removeEventListener('touchcancel', onUp);
+    };
+  }, [isScrubbing, currentIndex, seekToClientX]);
+
   // ─── Touch (finger-follow) + wheel + keyboard ─────────────
   // Touch handlers drive the stack transform DIRECTLY (via inline style,
   // bypassing React) so dragging stays at native 60fps regardless of how
@@ -273,6 +341,11 @@ const TVFeed = ({ isPremium }) => {
     const vh = () => window.innerHeight;
 
     const onTouchStart = (e) => {
+      // If the touch started inside the progress bar, let the scrub
+      // handler take over — vertical-swipe nav shouldn't fire.
+      if (e.target.closest && e.target.closest('.tv-feed-progress-wrap')) {
+        return;
+      }
       dragStateRef.current.active = true;
       dragStateRef.current.startY = e.touches[0].clientY;
       dragStateRef.current.deltaY = 0;
@@ -482,14 +555,23 @@ const TVFeed = ({ isPremium }) => {
         ))}
       </div>
 
-      {/* Top progress bar — always-on, thin gold line at the very top edge
-          showing playback position in the current video. Live signal that
-          something is happening. */}
-      <div className="tv-feed-progress" aria-hidden="true">
-        <div
-          className="tv-feed-progress-fill"
-          style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
-        />
+      {/* Bottom progress bar — tap to seek, drag to scrub. 24px touch
+          target (the wrap) with a 3px visible bar at its bottom edge —
+          premium-player pattern, big enough to drag, small enough to be
+          quiet visually. The fill uses the app's Oracle-gold token so
+          it tracks the brand color anywhere it's set. */}
+      <div
+        className={`tv-feed-progress-wrap${isScrubbing ? ' scrubbing' : ''}`}
+        ref={progressBarRef}
+        onMouseDown={handleScrubStart}
+        onTouchStart={handleScrubStart}
+      >
+        <div className="tv-feed-progress" aria-hidden="true">
+          <div
+            className="tv-feed-progress-fill"
+            style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+          />
+        </div>
       </div>
 
       {/* Scrims — gradient + backdrop-blur zones that guarantee legibility
@@ -570,14 +652,9 @@ const TVFeed = ({ isPremium }) => {
         </div>
       </div>
 
-      {/* Swipe hint — only on first video, only if there's a next, fades
-          on first navigation. */}
-      {showSwipeHint && currentIndex === 0 && videos.length > 1 && (
-        <div className="tv-feed-swipe-hint" aria-hidden="true">
-          <span className="tv-feed-swipe-chev">∧</span>
-          <span className="tv-feed-swipe-text">Next</span>
-        </div>
-      )}
+      {/* Swipe hint removed — bottom progress bar + vertical layout
+          already signal "video, swipe vertically" via universal muscle
+          memory (TikTok/Reels). Don't reinvent the wheel. */}
     </div>
   );
 };
