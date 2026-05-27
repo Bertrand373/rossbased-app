@@ -25,19 +25,30 @@
 //     Escape to exit. (Accessibility + power users.)
 //   - Tap on the video itself: play/pause toggle.
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaTimes, FaPlay, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
 import { listFeed } from '../../services/tttvService';
 import './TVFeed.css';
 
-const SWIPE_THRESHOLD = 60;     // px before a swipe counts as navigation
-const WHEEL_COOLDOWN_MS = 700;  // debounce between wheel-driven transitions
+const WHEEL_COOLDOWN_MS = 700;        // debounce between wheel-driven transitions
+const SWIPE_RATIO_TO_ADVANCE = 0.20;  // 20% of viewport height = commit nav
+const EDGE_RESISTANCE = 0.35;         // rubber-band damping at first/last
+const SNAP_DURATION_MS = 360;         // cubic snap-to-position duration
+const SNAP_EASING = 'cubic-bezier(0.16, 1, 0.3, 1)';
 
 const TVFeed = ({ isPremium }) => {
   const navigate = useNavigate();
   const containerRef = useRef(null);
-  const videoRef = useRef(null);
+  // Stack container (translates vertically to bring slots into view) and a
+  // map of per-slot video element refs keyed by absolute video index.
+  // videoRefs lets us reach into the prev/current/next videos to play, pause,
+  // or attach event listeners without tracking three separate refs by name.
+  const stackRef = useRef(null);
+  const videoRefs = useRef({});
+  // Drag state lives in a ref so touchmove updates don't re-render React at
+  // 60fps — only the inline transform on stackRef updates during the drag.
+  const dragStateRef = useRef({ active: false, startY: 0, deltaY: 0 });
 
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -88,40 +99,68 @@ const TVFeed = ({ isPremium }) => {
     return () => { cancelled = true; };
   }, [isPremium]);
 
-  // ─── Restart playback when the current video changes ──────
-  // Forced via .load() because changing src on an existing element doesn't
-  // automatically reset the playback head on iOS Safari. We also re-attach
-  // play attempts on multiple events (loadedmetadata + canplay + immediate)
-  // to harden autoplay across iOS PWA quirks.
+  // ─── Switch active video when currentIndex changes ─────────
+  // With the 3-video stack, prev/current/next are all mounted at once. On
+  // every index change we pause every non-current video and play the new
+  // current. Pre-loaded videos start near-instantly because the browser
+  // already has metadata + first chunk via preload="auto" + the src binding.
   useEffect(() => {
-    if (!videoRef.current || videos.length === 0) return;
-    const video = videoRef.current;
-    try { video.load(); } catch {/* iOS quirk */}
+    if (videos.length === 0) return;
+    const active = videoRefs.current[currentIndex];
+
+    // Pause everyone except the new active
+    Object.entries(videoRefs.current).forEach(([idx, el]) => {
+      if (!el) return;
+      if (Number(idx) === currentIndex) return;
+      try { el.pause(); } catch {/* harmless */}
+    });
+
+    if (!active) return;
+    try { active.currentTime = 0; } catch {/* iOS quirk */}
 
     const tryPlay = () => {
-      const p = video.play();
+      const p = active.play();
       if (p && p.catch) p.catch(() => {});
     };
     tryPlay();
-    video.addEventListener('loadedmetadata', tryPlay);
-    video.addEventListener('canplay', tryPlay);
+    active.addEventListener('loadedmetadata', tryPlay);
+    active.addEventListener('canplay', tryPlay);
 
     setProgress(0);
     setOracleVisible(false);
 
     return () => {
-      video.removeEventListener('loadedmetadata', tryPlay);
-      video.removeEventListener('canplay', tryPlay);
+      active.removeEventListener('loadedmetadata', tryPlay);
+      active.removeEventListener('canplay', tryPlay);
     };
   }, [currentIndex, videos]);
+
+  // ─── Snap stack to the current slot on every index change ──
+  // The stack is at translate3d(0, -currentIndex * 100vh, 0). When state
+  // updates (from navigation, end-of-drag, etc), this useEffect smoothly
+  // animates the stack to the new position. During a drag, the touchmove
+  // handler imperatively overrides this transform — but on release, this
+  // effect re-runs (via the snapStack util) to settle to the snap position.
+  const snapStack = useCallback(() => {
+    const stack = stackRef.current;
+    if (!stack) return;
+    stack.style.transition = `transform ${SNAP_DURATION_MS}ms ${SNAP_EASING}`;
+    stack.style.transform = `translate3d(0, ${-currentIndex * 100}vh, 0)`;
+  }, [currentIndex]);
+
+  useEffect(() => {
+    snapStack();
+  }, [snapStack]);
 
   // ─── Real-time progress + Oracle overlay window ───────────
   // Single timeupdate listener drives both the top progress bar (% of
   // current video played) and the Oracle overlay fade-in window
   // (currentTime ∈ [overlay.atSec, overlay.atSec + 4]). Putting both in
   // one listener avoids racing two separate handlers on the same event.
+  // Targets the ACTIVE video in the stack — re-attaches when currentIndex
+  // changes.
   useEffect(() => {
-    const video = videoRef.current;
+    const video = videoRefs.current[currentIndex];
     if (!video || videos.length === 0) return;
     const current = videos[currentIndex];
     const overlay = current?.oracleOverlay;
@@ -192,11 +231,9 @@ const TVFeed = ({ isPremium }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex]);
 
-  // Sync isPlaying with the actual video element — handles cases where the
-  // browser pauses/plays without us asking (tab backgrounding, audio focus
-  // grabs, etc).
+  // Sync isPlaying with the active video — re-attaches on index change.
   useEffect(() => {
-    const video = videoRef.current;
+    const video = videoRefs.current[currentIndex];
     if (!video) return;
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
@@ -209,42 +246,86 @@ const TVFeed = ({ isPremium }) => {
   }, [currentIndex]);
 
   const handleVideoTap = useCallback(() => {
-    if (!videoRef.current) return;
-    if (videoRef.current.paused) {
-      videoRef.current.play().catch(() => {});
+    const video = videoRefs.current[currentIndex];
+    if (!video) return;
+    if (video.paused) {
+      video.play().catch(() => {});
     } else {
-      videoRef.current.pause();
+      video.pause();
     }
     revealChrome();
-  }, [revealChrome]);
+  }, [currentIndex, revealChrome]);
 
-  // ─── Touch + wheel + keyboard ─────────────────────────────
+  // ─── Touch (finger-follow) + wheel + keyboard ─────────────
+  // Touch handlers drive the stack transform DIRECTLY (via inline style,
+  // bypassing React) so dragging stays at native 60fps regardless of how
+  // many videos are in flight. On release, snapStack via the index-change
+  // useEffect handles the cubic settle to the new (or same) position.
+  //
+  // Edge rubber-band: at the first video, downward drag is damped
+  // (delta * EDGE_RESISTANCE) — same at the last video for upward drag.
+  // Same vibe as native iOS scroll bounce.
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    let startY = 0;
-    let endY = 0;
-    let dragging = false;
     let wheelLock = false;
+    const vh = () => window.innerHeight;
 
     const onTouchStart = (e) => {
-      startY = e.touches[0].clientY;
-      endY = startY;
-      dragging = true;
-    };
-    const onTouchMove = (e) => {
-      if (!dragging) return;
-      endY = e.touches[0].clientY;
-    };
-    const onTouchEnd = () => {
-      if (!dragging) return;
-      const diff = startY - endY;
-      if (Math.abs(diff) >= SWIPE_THRESHOLD) {
-        if (diff > 0) goNext();
-        else goPrev();
+      dragStateRef.current.active = true;
+      dragStateRef.current.startY = e.touches[0].clientY;
+      dragStateRef.current.deltaY = 0;
+      // Disable transition for immediate finger-follow.
+      if (stackRef.current) {
+        stackRef.current.style.transition = 'none';
       }
-      dragging = false;
+    };
+
+    const onTouchMove = (e) => {
+      const drag = dragStateRef.current;
+      if (!drag.active) return;
+      drag.deltaY = e.touches[0].clientY - drag.startY;
+
+      // Rubber-band at edges so the user feels resistance instead of
+      // dragging into the void.
+      let effective = drag.deltaY;
+      if (currentIndex === 0 && effective > 0) {
+        effective = effective * EDGE_RESISTANCE;
+      } else if (currentIndex === videos.length - 1 && effective < 0) {
+        effective = effective * EDGE_RESISTANCE;
+      }
+
+      if (stackRef.current) {
+        const baseY = -currentIndex * vh();
+        stackRef.current.style.transform = `translate3d(0, ${baseY + effective}px, 0)`;
+      }
+    };
+
+    const onTouchEnd = () => {
+      const drag = dragStateRef.current;
+      if (!drag.active) return;
+      drag.active = false;
+
+      const delta = drag.deltaY;
+      const threshold = vh() * SWIPE_RATIO_TO_ADVANCE;
+      const canGoNext = currentIndex < videos.length - 1;
+      const canGoPrev = currentIndex > 0;
+
+      if (Math.abs(delta) >= threshold) {
+        if (delta < 0 && canGoNext) {
+          goNext();
+          revealChrome();
+          return; // snapStack effect handles the settle to new index
+        }
+        if (delta > 0 && canGoPrev) {
+          goPrev();
+          revealChrome();
+          return;
+        }
+      }
+      // Below threshold OR at an edge — snap back to current.
+      snapStack();
     };
 
     const onWheel = (e) => {
@@ -355,25 +436,51 @@ const TVFeed = ({ isPremium }) => {
   // ─── Render: active feed ──────────────────────────────────
   const current = videos[currentIndex];
 
+  // 3-video sliding window — render prev / current / next so all are
+  // preloaded by the browser in parallel. The stack container translates
+  // vertically to bring the active slot into view; swipes drag the whole
+  // stack, then snap to whichever slot is now under the viewport.
+  const visibleSlots = videos
+    .map((video, index) => ({ index, video }))
+    .filter(({ index }) => Math.abs(index - currentIndex) <= 1);
+
   return (
     <div
       className={`tv-feed${showChrome ? ' chrome-visible' : ' chrome-hidden'}`}
       ref={containerRef}
     >
-      {/* Video — full-bleed (object-fit: cover) for TikTok/Reels-style
-          takeover. Native 9:16 uploads fill the viewport with no crop.
-          Looping + muted-by-default for autoplay safety. */}
-      <video
-        ref={videoRef}
-        className="tv-feed-video"
-        src={current.storageUrl}
-        poster={current.posterUrl || undefined}
-        autoPlay
-        loop
-        playsInline
-        muted={isMuted}
-        onClick={handleVideoTap}
-      />
+      {/* 3-video preload stack — all slots in [currentIndex-1, currentIndex+1]
+          are mounted with their src set so the browser fetches in parallel.
+          Only the active slot has autoPlay; navigation switches which one
+          is playing. Swipe drags the stack via inline transform; release
+          snaps via snapStack(). The slot at top: index*100vh is positioned
+          absolutely so the entire stack just needs to translateY to bring
+          a given slot into the viewport. */}
+      <div className="tv-feed-stack" ref={stackRef}>
+        {visibleSlots.map(({ index, video }) => (
+          <div
+            key={video._id || index}
+            className={`tv-feed-slot${index === currentIndex ? ' active' : ''}`}
+            style={{ top: `${index * 100}vh` }}
+          >
+            <video
+              ref={(el) => {
+                if (el) videoRefs.current[index] = el;
+                else delete videoRefs.current[index];
+              }}
+              className="tv-feed-video"
+              src={video.storageUrl}
+              poster={video.posterUrl || undefined}
+              preload="auto"
+              autoPlay={index === currentIndex}
+              loop
+              playsInline
+              muted={isMuted}
+              onClick={index === currentIndex ? handleVideoTap : undefined}
+            />
+          </div>
+        ))}
+      </div>
 
       {/* Top progress bar — always-on, thin gold line at the very top edge
           showing playback position in the current video. Live signal that

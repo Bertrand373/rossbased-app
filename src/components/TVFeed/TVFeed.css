@@ -15,6 +15,36 @@
   touch-action: none;
 }
 
+/* ============================================================
+   3-VIDEO PRELOAD STACK
+   ============================================================
+   Stack container sits inside the .tv-feed viewport (overflow: hidden
+   clips anything outside). Its transform: translate3d(0, Y, 0) moves the
+   entire stack vertically — slots positioned at top: index*100vh stay
+   in their absolute positions, and the translate brings whichever slot
+   is "current" into the visible area. During a touchmove the inline
+   transform is updated imperatively at 60fps; on touchend the snapStack
+   util re-applies a transitioned snap to the current index. */
+.tv-feed-stack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  will-change: transform;
+}
+
+/* Each slot is a viewport-sized container at its absolute index position.
+   Only the active slot's video is actively playing; prev/next are mounted
+   so the browser preloads them in parallel. */
+.tv-feed-slot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100vh;
+}
+
 /* Full-bleed video — object-fit: cover for TikTok/Reels-style takeover.
    Native 9:16 uploads fill the viewport edge-to-edge with no crop. If a
    non-9:16 video ever sneaks in, it gets cropped rather than letterboxed,
