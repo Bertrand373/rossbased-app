@@ -28,45 +28,48 @@
 }
 
 /* ============================================================
-   CORNER CONTROLS — exit (top-left) + mute (top-right)
-   Both absolutely positioned to corners so they never drift into
-   content space, regardless of whether the parent is centering a
-   state screen or laying out the active feed.
+   CORNER CONTROLS — match the system X used in modals (.sheet-close-desktop)
+   Same size (32×32), same shape (circle), same hover treatment. The only
+   difference vs. the modal X: a subtle dark scrim + blur is needed here
+   because the underlying surface is live video instead of a dark sheet
+   panel — pure transparent would lose legibility on bright video frames.
+   Exit is top-RIGHT to match the modal X position convention; mute lives
+   top-LEFT as the secondary control.
    ============================================================ */
 .tv-feed-exit,
 .tv-feed-mute {
   position: absolute;
-  top: calc(env(safe-area-inset-top, 14px) + 14px);
-  width: 38px;
-  height: 38px;
+  top: calc(env(safe-area-inset-top, 0px) + 14px);
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.42);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.92);
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: none;
+  color: rgba(255, 255, 255, 0.65);
   cursor: pointer;
-  font-size: 14px;
-  transition: background 150ms ease, color 150ms ease, transform 100ms ease;
+  font-size: 12px;
+  transition: background 150ms ease, color 150ms ease;
   -webkit-tap-highlight-color: transparent;
   z-index: 5;
 }
 
-.tv-feed-exit { left: 14px; }
-.tv-feed-mute { right: 14px; }
+.tv-feed-exit { right: 14px; }
+.tv-feed-mute { left: 14px; }
 
 .tv-feed-exit:hover,
 .tv-feed-mute:hover {
-  background: rgba(0, 0, 0, 0.6);
-  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+  color: #ffffff;
 }
 
 .tv-feed-exit:active,
 .tv-feed-mute:active {
-  transform: scale(0.94);
+  background: rgba(0, 0, 0, 0.6);
 }
 
 /* ============================================================
