@@ -11,6 +11,7 @@ import HighlightPalette from './HighlightPalette';
 import MarginaliaSheet from './MarginaliaSheet';
 import NotesLibrary from './NotesLibrary';
 import toast from 'react-hot-toast';
+import { goldCheckIcon, GOLD_TOAST_CLASS } from '../Toast/ToastIcons';
 
 // Mixpanel tracking
 import { trackAIChatOpened, trackAIMessageSent, trackAILimitReached } from '../../utils/mixpanel';
@@ -1395,9 +1396,6 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   // Get Oracle loading icon
   const getLoadingIcon = () => '/The_Oracle.png';
 
-  // Gold dash icon for pin toasts (matches app toast system)
-  const goldDash = <span style={{ display: 'inline-block', width: 16, height: 3, borderRadius: 2, background: '#d4af37', flexShrink: 0 }} />;
-
   // Teach Oracle — ingest conversation exchange into knowledge base (admin only)
   const handleTeachOracle = async (oracleMsg, index) => {
     let userMsg = '';
@@ -1490,7 +1488,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
         });
         if (res.ok) {
           setPinnedMessages(prev => { const next = new Map(prev); next.delete(timestamp); return next; });
-          toast('Unpinned', { icon: goldDash });
+          toast('Unpinned', { icon: goldCheckIcon, className: GOLD_TOAST_CLASS });
           // Notify Calendar to refresh indicators
           window.dispatchEvent(new CustomEvent('oracle-pins-changed'));
         }
@@ -1531,7 +1529,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
 
       const data = await res.json();
       setPinnedMessages(prev => new Map(prev).set(timestamp, data.pin._id));
-      toast('Pinned to journey', { icon: goldDash });
+      toast('Pinned to journey', { icon: goldCheckIcon, className: GOLD_TOAST_CLASS });
       // Notify Calendar to refresh indicators
       window.dispatchEvent(new CustomEvent('oracle-pins-changed'));
     } catch (err) {
