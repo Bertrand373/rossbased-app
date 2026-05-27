@@ -90,31 +90,19 @@
 .me-tiles-2 { grid-template-columns: repeat(2, 1fr); }
 .me-tiles-3 { grid-template-columns: repeat(3, 1fr); }
 
-/* TTTV tile gets a quiet gold accent — signals "this is the new
-   premium thing" without screaming. Same restraint pattern as the
-   active tab nav state. */
-.me-tile-tttv {
-  background: rgba(255, 221, 0, 0.06);
-  border-color: rgba(255, 221, 0, 0.18);
-}
-
-.me-tile-tttv:hover {
-  background: rgba(255, 221, 0, 0.10);
-  border-color: rgba(255, 221, 0, 0.28);
-}
-
-.me-tile-tttv .me-tile-icon {
-  background: rgba(255, 221, 0, 0.14);
-  color: #ffdd00;
-}
-
-/* TTTV tile uses the actual brand mark instead of a generic icon.
-   The container's gold background tint shows through behind the
-   transparent PNG — same "framed brand" treatment as TTV apps everywhere. */
+/* TTTV tile inherits the same neutral surface + hairline border as
+   Community and Settings — the brand mark carries the identity, the
+   container shouldn't compete. Was previously tinted gold (bg + border
+   + icon container) which made it look like a different component
+   instead of one of three peers. Restraint over signaling. */
 .me-tile-icon-tttv {
   padding: 4px;
 }
 
+/* Two-logo swap for theme compatibility. The white mark reads on the
+   dark-mode neutral icon container; the black mark reads on the
+   light-mode neutral icon container. CSS hides whichever doesn't match
+   the active theme — no JS theme detection needed. */
 .me-tile-logo {
   width: 100%;
   height: 100%;
@@ -122,6 +110,18 @@
   display: block;
   user-select: none;
   -webkit-user-drag: none;
+}
+
+.me-tile-logo-light {
+  display: none;
+}
+
+[data-theme="light"] .me-tile-logo-dark {
+  display: none;
+}
+
+[data-theme="light"] .me-tile-logo-light {
+  display: block;
 }
 
 .me-tile {
