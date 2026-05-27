@@ -60,27 +60,53 @@
 }
 
 /* ============================================================
-   PROGRESS BAR — thin gold line at the very top edge
+   PROGRESS BAR — bottom-anchored, scrubbable
    ============================================================
-   Always-on signal that something is alive. Sits above everything
-   (z-index: 7) so it stays visible even when corner chrome auto-hides.
-   Width updates from the video's timeupdate event in JS. */
-.tv-feed-progress {
+   Standard short-form player placement (TikTok / Reels / YouTube
+   Shorts all put it here). The 24px wrap is the touch target — big
+   enough to grab on mobile. The visible 3px bar sits at the bottom
+   edge of the wrap so the perceived position is the bottom of the
+   screen. During scrub the bar thickens to 5px for tactile feedback.
+   Uses the Oracle-gold CSS variable (var(--accent-gold)) so the fill
+   is guaranteed to track the app's brand color forever. */
+.tv-feed-progress-wrap {
   position: absolute;
-  top: env(safe-area-inset-top, 0px);
+  bottom: env(safe-area-inset-bottom, 0px);
   left: 0;
   right: 0;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.10);
+  height: 24px;
+  display: flex;
+  align-items: flex-end;
   z-index: 7;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: pan-x;
+}
+
+.tv-feed-progress {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.18);
   pointer-events: none;
+  transition: height 180ms ease;
 }
 
 .tv-feed-progress-fill {
   height: 100%;
-  background: #ffdd00;
-  box-shadow: 0 0 5px rgba(255, 221, 0, 0.5);
+  background: var(--accent-gold, #ffdd00);
+  box-shadow: 0 0 4px var(--primary-glow, rgba(255, 221, 0, 0.45));
   transition: width 120ms linear;
+}
+
+/* Scrubbing state — thicker bar, no width transition (immediate seek). */
+.tv-feed-progress-wrap.scrubbing .tv-feed-progress {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.tv-feed-progress-wrap.scrubbing .tv-feed-progress-fill {
+  transition: none;
+  box-shadow: 0 0 8px var(--primary-glow, rgba(255, 221, 0, 0.55));
 }
 
 /* ============================================================
@@ -289,13 +315,30 @@
 }
 
 /* ============================================================
+   AUTO-HIDE: progress wrap + dots fade with the rest of the chrome.
+   The progress bar still updates underneath (just visually invisible);
+   on tap it reveals again with the current playback position intact.
+   ============================================================ */
+.tv-feed.chrome-hidden .tv-feed-progress-wrap {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tv-feed-progress-wrap {
+  transition: opacity 280ms ease;
+}
+
+/* ============================================================
    TITLE OVERLAY — serif bottom-left, the TTTV signature
    ============================================================ */
+/* Title positioned ABOVE the bottom progress bar (which is at safe-area
+   + 0px and ~24px tall). Adding 16px of gap so the title doesn't sit
+   directly on the progress bar. */
 .tv-feed-info {
   position: absolute;
   left: 22px;
   right: 60px;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 64px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 40px);
   z-index: 4;
   pointer-events: none;
 }
@@ -328,14 +371,15 @@
    ORACLE OVERLAY — italic serif line fades in mid-video at timestamp
    This IS the TTTV differentiator. Per-episode "quoted moment" that
    appears for 4 seconds. Serif here is correct (Notes-style voice),
-   distinct from the sans player chrome. Slides up from below as it fades
-   in for a premium "appears, then settles" feel.
+   distinct from the sans player chrome. Slides up from below as it
+   fades in for a premium "appears, then settles" feel. Positioned
+   above the title (which is now bottom: env + 40px).
    ============================================================ */
 .tv-feed-oracle {
   position: absolute;
   left: 22px;
   right: 60px;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 120px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 100px);
   z-index: 4;
   pointer-events: none;
   font-family: 'Iowan Old Style', 'Cormorant Garamond', 'Georgia', serif;
