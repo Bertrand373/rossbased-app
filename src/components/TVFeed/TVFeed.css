@@ -15,14 +15,16 @@
   touch-action: none;
 }
 
-/* The video element itself fills the frame. object-fit: contain so a 9:16
-   short on a 16:9 desktop just shows letterboxing rather than cropping. */
+/* Full-bleed video — object-fit: cover for TikTok/Reels-style takeover.
+   Native 9:16 uploads fill the viewport edge-to-edge with no crop. If a
+   non-9:16 video ever sneaks in, it gets cropped rather than letterboxed,
+   which is the right tradeoff for a vertical-first feed. */
 .tv-feed-video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   background: #000;
   cursor: pointer;
 }
@@ -60,6 +62,83 @@
 
 .tv-feed-exit { right: 14px; }
 .tv-feed-mute { left: 14px; }
+
+/* ============================================================
+   PERSISTENT BRAND MARK — top-center, low opacity
+   The kind of detail TikTok structurally cannot do (no brand to put
+   there). Quiet "this is TTTV" signal that doesn't compete for
+   attention. Fades with the rest of the chrome on idle.
+   ============================================================ */
+.tv-feed-brand {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 18px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 56px;
+  height: auto;
+  opacity: 0.38;
+  pointer-events: none;
+  z-index: 5;
+  transition: opacity 250ms ease;
+}
+
+/* ============================================================
+   PAUSE OVERLAY — frosted play glyph centered on tap-to-pause
+   Same vocab as corner buttons (scrim + blur), scaled up. Fades in/out
+   with a small scale animation so play/pause feels alive.
+   ============================================================ */
+.tv-feed-pause-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: rgba(255, 255, 255, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 6;
+  animation: tv-feed-pause-in 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tv-feed-pause-overlay svg {
+  /* Slight offset right so the play triangle reads as centered
+     (the glyph is asymmetric — the geometric center is left of optical). */
+  margin-left: 4px;
+}
+
+@keyframes tv-feed-pause-in {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.85); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* ============================================================
+   AUTO-HIDE CHROME
+   X, mute, brand, and dots all fade after 2.8s of no interaction.
+   Title stays — premium players always show what's playing.
+   Single tap on video brings everything back.
+   ============================================================ */
+.tv-feed.chrome-hidden .tv-feed-exit,
+.tv-feed.chrome-hidden .tv-feed-mute,
+.tv-feed.chrome-hidden .tv-feed-brand,
+.tv-feed.chrome-hidden .tv-feed-dots,
+.tv-feed.chrome-hidden .tv-feed-swipe-hint {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tv-feed-exit,
+.tv-feed-mute,
+.tv-feed-dots,
+.tv-feed-swipe-hint {
+  transition: opacity 280ms ease, background 150ms ease, color 150ms ease;
+}
 
 .tv-feed-exit:hover,
 .tv-feed-mute:hover {
