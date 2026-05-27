@@ -28,23 +28,15 @@
 }
 
 /* ============================================================
-   TOP BAR — back X + mute dot
+   CORNER CONTROLS — exit (top-left) + mute (top-right)
+   Both absolutely positioned to corners so they never drift into
+   content space, regardless of whether the parent is centering a
+   state screen or laying out the active feed.
    ============================================================ */
-.tv-feed-top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 14px 0;
-  padding-top: calc(env(safe-area-inset-top, 14px) + 14px);
-  z-index: 5;
-}
-
 .tv-feed-exit,
 .tv-feed-mute {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 14px) + 14px);
   width: 38px;
   height: 38px;
   border-radius: 50%;
@@ -60,7 +52,11 @@
   font-size: 14px;
   transition: background 150ms ease, color 150ms ease, transform 100ms ease;
   -webkit-tap-highlight-color: transparent;
+  z-index: 5;
 }
+
+.tv-feed-exit { left: 14px; }
+.tv-feed-mute { right: 14px; }
 
 .tv-feed-exit:hover,
 .tv-feed-mute:hover {
@@ -170,11 +166,12 @@
 
 /* ============================================================
    STATE SCREENS — non-premium, loading, error, coming-soon
-   Shared chrome: warm radial gradient bg matching the TTTV mockup
-   coming-soon state. ============================================ */
+   Pure black so the TTTV mark and serif headline carry. No warm
+   gradient, no decorative bg — premium = restraint. Letting the
+   wordmark sit on the void is the whole move.
+   ============================================================ */
 .tv-feed-state {
-  background:
-    radial-gradient(circle at 50% 30%, #2e1c10 0%, #160b06 45%, #050201 85%);
+  background: #000000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -184,62 +181,59 @@
   position: relative;
   text-align: center;
   padding: 0 32px;
-  max-width: 460px;
+  max-width: 440px;
   z-index: 4;
 }
 
+/* Brand mark — TitanTrack chevron + serif "tv" wordmark.
+   Built from /tt-icon-white.png + text composition. When Ross
+   drops the finalized Canva logo at /public/tttv-logo-white.png,
+   the .mark-chevron <img> src updates and .mark-tv gets removed. */
 .tv-feed-state-mark {
-  display: flex;
-  align-items: baseline;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  gap: 10px;
-  margin-bottom: 24px;
+  gap: 12px;
+  margin-bottom: 28px;
+  opacity: 0.96;
 }
 
-.tv-feed-state-chevron {
-  color: #fff;
-  font-size: 34px;
-  font-weight: 700;
-  line-height: 1;
-  transform: translateY(2px);
-  letter-spacing: -0.02em;
+.tv-feed-state-mark-chevron {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  filter: brightness(0) invert(1); /* force white regardless of source */
 }
 
-.tv-feed-state-tv {
-  color: #fff;
+.tv-feed-state-mark-tv {
+  color: #ffffff;
+  font-family: inherit;
   font-weight: 600;
-  font-size: 26px;
-  letter-spacing: 0.02em;
-}
-
-.tv-feed-state-eyebrow {
-  font-size: 10px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: rgba(255, 221, 0, 0.5);
-  margin-bottom: 14px;
+  font-size: 28px;
+  letter-spacing: 0.005em;
+  line-height: 1;
 }
 
 .tv-feed-state-title {
   font-family: 'Iowan Old Style', 'Cormorant Garamond', 'Georgia', serif;
-  font-size: 34px;
+  font-size: 36px;
   font-weight: 400;
-  color: #fff;
-  margin: 0 0 18px;
+  color: #ffffff;
+  margin: 0 0 14px;
   letter-spacing: 0.005em;
   line-height: 1.1;
 }
 
 .tv-feed-state-sub {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.55);
   line-height: 1.55;
-  margin: 0 0 28px;
+  margin: 0 0 32px;
 }
 
 .tv-feed-state-btn {
-  background: rgba(0, 0, 0, 0.42);
-  border: 1px solid rgba(255, 221, 0, 0.35);
+  background: transparent;
+  border: 1px solid rgba(255, 221, 0, 0.32);
   color: #ffdd00;
   padding: 12px 28px;
   border-radius: 9999px;
@@ -248,40 +242,12 @@
   font-family: inherit;
   letter-spacing: 0.02em;
   cursor: pointer;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   transition: background 150ms ease, border-color 150ms ease;
 }
 
 .tv-feed-state-btn:hover {
-  background: rgba(255, 221, 0, 0.08);
+  background: rgba(255, 221, 0, 0.06);
   border-color: rgba(255, 221, 0, 0.5);
-}
-
-.tv-feed-state-oracle {
-  position: absolute;
-  bottom: 36px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  padding: 0 32px;
-  z-index: 4;
-}
-
-.tv-feed-state-oracle-eyebrow {
-  font-size: 9px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: rgba(255, 221, 0, 0.5);
-  margin-bottom: 6px;
-}
-
-.tv-feed-state-oracle-line {
-  font-family: 'Iowan Old Style', 'Cormorant Garamond', 'Georgia', serif;
-  font-style: italic;
-  font-size: 13px;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.78);
 }
 
 /* ============================================================
