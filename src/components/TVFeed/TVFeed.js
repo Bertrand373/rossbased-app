@@ -364,6 +364,22 @@ const TVFeed = ({ isPremium }) => {
     return () => { cancelled = true; };
   }, [currentIndex, videos]);
 
+  // Propagate the active episode color to :root so the desktop void
+  // backdrop (body.tttv-active::before — see TVFeed.css) can use it.
+  // The player itself reads it via the inline style on .tv-feed; this
+  // hop is just so CSS *outside* the .tv-feed cascade (i.e. the body
+  // pseudo-element painting the surrounding cinema void) can pick up
+  // the same value. Cleared on unmount so other routes never see it.
+  useEffect(() => {
+    const value = episodeColor
+      ? `rgb(${episodeColor.r}, ${episodeColor.g}, ${episodeColor.b})`
+      : 'rgb(255, 221, 0)';
+    document.documentElement.style.setProperty('--episode-color', value);
+    return () => {
+      document.documentElement.style.removeProperty('--episode-color');
+    };
+  }, [episodeColor]);
+
   // ─── End-of-session detection ─────────────────────────────
   // The last video has loop={false} (see slot render). When it plays to
   // completion, fire the end-of-session overlay. Other videos loop, so
