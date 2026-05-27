@@ -91,13 +91,6 @@ const SCENES = {
     poster: '/videos/sanctum/samurai-poster.jpg',
     durationSec: 8,
   },
-
-  ronin: {
-    type: 'video',
-    src: '/videos/sanctum/ronin.mp4',
-    poster: '/videos/sanctum/ronin-poster.jpg',
-    durationSec: 8,
-  },
 };
 
 const DEFAULT_SCENE = 'golden';
@@ -113,7 +106,6 @@ export const SCENE_META = [
   { key: 'woodfire',   label: 'Woodfire',     tag: 'Coals and ash. Living embers.' },
   { key: 'lastlight',  label: 'Last Light',   tag: 'Sun through ivy. Held breath.' },
   { key: 'samurai',    label: 'Lone Watch',   tag: 'Cherry mist. Steel and moon.' },
-  { key: 'ronin',      label: 'Ronin',        tag: 'Ink and mist. Lone path.' },
 ];
 
 // Swatch colors for the picker thumbnails — sampled from each palette's brightest stop.
@@ -124,7 +116,6 @@ export const SCENE_SWATCH = {
   woodfire:   'rgb(200, 100, 40)',
   lastlight:  'rgb(220, 145, 65)',
   samurai:    'rgb(180, 175, 165)',
-  ronin:      'rgb(195, 190, 180)',
 };
 
 const resolveSceneKey = (sceneProp) => {
