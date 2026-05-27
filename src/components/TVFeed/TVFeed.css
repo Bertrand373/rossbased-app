@@ -185,33 +185,18 @@
   z-index: 4;
 }
 
-/* Brand mark — TitanTrack chevron + serif "tv" wordmark.
-   Built from /tt-icon-white.png + text composition. When Ross
-   drops the finalized Canva logo at /public/tttv-logo-white.png,
-   the .mark-chevron <img> src updates and .mark-tv gets removed. */
+/* Brand mark — finalized Canva logo (chevron + TV wordmark composed
+   as a single transparent PNG in /public/tttv-logo-white.png). Sized
+   to a width-based ceiling so it scales nicely across viewports
+   without distorting; the aspect ratio is preserved by object-fit. */
 .tv-feed-state-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 28px;
-  opacity: 0.96;
-}
-
-.tv-feed-state-mark-chevron {
-  width: 44px;
-  height: 44px;
+  display: block;
+  margin: 0 auto 28px;
+  width: clamp(140px, 38vw, 200px);
+  height: auto;
   object-fit: contain;
-  filter: brightness(0) invert(1); /* force white regardless of source */
-}
-
-.tv-feed-state-mark-tv {
-  color: #ffffff;
-  font-family: inherit;
-  font-weight: 600;
-  font-size: 28px;
-  letter-spacing: 0.005em;
-  line-height: 1;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .tv-feed-state-title {

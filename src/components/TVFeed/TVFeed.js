@@ -332,21 +332,16 @@ function TVFeedExit({ onClick }) {
   );
 }
 
-// TTTV brand mark — TitanTrack chevron + "tv" wordmark. Built from
-// /tt-icon-white.png (already in /public) until Ross drops his finalized
-// Canva PNG at /public/tttv-logo-white.png. Once that exists, the <img
-// src> below gets swapped for the single combined logo and the chevron+text
-// composition collapses to one image.
+// TTTV brand mark — the finalized Canva logo (chevron + TV wordmark
+// composed as a single asset, transparent bg). Lives in /public so it
+// can be referenced as a static URL without import overhead.
 function TTTVMark() {
   return (
-    <div className="tv-feed-state-mark" aria-label="TitanTrack TV">
-      <img
-        src="/tt-icon-white.png"
-        alt=""
-        className="tv-feed-state-mark-chevron"
-      />
-      <span className="tv-feed-state-mark-tv">tv</span>
-    </div>
+    <img
+      src="/tttv-logo-white.png"
+      alt="TitanTrack TV"
+      className="tv-feed-state-mark"
+    />
   );
 }
 
