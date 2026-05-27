@@ -91,6 +91,32 @@ const TVGrid = ({ videos, onPlay, onExit }) => {
 
       {/* 2-column card grid. order: -1 in the API sort gives newest-first;
           the order field also lets us reorder in admin. */}
+      {/* Background preloaders — invisible <video> elements that warm the
+          HTTP cache for the first N videos while the user is browsing.
+          When they tap a card, the player's <video> uses the cached bytes
+          → first frame paints almost instantly instead of waiting for the
+          full Firebase Storage round trip.
+
+          preload="auto" tells the browser to fetch as much as it thinks
+          useful; for short MP4s (~1MB) that's typically the whole file.
+          Limited to the first 3 cards so we don't blow bandwidth on a
+          future 20-episode library — those will preload on scroll/hover.
+          Off-screen via .tv-grid-preload so the elements stay "rendered"
+          (display:none skips preload in some browsers). */}
+      <div className="tv-grid-preload" aria-hidden="true">
+        {videos.slice(0, 3).map((v) => (
+          v.storageUrl ? (
+            <video
+              key={`preload-${v._id}`}
+              src={v.storageUrl}
+              preload="auto"
+              muted
+              playsInline
+            />
+          ) : null
+        ))}
+      </div>
+
       <ul className="tv-grid-cards">
         {videos.map((video) => {
           const isWatched = watched.has(video._id);
