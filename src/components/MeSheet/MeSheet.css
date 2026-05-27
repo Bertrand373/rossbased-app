@@ -83,9 +83,29 @@
 
 .me-tiles {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   margin-bottom: 22px;
+}
+
+.me-tiles-2 { grid-template-columns: repeat(2, 1fr); }
+.me-tiles-3 { grid-template-columns: repeat(3, 1fr); }
+
+/* TTTV tile gets a quiet gold accent — signals "this is the new
+   premium thing" without screaming. Same restraint pattern as the
+   active tab nav state. */
+.me-tile-tttv {
+  background: rgba(255, 221, 0, 0.06);
+  border-color: rgba(255, 221, 0, 0.18);
+}
+
+.me-tile-tttv:hover {
+  background: rgba(255, 221, 0, 0.10);
+  border-color: rgba(255, 221, 0, 0.28);
+}
+
+.me-tile-tttv .me-tile-icon {
+  background: rgba(255, 221, 0, 0.14);
+  color: #ffdd00;
 }
 
 .me-tile {

@@ -1,0 +1,309 @@
+/* src/components/TVFeed/TVFeed.css
+   Full-bleed takeover player. Sits above the app shell via z-index so the
+   normal header/nav/tab bar disappear visually while the user is in TTTV. */
+
+.tv-feed {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 8500;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  /* No native pull-to-refresh / overscroll behavior fighting our swipes. */
+  overscroll-behavior: contain;
+  touch-action: none;
+}
+
+/* The video element itself fills the frame. object-fit: contain so a 9:16
+   short on a 16:9 desktop just shows letterboxing rather than cropping. */
+.tv-feed-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+  cursor: pointer;
+}
+
+/* ============================================================
+   TOP BAR — back X + mute dot
+   ============================================================ */
+.tv-feed-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 14px 0;
+  padding-top: calc(env(safe-area-inset-top, 14px) + 14px);
+  z-index: 5;
+}
+
+.tv-feed-exit,
+.tv-feed-mute {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 150ms ease, color 150ms ease, transform 100ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tv-feed-exit:hover,
+.tv-feed-mute:hover {
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+}
+
+.tv-feed-exit:active,
+.tv-feed-mute:active {
+  transform: scale(0.94);
+}
+
+/* ============================================================
+   FEED DOTS — right edge position indicator for the curated session
+   ============================================================ */
+.tv-feed-dots {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  z-index: 4;
+}
+
+.tv-feed-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  transition: background 250ms ease, box-shadow 250ms ease, width 250ms ease, height 250ms ease;
+}
+
+.tv-feed-dot.active {
+  background: #ffdd00;
+  box-shadow: 0 0 6px rgba(255, 221, 0, 0.55);
+  width: 5px;
+  height: 5px;
+}
+
+/* ============================================================
+   TITLE OVERLAY — serif bottom-left, the TTTV signature
+   ============================================================ */
+.tv-feed-info {
+  position: absolute;
+  left: 22px;
+  right: 60px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 64px);
+  z-index: 4;
+  pointer-events: none;
+}
+
+.tv-feed-title {
+  font-family: 'Iowan Old Style', 'Cormorant Garamond', 'Georgia', serif;
+  font-size: 22px;
+  font-weight: 400;
+  color: #ffffff;
+  line-height: 1.2;
+  letter-spacing: 0.005em;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.78);
+  margin-bottom: 5px;
+}
+
+.tv-feed-meta {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* ============================================================
+   SWIPE HINT — quiet "next" affordance, fades after first interaction
+   ============================================================ */
+.tv-feed-swipe-hint {
+  position: absolute;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.55;
+  z-index: 5;
+  pointer-events: none;
+  animation: tv-feed-swipe-pulse 2.6s ease-in-out infinite;
+}
+
+.tv-feed-swipe-chev {
+  font-size: 14px;
+  line-height: 0.9;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.tv-feed-swipe-text {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+  margin-top: 3px;
+}
+
+@keyframes tv-feed-swipe-pulse {
+  0%, 100% { transform: translate(-50%, 0); opacity: 0.55; }
+  50% { transform: translate(-50%, -6px); opacity: 0.85; }
+}
+
+/* ============================================================
+   STATE SCREENS — non-premium, loading, error, coming-soon
+   Shared chrome: warm radial gradient bg matching the TTTV mockup
+   coming-soon state. ============================================ */
+.tv-feed-state {
+  background:
+    radial-gradient(circle at 50% 30%, #2e1c10 0%, #160b06 45%, #050201 85%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tv-feed-state-content {
+  position: relative;
+  text-align: center;
+  padding: 0 32px;
+  max-width: 460px;
+  z-index: 4;
+}
+
+.tv-feed-state-mark {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.tv-feed-state-chevron {
+  color: #fff;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+  transform: translateY(2px);
+  letter-spacing: -0.02em;
+}
+
+.tv-feed-state-tv {
+  color: #fff;
+  font-weight: 600;
+  font-size: 26px;
+  letter-spacing: 0.02em;
+}
+
+.tv-feed-state-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 221, 0, 0.5);
+  margin-bottom: 14px;
+}
+
+.tv-feed-state-title {
+  font-family: 'Iowan Old Style', 'Cormorant Garamond', 'Georgia', serif;
+  font-size: 34px;
+  font-weight: 400;
+  color: #fff;
+  margin: 0 0 18px;
+  letter-spacing: 0.005em;
+  line-height: 1.1;
+}
+
+.tv-feed-state-sub {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.55;
+  margin: 0 0 28px;
+}
+
+.tv-feed-state-btn {
+  background: rgba(0, 0, 0, 0.42);
+  border: 1px solid rgba(255, 221, 0, 0.35);
+  color: #ffdd00;
+  padding: 12px 28px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.tv-feed-state-btn:hover {
+  background: rgba(255, 221, 0, 0.08);
+  border-color: rgba(255, 221, 0, 0.5);
+}
+
+.tv-feed-state-oracle {
+  position: absolute;
+  bottom: 36px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  padding: 0 32px;
+  z-index: 4;
+}
+
+.tv-feed-state-oracle-eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 221, 0, 0.5);
+  margin-bottom: 6px;
+}
+
+.tv-feed-state-oracle-line {
+  font-family: 'Iowan Old Style', 'Cormorant Garamond', 'Georgia', serif;
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* ============================================================
+   LOADING SPINNER
+   ============================================================ */
+.tv-feed-spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-top-color: #ffdd00;
+  border-radius: 50%;
+  animation: tv-feed-spin 0.9s linear infinite;
+}
+
+@keyframes tv-feed-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   SMALLER SCREENS — keep typography breathing
+   ============================================================ */
+@media (max-height: 700px) {
+  .tv-feed-state-title { font-size: 28px; }
+  .tv-feed-state-content { padding: 0 24px; }
+}
