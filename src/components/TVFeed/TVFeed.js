@@ -96,6 +96,11 @@ const TVFeed = ({ isPremium }) => {
   // (only that video has loop=false). Premium feel: bounded session ends
   // gracefully instead of looping forever.
   const [showEndCard, setShowEndCard] = useState(false);
+  // Episode ambient color — pulled from the active poster's mid-tones.
+  // Used as a CSS variable to tint the radial glow behind the top brand
+  // pill, giving each episode a quiet color identity (Mubi pattern). Null
+  // until extraction completes; chrome falls back to gold when null.
+  const [episodeColor, setEpisodeColor] = useState(null);
   // Splash minimum duration — even if the feed loads instantly we hold
   // the TTTV mark for 450ms so the transition from Me-sheet tap to grid
   // reads as a deliberate intro instead of a flash. Premium = pacing.
@@ -323,6 +328,25 @@ const TVFeed = ({ isPremium }) => {
       video.removeEventListener('pause', onPause);
     };
   }, [currentIndex]);
+
+  // ─── Episode ambient color ────────────────────────────────
+  // Extracts a mid-tone color from the active poster and exposes it via
+  // the --episode-color CSS variable on the .tv-feed root. The radial
+  // glow behind the top brand pill uses that variable to give each
+  // episode its own quiet color identity. Transitions smoothly via CSS.
+  useEffect(() => {
+    if (videos.length === 0) return;
+    const current = videos[currentIndex];
+    if (!current?.posterUrl) {
+      setEpisodeColor(null);
+      return;
+    }
+    let cancelled = false;
+    extractDominantColor(current.posterUrl).then((color) => {
+      if (!cancelled) setEpisodeColor(color);
+    });
+    return () => { cancelled = true; };
+  }, [currentIndex, videos]);
 
   // ─── End-of-session detection ─────────────────────────────
   // The last video has loop={false} (see slot render). When it plays to
@@ -795,10 +819,18 @@ const TVFeed = ({ isPremium }) => {
     .map((video, index) => ({ index, video }))
     .filter(({ index }) => Math.abs(index - currentIndex) <= 1);
 
+  // Episode color as a CSS variable string. Falls back to the brand
+  // gold when extraction returns null (CORS not configured, transparent
+  // poster, etc).
+  const episodeColorVar = episodeColor
+    ? `rgb(${episodeColor.r}, ${episodeColor.g}, ${episodeColor.b})`
+    : 'rgb(255, 221, 0)';
+
   return (
     <div
       className={`tv-feed${showChrome ? ' chrome-visible' : ' chrome-hidden'}`}
       ref={containerRef}
+      style={{ '--episode-color': episodeColorVar }}
     >
       {/* 3-video preload stack — all slots in [currentIndex-1, currentIndex+1]
           are mounted with their src set so the browser fetches in parallel.
@@ -1022,6 +1054,57 @@ function TTTVMark() {
       className="tv-feed-state-mark"
     />
   );
+}
+
+// Extracts a representative mid-tone color from an image URL via a canvas
+// pixel sample. Skips extreme bright/dark pixels so the result reflects
+// the dominant content tone, not the bezels or highlights. Returns null
+// on CORS taint or load error — caller falls back to the gold default.
+//
+// Mubi/Criterion use this same pattern to tint UI per film. For TTTV,
+// each episode gets a subtle ambient color around the brand pill — felt,
+// not seen.
+//
+// Requires the storage bucket to have CORS configured to allow
+// crossOrigin requests; without it canvas tainting blocks the read.
+// See PR notes for the bucket CORS command.
+function extractDominantColor(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        const w = canvas.width = 40;
+        const h = canvas.height = 40;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const data = ctx.getImageData(0, 0, w, h).data;
+        let r = 0, g = 0, b = 0, count = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          const a = data[i + 3];
+          if (a < 200) continue;
+          const br = (data[i] + data[i + 1] + data[i + 2]) / 3;
+          if (br < 35 || br > 220) continue; // skip near-black and near-white
+          r += data[i];
+          g += data[i + 1];
+          b += data[i + 2];
+          count++;
+        }
+        if (count === 0) return resolve(null);
+        resolve({
+          r: Math.round(r / count),
+          g: Math.round(g / count),
+          b: Math.round(b / count),
+        });
+      } catch {
+        // Canvas taint or other read error — silent fallback.
+        resolve(null);
+      }
+    };
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
 }
 
 function formatDuration(sec) {
