@@ -108,6 +108,22 @@
   color: #ffdd00;
 }
 
+/* TTTV tile uses the actual brand mark instead of a generic icon.
+   The container's gold background tint shows through behind the
+   transparent PNG — same "framed brand" treatment as TTV apps everywhere. */
+.me-tile-icon-tttv {
+  padding: 4px;
+}
+
+.me-tile-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
 .me-tile {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-subtle);

@@ -30,7 +30,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { FaCog, FaBookmark, FaSignOutAlt, FaChevronRight, FaPlay } from 'react-icons/fa';
+import { FaCog, FaBookmark, FaSignOutAlt, FaChevronRight } from 'react-icons/fa';
 import useSheetSwipe from '../../hooks/useSheetSwipe';
 import '../../styles/BottomSheet.css';
 import './MeSheet.css';
@@ -175,7 +175,9 @@ const MeSheet = ({ open, onClose, userData, isPremium, onLogout, onOpenNotes }) 
           </button>
           {isPremium && (
             <button type="button" className="me-tile me-tile-tttv" onClick={handleTTTV}>
-              <div className="me-tile-icon"><FaPlay /></div>
+              <div className="me-tile-icon me-tile-icon-tttv">
+                <img src="/tttv-logo-white.png" alt="" className="me-tile-logo" />
+              </div>
               <div className="me-tile-label">TTTV</div>
               <div className="me-tile-sub">Watch</div>
             </button>

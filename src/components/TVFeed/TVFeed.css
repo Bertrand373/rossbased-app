@@ -166,14 +166,15 @@
 
 /* ============================================================
    STATE SCREENS — non-premium, loading, error, coming-soon
-   Pure black so the TTTV mark and serif headline carry. No warm
-   gradient, no decorative bg — premium = restraint. Letting the
-   wordmark sit on the void is the whole move.
+   Pure black + restrained typography. Composition is top-weighted
+   (content sits ~36% from the top) because that reads as "designed"
+   while default flex-centered reads as "flex did the work." Sizes are
+   restrained on purpose — confidence shows in restraint, not scale.
    ============================================================ */
 .tv-feed-state {
   background: #000000;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
 }
 
@@ -183,37 +184,47 @@
   padding: 0 32px;
   max-width: 440px;
   z-index: 4;
+  /* Top-weighted: content sits in the upper third of the viewport.
+     env() reserves the iOS notch space cleanly. */
+  margin-top: max(36vh, calc(env(safe-area-inset-top, 0px) + 100px));
 }
 
 /* Brand mark — finalized Canva logo (chevron + TV wordmark composed
    as a single transparent PNG in /public/tttv-logo-white.png). Sized
-   to a width-based ceiling so it scales nicely across viewports
-   without distorting; the aspect ratio is preserved by object-fit. */
+   smaller than v1 — premium reads as confident, not big. Subtle
+   breathing animation adds a hint of life without decoration. */
 .tv-feed-state-mark {
   display: block;
-  margin: 0 auto 28px;
-  width: clamp(140px, 38vw, 200px);
+  margin: 0 auto 26px;
+  width: clamp(110px, 28vw, 150px);
   height: auto;
   object-fit: contain;
   user-select: none;
   -webkit-user-drag: none;
+  animation: tv-feed-mark-breathe 4.5s ease-in-out infinite;
+}
+
+@keyframes tv-feed-mark-breathe {
+  0%, 100% { opacity: 0.94; }
+  50% { opacity: 1; }
 }
 
 .tv-feed-state-title {
   font-family: 'Iowan Old Style', 'Cormorant Garamond', 'Georgia', serif;
-  font-size: 36px;
+  font-size: 30px;
   font-weight: 400;
   color: #ffffff;
-  margin: 0 0 14px;
+  margin: 0 0 12px;
   letter-spacing: 0.005em;
   line-height: 1.1;
 }
 
 .tv-feed-state-sub {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.55);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.50);
   line-height: 1.55;
   margin: 0 0 32px;
+  letter-spacing: 0.005em;
 }
 
 .tv-feed-state-btn {
