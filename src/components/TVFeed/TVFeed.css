@@ -30,6 +30,57 @@
 }
 
 /* ============================================================
+   SCRIMS — frosted floor + ceiling for legibility on any video frame
+   ============================================================
+   Two gradient + backdrop-blur zones at the top and bottom of the player.
+   Each ramps via a CSS mask so the blur fades into the video instead of
+   stopping at a hard edge (would otherwise look like a stripe on bright
+   frames). This is the "frosted floor" pattern Apple TV+, Netflix, and
+   premium short-form players use to anchor overlay text without resorting
+   to a hard rectangle around it.
+
+   Bottom scrim is always on — it supports the always-visible title overlay.
+   Top scrim fades with the rest of the chrome on auto-hide (no reason to
+   keep it when the X/mute/brand have already disappeared). */
+
+.tv-feed-scrim-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 22%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0) 100%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  mask-image: linear-gradient(180deg, #000 0%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 100%);
+  transition: opacity 280ms ease;
+}
+
+.tv-feed-scrim-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 32%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.70) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 100%);
+}
+
+/* Top scrim disappears with the rest of the chrome — when there's no X
+   or brand mark up there to anchor, the scrim has nothing to support. */
+.tv-feed.chrome-hidden .tv-feed-scrim-top {
+  opacity: 0;
+}
+
+/* ============================================================
    CORNER CONTROLS — match the system X used in modals (.sheet-close-desktop)
    Same size (32×32), same shape (circle), same hover treatment. The only
    difference vs. the modal X: a subtle dark scrim + blur is needed here
@@ -192,6 +243,10 @@
   pointer-events: none;
 }
 
+/* Title typography — scrim does the heavy lifting for legibility now, so
+   the text-shadow is barely there (just a hint for crispness on very
+   bright frames). Premium look: clean text on a frosted floor instead of
+   shadow-heavy "halo" text. */
 .tv-feed-title {
   font-family: 'Iowan Old Style', 'Cormorant Garamond', 'Georgia', serif;
   font-size: 22px;
@@ -199,15 +254,15 @@
   color: #ffffff;
   line-height: 1.2;
   letter-spacing: 0.005em;
-  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.78);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
   margin-bottom: 5px;
 }
 
 .tv-feed-meta {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.68);
   letter-spacing: 0.04em;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.30);
 }
 
 /* ============================================================
