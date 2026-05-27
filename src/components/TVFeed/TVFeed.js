@@ -45,6 +45,12 @@ const TVFeed = ({ isPremium }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const [showSwipeHint, setShowSwipeHint] = useState(true);
+  // Playback + chrome visibility — sync directly with the video element's
+  // play/pause events so the overlay stays right even when iOS pauses on
+  // its own (e.g., tab backgrounded, system audio interruption).
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [showChrome, setShowChrome] = useState(true);
+  const chromeTimeoutRef = useRef(null);
 
   // Always start with the body scroll locked — TVFeed is a takeover view.
   // Restored on unmount so the user lands back in normal scroll state.
@@ -113,6 +119,50 @@ const TVFeed = ({ isPremium }) => {
     setIsMuted(m => !m);
   }, []);
 
+  // ─── Chrome auto-hide ─────────────────────────────────────
+  // After 2.8s of no interaction, the corner controls + brand mark + dots
+  // fade out so the video takes full attention. Any tap brings them back.
+  // The title stays always — premium players keep context visible.
+  const scheduleChromeHide = useCallback(() => {
+    if (chromeTimeoutRef.current) clearTimeout(chromeTimeoutRef.current);
+    chromeTimeoutRef.current = setTimeout(() => setShowChrome(false), 2800);
+  }, []);
+
+  const revealChrome = useCallback(() => {
+    setShowChrome(true);
+    scheduleChromeHide();
+  }, [scheduleChromeHide]);
+
+  // Kick off the auto-hide once playback starts on the first video.
+  useEffect(() => {
+    if (videos.length > 0 && isPlaying) scheduleChromeHide();
+    return () => {
+      if (chromeTimeoutRef.current) clearTimeout(chromeTimeoutRef.current);
+    };
+  }, [videos.length, isPlaying, scheduleChromeHide]);
+
+  // Reveal chrome on every video change so the user sees what's playing next.
+  useEffect(() => {
+    if (videos.length > 0) revealChrome();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex]);
+
+  // Sync isPlaying with the actual video element — handles cases where the
+  // browser pauses/plays without us asking (tab backgrounding, audio focus
+  // grabs, etc).
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
+    video.addEventListener('play', onPlay);
+    video.addEventListener('pause', onPause);
+    return () => {
+      video.removeEventListener('play', onPlay);
+      video.removeEventListener('pause', onPause);
+    };
+  }, [currentIndex]);
+
   const handleVideoTap = useCallback(() => {
     if (!videoRef.current) return;
     if (videoRef.current.paused) {
@@ -120,7 +170,8 @@ const TVFeed = ({ isPremium }) => {
     } else {
       videoRef.current.pause();
     }
-  }, []);
+    revealChrome();
+  }, [revealChrome]);
 
   // ─── Touch + wheel + keyboard ─────────────────────────────
   useEffect(() => {
@@ -260,8 +311,13 @@ const TVFeed = ({ isPremium }) => {
   const current = videos[currentIndex];
 
   return (
-    <div className="tv-feed" ref={containerRef}>
-      {/* Video — full-bleed, looping, muted by default (autoplay safety) */}
+    <div
+      className={`tv-feed${showChrome ? ' chrome-visible' : ' chrome-hidden'}`}
+      ref={containerRef}
+    >
+      {/* Video — full-bleed (object-fit: cover) for TikTok/Reels-style
+          takeover. Native 9:16 uploads fill the viewport with no crop.
+          Looping + muted-by-default for autoplay safety. */}
       <video
         ref={videoRef}
         className="tv-feed-video"
@@ -274,14 +330,33 @@ const TVFeed = ({ isPremium }) => {
         onClick={handleVideoTap}
       />
 
-      {/* Top bar — back X + mute toggle. Both anchored to corners via
-          .tv-feed-exit / .tv-feed-mute absolute positioning, so they never
-          drift into content space the way the old flex-centered version
-          could. */}
+      {/* Pause overlay — frosted play glyph fades into center when paused.
+          Same vocabulary as the corner buttons (scrim + blur) just scaled
+          up. Vanishes on play. */}
+      {!isPlaying && (
+        <div className="tv-feed-pause-overlay" aria-hidden="true">
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </div>
+      )}
+
+      {/* Persistent quiet brand mark — top center, low opacity. The kind
+          of detail TikTok structurally can't do (they have no brand for
+          the player). Fades with the rest of the chrome on idle. */}
+      <img
+        src="/tttv-logo-white.png"
+        alt=""
+        className="tv-feed-brand"
+        aria-hidden="true"
+      />
+
+      {/* Top-corner controls. Both auto-hide with the rest of the chrome
+          after 2.8s of no interaction; tap on video brings them back. */}
       <TVFeedExit onClick={handleExit} />
       <button
         className="tv-feed-mute"
-        onClick={handleMuteToggle}
+        onClick={(e) => { e.stopPropagation(); handleMuteToggle(); revealChrome(); }}
         aria-label={isMuted ? 'Unmute' : 'Mute'}
       >
         {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
@@ -299,7 +374,8 @@ const TVFeed = ({ isPremium }) => {
         </div>
       )}
 
-      {/* Title overlay — serif bottom-left, the TTTV signature */}
+      {/* Title overlay — always-on. Premium players keep context visible
+          even when the rest of the chrome fades. */}
       <div className="tv-feed-info">
         <div className="tv-feed-title">{current.title}</div>
         <div className="tv-feed-meta">
@@ -308,8 +384,8 @@ const TVFeed = ({ isPremium }) => {
         </div>
       </div>
 
-      {/* Swipe hint — only on first video, only if there's a next, fades on
-          first navigation. Quiet — not nagging. */}
+      {/* Swipe hint — only on first video, only if there's a next, fades
+          on first navigation. */}
       {showSwipeHint && currentIndex === 0 && videos.length > 1 && (
         <div className="tv-feed-swipe-hint" aria-hidden="true">
           <span className="tv-feed-swipe-chev">∧</span>
