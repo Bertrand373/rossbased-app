@@ -20,6 +20,18 @@
   color: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
   padding: 0 16px calc(env(safe-area-inset-bottom, 0px) + 40px);
+  /* Soft fade-up entry — same vocabulary as .tv-feed and the rest of the
+     app's surface transitions. When splash unmounts and the grid mounts,
+     the cards rise into place (existing animation on .tv-grid-cards) AND
+     the surface itself fades up underneath them. Splash and grid both
+     paint black backgrounds, so the swap feels like one continuous
+     surface settling into focus rather than two screens trading places. */
+  animation: tv-grid-in 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes tv-grid-in {
+  0%   { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 /* ============================================================
@@ -92,6 +104,55 @@
 
 @media (min-width: 720px) {
   .tv-grid-cards { gap: 14px; max-width: 720px; margin: 0 auto; }
+}
+
+/* ============================================================
+   DESKTOP — centered portrait frame, matches the player
+   ============================================================
+   On ≥768px the grid lives in the same centered phone-shaped frame as
+   the player so the two surfaces feel like one continuous space. The
+   frame is sized to the viewport's shorter dimension via aspect-ratio,
+   capped at 880px tall. Cards inside still flow as the existing
+   2-column grid; the constraint just gives them a focused stage instead
+   of stretching across the whole monitor. Hairline border + soft shadow
+   lift the frame off the void (body.tttv-active background).
+
+   Override the .tv-grid-cards max-width inside the desktop frame since
+   the frame itself is already narrower than 720px — let the cards fill
+   the frame width with the same gutter as mobile. */
+@media (min-width: 768px) {
+  .tv-grid {
+    inset: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: calc(100vh - 56px);
+    max-height: 880px;
+    max-width: 90vw;
+    aspect-ratio: 9 / 16;
+    border-radius: 22px;
+    box-shadow:
+      0 30px 90px rgba(0, 0, 0, 0.65),
+      0 0 0 1px rgba(255, 255, 255, 0.05);
+    /* Re-compose the entry animation with the centering transform so
+       the frame doesn't snap to the corner mid-rise. */
+    animation: tv-grid-in-desktop 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes tv-grid-in-desktop {
+    0%   { opacity: 0; transform: translate(-50%, -48%) scale(0.985); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+
+  .tv-grid-cards {
+    max-width: none;
+    margin: 4px 0 0;
+  }
+
+  /* Header sticky inside the frame, not the viewport. */
+  .tv-grid-header {
+    padding-top: 18px;
+  }
 }
 
 .tv-grid-card {

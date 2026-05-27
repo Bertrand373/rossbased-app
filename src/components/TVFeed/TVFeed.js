@@ -118,6 +118,17 @@ const TVFeed = ({ isPremium }) => {
     return () => { document.body.style.overflow = prev; };
   }, []);
 
+  // Body class while TTTV is active. On desktop the .tv-feed / .tv-grid
+  // surfaces become a centered portrait frame instead of the full viewport,
+  // and the area around that frame needs to paint pure black instead of
+  // letting the app shell show through. The body bg is the cheapest void.
+  // No-op on mobile (the surface is still inset:0). Cleaned up on unmount
+  // so /me and other routes are untouched.
+  useEffect(() => {
+    document.body.classList.add('tttv-active');
+    return () => document.body.classList.remove('tttv-active');
+  }, []);
+
   // Sync currentIndex to the URL's ?play=<videoId> param. Runs whenever
   // playingId changes (user tapped a grid card) or videos finish loading
   // (deep-link to /tv?play=X on first mount). Defaults to 0 if the id
@@ -198,11 +209,16 @@ const TVFeed = ({ isPremium }) => {
   // effect re-runs (via the snapStack util) to settle to the snap position.
   const snapStack = useCallback(() => {
     const stack = stackRef.current;
-    if (!stack) return;
+    const container = containerRef.current;
+    if (!stack || !container) return;
     stack.style.transition = `transform ${SNAP_DURATION_MS}ms ${SNAP_EASING}`;
-    // Consistent px units everywhere — mixing vh and px in transforms
-    // makes Safari interpolate weirdly mid-snap. Snap = absolute px.
-    stack.style.transform = `translate3d(0, ${-currentIndex * window.innerHeight}px, 0)`;
+    // Container height (not window.innerHeight) so the math respects the
+    // desktop portrait frame, where .tv-feed is constrained to a centered
+    // 9:16 box. On mobile, container.clientHeight === window.innerHeight
+    // (the .tv-feed is still inset:0) so behavior is unchanged. Consistent
+    // px units everywhere — mixing vh and px in transforms makes Safari
+    // interpolate weirdly mid-snap. Snap = absolute px.
+    stack.style.transform = `translate3d(0, ${-currentIndex * container.clientHeight}px, 0)`;
   }, [currentIndex]);
 
   useEffect(() => {
@@ -590,7 +606,10 @@ const TVFeed = ({ isPremium }) => {
     if (!container) return;
 
     let wheelLock = false;
-    const vh = () => window.innerHeight;
+    // Container height — desktop constrains .tv-feed to a portrait frame,
+    // so the slot height is the frame, not the viewport. Mobile matches
+    // window.innerHeight since the frame is inset:0 there.
+    const vh = () => container.clientHeight;
 
     const onTouchStart = (e) => {
       // If the touch started inside the progress bar, let the scrub
