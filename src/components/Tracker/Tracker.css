@@ -159,6 +159,49 @@
   );
 }
 
+/* Ronin scene — sumi-e ink-wash style with a mostly WHITE/cream backdrop.
+   By far the lightest source in the lineup, so dark mode needs a combo
+   strategy:
+     1. CSS filter on the video itself (see ronin .sanctum-video rule below)
+        mutes the highlight whites pre-overlay so the gradient has less work.
+     2. Layered overlay here: radial vignette darkens corners/edges where the
+        bright sumi-e space lives, linear gradient handles the top/bottom text
+        bands. Lighter through the vertical middle since the ronin silhouette
+        already gives the streak number its own dark backdrop. */
+.sanctum-video-backplate[data-scene="ronin"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    /* Top layer: vertical bands for header + Oracle quote legibility, gentler
+       through the middle where the ronin silhouette provides natural contrast
+       for the gold streak number. */
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0.25) 35%,
+      rgba(0, 0, 0, 0.28) 65%,
+      rgba(0, 0, 0, 0.60) 100%
+    ),
+    /* Bottom layer: radial vignette darkening corners + edges. Cuts the
+       bright sumi-e space at the periphery without flattening the centered
+       subject. */
+    radial-gradient(
+      ellipse 95% 70% at 50% 50%,
+      rgba(0, 0, 0, 0) 35%,
+      rgba(0, 0, 0, 0.45) 100%
+    );
+}
+
+/* Mute the highlight whites BEFORE the overlay hits — preserves sumi-e
+   character instead of flattening it, gives the gradient less work to do.
+   Dark mode only; light mode's whites integrate fine with parchment. */
+.sanctum-video-backplate[data-scene="ronin"] .sanctum-video {
+  filter: brightness(0.88) contrast(1.04);
+}
+
 /* ===========================================================================
    LIGHT-MODE VIDEO OVERLAYS
    ===========================================================================
@@ -206,6 +249,25 @@
     rgba(244, 237, 224, 0.60) 65%,
     rgba(244, 237, 224, 0.45) 100%
   );
+}
+
+/* Light mode Ronin — sumi-e on cream IS what sumi-e is supposed to look like.
+   Just a soft cream wash to integrate with the parchment palette. No radial
+   vignette in light mode — the whites belong here. */
+[data-theme="light"] .sanctum-video-backplate[data-scene="ronin"]::after {
+  background: linear-gradient(
+    180deg,
+    rgba(244, 237, 224, 0.40) 0%,
+    rgba(244, 237, 224, 0.30) 40%,
+    rgba(244, 237, 224, 0.32) 65%,
+    rgba(244, 237, 224, 0.45) 100%
+  );
+}
+
+/* And drop the brightness-mute on the video itself in light mode — let the
+   sumi-e whites be whites against cream. */
+[data-theme="light"] .sanctum-video-backplate[data-scene="ronin"] .sanctum-video {
+  filter: none;
 }
 
 /* Mobile-only crop shift for the Lone Watch scene — landscape source has the
