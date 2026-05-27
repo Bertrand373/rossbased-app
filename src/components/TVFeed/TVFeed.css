@@ -27,12 +27,53 @@
   100% { opacity: 1; }
 }
 
-/* Body class added by TVFeed via useEffect. Paints the area around the
-   desktop portrait frame pure black so the app shell doesn't show
-   through. No-op on mobile (the .tv-feed surface is still inset:0).
-   Lives in this file because it's owned by the TTTV surface. */
+/* Body class added by TVFeed via useEffect. On desktop, paints a full-
+   viewport cinematic backdrop OVER the app shell so the portrait frame
+   sits on intentional atmosphere instead of letting the Tracker/Calendar
+   nav bleed through. A simple body bg color isn't enough — the app
+   shell paints its own DOM (logo, nav, avatars) at their own z-indexes
+   on top of body bg. The ::before pseudo-element renders at z-index
+   8400 (just below .tv-feed and .tv-grid at 8500) so it covers
+   everything below the TTTV surface.
+
+   The backdrop composition is layered:
+   1. Soft full-viewport radial of the active episode's dominant color
+      (--episode-color, propagated to :root by TVFeed). 4% opacity —
+      a hint of color, not a wash. Falls back to brand gold when
+      extraction returns null (CORS not configured).
+   2. Same warm gold ember radial used on splash/state screens, kept
+      for visual continuity.
+   3. Pure black base.
+
+   This is the Mubi / Apple TV+ pattern: portrait video on a landscape
+   screen looks broken without ambient surround. The void is alive. */
 body.tttv-active {
   background-color: #000;
+}
+
+@media (min-width: 768px) {
+  body.tttv-active::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 8400;
+    pointer-events: none;
+    /* The void backdrop. A soft full-viewport radial where the episode's
+       dominant color is mixed with black at 14% — enough to feel like
+       atmosphere, not enough to read as "tinted." color-mix() does the
+       math in srgb so the result respects the dominant color's hue
+       without bleaching toward white. Falls back to brand gold when
+       --episode-color is empty (CORS not configured for the bucket).
+       Transitions smoothly between episodes thanks to the 600ms ease
+       on background — colors fade rather than swap. */
+    background:
+      radial-gradient(
+        ellipse 65% 85% at 50% 50%,
+        color-mix(in srgb, var(--episode-color, #ffdd00) 14%, #000) 0%,
+        #000 75%
+      );
+    transition: background 600ms ease;
+  }
 }
 
 /* Episode-color ambient glow at the top of the player. A soft radial of
@@ -820,14 +861,23 @@ body.tttv-active {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    height: calc(100vh - 56px);
-    max-height: 880px;
+    /* Sizing strategy: target a comfortable ~480px width on normal
+       desktop heights, but scale down on short viewports rather than
+       overflowing. We set width directly (not via aspect-ratio) so the
+       width target wins on tall viewports; height is the lesser of the
+       9:16 derivation and the available viewport. Result: ~480px wide
+       on 800-1000px tall windows, scales gracefully on smaller. */
+    width: min(480px, calc((100vh - 40px) * 9 / 16));
+    height: min(854px, calc(100vh - 40px));
     max-width: 90vw;
-    aspect-ratio: 9 / 16;
     border-radius: 22px;
+    /* The frame sits on the ambient backdrop (body.tttv-active::before)
+       at z-index 8400. Drop the shadow's intensity slightly since the
+       backdrop already creates depth; keep the hairline border for
+       edge definition. */
     box-shadow:
-      0 30px 90px rgba(0, 0, 0, 0.65),
-      0 0 0 1px rgba(255, 255, 255, 0.05);
+      0 20px 60px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.06);
     /* Compose the entry transform with the centering transform — the
        fade-in animation needs to target both at once or the frame
        jumps to viewport corner mid-animation. */
