@@ -30,6 +30,30 @@
 }
 
 /* ============================================================
+   PROGRESS BAR — thin gold line at the very top edge
+   ============================================================
+   Always-on signal that something is alive. Sits above everything
+   (z-index: 7) so it stays visible even when corner chrome auto-hides.
+   Width updates from the video's timeupdate event in JS. */
+.tv-feed-progress {
+  position: absolute;
+  top: env(safe-area-inset-top, 0px);
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.10);
+  z-index: 7;
+  pointer-events: none;
+}
+
+.tv-feed-progress-fill {
+  height: 100%;
+  background: #ffdd00;
+  box-shadow: 0 0 5px rgba(255, 221, 0, 0.5);
+  transition: width 120ms linear;
+}
+
+/* ============================================================
    SCRIMS — frosted floor + ceiling for legibility on any video frame
    ============================================================
    Two gradient + backdrop-blur zones at the top and bottom of the player.
@@ -220,13 +244,16 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.18);
   transition: background 250ms ease, box-shadow 250ms ease, width 250ms ease, height 250ms ease;
 }
 
+/* Active dot is white (not gold) — gold was reading as a separate
+   accent that didn't match the rest of the chrome's white vocabulary
+   on the player. Position indicator is a white-on-white density shift. */
 .tv-feed-dot.active {
-  background: #ffdd00;
-  box-shadow: 0 0 6px rgba(255, 221, 0, 0.55);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.45);
   width: 5px;
   height: 5px;
 }
@@ -243,26 +270,59 @@
   pointer-events: none;
 }
 
-/* Title typography — scrim does the heavy lifting for legibility now, so
-   the text-shadow is barely there (just a hint for crispness on very
-   bright frames). Premium look: clean text on a frosted floor instead of
-   shadow-heavy "halo" text. */
+/* Title typography — sans-serif to match the rest of the app chrome
+   (Oracle responses, nav, headers all live in sans). Serif is reserved
+   for editorial Notes-style moments (the Oracle overlay below, state
+   screens, Notes library), NOT player chrome. */
 .tv-feed-title {
-  font-family: 'Iowan Old Style', 'Cormorant Garamond', 'Georgia', serif;
-  font-size: 22px;
-  font-weight: 400;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
   color: #ffffff;
-  line-height: 1.2;
-  letter-spacing: 0.005em;
+  line-height: 1.25;
+  letter-spacing: -0.005em;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
   margin-bottom: 5px;
 }
 
 .tv-feed-meta {
+  font-family: inherit;
   font-size: 11px;
+  font-weight: 500;
   color: rgba(255, 255, 255, 0.68);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.30);
+}
+
+/* ============================================================
+   ORACLE OVERLAY — italic serif line fades in mid-video at timestamp
+   This IS the TTTV differentiator. Per-episode "quoted moment" that
+   appears for 4 seconds. Serif here is correct (Notes-style voice),
+   distinct from the sans player chrome. Slides up from below as it fades
+   in for a premium "appears, then settles" feel.
+   ============================================================ */
+.tv-feed-oracle {
+  position: absolute;
+  left: 22px;
+  right: 60px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 120px);
+  z-index: 4;
+  pointer-events: none;
+  font-family: 'Iowan Old Style', 'Cormorant Garamond', 'Georgia', serif;
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.95);
+  letter-spacing: 0.005em;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 420ms ease, transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tv-feed-oracle.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* ============================================================

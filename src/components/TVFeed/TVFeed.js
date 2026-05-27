@@ -51,6 +51,11 @@ const TVFeed = ({ isPremium }) => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [showChrome, setShowChrome] = useState(true);
   const chromeTimeoutRef = useRef(null);
+  // Real-time playback position (0-100) for the top progress bar, and
+  // visibility of the Oracle overlay (italic-serif line that fades in
+  // at the timestamp the episode specifies).
+  const [progress, setProgress] = useState(0);
+  const [oracleVisible, setOracleVisible] = useState(false);
 
   // Always start with the body scroll locked — TVFeed is a takeover view.
   // Restored on unmount so the user lands back in normal scroll state.
@@ -85,17 +90,57 @@ const TVFeed = ({ isPremium }) => {
 
   // ─── Restart playback when the current video changes ──────
   // Forced via .load() because changing src on an existing element doesn't
-  // automatically reset the playback head on iOS Safari.
+  // automatically reset the playback head on iOS Safari. We also re-attach
+  // play attempts on multiple events (loadedmetadata + canplay + immediate)
+  // to harden autoplay across iOS PWA quirks.
   useEffect(() => {
     if (!videoRef.current || videos.length === 0) return;
-    try {
-      videoRef.current.load();
-      const playPromise = videoRef.current.play();
-      if (playPromise && playPromise.catch) playPromise.catch(() => {});
-    } catch {
-      /* iOS sometimes throws if user gesture missing — fine, autoPlay+muted
-         covers the rest, and tap-on-video can recover. */
-    }
+    const video = videoRef.current;
+    try { video.load(); } catch {/* iOS quirk */}
+
+    const tryPlay = () => {
+      const p = video.play();
+      if (p && p.catch) p.catch(() => {});
+    };
+    tryPlay();
+    video.addEventListener('loadedmetadata', tryPlay);
+    video.addEventListener('canplay', tryPlay);
+
+    setProgress(0);
+    setOracleVisible(false);
+
+    return () => {
+      video.removeEventListener('loadedmetadata', tryPlay);
+      video.removeEventListener('canplay', tryPlay);
+    };
+  }, [currentIndex, videos]);
+
+  // ─── Real-time progress + Oracle overlay window ───────────
+  // Single timeupdate listener drives both the top progress bar (% of
+  // current video played) and the Oracle overlay fade-in window
+  // (currentTime ∈ [overlay.atSec, overlay.atSec + 4]). Putting both in
+  // one listener avoids racing two separate handlers on the same event.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || videos.length === 0) return;
+    const current = videos[currentIndex];
+    const overlay = current?.oracleOverlay;
+    const hasOverlay = overlay && overlay.text && overlay.text.trim().length > 0;
+
+    const onTimeUpdate = () => {
+      if (video.duration > 0) {
+        setProgress((video.currentTime / video.duration) * 100);
+      }
+      if (hasOverlay) {
+        const t = video.currentTime;
+        const start = overlay.atSec || 0;
+        const end = start + 4; // 4-second visibility window
+        setOracleVisible(t >= start && t <= end);
+      }
+    };
+
+    video.addEventListener('timeupdate', onTimeUpdate);
+    return () => video.removeEventListener('timeupdate', onTimeUpdate);
   }, [currentIndex, videos]);
 
   // ─── Navigation handlers ──────────────────────────────────
@@ -330,6 +375,16 @@ const TVFeed = ({ isPremium }) => {
         onClick={handleVideoTap}
       />
 
+      {/* Top progress bar — always-on, thin gold line at the very top edge
+          showing playback position in the current video. Live signal that
+          something is happening. */}
+      <div className="tv-feed-progress" aria-hidden="true">
+        <div
+          className="tv-feed-progress-fill"
+          style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+        />
+      </div>
+
       {/* Scrims — gradient + backdrop-blur zones that guarantee legibility
           of overlay chrome on ANY video frame. The bottom scrim is always
           on (supports the always-visible title); the top scrim fades with
@@ -381,6 +436,20 @@ const TVFeed = ({ isPremium }) => {
               className={`tv-feed-dot${i === currentIndex ? ' active' : ''}`}
             />
           ))}
+        </div>
+      )}
+
+      {/* Oracle overlay — the TTTV differentiator. When an episode has
+          oracleOverlay.text set in admin, at oracleOverlay.atSec the line
+          fades in for 4 seconds, then fades out. Italic serif here is
+          intentional — this IS the Notes-style "quoted moment" voice
+          that serif is meant to carry. */}
+      {current.oracleOverlay?.text && (
+        <div
+          className={`tv-feed-oracle${oracleVisible ? ' visible' : ''}`}
+          aria-hidden={!oracleVisible}
+        >
+          {current.oracleOverlay.text}
         </div>
       )}
 
