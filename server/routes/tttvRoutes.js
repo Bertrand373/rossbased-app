@@ -101,6 +101,54 @@ async function getNextEpisodeNumber() {
 }
 
 // ============================================================
+// POST /api/tttv/setup-cors
+// One-shot admin endpoint to configure Firebase Storage CORS so the
+// client can fetch() videos cross-origin. Required for:
+//   1. The Blob URL preload pattern (TVFeed fetches MP4s into Blobs
+//      for instant playback on iOS Safari)
+//   2. Canvas pixel sampling for the per-episode ambient color
+//      extraction (extractDominantColor in TVFeed)
+//
+// Without CORS, both fall back gracefully (storage URL on video element,
+// brand-gold ambient color) but iOS feels laggy and the ambient stays
+// gold. Call this once after deploy; the config persists on the bucket
+// until changed.
+//
+//   curl -X POST -H "Authorization: Bearer $TOKEN" \
+//        https://titantrack.app/api/tttv/setup-cors
+//
+// Idempotent — safe to call multiple times.
+// ============================================================
+router.post('/setup-cors', adminCheck, async (req, res) => {
+  try {
+    const bucket = admin.storage().bucket(STORAGE_BUCKET);
+    await bucket.setCorsConfiguration([
+      {
+        origin: ['*'],
+        method: ['GET', 'HEAD'],
+        responseHeader: [
+          'Content-Type',
+          'Content-Length',
+          'Content-Range',
+          'Accept-Ranges',
+          'ETag',
+          'Cache-Control'
+        ],
+        maxAgeSeconds: 3600
+      }
+    ]);
+    return res.json({
+      success: true,
+      bucket: STORAGE_BUCKET,
+      message: 'CORS configured. Blob URL preload + canvas color extraction now work cross-origin.'
+    });
+  } catch (e) {
+    console.error('[TTTV setup-cors] Failed:', e);
+    return res.status(500).json({ error: e.message || 'Failed to set CORS' });
+  }
+});
+
+// ============================================================
 // POST /api/tttv/videos
 // Upload a new episode (video + optional poster + metadata).
 // ============================================================

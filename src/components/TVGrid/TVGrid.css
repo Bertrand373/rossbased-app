@@ -102,27 +102,10 @@
   100% { opacity: 1; transform: translateY(0); }
 }
 
-/* Off-screen preloader container. The <video> elements inside fetch
-   their MP4s on grid mount so the cache is hot by the time the user
-   taps a card. Browsers skip preload on display:none elements, so we
-   position off-screen with effectively zero size + zero opacity instead.
-   pointer-events:none guarantees the user can't accidentally hit them. */
-.tv-grid-preload {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: -1;
-}
-
-.tv-grid-preload video {
-  width: 1px;
-  height: 1px;
-}
+/* .tv-grid-preload removed — video preload moved to TVFeed which now
+   uses Blob URLs (fetch the MP4 into a Blob, hand the video element
+   a blob: URL). Works on iOS Safari where <video preload="auto"> is
+   ignored. See TVFeed's blob preload useEffect. */
 
 @media (min-width: 720px) {
   .tv-grid-cards { gap: 14px; max-width: 720px; margin: 0 auto; }

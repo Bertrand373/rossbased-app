@@ -89,6 +89,13 @@ const TVFeed = ({ isPremium }) => {
   // with the rest of the chrome on idle.
   const [currentTimeSec, setCurrentTimeSec] = useState(0);
   const [oracleVisible, setOracleVisible] = useState(false);
+  // Blob URLs keyed by video._id. When a blob URL is ready for a video,
+  // the player uses it instead of the raw Firebase Storage URL — this
+  // bypasses the network entirely on tap, which is the only reliable
+  // way to get instant playback on iOS Safari (which ignores video
+  // preload="auto" to save bandwidth/battery). See the preload effect
+  // below for the fetch + objectURL logic.
+  const [blobUrls, setBlobUrls] = useState({});
   // Scrub state — when user drags the progress bar, we pause the video
   // and update currentTime live so they see the frame at their finger.
   // Resumes play on release. wasPlayingBeforeScrubRef remembers whether
@@ -168,6 +175,52 @@ const TVFeed = ({ isPremium }) => {
     })();
     return () => { cancelled = true; };
   }, [isPremium]);
+
+  // ─── Blob URL preload (iOS Safari instant play) ────────────
+  // iOS Safari (and PWAs running on it) ignores <video preload="auto">
+  // to save bandwidth/battery — it treats it like preload="none" on
+  // cellular and unreliably honors it on WiFi. The "preload hidden
+  // video elements on the grid" trick from PR #93 works in Chrome but
+  // does nothing on iOS, leaving tap-to-play feeling laggy.
+  //
+  // The reliable cross-browser approach: fetch the MP4 into a Blob and
+  // use the resulting blob: URL as the video src. Blob URLs bypass the
+  // network layer entirely — the video element reads in-memory bytes,
+  // so the first frame paints as fast as the decoder can run (~50ms).
+  // Works identically on Chrome, Safari, iOS PWA, everything.
+  //
+  // Limited to first 3 videos so we don't blow mobile memory on a
+  // future 20-episode library (3 × ~1MB = 3MB held in memory). As the
+  // library grows, can swap to a windowed strategy: keep blobs for
+  // current/next/prev and fetch others on demand.
+  //
+  // Cleanup revokes the object URLs to free memory on unmount.
+  useEffect(() => {
+    if (!videos.length) return;
+    const aborts = [];
+    const createdBlobs = [];
+    videos.slice(0, 3).forEach((v) => {
+      if (!v.storageUrl) return;
+      const ctrl = new AbortController();
+      aborts.push(ctrl);
+      fetch(v.storageUrl, { signal: ctrl.signal })
+        .then((res) => res.blob())
+        .then((blob) => {
+          const url = URL.createObjectURL(blob);
+          createdBlobs.push(url);
+          setBlobUrls((prev) => ({ ...prev, [v._id]: url }));
+        })
+        .catch(() => {
+          // AbortError on unmount or network error — silent fallback,
+          // player will use storageUrl directly (still works, just not
+          // as instant).
+        });
+    });
+    return () => {
+      aborts.forEach((c) => c.abort());
+      createdBlobs.forEach((u) => URL.revokeObjectURL(u));
+    };
+  }, [videos]);
 
   // ─── Switch active video when currentIndex changes ─────────
   // With the 3-video stack, prev/current/next are all mounted at once. On
@@ -903,7 +956,12 @@ const TVFeed = ({ isPremium }) => {
                 else delete videoRefs.current[index];
               }}
               className="tv-feed-video"
-              src={video.storageUrl}
+              // Prefer the blob: URL (in-memory bytes, zero network) when
+              // the preload effect has finished fetching this video. Falls
+              // back to the raw storage URL when the blob isn't ready yet
+              // (early tap before the fetch completes, or videos beyond
+              // the preloaded first 3).
+              src={blobUrls[video._id] || video.storageUrl}
               preload="auto"
               autoPlay={index === currentIndex}
               // Last video doesn't loop so we can detect end-of-session via
