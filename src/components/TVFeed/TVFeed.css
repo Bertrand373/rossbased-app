@@ -199,22 +199,35 @@
 .tv-feed-mute { left: 14px; }
 
 /* ============================================================
-   PERSISTENT BRAND MARK — top-center, low opacity
-   The kind of detail TikTok structurally cannot do (no brand to put
-   there). Quiet "this is TTTV" signal that doesn't compete for
-   attention. Fades with the rest of the chrome on idle.
+   PERSISTENT BRAND MARK — top-center, in a subtle pill
+   The wordmark gets a thin dark scrim+blur container so it reads on
+   any video frame regardless of background brightness. Same chrome
+   vocabulary as the corner X/mute buttons, just elongated and quieter.
+   Both the pill and the mark fade with the rest of the chrome on idle.
    ============================================================ */
-.tv-feed-brand {
+.tv-feed-brand-pill {
   position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + 18px);
+  top: calc(env(safe-area-inset-top, 0px) + 14px);
   left: 50%;
   transform: translateX(-50%);
-  width: 56px;
-  height: auto;
-  opacity: 0.38;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 9999px;
   pointer-events: none;
   z-index: 5;
   transition: opacity 250ms ease;
+}
+
+.tv-feed-brand {
+  width: 52px;
+  height: auto;
+  display: block;
+  opacity: 0.82;
 }
 
 /* ============================================================
