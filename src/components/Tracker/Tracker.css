@@ -118,6 +118,27 @@
   );
 }
 
+.sanctum-video-backplate[data-scene="lastlight"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  /* Abandoned window composition — sunset visible through ivy-covered window
+     panes is the brightest spot, sits roughly center-vertical. Dark interior
+     framing on left + dark windowsill at bottom. Heaviest dim across the
+     middle band (40-65%) where the streak number sits over the sunset glow.
+     Lighter at top (already mixed dark/medium) and bottom (windowsill is
+     naturally dark — keeps Oracle quote readable without over-dimming). */
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.40) 0%,
+    rgba(0, 0, 0, 0.62) 42%,
+    rgba(0, 0, 0, 0.58) 65%,
+    rgba(0, 0, 0, 0.42) 100%
+  );
+}
+
 /* ===========================================================================
    LIGHT-MODE VIDEO OVERLAYS
    ===========================================================================
@@ -144,6 +165,16 @@
     rgba(244, 237, 224, 0.70) 45%,
     rgba(244, 237, 224, 0.70) 80%,
     rgba(244, 237, 224, 0.60) 100%
+  );
+}
+
+[data-theme="light"] .sanctum-video-backplate[data-scene="lastlight"]::after {
+  background: linear-gradient(
+    180deg,
+    rgba(244, 237, 224, 0.45) 0%,
+    rgba(244, 237, 224, 0.68) 42%,
+    rgba(244, 237, 224, 0.62) 65%,
+    rgba(244, 237, 224, 0.48) 100%
   );
 }
 

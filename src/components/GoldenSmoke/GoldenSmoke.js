@@ -77,6 +77,13 @@ const SCENES = {
     poster: '/videos/sanctum/woodfire-poster.jpg',
     durationSec: 10,
   },
+
+  lastlight: {
+    type: 'video',
+    src: '/videos/sanctum/lastlight.mp4',
+    poster: '/videos/sanctum/lastlight-poster.jpg',
+    durationSec: 8,
+  },
 };
 
 const DEFAULT_SCENE = 'golden';
@@ -90,6 +97,7 @@ export const SCENE_META = [
   { key: 'jade',       label: 'Jade Mist',    tag: 'Mineral stillness. Wide, calm.' },
   { key: 'goldenhour', label: 'Golden Hour',  tag: 'Sun on water. Quiet horizon.' },
   { key: 'woodfire',   label: 'Woodfire',     tag: 'Coals and ash. Living embers.' },
+  { key: 'lastlight',  label: 'Last Light',   tag: 'Sun through ivy. Held breath.' },
 ];
 
 // Swatch colors for the picker thumbnails — sampled from each palette's brightest stop.
@@ -98,6 +106,7 @@ export const SCENE_SWATCH = {
   jade:       'rgb(165, 220, 190)',
   goldenhour: 'rgb(245, 175, 100)',
   woodfire:   'rgb(200, 100, 40)',
+  lastlight:  'rgb(220, 145, 65)',
 };
 
 const resolveSceneKey = (sceneProp) => {
