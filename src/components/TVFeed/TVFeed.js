@@ -193,19 +193,12 @@ const TVFeed = ({ isPremium }) => {
   if (!isPremium) {
     return (
       <div className="tv-feed tv-feed-state">
-        <button className="tv-feed-exit" onClick={handleExit} aria-label="Close">
-          <FaTimes />
-        </button>
+        <TVFeedExit onClick={handleExit} />
         <div className="tv-feed-state-content">
-          <div className="tv-feed-state-mark">
-            <span className="tv-feed-state-chevron">⌂</span>
-            <span className="tv-feed-state-tv">tv</span>
-          </div>
-          <div className="tv-feed-state-eyebrow">TITANTRACK · TV</div>
+          <TTTVMark />
           <h1 className="tv-feed-state-title">Members only.</h1>
           <p className="tv-feed-state-sub">
-            A private library of shorts from Ross.<br/>
-            Upgrade to unlock.
+            A private library of shorts from Ross.
           </p>
           <button
             className="tv-feed-state-btn"
@@ -231,12 +224,10 @@ const TVFeed = ({ isPremium }) => {
   if (error) {
     return (
       <div className="tv-feed tv-feed-state">
-        <button className="tv-feed-exit" onClick={handleExit} aria-label="Close">
-          <FaTimes />
-        </button>
+        <TVFeedExit onClick={handleExit} />
         <div className="tv-feed-state-content">
-          <div className="tv-feed-state-eyebrow">TTTV</div>
-          <h1 className="tv-feed-state-title">Could not load.</h1>
+          <TTTVMark />
+          <h1 className="tv-feed-state-title">Couldn't load.</h1>
           <p className="tv-feed-state-sub">{error}</p>
           <button className="tv-feed-state-btn" onClick={() => window.location.reload()}>
             Try again
@@ -247,29 +238,19 @@ const TVFeed = ({ isPremium }) => {
   }
 
   // ─── Render: empty / coming-soon ──────────────────────────
+  // Stripped to the bone per direct feedback: logo + headline + subtitle.
+  // No Oracle italic line here — that's Notes vocabulary, not coming-soon
+  // vocabulary. Pure black bg lets the mark carry.
   if (videos.length === 0) {
     return (
       <div className="tv-feed tv-feed-state">
-        <button className="tv-feed-exit" onClick={handleExit} aria-label="Close">
-          <FaTimes />
-        </button>
+        <TVFeedExit onClick={handleExit} />
         <div className="tv-feed-state-content">
-          <div className="tv-feed-state-mark">
-            <span className="tv-feed-state-chevron">⌂</span>
-            <span className="tv-feed-state-tv">tv</span>
-          </div>
-          <div className="tv-feed-state-eyebrow">TITANTRACK · TV</div>
+          <TTTVMark />
           <h1 className="tv-feed-state-title">Arriving soon.</h1>
           <p className="tv-feed-state-sub">
-            A private library of shorts<br/>
-            from Ross. Members only.
+            A private library of shorts from Ross.
           </p>
-        </div>
-        <div className="tv-feed-state-oracle">
-          <div className="tv-feed-state-oracle-eyebrow">ORACLE OBSERVES</div>
-          <div className="tv-feed-state-oracle-line">
-            Some things you can't speed up. The signal needs the silence first.
-          </div>
         </div>
       </div>
     );
@@ -293,19 +274,18 @@ const TVFeed = ({ isPremium }) => {
         onClick={handleVideoTap}
       />
 
-      {/* Top bar — back X + mute toggle */}
-      <div className="tv-feed-top">
-        <button className="tv-feed-exit" onClick={handleExit} aria-label="Close">
-          <FaTimes />
-        </button>
-        <button
-          className="tv-feed-mute"
-          onClick={handleMuteToggle}
-          aria-label={isMuted ? 'Unmute' : 'Mute'}
-        >
-          {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
-        </button>
-      </div>
+      {/* Top bar — back X + mute toggle. Both anchored to corners via
+          .tv-feed-exit / .tv-feed-mute absolute positioning, so they never
+          drift into content space the way the old flex-centered version
+          could. */}
+      <TVFeedExit onClick={handleExit} />
+      <button
+        className="tv-feed-mute"
+        onClick={handleMuteToggle}
+        aria-label={isMuted ? 'Unmute' : 'Mute'}
+      >
+        {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
+      </button>
 
       {/* Feed dots — right edge, position indicator for the curated session */}
       {videos.length > 1 && (
@@ -339,6 +319,36 @@ const TVFeed = ({ isPremium }) => {
     </div>
   );
 };
+
+// Top-left close button — positioned absolute so it stays pinned to the
+// corner regardless of whether it's wrapping the active feed or a centered
+// state screen. Was previously inside a flex-centered parent which floated
+// it next to the content text.
+function TVFeedExit({ onClick }) {
+  return (
+    <button className="tv-feed-exit" onClick={onClick} aria-label="Close">
+      <FaTimes />
+    </button>
+  );
+}
+
+// TTTV brand mark — TitanTrack chevron + "tv" wordmark. Built from
+// /tt-icon-white.png (already in /public) until Ross drops his finalized
+// Canva PNG at /public/tttv-logo-white.png. Once that exists, the <img
+// src> below gets swapped for the single combined logo and the chevron+text
+// composition collapses to one image.
+function TTTVMark() {
+  return (
+    <div className="tv-feed-state-mark" aria-label="TitanTrack TV">
+      <img
+        src="/tt-icon-white.png"
+        alt=""
+        className="tv-feed-state-mark-chevron"
+      />
+      <span className="tv-feed-state-mark-tv">tv</span>
+    </div>
+  );
+}
 
 function formatDuration(sec) {
   const s = Math.floor(sec || 0);
