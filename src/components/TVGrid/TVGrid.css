@@ -1,0 +1,283 @@
+/* src/components/TVGrid/TVGrid.css
+   Atlas-inspired 2-column episode grid. Same chrome family as the
+   player (TTTV mark top, X corner button, pure black bg) so the two
+   surfaces feel like one product. Cards are tall (3:4) with poster-fill
+   bg, gold-token episode badge, and a scrim-anchored title. */
+
+.tv-grid {
+  position: fixed;
+  inset: 0;
+  background: #000000;
+  z-index: 8500;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
+  padding: 0 16px calc(env(safe-area-inset-bottom, 0px) + 40px);
+}
+
+/* ============================================================
+   HEADER — TTTV mark + corner X
+   ============================================================ */
+
+.tv-grid-header {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 18px);
+  padding-bottom: 18px;
+  background: linear-gradient(180deg, #000 0%, #000 60%, rgba(0, 0, 0, 0) 100%);
+  z-index: 5;
+}
+
+.tv-grid-header-mark {
+  width: 64px;
+  height: auto;
+  object-fit: contain;
+  opacity: 0.92;
+}
+
+.tv-grid-exit {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 14px);
+  right: 4px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: none;
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 150ms ease, color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tv-grid-exit:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+/* ============================================================
+   INTRO — eyebrow + tagline
+   ============================================================ */
+
+.tv-grid-intro {
+  text-align: center;
+  margin: 4px 0 22px;
+}
+
+.tv-grid-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--accent-gold-text, rgba(255, 221, 0, 0.5));
+  margin-bottom: 6px;
+}
+
+.tv-grid-tagline {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.01em;
+}
+
+/* ============================================================
+   CARDS GRID
+   ============================================================ */
+
+.tv-grid-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (min-width: 720px) {
+  .tv-grid-cards { gap: 14px; max-width: 720px; margin: 0 auto; }
+}
+
+.tv-grid-card {
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+.tv-grid-card-btn {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #050505;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--transition-fast, 150ms ease), border-color var(--transition-fast, 150ms ease);
+}
+
+.tv-grid-card-btn:hover {
+  border-color: rgba(255, 221, 0, 0.18);
+}
+
+.tv-grid-card-btn:active {
+  transform: scale(0.98);
+}
+
+/* Watched: dim the whole card so unwatched episodes pop. */
+.tv-grid-card.watched .tv-grid-card-btn {
+  opacity: 0.55;
+}
+
+.tv-grid-card.watched .tv-grid-card-btn:hover {
+  opacity: 0.8;
+}
+
+/* Poster fills the card. */
+.tv-grid-card-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.tv-grid-card-poster-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255, 221, 0, 0.06) 0%, rgba(0, 0, 0, 0.95) 70%);
+  color: rgba(255, 221, 0, 0.5);
+  font-size: 26px;
+}
+
+/* ============================================================
+   EPISODE BADGE — top-right, matches Atlas tier-badge composition
+   (label above, big value, colored dotted underline)
+   ============================================================ */
+
+.tv-grid-card-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 6px 10px 7px;
+  text-align: center;
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: 42px;
+}
+
+.tv-grid-card-badge-label {
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+}
+
+.tv-grid-card-badge-num {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-gold, #ffdd00);
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.tv-grid-card-badge-rule {
+  width: 28px;
+  height: 1.5px;
+  margin-top: 3px;
+  border-radius: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--accent-gold, #ffdd00) 0 3px,
+    transparent 3px 6px
+  );
+  opacity: 0.85;
+}
+
+/* ============================================================
+   WATCHED PILL — top-left
+   ============================================================ */
+
+.tv-grid-card-watched {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* ============================================================
+   SCRIM + TEXT
+   ============================================================ */
+
+.tv-grid-card-scrim {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 58%;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.85) 100%);
+  pointer-events: none;
+}
+
+.tv-grid-card-info {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.tv-grid-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  margin-bottom: 3px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.tv-grid-card-meta {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.68);
+  letter-spacing: 0.02em;
+  font-weight: 500;
+}

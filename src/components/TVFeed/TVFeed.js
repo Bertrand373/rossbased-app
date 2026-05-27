@@ -26,9 +26,10 @@
 //   - Tap on the video itself: play/pause toggle.
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FaTimes, FaPlay, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
 import { listFeed } from '../../services/tttvService';
+import TVGrid, { markWatched } from '../TVGrid/TVGrid';
 import './TVFeed.css';
 
 const WHEEL_COOLDOWN_MS = 700;        // debounce between wheel-driven transitions
@@ -40,6 +41,11 @@ const SNAP_EASING = 'cubic-bezier(0.16, 1, 0.3, 1)';
 
 const TVFeed = ({ isPremium }) => {
   const navigate = useNavigate();
+  // URL state for which episode is playing. No ?play param = grid view.
+  // ?play=<videoId> = player at that episode. Lets back button return to
+  // grid naturally and makes specific-episode URLs shareable.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const playingId = searchParams.get('play');
   const containerRef = useRef(null);
   // Stack container (translates vertically to bring slots into view) and a
   // map of per-slot video element refs keyed by absolute video index.
@@ -93,6 +99,19 @@ const TVFeed = ({ isPremium }) => {
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = prev; };
   }, []);
+
+  // Sync currentIndex to the URL's ?play=<videoId> param. Runs whenever
+  // playingId changes (user tapped a grid card) or videos finish loading
+  // (deep-link to /tv?play=X on first mount). Defaults to 0 if the id
+  // doesn't match any loaded episode.
+  useEffect(() => {
+    if (!playingId || videos.length === 0) return;
+    const idx = videos.findIndex(v => v._id === playingId);
+    if (idx >= 0 && idx !== currentIndex) {
+      setCurrentIndex(idx);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playingId, videos]);
 
   // ─── Load the published feed ───────────────────────────────
   useEffect(() => {
@@ -188,7 +207,14 @@ const TVFeed = ({ isPremium }) => {
 
     const onTimeUpdate = () => {
       if (video.duration > 0) {
-        setProgress((video.currentTime / video.duration) * 100);
+        const ratio = video.currentTime / video.duration;
+        setProgress(ratio * 100);
+        // Mark watched when the user crosses 80% — same threshold YouTube
+        // uses for "counted as a view." Localstorage-only for now; future
+        // PR can sync to backend per user.
+        if (ratio >= 0.8 && current?._id) {
+          markWatched(current._id);
+        }
       }
       if (hasOverlay) {
         const t = video.currentTime;
@@ -215,9 +241,16 @@ const TVFeed = ({ isPremium }) => {
     setCurrentIndex(i => Math.max(0, i - 1));
   }, []);
 
+  // Exit: from player → back to grid (clears ?play). From grid → exit
+  // the /tv route entirely. The conditional means the X button does the
+  // right "one level up" thing regardless of which view we're in.
   const handleExit = useCallback(() => {
-    navigate('/');
-  }, [navigate]);
+    if (playingId) {
+      setSearchParams({});
+    } else {
+      navigate('/');
+    }
+  }, [navigate, playingId, setSearchParams]);
 
   const handleMuteToggle = useCallback(() => {
     setIsMuted(m => !m);
@@ -543,6 +576,20 @@ const TVFeed = ({ isPremium }) => {
           </p>
         </div>
       </div>
+    );
+  }
+
+  // ─── Render: grid (browse) ────────────────────────────────
+  // No ?play in the URL = user is browsing. Atlas-style 2-column card
+  // grid with poster bg, episode badge, title, and watched indicators.
+  // Tap a card to enter player mode at that episode.
+  if (!playingId) {
+    return (
+      <TVGrid
+        videos={videos}
+        onPlay={(id) => setSearchParams({ play: id })}
+        onExit={() => navigate('/')}
+      />
     );
   }
 
