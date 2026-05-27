@@ -5,6 +5,7 @@ import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSa
   isSameDay, subMonths, addMonths, differenceInDays, isAfter,
   startOfWeek as getWeekStart, addWeeks, subWeeks } from 'date-fns';
 import toast from 'react-hot-toast';
+import { goldCheckIcon, GOLD_TOAST_CLASS } from '../Toast/ToastIcons';
 import './CalendarBase.css';
 import './CalendarModals.css';
 import '../../styles/BottomSheet.css';
@@ -1144,9 +1145,6 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   }, []);
 
   // Remove a pin
-  // Gold dash icon for pin toasts (matches app toast system)
-  const goldDash = <span style={{ display: 'inline-block', width: 16, height: 3, borderRadius: 2, background: '#d4af37', flexShrink: 0 }} />;
-
   const removePin = async (pinId) => {
     const token = localStorage.getItem('token');
     if (!token) return;
@@ -1161,7 +1159,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         setDayPins(prev => prev.filter(p => p._id !== pinId));
         // Refresh month indicators
         fetchPinsForMonth(currentDate.getFullYear(), currentDate.getMonth());
-        toast('Pin removed', { icon: goldDash });
+        toast('Pin removed', { icon: goldCheckIcon, className: GOLD_TOAST_CLASS });
         // Notify AIChat so "Pinned" toggles back to "Pin"
         window.dispatchEvent(new CustomEvent('oracle-pins-changed', {
           detail: { removedTimestamp: pin?.messageTimestamp }
