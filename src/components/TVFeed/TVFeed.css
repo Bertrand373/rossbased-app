@@ -166,11 +166,33 @@ body.tttv-active {
   right: 0;
   height: 24px;
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-end;
   z-index: 7;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   touch-action: pan-x;
+}
+
+/* Inline live timer — quiet "0:08" sitting just above the bar on the
+   left. Tabular numerals so digits don't shift width as seconds tick.
+   Fades with the rest of the chrome via the .tv-feed.chrome-hidden
+   selector below. */
+.tv-feed-timer {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.62);
+  letter-spacing: 0.02em;
+  padding: 0 0 4px 14px;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  transition: opacity 280ms ease;
+}
+
+.tv-feed.chrome-hidden .tv-feed-timer {
+  opacity: 0;
 }
 
 .tv-feed-progress {
@@ -307,6 +329,13 @@ body.tttv-active {
   pointer-events: none;
   z-index: 5;
   transition: opacity 250ms ease;
+  /* Shared element with .tv-grid-header-mark — when the user taps a
+     card on the grid or hits X in the player, document.startViewTransition
+     wraps the state change and the browser interpolates the geometry
+     between this pill and the grid header logo. The pill shrinks/grows
+     into place. Chrome 111+, Safari 18+; older browsers do a regular
+     swap. Premium-feel touch with zero JS animation code. */
+  view-transition-name: tttv-logo;
 }
 
 .tv-feed-brand {
