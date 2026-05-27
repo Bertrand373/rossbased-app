@@ -26,7 +26,6 @@
 //   - Tap on the video itself: play/pause toggle.
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { flushSync } from 'react-dom';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FaPlay, FaVolumeMute, FaVolumeUp, FaBookmark, FaShareAlt } from 'react-icons/fa';
 import toast from 'react-hot-toast';
@@ -297,17 +296,9 @@ const TVFeed = ({ isPremium }) => {
   // Exit: from player → back to grid (clears ?play). From grid → exit
   // the /tv route entirely. The conditional means the X button does the
   // right "one level up" thing regardless of which view we're in.
-  //
-  // The grid-to-player and player-to-grid transitions are wrapped in
-  // document.startViewTransition where supported (Chrome 111+, Safari
-  // 18+) so the TTTV logo shared between the two views does a FLIP-
-  // style position/scale animation. The CSS view-transition-name on
-  // both .tv-grid-header-mark and .tv-feed-brand-pill ties them
-  // together as one shared element; the browser handles the rest.
-  // Falls back to a regular state change on older browsers.
   const handleExit = useCallback(() => {
     if (playingId) {
-      withViewTransition(() => setSearchParams({}));
+      setSearchParams({});
     } else {
       navigate('/');
     }
@@ -478,30 +469,16 @@ const TVFeed = ({ isPremium }) => {
     };
   }, []);
 
-  // Two-tap pause: matches premium player vocabulary (Apple TV+, Mubi,
-  // Netflix). When chrome is hidden, the first tap *only* brings chrome
-  // back — no pause. A second tap while chrome is still visible toggles
-  // play/pause. This prevents accidental pauses when the user is just
-  // reaching for the X / mute / share controls; pause has to be
-  // deliberate. TikTok/Reels use single-tap pause because their chrome
-  // is minimal and always-on; TTTV's auto-hiding chrome makes two-tap
-  // the right pattern.
   const handleVideoTap = useCallback(() => {
     const video = videoRefs.current[currentIndex];
     if (!video) return;
-    if (!showChrome) {
-      // Chrome is hidden — first tap just reveals it.
-      revealChrome();
-      return;
-    }
-    // Chrome is visible — second tap (within the 2.8s window) pauses.
     if (video.paused) {
       video.play().catch(() => {});
     } else {
       video.pause();
     }
     revealChrome();
-  }, [currentIndex, revealChrome, showChrome]);
+  }, [currentIndex, revealChrome]);
 
   // ─── Save current moment ──────────────────────────────────
   // Bookmarks the exact timestamp the user is at (so the entry remembers
@@ -865,7 +842,7 @@ const TVFeed = ({ isPremium }) => {
     return (
       <TVGrid
         videos={videos}
-        onPlay={(id) => withViewTransition(() => setSearchParams({ play: id }))}
+        onPlay={(id) => setSearchParams({ play: id })}
         onExit={() => navigate('/')}
       />
     );
@@ -1205,28 +1182,5 @@ function formatTime(sec) {
   return `${m}:${String(r).padStart(2, '0')}`;
 }
 
-// Wraps a state-mutating callback in document.startViewTransition where
-// supported. Used for the grid ↔ player transitions so the TTTV logo
-// (shared via view-transition-name CSS on .tv-grid-header-mark and
-// .tv-feed-brand-pill) does a smooth FLIP-style position+scale crossfade
-// between its grid header position and its in-player pill position.
-// Browser handles all the geometry; we just have to wrap the swap.
-//
-// flushSync is necessary because React 18 batches state updates — without
-// it, setSearchParams queues a render but the DOM hasn't changed yet
-// when the View Transition API takes its "after" snapshot, so the
-// animation captures identical before/after states and skips. flushSync
-// forces synchronous render inside the transition callback.
-//
-// Falls back to a regular call when the API is unsupported (older
-// Safari, Firefox without flag). Premium-feel detail; never user-facing
-// if the browser can't do it.
-function withViewTransition(fn) {
-  if (typeof document !== 'undefined' && document.startViewTransition) {
-    document.startViewTransition(() => { flushSync(fn); });
-  } else {
-    fn();
-  }
-}
 
 export default TVFeed;

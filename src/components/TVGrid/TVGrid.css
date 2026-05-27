@@ -55,11 +55,6 @@
   height: auto;
   object-fit: contain;
   opacity: 0.92;
-  /* Shared element with .tv-feed-brand-pill — see TVFeed.css for the
-     full story. The View Transitions API uses this name to interpolate
-     the mark's geometry as it shrinks into the pill (entering the
-     player) or grows back out (returning to the grid). */
-  view-transition-name: tttv-logo;
 }
 
 .tv-grid-exit {
