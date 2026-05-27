@@ -32,9 +32,10 @@ import { listFeed } from '../../services/tttvService';
 import './TVFeed.css';
 
 const WHEEL_COOLDOWN_MS = 700;        // debounce between wheel-driven transitions
-const SWIPE_RATIO_TO_ADVANCE = 0.20;  // 20% of viewport height = commit nav
+const SWIPE_RATIO_TO_ADVANCE = 0.10;  // 10% of viewport = commit nav (lowered from 20%)
+const FLICK_VELOCITY_PX_PER_MS = 0.45; // ~450 px/sec = a clear flick → commit regardless of distance
 const EDGE_RESISTANCE = 0.35;         // rubber-band damping at first/last
-const SNAP_DURATION_MS = 360;         // cubic snap-to-position duration
+const SNAP_DURATION_MS = 320;         // cubic snap-to-position duration (slightly snappier)
 const SNAP_EASING = 'cubic-bezier(0.16, 1, 0.3, 1)';
 
 const TVFeed = ({ isPremium }) => {
@@ -48,7 +49,17 @@ const TVFeed = ({ isPremium }) => {
   const videoRefs = useRef({});
   // Drag state lives in a ref so touchmove updates don't re-render React at
   // 60fps — only the inline transform on stackRef updates during the drag.
-  const dragStateRef = useRef({ active: false, startY: 0, deltaY: 0 });
+  // startTime + lastY/lastTime let us compute velocity at release: a fast
+  // flick can commit nav even when the user only dragged a short distance.
+  // Premium short-form (TikTok/Reels/Shorts) all do velocity-aware swipes.
+  const dragStateRef = useRef({
+    active: false,
+    startY: 0,
+    deltaY: 0,
+    startTime: 0,
+    lastY: 0,
+    lastTime: 0,
+  });
 
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -348,9 +359,13 @@ const TVFeed = ({ isPremium }) => {
       if (e.target.closest && e.target.closest('.tv-feed-progress-wrap')) {
         return;
       }
+      const now = performance.now();
       dragStateRef.current.active = true;
       dragStateRef.current.startY = e.touches[0].clientY;
       dragStateRef.current.deltaY = 0;
+      dragStateRef.current.startTime = now;
+      dragStateRef.current.lastY = e.touches[0].clientY;
+      dragStateRef.current.lastTime = now;
       // Disable transition for immediate finger-follow.
       if (stackRef.current) {
         stackRef.current.style.transition = 'none';
@@ -364,7 +379,12 @@ const TVFeed = ({ isPremium }) => {
       // vertical scroll doesn't fight our finger-follow drag. Requires
       // passive: false on the listener.
       if (e.cancelable) e.preventDefault();
-      drag.deltaY = e.touches[0].clientY - drag.startY;
+      const y = e.touches[0].clientY;
+      drag.deltaY = y - drag.startY;
+      // Update last-y/time at every move so velocity is the *recent* speed
+      // at release — not the average across the whole drag.
+      drag.lastY = y;
+      drag.lastTime = performance.now();
 
       // Rubber-band at edges so the user feels resistance instead of
       // dragging into the void.
@@ -387,15 +407,27 @@ const TVFeed = ({ isPremium }) => {
       drag.active = false;
 
       const delta = drag.deltaY;
-      const threshold = vh() * SWIPE_RATIO_TO_ADVANCE;
+      const elapsed = Math.max(1, drag.lastTime - drag.startTime);
+      // Velocity in px/ms — positive = downward, negative = upward.
+      const velocity = delta / elapsed;
+      const speed = Math.abs(velocity);
+
+      const distanceThreshold = vh() * SWIPE_RATIO_TO_ADVANCE;
       const canGoNext = currentIndex < videos.length - 1;
       const canGoPrev = currentIndex > 0;
 
-      if (Math.abs(delta) >= threshold) {
+      // Commit nav if EITHER the distance threshold is met OR the user
+      // flicked fast enough. Direction comes from delta sign (negative =
+      // dragged upward = next video). This matches TikTok/Reels/Shorts
+      // feel — quick flicks always advance, slow short drags snap back.
+      const distancePast = Math.abs(delta) >= distanceThreshold;
+      const flicked = speed >= FLICK_VELOCITY_PX_PER_MS;
+
+      if (distancePast || flicked) {
         if (delta < 0 && canGoNext) {
           goNext();
           revealChrome();
-          return; // snapStack effect handles the settle to new index
+          return; // snapStack effect handles the settle
         }
         if (delta > 0 && canGoPrev) {
           goPrev();
@@ -403,7 +435,7 @@ const TVFeed = ({ isPremium }) => {
           return;
         }
       }
-      // Below threshold OR at an edge — snap back to current.
+      // Below threshold AND not a flick — or at an edge. Snap back.
       snapStack();
     };
 
