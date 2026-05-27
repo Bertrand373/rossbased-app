@@ -176,7 +176,12 @@ const MeSheet = ({ open, onClose, userData, isPremium, onLogout, onOpenNotes }) 
           {isPremium && (
             <button type="button" className="me-tile me-tile-tttv" onClick={handleTTTV}>
               <div className="me-tile-icon me-tile-icon-tttv">
-                <img src="/tttv-logo-white.png" alt="" className="me-tile-logo" />
+                {/* Two logos rendered, CSS hides whichever doesn't match the
+                    active theme. White mark for dark mode, black mark for
+                    light mode — the inverse of the icon container's neutral
+                    tint per theme. */}
+                <img src="/tttv-logo-white.png" alt="" className="me-tile-logo me-tile-logo-dark" />
+                <img src="/tttv-logo-black.png" alt="" className="me-tile-logo me-tile-logo-light" />
               </div>
               <div className="me-tile-label">TTTV</div>
               <div className="me-tile-sub">Watch</div>
