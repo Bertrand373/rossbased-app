@@ -84,6 +84,13 @@ const SCENES = {
     poster: '/videos/sanctum/lastlight-poster.jpg',
     durationSec: 8,
   },
+
+  samurai: {
+    type: 'video',
+    src: '/videos/sanctum/samurai.mp4',
+    poster: '/videos/sanctum/samurai-poster.jpg',
+    durationSec: 8,
+  },
 };
 
 const DEFAULT_SCENE = 'golden';
@@ -98,6 +105,7 @@ export const SCENE_META = [
   { key: 'goldenhour', label: 'Golden Hour',  tag: 'Sun on water. Quiet horizon.' },
   { key: 'woodfire',   label: 'Woodfire',     tag: 'Coals and ash. Living embers.' },
   { key: 'lastlight',  label: 'Last Light',   tag: 'Sun through ivy. Held breath.' },
+  { key: 'samurai',    label: 'Lone Watch',   tag: 'Cherry mist. Steel and moon.' },
 ];
 
 // Swatch colors for the picker thumbnails — sampled from each palette's brightest stop.
@@ -107,6 +115,7 @@ export const SCENE_SWATCH = {
   goldenhour: 'rgb(245, 175, 100)',
   woodfire:   'rgb(200, 100, 40)',
   lastlight:  'rgb(220, 145, 65)',
+  samurai:    'rgb(180, 175, 165)',
 };
 
 const resolveSceneKey = (sceneProp) => {

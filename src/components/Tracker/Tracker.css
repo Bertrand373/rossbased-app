@@ -139,6 +139,26 @@
   );
 }
 
+.sanctum-video-backplate[data-scene="samurai"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  /* Lone-watch composition — full moon is the brightest spot, sits slightly
+     above center vertical. Cherry-tree silhouette (dark) left, samurai figure
+     + rock (dark) right. Bottom is misty water (medium-dark). Heaviest dim
+     at 35% to tame the moon glow under the streak number; lighter at top
+     (dark sky already) and bottom (mist + figure silhouettes already dark). */
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.42) 0%,
+    rgba(0, 0, 0, 0.65) 38%,
+    rgba(0, 0, 0, 0.55) 65%,
+    rgba(0, 0, 0, 0.40) 100%
+  );
+}
+
 /* ===========================================================================
    LIGHT-MODE VIDEO OVERLAYS
    ===========================================================================
@@ -175,6 +195,16 @@
     rgba(244, 237, 224, 0.68) 42%,
     rgba(244, 237, 224, 0.62) 65%,
     rgba(244, 237, 224, 0.48) 100%
+  );
+}
+
+[data-theme="light"] .sanctum-video-backplate[data-scene="samurai"]::after {
+  background: linear-gradient(
+    180deg,
+    rgba(244, 237, 224, 0.48) 0%,
+    rgba(244, 237, 224, 0.70) 38%,
+    rgba(244, 237, 224, 0.60) 65%,
+    rgba(244, 237, 224, 0.45) 100%
   );
 }
 
