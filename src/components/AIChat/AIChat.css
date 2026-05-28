@@ -793,24 +793,51 @@
   opacity: 0.4;
 }
 
-/* Recording state — warm red. Crimson rather than emergency red so it
-   reads as "active mic" not "alert / error". */
+/* Recording state — gold ember. We deliberately step away from the
+   universal "crimson recording" pattern because crimson reads as
+   utilitarian SaaS (Zoom, Loom, iPhone Voice Memos) and clashes with
+   the sacred / oracular atmosphere — like a fire-engine red exit sign
+   in a candlelit chamber. The button instead becomes the *source* of
+   the same gold the panel is bathed in: "the Oracle's lamp ignites."
+
+   The "is it recording?" signal is carried redundantly by the panel
+   glow + the timer in the placeholder + the cancel × button, so the
+   recording-state button doesn't have to also scream ACTIVE RED.
+
+   Ember anatomy:
+     - Burnt-honey gold fill (the --accent-gold token #ffdd00 is too
+       neon for a solid background — this hue reads as fired metal
+       rather than LED indicator)
+     - Near-black icon for the glowing-ember-on-dark inverse
+     - Persistent outer halo + soft inset glow so the button actually
+       *emits* light, not just sits flat
+     - Pulse synced to the panel breathe period (2.8s) so the lamp and
+       the chamber breathe together — meditative, not urgent. */
 .ai-chat-mic.recording {
-  color: #ffffff;
-  background-color: #d04545;
-  animation: ai-chat-mic-pulse 1.4s ease-in-out infinite;
+  color: #1a1208;
+  background-color: #d4a017;
+  box-shadow:
+    0 0 18px rgba(255, 221, 0, 0.30),
+    inset 0 0 6px rgba(255, 240, 200, 0.25);
+  animation: ai-chat-mic-pulse 2.8s ease-in-out infinite;
 }
 
 .ai-chat-mic.recording:hover {
-  background-color: #c43a3a;
+  background-color: #e0ad1c;
 }
 
 @keyframes ai-chat-mic-pulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(208, 69, 69, 0.45);
+    box-shadow:
+      0 0 0 0 rgba(255, 221, 0, 0.40),
+      0 0 18px rgba(255, 221, 0, 0.30),
+      inset 0 0 6px rgba(255, 240, 200, 0.25);
   }
   50% {
-    box-shadow: 0 0 0 10px rgba(208, 69, 69, 0);
+    box-shadow:
+      0 0 0 12px rgba(255, 221, 0, 0),
+      0 0 24px rgba(255, 221, 0, 0.45),
+      inset 0 0 8px rgba(255, 240, 200, 0.35);
   }
 }
 
