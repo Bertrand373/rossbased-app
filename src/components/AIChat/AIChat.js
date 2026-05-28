@@ -2687,9 +2687,14 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                     }
                   >
                     {voiceState === 'recording' ? (
-                      // Stop square
+                      // Steady ember dot. A literal stop-square reads as
+                      // "video editor stop button" — replacing it with a
+                      // small filled dot lets the glowing gold button read
+                      // as "the lamp is lit" instead. The pulse + the
+                      // adjacent cancel × carry the tap-to-stop affordance,
+                      // and the aria-label keeps the action explicit for AT.
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                        <rect x="6" y="6" width="12" height="12" rx="2" />
+                        <circle cx="12" cy="12" r="4" />
                       </svg>
                     ) : voiceState === 'uploading' ? (
                       // Spinner — CSS animates the rotation on .ai-chat-mic.uploading svg
