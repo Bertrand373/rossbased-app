@@ -1151,6 +1151,17 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
           setVoiceError(null);
           return;
         }
+        if (payload.code === 'TRANSCRIBE_UNAVAILABLE') {
+          // Groq itself rejected our auth (401/403). Bad/rotated key on
+          // the server, or a Groq outage. Retrying right now won't help —
+          // hide the mic so the user isn't poking a dead control, but
+          // leave one toast so they know to come back later. (The toast
+          // also auto-clears in 4s; the hidden mic persists until refresh,
+          // which is the right window because a refresh re-probes.)
+          setVoiceState('unavailable');
+          setVoiceError('Voice unavailable right now — refresh to retry later.');
+          return;
+        }
         if (res.status === 429) {
           setVoiceError('Daily voice limit reached — try typing.');
         } else if (payload.code === 'AUDIO_TOO_LARGE') {
