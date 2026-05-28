@@ -4,12 +4,13 @@
 //
 // Two render paths share the same component:
 //   - 'wisp' scenes (golden, jade) → procedural canvas, pure JS particles
-//   - 'video' scenes (goldenhour) → SanctumVideoBackplate sub-component
+//   - 'video' scenes (lastlight, firstlight, autumn) → SanctumVideoBackplate
 //
 // Scene resolution priority (first match wins):
-//   1. URL param ?scene=golden|jade|goldenhour  (dev override)
-//   2. `scene` prop                             (production: from userData)
-//   3. DEFAULT_SCENE = 'golden'
+//   1. URL param ?scene=golden|jade|lastlight|firstlight|autumn  (dev override)
+//   2. REMOVED_SCENES_MIGRATION lookup (e.g. saved 'goldenhour' → 'lastlight')
+//   3. `scene` prop if valid (production: from userData)
+//   4. DEFAULT_SCENE = 'golden'
 //
 // Motion is paused when:
 //   - The user has prefers-reduced-motion enabled (canvas freezes after one frame)
@@ -64,20 +65,6 @@ const SCENES = {
     baseGrad: { direction: 'bottom', stops: [[80, 135, 110, 0.07], [50, 95, 75, 0.02], [0, 0, 0, 0]] },
   },
 
-  goldenhour: {
-    type: 'video',
-    src: '/videos/sanctum/goldenhour.mp4',
-    poster: '/videos/sanctum/goldenhour-poster.jpg',
-    durationSec: 10,
-  },
-
-  woodfire: {
-    type: 'video',
-    src: '/videos/sanctum/woodfire.mp4',
-    poster: '/videos/sanctum/woodfire-poster.jpg',
-    durationSec: 10,
-  },
-
   lastlight: {
     type: 'video',
     src: '/videos/sanctum/lastlight.mp4',
@@ -85,12 +72,29 @@ const SCENES = {
     durationSec: 8,
   },
 
-  samurai: {
+  firstlight: {
     type: 'video',
-    src: '/videos/sanctum/samurai.mp4',
-    poster: '/videos/sanctum/samurai-poster.jpg',
+    src: '/videos/sanctum/firstlight.mp4',
+    poster: '/videos/sanctum/firstlight-poster.jpg',
     durationSec: 8,
   },
+
+  autumn: {
+    type: 'video',
+    src: '/videos/sanctum/autumn.mp4',
+    poster: '/videos/sanctum/autumn-poster.jpg',
+    durationSec: 8,
+  },
+};
+
+// Migration target for scenes that have been removed from the lineup.
+// Users with one of these keys saved on their account land on Last Light
+// instead of falling back to the procedural Golden Smoke default — feels
+// like a clean lateral swap into another video scene rather than a downgrade.
+const REMOVED_SCENES_MIGRATION = {
+  goldenhour: 'lastlight',
+  woodfire:   'lastlight',
+  samurai:    'lastlight',
 };
 
 const DEFAULT_SCENE = 'golden';
@@ -102,20 +106,18 @@ export const DEFAULT_SCENE_KEY = DEFAULT_SCENE;
 export const SCENE_META = [
   { key: 'golden',     label: 'Golden Smoke', tag: 'Origin temple. Warm, abundant.' },
   { key: 'jade',       label: 'Jade Mist',    tag: 'Mineral stillness. Wide, calm.' },
-  { key: 'goldenhour', label: 'Golden Hour',  tag: 'Sun on water. Quiet horizon.' },
-  { key: 'woodfire',   label: 'Woodfire',     tag: 'Coals and ash. Living embers.' },
   { key: 'lastlight',  label: 'Last Light',   tag: 'Sun through ivy. Held breath.' },
-  { key: 'samurai',    label: 'Lone Watch',   tag: 'Cherry mist. Steel and moon.' },
+  { key: 'firstlight', label: 'First Light',  tag: 'Sun through cedars. Forest waking.' },
+  { key: 'autumn',     label: 'Autumn',       tag: 'Tatami stillness. Maple wind.' },
 ];
 
 // Swatch colors for the picker thumbnails — sampled from each palette's brightest stop.
 export const SCENE_SWATCH = {
   golden:     'rgb(212, 175, 55)',
   jade:       'rgb(165, 220, 190)',
-  goldenhour: 'rgb(245, 175, 100)',
-  woodfire:   'rgb(200, 100, 40)',
   lastlight:  'rgb(220, 145, 65)',
-  samurai:    'rgb(180, 175, 165)',
+  firstlight: 'rgb(160, 175, 105)',
+  autumn:     'rgb(210, 80, 55)',
 };
 
 const resolveSceneKey = (sceneProp) => {
@@ -124,6 +126,12 @@ const resolveSceneKey = (sceneProp) => {
       const param = new URLSearchParams(window.location.search).get('scene');
       if (isValidScene(param)) return param;
     } catch (_) {}
+  }
+  // Migrate users from removed scenes (Golden Hour / Woodfire / Lone Watch)
+  // → Last Light, so their picker lands on a real scene instead of silently
+  // reverting to the procedural default.
+  if (sceneProp && REMOVED_SCENES_MIGRATION[sceneProp]) {
+    return REMOVED_SCENES_MIGRATION[sceneProp];
   }
   if (isValidScene(sceneProp)) return sceneProp;
   return DEFAULT_SCENE;
