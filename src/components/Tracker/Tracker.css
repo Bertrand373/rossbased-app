@@ -78,46 +78,6 @@
    contrast where bright clip moments would fight UI text (streak number,
    meta strip, Oracle quote at the bottom). Each scene gets its own gradient
    tuned to its composition. */
-.sanctum-video-backplate[data-scene="goldenhour"]::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  /* Heaviest dim through the sun-reflection band (~40% from top — where
-     the streak number sits). Tapers lighter at the bottom but stays deep
-     enough that the italic Oracle quote stays legible against the grass. */
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.50) 0%,
-    rgba(0, 0, 0, 0.65) 40%,
-    rgba(0, 0, 0, 0.55) 70%,
-    rgba(0, 0, 0, 0.45) 100%
-  );
-}
-
-.sanctum-video-backplate[data-scene="woodfire"]::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  /* Macro embers composition — light-grey ashy smoke fills the top half
-     (medium-bright, fights white header text) and bright orange flames +
-     glowing embers fill the bottom half (brightest part of the frame).
-     Unlike Golden Hour or the previous forest Woodfire, there is no
-     naturally dark region — heavy dim sustained across 45-80% to keep
-     the streak number AND Oracle quote readable. Tapered slightly at
-     the very bottom so the embers still glow through. */
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.50) 0%,
-    rgba(0, 0, 0, 0.65) 45%,
-    rgba(0, 0, 0, 0.65) 80%,
-    rgba(0, 0, 0, 0.55) 100%
-  );
-}
-
 .sanctum-video-backplate[data-scene="lastlight"]::after {
   content: '';
   position: absolute;
@@ -139,23 +99,41 @@
   );
 }
 
-.sanctum-video-backplate[data-scene="samurai"]::after {
+.sanctum-video-backplate[data-scene="firstlight"]::after {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 1;
-  /* Lone-watch composition — full moon is the brightest spot, sits slightly
-     above center vertical. Cherry-tree silhouette (dark) left, samurai figure
-     + rock (dark) right. Bottom is misty water (medium-dark). Heaviest dim
-     at 35% to tame the moon glow under the streak number; lighter at top
-     (dark sky already) and bottom (mist + figure silhouettes already dark). */
+  /* Misty forest with diagonal sun rays — brightest band is the upper-left
+     where the rays pierce through the canopy. Streak number lands over the
+     warm-glow center band, so heaviest dim there. Bottom is dark conifer
+     silhouettes (already naturally dark for the Oracle quote). */
   background: linear-gradient(
     180deg,
-    rgba(0, 0, 0, 0.42) 0%,
-    rgba(0, 0, 0, 0.65) 38%,
-    rgba(0, 0, 0, 0.55) 65%,
-    rgba(0, 0, 0, 0.40) 100%
+    rgba(0, 0, 0, 0.45) 0%,
+    rgba(0, 0, 0, 0.62) 40%,
+    rgba(0, 0, 0, 0.50) 70%,
+    rgba(0, 0, 0, 0.35) 100%
+  );
+}
+
+.sanctum-video-backplate[data-scene="autumn"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  /* Japanese tatami room composition — central shoji screens open onto a
+     bright sky + red maple tree (brightest band in the middle). Dark interior
+     ceiling at top, mid-toned tatami floor with leaves at bottom. Heaviest
+     dim at 40% where the streak number sits against the maple+sky window. */
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.40) 0%,
+    rgba(0, 0, 0, 0.60) 40%,
+    rgba(0, 0, 0, 0.50) 70%,
+    rgba(0, 0, 0, 0.42) 100%
   );
 }
 
@@ -168,26 +146,6 @@
    toward black, preserving the cream/parchment vibe while keeping dark text
    legible on top. Higher specificity than the base rules so this wins when
    the html data-theme is "light". */
-[data-theme="light"] .sanctum-video-backplate[data-scene="goldenhour"]::after {
-  background: linear-gradient(
-    180deg,
-    rgba(244, 237, 224, 0.55) 0%,
-    rgba(244, 237, 224, 0.70) 40%,
-    rgba(244, 237, 224, 0.60) 70%,
-    rgba(244, 237, 224, 0.50) 100%
-  );
-}
-
-[data-theme="light"] .sanctum-video-backplate[data-scene="woodfire"]::after {
-  background: linear-gradient(
-    180deg,
-    rgba(244, 237, 224, 0.55) 0%,
-    rgba(244, 237, 224, 0.70) 45%,
-    rgba(244, 237, 224, 0.70) 80%,
-    rgba(244, 237, 224, 0.60) 100%
-  );
-}
-
 [data-theme="light"] .sanctum-video-backplate[data-scene="lastlight"]::after {
   background: linear-gradient(
     180deg,
@@ -198,32 +156,24 @@
   );
 }
 
-[data-theme="light"] .sanctum-video-backplate[data-scene="samurai"]::after {
+[data-theme="light"] .sanctum-video-backplate[data-scene="firstlight"]::after {
   background: linear-gradient(
     180deg,
-    rgba(244, 237, 224, 0.48) 0%,
-    rgba(244, 237, 224, 0.70) 38%,
-    rgba(244, 237, 224, 0.60) 65%,
-    rgba(244, 237, 224, 0.45) 100%
+    rgba(244, 237, 224, 0.50) 0%,
+    rgba(244, 237, 224, 0.68) 40%,
+    rgba(244, 237, 224, 0.55) 70%,
+    rgba(244, 237, 224, 0.40) 100%
   );
 }
 
-
-/* Mobile-only crop shift for the Lone Watch scene — landscape source has the
-   samurai silhouette at ~80-87% horizontal (far right). Previous attempt used
-   `right center` (100%), which showed source pixels 1420-1920 — that put the
-   samurai at LEFT-CENTER of the visible mobile window with dark rocks
-   filling the right side, and lost the moon entirely.
-   78% center shifts the window to source pixels ~1110-1610. Now:
-     - Right portion of the moon (~1100-1248) visible on left of mobile frame
-     - Samurai silhouette (~1500-1700) on the right of mobile frame
-     - Streak number sits in the negative space between, against the misty
-       mountain backdrop instead of one extreme
-   Desktop landscape unchanged — full composition still reads. */
-@media (max-width: 767px) {
-  .sanctum-video-backplate[data-scene="samurai"] .sanctum-video {
-    object-position: 78% center;
-  }
+[data-theme="light"] .sanctum-video-backplate[data-scene="autumn"]::after {
+  background: linear-gradient(
+    180deg,
+    rgba(244, 237, 224, 0.45) 0%,
+    rgba(244, 237, 224, 0.65) 40%,
+    rgba(244, 237, 224, 0.55) 70%,
+    rgba(244, 237, 224, 0.48) 100%
+  );
 }
 
 /* Smoke bleeds through header and nav on Tracker tab */

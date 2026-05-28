@@ -67,10 +67,12 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
   // previewScene !== null means picker is open and showing a live preview
   const [showScenePicker, setShowScenePicker] = useState(false);
   const [previewScene, setPreviewScene] = useState(null);
-  // Premium / OG users default to Golden Hour so they discover the realistic-video
-  // scene without having to find the picker. Their explicit pick (saved to userData)
-  // always wins — this only applies when backgroundScene is unset/invalid.
-  const sceneDefault = isPremium ? 'goldenhour' : DEFAULT_SCENE_KEY;
+  // Premium / OG users default to Last Light so they discover a realistic-video
+  // scene without having to find the picker. Their explicit pick (saved to
+  // userData) always wins — this only applies when backgroundScene is
+  // unset/invalid. (Previously defaulted to Golden Hour, which was removed in
+  // the anime-inspired Sanctum swap; Last Light is the closest tonal match.)
+  const sceneDefault = isPremium ? 'lastlight' : DEFAULT_SCENE_KEY;
   const savedScene = isValidScene(userData.backgroundScene) ? userData.backgroundScene : sceneDefault;
   const activeScene = previewScene !== null ? previewScene : savedScene;
 
