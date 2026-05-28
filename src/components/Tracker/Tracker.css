@@ -176,6 +176,22 @@
   );
 }
 
+/* Mobile-only crop shift for the Autumn scene — landscape source has the
+   bright central window (sky + maple branches) at ~37-63% horizontal.
+   Default center-crop on mobile portrait shows that bright band, which is
+   exactly where the gold streak number lands → contrast gets thin against
+   the grey sky. Shifting to 35% center pushes the visible window to source
+   pixels ~ 500-1000, which puts the dense maple foliage + left interior
+   framing in frame. Streak number lands over darker maple branches instead
+   of bright sky, and the maple becomes the visual subject (matches the
+   "Autumn" scene name). Desktop landscape unchanged — full composition
+   reads fine at the wider aspect. */
+@media (max-width: 767px) {
+  .sanctum-video-backplate[data-scene="autumn"] .sanctum-video {
+    object-position: 35% center;
+  }
+}
+
 /* Smoke bleeds through header and nav on Tracker tab */
 /* transition-duration: 0ms = instant on entering tracker */
 /* Base 400ms transition on .app-header/.mobile-nav handles smooth fade back on leaving */
@@ -585,7 +601,11 @@
 
 .scene-option-check {
   font-size: 0.875rem;
-  color: var(--accent-gold);
+  /* App-wide success green (--success: #22c55e from index.css) instead of
+     gold — the gold check competed with the gold streak number when both
+     were on screen at once. Green reads as "selected/confirmed" and matches
+     the rest of the app's success-state vocabulary. */
+  color: var(--success);
   flex-shrink: 0;
 }
 
