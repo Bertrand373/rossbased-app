@@ -19,6 +19,10 @@ import OraclePulse from '../OraclePulse/OraclePulse';
 import RecoveryFlow from '../Recovery/RecoveryFlow';
 import CheckInSheet from '../Circle/CheckInSheet';
 import { useCircle } from '../../hooks/useCircle';
+import TrackerCameraButton from '../Photo/TrackerCameraButton';
+import PhotoCaptureSheet from '../Photo/PhotoCaptureSheet';
+import MilestoneSheet, { pendingMilestone } from '../Photo/MilestoneSheet';
+import { getBaselinePhoto, readEntry } from '../../utils/dayJournal';
 import GoldenSmoke, { SCENE_META, SCENE_SWATCH, DEFAULT_SCENE_KEY, isValidScene } from '../GoldenSmoke/GoldenSmoke';
 import { getLunarData } from '../../utils/lunarData';
 
@@ -62,6 +66,14 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
   // when the user is in a circle and hasn't reported today.
   const [showCheckInSheet, setShowCheckInSheet] = useState(false);
   const { circle: viewerCircle } = useCircle();
+  // Photo capture sheet — opens from the ghost camera button below
+  // Log Today, and (in a follow-up phase) from the post-log prompt.
+  const [showPhotoCaptureSheet, setShowPhotoCaptureSheet] = useState(false);
+  // Milestone celebration sheet — fires after daily log when streak
+  // crosses a celebrated threshold AND user has both baseline + today
+  // photos. Day number captured for the active firing.
+  const [showMilestoneSheet, setShowMilestoneSheet] = useState(false);
+  const [milestoneDayForSheet, setMilestoneDayForSheet] = useState(null);
 
   // Sanctum picker — premium scene library for the Tracker background
   // previewScene !== null means picker is open and showing a live preview
@@ -1188,9 +1200,26 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
       closeBenefits(() => {
         setShowBenefits(false);
 
+        // Milestone celebration takes priority over peak + check-in.
+        // Eligibility: streak crosses an un-celebrated milestone day AND
+        // user has both a baseline photo and today's photo. Without
+        // photos there's nothing to compose, so the milestone silently
+        // stays "pending" until the user takes the missing photos and
+        // logs again.
+        const todayStr = format(new Date(), 'yyyy-MM-dd');
+        const baseline = getBaselinePhoto(userData?.notes);
+        const todayPhoto = readEntry(userData?.notes, todayStr).photoKey;
+        const nextMilestone = pendingMilestone(userData, streak);
+        let willShowMilestone = false;
+        if (nextMilestone && baseline?.photoKey && todayPhoto) {
+          setMilestoneDayForSheet(nextMilestone);
+          setTimeout(() => setShowMilestoneSheet(true), 400);
+          willShowMilestone = true;
+        }
+
         const coreAvg = (rounded.energy + rounded.focus + rounded.confidence + rounded.aura + rounded.sleep + rounded.workout) / 6;
         let willShowPeak = false;
-        if (coreAvg >= 7) {
+        if (!willShowMilestone && coreAvg >= 7) {
           const recordings = userData.peakRecordings || [];
           const lastRecording = recordings.length > 0 ? recordings[recordings.length - 1] : null;
           const daysSinceLast = lastRecording
@@ -1203,11 +1232,12 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
           }
         }
 
-        // Circle check-in prompt — fires only when peak prompt won't, so
-        // we never stack two sheets on top of each other after a log.
+        // Circle check-in prompt — fires only when neither milestone nor
+        // peak will fire, so we never stack sheets after a log.
         // Eligibility: user is in a circle, hasn't reported today, and
         // hasn't disabled the auto-share preference.
         if (
+          !willShowMilestone &&
           !willShowPeak &&
           viewerCircle &&
           !viewerCircle.viewerReportedToday &&
@@ -1673,6 +1703,27 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
         onAlert={handlePatternAlert}
       />
 
+      {/* Photo capture — opens from the ghost camera button. Handles both
+          first-photo ("set baseline") and subsequent retakes. */}
+      <PhotoCaptureSheet
+        open={showPhotoCaptureSheet}
+        onClose={() => setShowPhotoCaptureSheet(false)}
+        userData={userData}
+        updateUserData={updateUserData}
+      />
+
+      {/* Milestone celebration — fires from the saveBenefits chain when
+          streak crosses an un-celebrated threshold AND both baseline +
+          today photos exist. */}
+      <MilestoneSheet
+        open={showMilestoneSheet}
+        onClose={() => setShowMilestoneSheet(false)}
+        userData={userData}
+        updateUserData={updateUserData}
+        currentStreak={streak}
+        milestoneDay={milestoneDayForSheet}
+      />
+
       {/* Circle Check-In — opens after a daily log when eligible.
           See saveBenefits() for the firing logic and gating. */}
       <CheckInSheet
@@ -1868,14 +1919,22 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
 
         {/* ONBOARDING TARGET: benefits-trigger — grouped with hero */}
         <div className="tracker-log-wrap">
-          <button 
+          <button
             className={`${todayLogged ? 'btn-logged' : 'btn-primary'} benefits-trigger`}
             onClick={() => canLogBenefits ? setShowBenefits(true) : setShowLogLock(true)}
           >
             {todayLogged ? `${todayScore} ✓` : 'Log Today'}
           </button>
         </div>
-        
+
+        {/* Photo affordance — ghost camera button. Subordinate to Log Today.
+            Visual sits in the breathing room between Log Today and the
+            Oracle quote at the bottom. */}
+        <TrackerCameraButton
+          userData={userData}
+          onClick={() => setShowPhotoCaptureSheet(true)}
+        />
+
       </main>
 
       {/* Oracle bar — pinned bottom, matches Calendar moon bar.

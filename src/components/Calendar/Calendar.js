@@ -1,8 +1,8 @@
 // components/Calendar/Calendar.js - TITANTRACK ELITE
 // Two CSS files: CalendarBase.css + CalendarModals.css
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, 
-  isSameDay, subMonths, addMonths, differenceInDays, isAfter,
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth,
+  isSameDay, subMonths, addMonths, differenceInDays, isAfter, parseISO,
   startOfWeek as getWeekStart, addWeeks, subWeeks } from 'date-fns';
 import toast from 'react-hot-toast';
 import { goldCheckIcon, GOLD_TOAST_CLASS } from '../Toast/ToastIcons';
@@ -18,6 +18,13 @@ import interventionService from '../../services/InterventionService';
 // UNIFIED TRIGGER SYSTEM
 import { getAllTriggers, getTriggerLabel } from '../../constants/triggerConstants';
 import { getLunarData } from '../../utils/lunarData';
+import { readEntry, writeEntry, hasPhoto as hasJournalPhoto } from '../../utils/dayJournal';
+import { getPresignedUrl, invalidate as invalidatePhotoUrl } from '../../utils/photoUrl';
+import PhotoCaptureSheet from '../Photo/PhotoCaptureSheet';
+import JourneyView from '../Photo/JourneyView';
+import '../Photo/Photo.css';
+
+const API_URL_FOR_PHOTOS = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
@@ -175,6 +182,10 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   // Journal states
   const [isEditingNote, setIsEditingNote] = useState(false);
   const [noteText, setNoteText] = useState('');
+  // Selected day's photo — presigned URL is fetched on day-open so the
+  // image is ready when the journal panel renders.
+  const [selectedDayPhotoUrl, setSelectedDayPhotoUrl] = useState(null);
+  const [showCalendarPhotoCapture, setShowCalendarPhotoCapture] = useState(false);
 
   // Oracle Pin states
   const [pinnedDates, setPinnedDates] = useState(new Set());
@@ -670,15 +681,26 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const openDayInfo = (day) => {
     setSelectedDate(day);
     const dayStr = format(day, 'yyyy-MM-dd');
-    const existingNote = userData.notes && userData.notes[dayStr];
-    setNoteText(existingNote || '');
+    const entry = readEntry(userData.notes, dayStr);
+    setNoteText(entry.text || '');
     setIsEditingNote(false);
     setSheetView('info');
     setShowTriggerSelection(false);
     setEditingExistingTrigger(false);
     setSelectedTrigger('');
+    setSelectedDayPhotoUrl(null);
     setDayInfoModal(true);
     fetchDayPins(dayStr);
+
+    // Pre-fetch the presigned URL so the photo appears without a flash
+    // when the journal panel mounts.
+    if (entry.photoKey) {
+      getPresignedUrl(entry.photoKey).then((url) => {
+        // Only commit if the same day is still selected by the time
+        // the URL resolves.
+        if (url) setSelectedDayPhotoUrl(url);
+      });
+    }
   };
 
   const closeDayInfo = () => {
@@ -687,6 +709,8 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setSelectedDate(null);
     setIsEditingNote(false);
     setNoteText('');
+    setSelectedDayPhotoUrl(null);
+    setShowCalendarPhotoCapture(false);
     setSheetView('info');
     setShowTriggerSelection(false);
     setEditingExistingTrigger(false);
@@ -1010,19 +1034,62 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
   const cancelEditingNote = () => {
     const dayStr = format(selectedDate, 'yyyy-MM-dd');
-    const existingNote = userData.notes && userData.notes[dayStr];
-    setNoteText(existingNote || '');
+    const entry = readEntry(userData.notes, dayStr);
+    setNoteText(entry.text || '');
     setIsEditingNote(false);
   };
 
   const saveNote = () => {
     if (!selectedDate || !updateUserData) return;
-    
     const dayStr = format(selectedDate, 'yyyy-MM-dd');
-    const updatedNotes = { ...(userData.notes || {}), [dayStr]: noteText };
+    const updatedNotes = writeEntry(userData.notes || {}, dayStr, { text: noteText });
     updateUserData({ notes: updatedNotes });
     setIsEditingNote(false);
     toast.success('Note saved');
+  };
+
+  // Remove the photo attached to the currently-selected day. Hits the
+  // server (which unlinks the journal entry server-side AND nukes the
+  // bytes), then mirrors that into local userData so the UI updates
+  // immediately.
+  const handleRemoveDayPhoto = async () => {
+    if (!selectedDate || !updateUserData) return;
+    const dayStr = format(selectedDate, 'yyyy-MM-dd');
+    const entry = readEntry(userData.notes, dayStr);
+    if (!entry.photoKey) return;
+    if (!window.confirm('Remove this day\'s photo? This cannot be undone.')) return;
+    const keyToRemove = entry.photoKey;
+
+    try {
+      const token = localStorage.getItem('token');
+      await fetch(`${API_URL_FOR_PHOTOS}/api/photos?key=${encodeURIComponent(keyToRemove)}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+    } catch (err) {
+      console.warn('Photo delete API call failed (proceeding to unlink locally):', err);
+    }
+
+    invalidatePhotoUrl(keyToRemove);
+    const updatedNotes = writeEntry(userData.notes || {}, dayStr, {
+      photoKey: null,
+      capturedAt: null,
+      framing: null
+    });
+    updateUserData({ notes: updatedNotes });
+    setSelectedDayPhotoUrl(null);
+    toast.success('Photo removed');
+  };
+
+  // After PhotoCaptureSheet completes a save, re-fetch the presigned URL
+  // for the brand-new photo so the journal panel updates without needing
+  // the user to close and reopen the day.
+  const handleCalendarPhotoSaved = ({ key }) => {
+    setShowCalendarPhotoCapture(false);
+    if (!key) return;
+    getPresignedUrl(key).then((url) => {
+      if (url) setSelectedDayPhotoUrl(url);
+    });
   };
 
   // Render status badge for day info modal
@@ -1244,49 +1311,97 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   }, [currentDate, fetchPinsForMonth]);
 
   // Render helper for journal section (used in both sticky and non-sticky layouts)
-  const renderJournalSection = () => (
-    <div className="calendar-journal">
-      <h4>Journal</h4>
-      
-      {!isPremium ? (
-        <div className="calendar-journal-locked" onClick={() => openPlanModal && openPlanModal()}>
-          <p>Upgrade to Premium to journal</p>
-        </div>
-      ) : isEditingNote ? (
-        <div className="calendar-journal-editing">
-          <textarea
-            className="calendar-journal-textarea"
-            ref={(el) => {
-              if (el) {
-                el.focus();
-                setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
-              }
-            }}
-            value={noteText}
-            onChange={(e) => setNoteText(e.target.value)}
-            placeholder="What's on your mind?"
-            rows="4"
-          />
-          <div className="calendar-journal-actions">
-            <button className="calendar-journal-save" onClick={saveNote}>
-              Save
-            </button>
-            <button className="calendar-journal-cancel" onClick={cancelEditingNote}>
-              Cancel
-            </button>
+  const renderJournalSection = () => {
+    const dayStr = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : null;
+    const entry = dayStr ? readEntry(userData?.notes, dayStr) : null;
+    const hasPhoto = !!entry?.photoKey;
+
+    return (
+      <div className="calendar-journal">
+        <h4>Journal</h4>
+
+        {!isPremium ? (
+          <div className="calendar-journal-locked" onClick={() => openPlanModal && openPlanModal()}>
+            <p>Upgrade to Premium to journal</p>
           </div>
-        </div>
-      ) : noteText ? (
-        <div className="calendar-journal-entry" onClick={startEditingNote}>
-          {noteText}
-        </div>
-      ) : (
-        <div className="calendar-journal-empty" onClick={startEditingNote}>
-          <p>Tap to add a journal entry</p>
-        </div>
-      )}
-    </div>
-  );
+        ) : isEditingNote ? (
+          <div className="calendar-journal-editing">
+            <textarea
+              className="calendar-journal-textarea"
+              ref={(el) => {
+                if (el) {
+                  el.focus();
+                  setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+                }
+              }}
+              value={noteText}
+              onChange={(e) => setNoteText(e.target.value)}
+              placeholder="What's on your mind?"
+              rows="4"
+            />
+            <div className="calendar-journal-actions">
+              <button className="calendar-journal-save" onClick={saveNote}>
+                Save
+              </button>
+              <button className="calendar-journal-cancel" onClick={cancelEditingNote}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            {noteText ? (
+              <div className="calendar-journal-entry" onClick={startEditingNote}>
+                {noteText}
+              </div>
+            ) : !hasPhoto ? (
+              <div className="calendar-journal-empty" onClick={startEditingNote}>
+                <p>Tap to add a journal entry</p>
+              </div>
+            ) : null}
+
+            {hasPhoto && (
+              <div className="calendar-journal-photo">
+                {selectedDayPhotoUrl ? (
+                  <img src={selectedDayPhotoUrl} alt="Captured for this day" />
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                    Loading…
+                  </div>
+                )}
+                <div className="calendar-journal-photo-actions">
+                  <button
+                    type="button"
+                    className="calendar-journal-photo-action"
+                    onClick={() => setShowCalendarPhotoCapture(true)}
+                  >
+                    Replace
+                  </button>
+                  <button
+                    type="button"
+                    className="calendar-journal-photo-action"
+                    onClick={handleRemoveDayPhoto}
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {!hasPhoto && (
+              <button
+                type="button"
+                className="calendar-journal-add-photo"
+                onClick={() => setShowCalendarPhotoCapture(true)}
+              >
+                + Attach a photo for this day
+              </button>
+            )}
+          </>
+        )}
+      </div>
+    );
+  };
 
   // Remove wet dream from a day
   const handleRemoveWetDream = () => {
@@ -1791,12 +1906,23 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           isFuture ? 'future' : ''
         ].filter(Boolean).join(' ');
 
+        // Photo indicator — quiet gold dot in the corner of any day cell
+        // that has an attached photo, so the calendar reads as both a
+        // tracking grid AND a visual-journey index.
+        const cellDayStr = format(currentDay, 'yyyy-MM-dd');
+        const dayHasPhoto = isCurrentMonth && hasJournalPhoto(userData?.notes, cellDayStr);
+
         week.push(
           <div key={i} className={cellClasses} onClick={() => openDayInfo(currentDay)}>
             <span className="day-number">{format(currentDay, 'd')}</span>
             {/* Data dash - unified indicator for benefits or journal */}
             {hasData && !isFuture && (
               <span className="day-data-dash"></span>
+            )}
+            {/* Photo indicator — quiet gold dot, signals the day has a
+                photo attached. Tap-through opens the day-info modal. */}
+            {dayHasPhoto && !isFuture && (
+              <span className="day-cell-photo-dot" aria-hidden="true"></span>
             )}
             {/* Workout indicator - tiny dumbbell glyph (clickable → opens workout sheet) */}
             {hasWorkout && (
@@ -1935,18 +2061,25 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         
         {/* View Toggle - Text only, like landing stats */}
         <div className="view-toggle-minimal">
-          <button 
+          <button
             className={`toggle-option ${viewMode === 'month' ? 'active' : ''}`}
             onClick={() => handleViewToggle('month')}
           >
             Month
           </button>
           <span className="toggle-divider" />
-          <button 
+          <button
             className={`toggle-option ${viewMode === 'week' ? 'active' : ''}`}
             onClick={() => handleViewToggle('week')}
           >
             Week
+          </button>
+          <span className="toggle-divider" />
+          <button
+            className={`toggle-option ${viewMode === 'journey' ? 'active' : ''}`}
+            onClick={() => handleViewToggle('journey')}
+          >
+            Journey
           </button>
           {viewMode === 'week' && (
             <button className="week-metrics-gear" onClick={openMetricsSheet} aria-label="Choose week metrics">
@@ -1986,7 +2119,22 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         onTouchStart={handleSwipeStart}
         onTouchEnd={handleSwipeEnd}
       >
-        {viewMode === 'month' ? renderMonthView() : renderWeekView()}
+        {viewMode === 'journey'
+          ? (
+            <JourneyView
+              userData={userData}
+              onOpenDay={(dayStr) => openDayInfo(parseISO(dayStr))}
+              onAddFirstPhoto={() => {
+                // No selected date yet — open today's capture flow.
+                setSelectedDate(new Date());
+                setShowCalendarPhotoCapture(true);
+              }}
+            />
+          )
+          : viewMode === 'month'
+            ? renderMonthView()
+            : renderWeekView()
+        }
       </div>
 
       {/* Moon Phase - Sticky bar above nav, both views */}
@@ -2397,6 +2545,20 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Photo capture for the currently-selected day. Calendar passes
+          targetDate explicitly so the photo attaches to whatever day
+          the user opened, not necessarily today. */}
+      {selectedDate && (
+        <PhotoCaptureSheet
+          open={showCalendarPhotoCapture}
+          onClose={() => setShowCalendarPhotoCapture(false)}
+          userData={userData}
+          updateUserData={updateUserData}
+          targetDate={format(selectedDate, 'yyyy-MM-dd')}
+          onSaved={handleCalendarPhotoSaved}
+        />
       )}
     </div>
   );

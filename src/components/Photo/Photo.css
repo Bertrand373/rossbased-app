@@ -1,0 +1,503 @@
+/* src/components/Photo/Photo.css
+   All photo-feature styling — capture sheet, journey view, milestone
+   sheet, and the Tracker ghost camera button.
+
+   Inherits .sheet-backdrop / .sheet-panel from BottomSheet.css.
+   Inherits .btn-primary / .btn-ghost from App.css.
+   Gold reserved for the streak number itself; the only place gold
+   appears in this feature is the milestone celebration content (which
+   IS a streak-day moment). Everything else uses neutral palette. */
+
+/* ============================================================
+   TRACKER GHOST CAMERA BUTTON
+   ============================================================ */
+
+.tracker-camera-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 22px;
+  opacity: 0;
+  animation: trackerCamFadeIn 500ms ease 250ms forwards;
+}
+
+@keyframes trackerCamFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.tracker-camera-btn {
+  appearance: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  position: relative;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 200ms ease, transform 150ms ease;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tracker-camera-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px dashed var(--text-tertiary);
+  pointer-events: none;
+}
+
+.tracker-camera-btn:hover {
+  opacity: 0.85;
+}
+
+.tracker-camera-btn:hover::after {
+  border-color: var(--text-secondary);
+}
+
+.tracker-camera-btn:active {
+  transform: scale(0.96);
+}
+
+.tracker-camera-btn.has-today {
+  opacity: 0.85;
+}
+
+.tracker-camera-btn.has-today::after {
+  border-style: solid;
+  border-color: var(--border);
+}
+
+.tracker-camera-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--text-tertiary);
+  transition: color 200ms ease;
+}
+
+.tracker-camera-btn:hover .tracker-camera-icon,
+.tracker-camera-btn.has-today .tracker-camera-icon {
+  color: var(--text-secondary);
+}
+
+/* ============================================================
+   CAPTURE SHEET
+   ============================================================ */
+
+.photo-capture-sheet {
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.photo-capture-headline {
+  flex-shrink: 0;
+  padding: 0 4px 14px;
+  text-align: center;
+}
+
+.photo-capture-body {
+  flex: 1;
+  min-height: 0;
+  padding: 0 4px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.photo-capture-sub {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.5;
+  margin: 4px 12px 0;
+  letter-spacing: 0.005em;
+}
+
+.photo-capture-guidance {
+  position: relative;
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 3 / 4;
+  background: var(--surface-overlay);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  margin-top: 4px;
+}
+
+.photo-capture-guidance img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-capture-guidance-label {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 4px 8px;
+  border-radius: 6px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.photo-capture-actions {
+  flex-shrink: 0;
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.photo-capture-actions .btn-primary,
+.photo-capture-actions .btn-ghost {
+  flex: 1;
+  padding: 14px 20px;
+  border-radius: 9999px;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease, background-color 150ms ease, opacity 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.photo-capture-actions .btn-primary {
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.photo-capture-actions .btn-primary:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.photo-capture-actions .btn-primary:disabled,
+.photo-capture-actions .btn-ghost:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.photo-capture-actions .btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.photo-capture-actions .btn-ghost:hover:not(:disabled) {
+  border-color: var(--border);
+  color: var(--text);
+}
+
+/* ============================================================
+   JOURNEY VIEW (Calendar toggle)
+   ============================================================ */
+
+.journey-view {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 12px 16px 40px;
+  overflow-y: auto;
+}
+
+.journey-empty {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.journey-empty-cta {
+  margin-top: 16px;
+}
+
+.journey-row {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 16px;
+  align-items: start;
+  opacity: 0;
+  animation: journeyRowIn 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes journeyRowIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.journey-row-meta {
+  text-align: right;
+  padding-top: 4px;
+}
+
+.journey-row-day {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  font-feature-settings: 'tnum' 1;
+}
+
+.journey-row-day.milestone {
+  color: rgba(212, 175, 55, 0.9);
+}
+
+.journey-row-date {
+  font-size: 0.625rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+.journey-row-photo {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: transform 200ms ease, border-color 200ms ease;
+}
+
+.journey-row-photo:hover {
+  border-color: var(--border);
+  transform: translateY(-2px);
+}
+
+.journey-row-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.journey-row-photo.milestone {
+  border-color: rgba(212, 175, 55, 0.5);
+}
+
+.journey-row-note {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* ============================================================
+   MILESTONE CELEBRATION SHEET
+   ============================================================ */
+
+.milestone-sheet {
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.milestone-headline {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 0 4px 8px;
+}
+
+.milestone-eyebrow {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  margin-bottom: 8px;
+}
+
+.milestone-title {
+  font-size: 2rem;
+  font-weight: 300;
+  color: rgba(212, 175, 55, 0.92);
+  letter-spacing: -0.015em;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.milestone-sub {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 8px 16px 0;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.milestone-preview {
+  flex-shrink: 0;
+  margin: 16px auto 0;
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 1 / 1;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  position: relative;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.milestone-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.milestone-preview-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.milestone-actions {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 0 4px;
+}
+
+.milestone-actions .btn-primary {
+  width: 100%;
+  padding: 14px 22px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 600;
+  border-radius: 9999px;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: border-color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.milestone-actions .btn-primary:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.milestone-actions .btn-ghost {
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 8px 4px;
+  letter-spacing: 0.02em;
+  transition: color 150ms ease;
+}
+
+.milestone-actions .btn-ghost:hover {
+  color: var(--text-secondary);
+}
+
+/* ============================================================
+   CALENDAR DAY-CELL PHOTO INDICATOR
+   ============================================================ */
+
+.day-cell .day-cell-photo-dot {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.7);
+  pointer-events: none;
+}
+
+/* ============================================================
+   CALENDAR JOURNAL PHOTO PREVIEW
+   ============================================================ */
+
+.calendar-journal-photo {
+  margin-top: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-subtle);
+  position: relative;
+  aspect-ratio: 3 / 4;
+  max-width: 260px;
+}
+
+.calendar-journal-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.calendar-journal-photo-actions {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  display: flex;
+  gap: 6px;
+}
+
+.calendar-journal-photo-action {
+  appearance: none;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.calendar-journal-add-photo {
+  appearance: none;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: 1px dashed var(--border-prominent);
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  margin-top: 10px;
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.calendar-journal-add-photo:hover {
+  border-color: var(--text-secondary);
+  color: var(--text);
+}
