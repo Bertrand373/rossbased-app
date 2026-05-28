@@ -751,6 +751,186 @@
 }
 
 /* ============================================================
+   VOICE DICTATION — mic button, recording state, panel glow
+   ============================================================
+   Visual language:
+     - Idle mic = same restraint as the send button (transparent, muted).
+     - Recording = warm crimson pulse + the chat panel itself gains a
+       soft gold inner glow ("the Oracle is listening"). The glow uses
+       the existing --accent-gold tokens so it lives in the same visual
+       family as the wordmark and avatar ring.
+     - Uploading = inline spinner on the mic button. We never block the
+       composer fully because uploads are normally sub-second.
+   ============================================================ */
+
+.ai-chat-mic {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: none;
+  border-radius: 9999px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 160ms ease, background-color 160ms ease, box-shadow 160ms ease, transform 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ai-chat-mic:hover {
+  color: var(--text-secondary);
+  background-color: var(--surface-raised);
+}
+
+.ai-chat-mic:active {
+  transform: scale(0.94);
+}
+
+.ai-chat-mic:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* Recording state — warm red. Crimson rather than emergency red so it
+   reads as "active mic" not "alert / error". */
+.ai-chat-mic.recording {
+  color: #ffffff;
+  background-color: #d04545;
+  animation: ai-chat-mic-pulse 1.4s ease-in-out infinite;
+}
+
+.ai-chat-mic.recording:hover {
+  background-color: #c43a3a;
+}
+
+@keyframes ai-chat-mic-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(208, 69, 69, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(208, 69, 69, 0);
+  }
+}
+
+/* Uploading state — spinner rotates the path inside the SVG. */
+.ai-chat-mic.uploading {
+  color: var(--text-secondary);
+  cursor: progress;
+}
+
+.ai-chat-mic.uploading svg {
+  animation: ai-chat-mic-spin 0.9s linear infinite;
+}
+
+@keyframes ai-chat-mic-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Cancel button — sits in the send-button slot during recording. Subtle
+   so it doesn't compete with the prominent stop action in the mic slot. */
+.ai-chat-voice-cancel {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: none;
+  border-radius: 9999px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 160ms ease, background-color 160ms ease, transform 120ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ai-chat-voice-cancel:hover {
+  color: var(--text-secondary);
+  background-color: var(--surface-raised);
+}
+
+.ai-chat-voice-cancel:active {
+  transform: scale(0.94);
+}
+
+/* Transient inline error / status — sits just above the input bar.
+   Positioned absolutely so it never disturbs the composer layout. */
+.ai-chat-voice-error {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  padding: 7px 14px;
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  font-size: 13px;
+  line-height: 1.2;
+  white-space: nowrap;
+  max-width: calc(100% - 32px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  z-index: 3;
+  animation: ai-chat-voice-error-in 180ms ease-out;
+}
+
+@keyframes ai-chat-voice-error-in {
+  from { opacity: 0; transform: translate(-50%, 4px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Anchor the error toast against the input area. The input-area is
+   already position: relative, so the error positions relative to it. */
+.ai-chat-input-area {
+  /* (keep existing rules — this block is a documentation marker) */
+}
+
+/* Panel "listening" glow — gold inner halo on the chat surface ONLY
+   while recording. Uses the existing --accent-gold token family so it
+   lives in the same palette as the wordmark, avatar ring, etc.
+
+   Inset shadow chosen over a border so we don't reflow the layout when
+   the state toggles. Two-layer shadow: a softer outer + a sharper inner
+   line — same trick the avatar ring uses. */
+.ai-chat-main.listening {
+  box-shadow:
+    inset 0 0 0 1px var(--accent-gold-border-hover),
+    inset 0 0 24px rgba(255, 221, 0, 0.06);
+  animation: ai-chat-panel-breathe 2.8s ease-in-out infinite;
+}
+
+@keyframes ai-chat-panel-breathe {
+  0%, 100% {
+    box-shadow:
+      inset 0 0 0 1px var(--accent-gold-border),
+      inset 0 0 18px rgba(255, 221, 0, 0.04);
+  }
+  50% {
+    box-shadow:
+      inset 0 0 0 1px var(--accent-gold-border-hover),
+      inset 0 0 28px rgba(255, 221, 0, 0.09);
+  }
+}
+
+/* Honor reduced-motion: keep the glow as a static state, drop the pulses. */
+@media (prefers-reduced-motion: reduce) {
+  .ai-chat-mic.recording {
+    animation: none;
+  }
+  .ai-chat-mic.uploading svg {
+    animation: none;
+  }
+  .ai-chat-main.listening {
+    animation: none;
+  }
+}
+
+/* ============================================================
    LIMIT REACHED STATE
    ============================================================ */
 
@@ -1011,11 +1191,19 @@
     font-size: 16px; /* Prevents iOS zoom */
   }
   
-  .ai-chat-send {
+  .ai-chat-send,
+  .ai-chat-mic,
+  .ai-chat-voice-cancel {
     width: 40px;
     height: 40px;
   }
-  
+
+  .ai-chat-voice-error {
+    font-size: 12px;
+    padding: 6px 12px;
+    margin-bottom: 6px;
+  }
+
   .ai-chat-message-content {
     font-size: 0.9375rem;
   }

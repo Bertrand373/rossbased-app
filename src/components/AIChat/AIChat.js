@@ -41,6 +41,19 @@ const getThreadMessagesKey = (threadId) => {
 const MAX_STORED_MESSAGES = 200; // matches server cap per thread
 const MAX_CONTEXT_MESSAGES = 10; // Send last 10 to Claude
 
+// Voice dictation — max recording length before auto-stop. Matches the
+// upload size cap the server enforces. Long enough to ask a thoughtful
+// question, short enough that Whisper returns in well under a second.
+const MAX_VOICE_SECONDS = 60;
+
+// Format elapsed seconds as M:SS for the listening timer.
+const formatVoiceElapsed = (s) => {
+  const total = Math.max(0, Math.floor(s));
+  const mm = Math.floor(total / 60);
+  const ss = String(total % 60).padStart(2, '0');
+  return `${mm}:${ss}`;
+};
+
 // Stable thread id generator — uuidv4 if available, else timestamp-based fallback
 const newThreadId = () => {
   try {
@@ -461,7 +474,15 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   const [teachModal, setTeachModal] = useState(null); // { userMsg, oracleMsg, existingMatches, checking }
   const [teachForm, setTeachForm] = useState({ title: '', note: '', category: 'general' });
   const [teachStatus, setTeachStatus] = useState('idle'); // idle | saving | done | error
-  
+
+  // Voice dictation state. 'unavailable' means either the browser can't
+  // record (no MediaRecorder / no getUserMedia) or the server returned
+  // TRANSCRIBE_DISABLED — in both cases we hide the mic button entirely
+  // for the rest of the session.
+  const [voiceState, setVoiceState] = useState('idle'); // 'idle' | 'recording' | 'uploading' | 'unavailable'
+  const [voiceElapsed, setVoiceElapsed] = useState(0);  // seconds, drives the listening timer
+  const [voiceError, setVoiceError] = useState(null);   // inline transient string, auto-clears
+
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const chatBodyRef = useRef(null);
@@ -476,6 +497,14 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
   const hasScrolledToStreamStart = useRef(false);
   const chatSyncTimer = useRef(null); // Debounced server sync
   const autoTitleThreadRef = useRef(null); // Stable handle so sendMessage can call it without dep cycle
+
+  // Voice dictation refs — kept out of state because they don't drive
+  // render and we don't want stale closures clobbering an active recording.
+  const mediaRecorderRef = useRef(null);
+  const mediaStreamRef = useRef(null);
+  const recordedChunksRef = useRef([]);
+  const recordingTimerRef = useRef(null);
+  const recordingCanceledRef = useRef(false);
 
   // Admin check — only rossbased sees Teach button
   const isAdmin = (() => {
@@ -1005,6 +1034,297 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
       console.error('Failed to fetch AI usage:', err);
     }
   };
+
+  // =========================================================================
+  // VOICE DICTATION
+  // =========================================================================
+  // Push-to-talk pattern: tap mic → record → tap again to stop → transcript
+  // is APPENDED to the textarea (never auto-sent — the user pays per Oracle
+  // message, so they always get to review/edit before hitting Send).
+  //
+  // Edge cases handled:
+  //  - No MediaRecorder / no getUserMedia → button hidden via 'unavailable'
+  //  - Mic permission denied → quiet inline message, no retry loop
+  //  - 60s cap reached → auto-stop and transcribe what we have
+  //  - User taps cancel mid-recording → drop chunks, no upload
+  //  - Empty / silent recording → "didn't catch that" inline, no spend
+  //  - Component unmount mid-recording → cleanup useEffect kills the stream
+  //  - Server unconfigured → first failed call sets 'unavailable' for session
+
+  // Feature-detect once on mount. We do this here (not at module scope) so
+  // SSR / non-browser environments don't crash on `window`.
+  useEffect(() => {
+    const hasMediaRecorder = typeof window !== 'undefined' && typeof window.MediaRecorder !== 'undefined';
+    const hasUserMedia = typeof navigator !== 'undefined' && !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+    if (!hasMediaRecorder || !hasUserMedia) {
+      setVoiceState('unavailable');
+    }
+  }, []);
+
+  // Hard cleanup on unmount — kills the OS-level mic indicator if the user
+  // closes the chat panel mid-recording.
+  useEffect(() => {
+    return () => {
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+        recordingTimerRef.current = null;
+      }
+      try {
+        const rec = mediaRecorderRef.current;
+        if (rec && rec.state !== 'inactive') {
+          recordingCanceledRef.current = true;
+          rec.stop();
+        }
+      } catch {}
+      const stream = mediaStreamRef.current;
+      if (stream) {
+        try { stream.getTracks().forEach(t => t.stop()); } catch {}
+        mediaStreamRef.current = null;
+      }
+    };
+  }, []);
+
+  // Auto-clear inline voice errors after a few seconds so they don't linger.
+  useEffect(() => {
+    if (!voiceError) return undefined;
+    const t = setTimeout(() => setVoiceError(null), 4000);
+    return () => clearTimeout(t);
+  }, [voiceError]);
+
+  // iOS / macOS Safari historically has issues with audio/webm even when
+  // isTypeSupported returns true (some versions produce empty blobs). Since
+  // Safari supports audio/mp4 reliably and Chrome/Firefox don't support
+  // audio/mp4 for MediaRecorder at all, we list mp4 first: Safari picks it,
+  // others fall through to webm. Best of both with no UA sniffing.
+  const pickAudioMimeType = useCallback(() => {
+    if (typeof window === 'undefined' || !window.MediaRecorder) return '';
+    const candidates = [
+      'audio/mp4;codecs=mp4a.40.2',
+      'audio/mp4',
+      'audio/webm;codecs=opus',
+      'audio/webm',
+    ];
+    for (const t of candidates) {
+      if (window.MediaRecorder.isTypeSupported && window.MediaRecorder.isTypeSupported(t)) {
+        return t;
+      }
+    }
+    return '';
+  }, []);
+
+  const releaseMicStream = useCallback(() => {
+    const stream = mediaStreamRef.current;
+    if (stream) {
+      try { stream.getTracks().forEach(t => t.stop()); } catch {}
+      mediaStreamRef.current = null;
+    }
+  }, []);
+
+  // POST audio blob → /api/oracle/transcribe → append text to composer.
+  const transcribeAudioBlob = useCallback(async (blob) => {
+    // Very short blobs are almost always tap-tap-immediately or iOS
+    // producing an empty container. Skip the round trip.
+    if (!blob || blob.size < 1024) {
+      setVoiceError("Didn't catch that — try again.");
+      setVoiceState('idle');
+      return;
+    }
+    setVoiceState('uploading');
+    setVoiceError(null);
+    try {
+      const token = localStorage.getItem('token');
+      const formData = new FormData();
+      const ext = (blob.type || '').includes('mp4') ? 'm4a' : 'webm';
+      formData.append('audio', blob, `oracle-voice.${ext}`);
+      const res = await fetch(`${API_URL}/api/oracle/transcribe`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      if (!res.ok) {
+        let payload = {};
+        try { payload = await res.json(); } catch {}
+        if (payload.code === 'TRANSCRIBE_DISABLED') {
+          // Server has no Groq key — quietly hide the mic for the rest
+          // of this session rather than spamming a cryptic error.
+          setVoiceState('unavailable');
+          setVoiceError(null);
+          return;
+        }
+        if (res.status === 429) {
+          setVoiceError('Daily voice limit reached — try typing.');
+        } else if (payload.code === 'AUDIO_TOO_LARGE') {
+          setVoiceError('Recording was too long.');
+        } else if (payload.code === 'TRANSCRIBE_TIMEOUT') {
+          setVoiceError('Transcription timed out — try again.');
+        } else {
+          setVoiceError("Couldn't transcribe — try again.");
+        }
+        setVoiceState('idle');
+        return;
+      }
+      const data = await res.json();
+      const text = (data.text || '').trim();
+      if (!text) {
+        setVoiceError("Didn't catch that — try again.");
+        setVoiceState('idle');
+        return;
+      }
+      // Append, never replace. A space separator keeps prior typed text
+      // readable. Move caret to end and re-focus so the user can keep
+      // editing immediately.
+      setInputValue((prev) => {
+        const sep = prev && !/\s$/.test(prev) ? ' ' : '';
+        return prev + sep + text;
+      });
+      requestAnimationFrame(() => {
+        const el = inputRef.current;
+        if (el) {
+          el.style.height = 'auto';
+          el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+          try { el.focus(); } catch {}
+          const len = el.value.length;
+          try { el.setSelectionRange(len, len); } catch {}
+        }
+      });
+      setVoiceState('idle');
+    } catch (err) {
+      console.error('[voice] transcribe failed', err);
+      setVoiceError("Couldn't transcribe — try again.");
+      setVoiceState('idle');
+    }
+  }, []);
+
+  // Stop the active recording. cancel=true drops the audio (user hit ×);
+  // cancel=false uploads it for transcription (user hit stop, or the 60s
+  // cap fired).
+  const stopVoiceRecording = useCallback(({ cancel = false } = {}) => {
+    if (recordingTimerRef.current) {
+      clearInterval(recordingTimerRef.current);
+      recordingTimerRef.current = null;
+    }
+    recordingCanceledRef.current = cancel;
+    const rec = mediaRecorderRef.current;
+    try {
+      if (rec && rec.state !== 'inactive') {
+        rec.stop(); // onstop handler does the upload (or skip if canceled)
+        return;
+      }
+    } catch (e) {
+      console.error('[voice] stop error', e);
+    }
+    // Recorder wasn't active — clean up directly so we don't get stuck.
+    releaseMicStream();
+    setVoiceElapsed(0);
+    setVoiceState('idle');
+  }, [releaseMicStream]);
+
+  const startVoiceRecording = useCallback(async () => {
+    if (voiceState !== 'idle') return;
+    setVoiceError(null);
+    setVoiceElapsed(0);
+    recordingCanceledRef.current = false;
+    recordedChunksRef.current = [];
+
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (err) {
+      // Quiet inline failure — never retry-loop the permission prompt.
+      if (err && (err.name === 'NotAllowedError' || err.name === 'SecurityError')) {
+        setVoiceError('Mic access denied — enable it in your browser settings.');
+      } else if (err && err.name === 'NotFoundError') {
+        setVoiceError('No microphone detected.');
+      } else if (err && err.name === 'NotReadableError') {
+        setVoiceError('Mic is in use by another app.');
+      } else {
+        console.error('[voice] getUserMedia failed', err);
+        setVoiceError("Couldn't access mic — try again.");
+      }
+      return;
+    }
+    mediaStreamRef.current = stream;
+
+    let recorder;
+    try {
+      const mimeType = pickAudioMimeType();
+      recorder = mimeType
+        ? new MediaRecorder(stream, { mimeType })
+        : new MediaRecorder(stream);
+    } catch (err) {
+      console.error('[voice] MediaRecorder ctor failed', err);
+      releaseMicStream();
+      setVoiceError("Voice isn't supported on this browser.");
+      setVoiceState('unavailable');
+      return;
+    }
+    mediaRecorderRef.current = recorder;
+
+    recorder.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) recordedChunksRef.current.push(e.data);
+    };
+    recorder.onstop = () => {
+      const chunks = recordedChunksRef.current;
+      recordedChunksRef.current = [];
+      releaseMicStream();
+      if (recordingCanceledRef.current) {
+        recordingCanceledRef.current = false;
+        setVoiceElapsed(0);
+        setVoiceState('idle');
+        return;
+      }
+      const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
+      setVoiceElapsed(0);
+      transcribeAudioBlob(blob);
+    };
+    recorder.onerror = (ev) => {
+      console.error('[voice] recorder error', ev);
+      setVoiceError('Recording failed — try again.');
+      setVoiceState('idle');
+      setVoiceElapsed(0);
+      releaseMicStream();
+    };
+
+    try {
+      recorder.start();
+    } catch (err) {
+      console.error('[voice] recorder.start failed', err);
+      releaseMicStream();
+      setVoiceError("Couldn't start recording.");
+      return;
+    }
+    setVoiceState('recording');
+
+    // 250ms tick for smooth-ish timer + 60s auto-stop. The cap is UX, not
+    // a security control — the server's 10MB size limit is the real
+    // ceiling against malformed clients.
+    const startedAt = Date.now();
+    recordingTimerRef.current = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+      setVoiceElapsed(elapsed);
+      if (elapsed >= MAX_VOICE_SECONDS) {
+        stopVoiceRecording({ cancel: false }); // transcribe what we have
+      }
+    }, 250);
+  }, [voiceState, pickAudioMimeType, releaseMicStream, stopVoiceRecording, transcribeAudioBlob]);
+
+  // Single tap-handler for the mic button. Recording → stop+transcribe.
+  // Idle → start. Uploading → no-op (button is disabled in that state).
+  const handleMicClick = useCallback(() => {
+    if (voiceState === 'recording') {
+      stopVoiceRecording({ cancel: false });
+    } else if (voiceState === 'idle') {
+      startVoiceRecording();
+    }
+  }, [voiceState, startVoiceRecording, stopVoiceRecording]);
+
+  const handleVoiceCancel = useCallback(() => {
+    stopVoiceRecording({ cancel: true });
+  }, [stopVoiceRecording]);
+
+  // =========================================================================
+  // END VOICE DICTATION
+  // =========================================================================
 
   // Send message with streaming
   const sendMessage = useCallback(async () => {
@@ -1989,7 +2309,7 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
           {/* Threads Sidebar */}
           {renderThreadsSidebar()}
 
-          <div className="ai-chat-main">
+          <div className={`ai-chat-main${voiceState === 'recording' ? ' listening' : ''}`}>
           {/* Header */}
           <header
             className="ai-chat-header has-sidebar-toggle"
@@ -2293,6 +2613,15 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
             </div>
           )}
 
+          {/* Voice transient — mic permission denied, transcribe failure,
+              "didn't catch that", etc. Floats above the input bar and
+              auto-clears after a few seconds. */}
+          {voiceError && (
+            <div className="ai-chat-voice-error" role="status" aria-live="polite">
+              {voiceError}
+            </div>
+          )}
+
           {/* Input Area */}
           <div className="ai-chat-input-area">
             {usage.messagesRemaining > 0 ? (
@@ -2300,7 +2629,13 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                 <textarea
                   ref={inputRef}
                   className="ai-chat-input"
-                  placeholder="What's on your mind?"
+                  placeholder={
+                    voiceState === 'recording'
+                      ? `Listening… ${formatVoiceElapsed(voiceElapsed)}`
+                      : voiceState === 'uploading'
+                      ? 'Transcribing…'
+                      : "What's on your mind?"
+                  }
                   value={inputValue}
                   onChange={(e) => {
                     setInputValue(e.target.value);
@@ -2316,20 +2651,79 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                     }, 350);
                   }}
                   onBlur={() => {}}
-                  disabled={isLoading}
+                  disabled={isLoading || voiceState === 'recording' || voiceState === 'uploading'}
                   rows={1}
                 />
-                <button 
-                  className={`ai-chat-send ${inputValue.trim() && !isLoading ? 'active' : ''}`}
-                  onClick={sendMessage}
-                  disabled={!inputValue.trim() || isLoading}
-                  aria-label="Send message"
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="12" y1="19" x2="12" y2="5" />
-                    <polyline points="5 12 12 5 19 12" />
-                  </svg>
-                </button>
+
+                {/* Mic button — hidden when voice is unavailable (no browser
+                    support, or server lacks GROQ_API_KEY). When recording it
+                    becomes a stop button; when uploading it shows a spinner. */}
+                {voiceState !== 'unavailable' && (
+                  <button
+                    type="button"
+                    className={`ai-chat-mic${voiceState === 'recording' ? ' recording' : ''}${voiceState === 'uploading' ? ' uploading' : ''}`}
+                    onClick={handleMicClick}
+                    // Disabled only when starting wouldn't make sense. While
+                    // recording, the user MUST always be able to tap to stop
+                    // (or to cancel via the × button) — never lock them in.
+                    disabled={voiceState === 'uploading' || (voiceState === 'idle' && isLoading)}
+                    aria-label={
+                      voiceState === 'recording'
+                        ? 'Stop and transcribe'
+                        : voiceState === 'uploading'
+                        ? 'Transcribing'
+                        : 'Record voice message'
+                    }
+                  >
+                    {voiceState === 'recording' ? (
+                      // Stop square
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <rect x="6" y="6" width="12" height="12" rx="2" />
+                      </svg>
+                    ) : voiceState === 'uploading' ? (
+                      // Spinner — CSS animates the rotation on .ai-chat-mic.uploading svg
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                        <path d="M21 12a9 9 0 1 1-6.3-8.6" />
+                      </svg>
+                    ) : (
+                      // Mic icon
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <rect x="9" y="3" width="6" height="12" rx="3" />
+                        <path d="M5 11a7 7 0 0 0 14 0" />
+                        <line x1="12" y1="18" x2="12" y2="22" />
+                        <line x1="9" y1="22" x2="15" y2="22" />
+                      </svg>
+                    )}
+                  </button>
+                )}
+
+                {/* Send slot doubles as a cancel button while recording.
+                    Same position so the user's thumb doesn't have to move. */}
+                {voiceState === 'recording' ? (
+                  <button
+                    type="button"
+                    className="ai-chat-voice-cancel"
+                    onClick={handleVoiceCancel}
+                    aria-label="Cancel recording"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                    </svg>
+                  </button>
+                ) : (
+                  <button
+                    className={`ai-chat-send ${inputValue.trim() && !isLoading && voiceState === 'idle' ? 'active' : ''}`}
+                    onClick={sendMessage}
+                    disabled={!inputValue.trim() || isLoading || voiceState !== 'idle'}
+                    aria-label="Send message"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="12" y1="19" x2="12" y2="5" />
+                      <polyline points="5 12 12 5 19 12" />
+                    </svg>
+                  </button>
+                )}
               </>
             ) : (
               <div className="ai-chat-limit-reached">
