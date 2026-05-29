@@ -353,7 +353,12 @@ const userSchema = new mongoose.Schema({
   circlePrefs: {
     shareNote: { type: Boolean, default: true },         // include the optional 140-char note when broadcasting
     autoShareCheckIn: { type: Boolean, default: true }   // prompt to share after each daily log
-  }
+  },
+
+  // Milestones the user has seen the celebration sheet for. Prevents
+  // re-prompting after the same Day-X is hit again post-edit/reset.
+  // See MILESTONE_DAYS in MilestoneSheet.js.
+  milestonesCelebrated: { type: [Number], default: [] }
 
 }, {
   timestamps: true
