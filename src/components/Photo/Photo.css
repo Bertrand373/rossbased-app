@@ -530,13 +530,30 @@
 .photo-capture-actions .btn-primary,
 .photo-capture-actions .btn-ghost {
   flex: 1;
-  padding: 14px 20px;
+  min-width: 0;
+  padding: 14px 14px;
   border-radius: 9999px;
   font-size: 0.9375rem;
   font-family: inherit;
   cursor: pointer;
+  /* "Set baseline" is the longest of the three possible primary
+     labels (Set baseline / Replace / Use photo) and was wrapping
+     onto two lines inside the flex:1 column. nowrap + the tighter
+     horizontal padding above keeps every label on a single line. */
+  white-space: nowrap;
+  text-align: center;
   transition: border-color 150ms ease, color 150ms ease, background-color 150ms ease, opacity 150ms ease;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Tighter still on narrow phones (≤375px) so the longest label
+   never wraps even after Safari's text rendering rounding. */
+@media (max-width: 380px) {
+  .photo-capture-actions .btn-primary,
+  .photo-capture-actions .btn-ghost {
+    padding: 13px 10px;
+    font-size: 0.875rem;
+  }
 }
 
 .photo-capture-actions .btn-primary {
