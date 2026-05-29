@@ -148,6 +148,11 @@ app.use(cors({
 // Handle CORS preflight requests
 app.options('*', cors());
 
+// Health check — Render uses this to gate zero-downtime rolling deploys (boot the
+// new instance, wait for it to pass, then drain the old one). Liveness only: no DB
+// dependency, so a transient Mongo blip can't fail the check and trigger a restart loop.
+app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
+
 // STRIPE WEBHOOK: Capture raw body via verify callback for signature verification
 // This is Stripe's recommended approach - captures bytes before any parsing
 app.use(express.json({
@@ -2051,27 +2056,54 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
     // Stream from Claude with natural pacing
     // stop_sequences prevent the model from drifting into prompt-scaffolding mode
     // (e.g. hallucinating "USER:" turns or "IMPORTANT INSTRUCTION FOR THIS RESPONSE:" blocks)
-    const stream = await anthropic.messages.stream({
+    const streamParams = {
       model: ORACLE_MODEL,
       max_tokens: 1000,
       system: systemWithKnowledge,
       messages: messages,
       stop_sequences: ['\nUSER:', '\nSYSTEM:', '\nIMPORTANT INSTRUCTION', '\n[SYSTEM]']
-    });
-    __tMark('Claude stream opened');
+    };
 
     let fullResponse = '';
     let __firstChunkLogged = false;
 
-    for await (const event of stream) {
-      if (event.type === 'content_block_delta' && event.delta?.text) {
-        if (!__firstChunkLogged) {
-          __tMark('FIRST CHUNK from Claude');
-          __firstChunkLogged = true;
+    const runStream = async () => {
+      const stream = await anthropic.messages.stream(streamParams);
+      for await (const event of stream) {
+        if (event.type === 'content_block_delta' && event.delta?.text) {
+          if (!__firstChunkLogged) {
+            __tMark('FIRST CHUNK from Claude');
+            __firstChunkLogged = true;
+          }
+          fullResponse += event.delta.text;
+          res.write(`data: ${JSON.stringify({ type: 'content', text: event.delta.text })}\n\n`);
         }
-        fullResponse += event.delta.text;
-        res.write(`data: ${JSON.stringify({ type: 'content', text: event.delta.text })}\n\n`);
       }
+    };
+
+    // Retry once on a transient overload (529) — mirrors the Discord path's
+    // callClaude. Only safe to retry when nothing has streamed yet (overload
+    // fails before the first token), so a retry can't duplicate output.
+    try {
+      await runStream();
+    } catch (streamErr) {
+      const isOverloaded = streamErr.status === 529 || streamErr.error?.error?.type === 'overloaded_error';
+      if (isOverloaded && fullResponse === '') {
+        console.log('[Oracle] API overloaded — retrying in 3s...');
+        await new Promise(r => setTimeout(r, 3000));
+        await runStream();
+      } else {
+        throw streamErr;
+      }
+    }
+
+    // No content produced (upstream returned empty, or dropped before any token).
+    // Treat as a transient failure: do NOT burn the user's daily slot — surface a
+    // retryable error and bail before the usage increment below.
+    if (!fullResponse.trim()) {
+      res.write(`data: ${JSON.stringify({ type: 'error', message: 'Stream interrupted' })}\n\n`);
+      res.end();
+      return;
     }
 
     // Update usage after successful stream.
@@ -3685,4 +3717,22 @@ if (process.env.ORACLE_DISCORD_TOKEN) {
 }
 
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Graceful shutdown. On deploy, Render sends SIGTERM; previously the process
+// exited immediately and severed every in-flight Oracle stream (users saw
+// "Oracle is between dimensions"). Now we stop accepting new connections and let
+// active streams finish. Render allows ~30s before SIGKILL, so 20s is the backstop.
+const shutdown = (signal) => {
+  console.log(`${signal} received — draining connections...`);
+  server.close(() => {
+    console.log('HTTP server closed — exiting.');
+    process.exit(0);
+  });
+  setTimeout(() => {
+    console.error('Drain timed out — forcing exit.');
+    process.exit(1);
+  }, 20000).unref();
+};
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));

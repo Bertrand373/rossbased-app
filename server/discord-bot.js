@@ -3620,16 +3620,18 @@ Should Oracle break silence on Discord this week?`
 // GRACEFUL SHUTDOWN
 // ============================================================
 
+// The bot runs in the same process as the web server (required by app.js).
+// app.js owns process exit — it drains in-flight Oracle HTTP streams first — so
+// these handlers only release the Discord gateway. They must NOT call
+// process.exit, or they'd kill in-flight web streams mid-response on every deploy.
 process.on('SIGINT', () => {
   console.log('🔮 Oracle going offline...');
   client.destroy();
-  process.exit(0);
 });
 
 process.on('SIGTERM', () => {
   console.log('🔮 Oracle going offline...');
   client.destroy();
-  process.exit(0);
 });
 
 // ============================================================
