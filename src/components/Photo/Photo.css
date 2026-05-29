@@ -215,14 +215,15 @@
 }
 
 /* Lock acquired — face is centered in the oval. Stroke transitions
-   to soft sage (NOT bright success-green; the alert vocabulary
-   doesn't fit a "ready to capture" moment), stroke thickens slightly,
-   and a warmer glow replaces the cool white drop-shadow. The pulse
-   animation pauses while locked so the visual feels "settled." */
+   to soft sage (NOT the app's bright --success green; that's our
+   toast/alert vocabulary). Picked rgba(140, 200, 150) — clearly
+   green enough to register against the dark video, restrained
+   enough not to feel like a UI alert. Stroke thickens, pulse pauses,
+   and a warm sage glow replaces the cool white drop-shadow. */
 .capture-guide.is-locked ellipse {
-  stroke: rgba(168, 196, 168, 0.85);
-  stroke-width: 1.75;
-  filter: drop-shadow(0 0 10px rgba(168, 196, 168, 0.42));
+  stroke: rgba(140, 200, 150, 0.95);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 12px rgba(140, 200, 150, 0.55));
   animation-play-state: paused;
   opacity: 1;
 }
@@ -306,11 +307,11 @@
   transition: color 320ms ease, background 320ms ease;
 }
 
-/* Locked-state chip — soft sage typography, slightly warmer pill.
-   Matches the oval's color transition. */
+/* Locked-state chip — sage typography matching the oval. Slightly
+   warmer pill background. */
 .capture-instruction.is-locked .capture-instruction-label {
-  color: rgba(190, 214, 190, 0.95);
-  background: rgba(40, 56, 40, 0.55);
+  color: rgba(180, 222, 190, 0.98);
+  background: rgba(34, 54, 40, 0.62);
 }
 
 /* Ghost-overlay toggle — discreet pill, top-left of viewport */
@@ -455,12 +456,52 @@
   outline-offset: 4px;
 }
 
-/* Locked-state shutter — subtle sage glow signals "lock acquired,
-   auto-capture imminent." Doesn't change the click affordance —
-   user can still tap to override. */
+/* Locked-state shutter — sage glow + border tint signals "auto-
+   capture imminent." Doesn't change the click affordance; user can
+   still tap to override at any point during the countdown. */
 .capture-shutter.is-locked {
-  box-shadow: 0 0 18px rgba(168, 196, 168, 0.35);
-  transition: box-shadow 320ms ease, transform 120ms ease, border-color 200ms ease;
+  border-color: rgba(140, 200, 150, 0.92);
+  box-shadow: 0 0 22px rgba(140, 200, 150, 0.42);
+  transition:
+    box-shadow 320ms ease,
+    border-color 320ms ease,
+    transform 120ms ease;
+}
+
+/* Countdown ring — SVG circle around the outside of the shutter
+   that fills clockwise over AUTO_CAPTURE_DELAY_MS. Gives the user
+   a clear visual cue that auto-capture is approaching and shows
+   exactly how much time they have to tap manually instead.
+
+   Keep this animation duration in sync with AUTO_CAPTURE_DELAY_MS
+   in PhotoCaptureSheet.js (currently 3500ms). */
+.capture-shutter-ring {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: 84px;
+  height: 84px;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.capture-shutter-ring circle {
+  fill: none;
+  stroke: rgba(140, 200, 150, 0.92);
+  stroke-width: 3;
+  stroke-linecap: round;
+  /* Circumference of r=38 is ~238.76. Start fully hidden, animate
+     to fully visible. Rotated -90deg so the fill starts at 12 o'clock. */
+  stroke-dasharray: 238.76;
+  stroke-dashoffset: 238.76;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  animation: captureCountdown 3500ms linear forwards;
+  filter: drop-shadow(0 0 6px rgba(140, 200, 150, 0.4));
+}
+
+@keyframes captureCountdown {
+  to { stroke-dashoffset: 0; }
 }
 
 /* White flash on capture — premium-camera shutter feel. Brief
