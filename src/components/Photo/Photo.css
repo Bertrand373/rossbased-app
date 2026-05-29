@@ -9,13 +9,25 @@
    IS a streak-day moment). Everything else uses neutral palette. */
 
 /* ============================================================
-   TRACKER GHOST CAMERA BUTTON
+   TRACKER PHOTO LINK
+
+   Ghost text link that sits directly beneath the Log Today pill —
+   subordinate to the primary CTA but in the same conversation.
+   Replaces an earlier dashed-circle button that read as orphaned
+   between Log Today and the Oracle quote.
+
+   Two states:
+     · Default: "+ Snap today's photo" in muted text
+     · After capture: "✓ Photo captured" in the app's success green
+       (var(--success) — the same green used elsewhere for confirmed
+       routine actions). Green stays restrained on purpose; gold is
+       reserved for streak/milestone moments.
    ============================================================ */
 
 .tracker-camera-wrap {
   display: flex;
   justify-content: center;
-  margin-top: 22px;
+  margin-top: 14px;
   opacity: 0;
   animation: trackerCamFadeIn 500ms ease 250ms forwards;
 }
@@ -25,64 +37,63 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.tracker-camera-btn {
+.tracker-camera-link {
   appearance: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
   background: transparent;
   border: none;
-  position: relative;
+  padding: 6px 10px;
   cursor: pointer;
-  opacity: 0.55;
-  transition: opacity 200ms ease, transform 150ms ease;
-  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  color: var(--text-tertiary);
+  transition: color 180ms ease, opacity 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 6px;
+}
+
+.tracker-camera-link:hover {
+  color: var(--text-secondary);
+}
+
+.tracker-camera-link:active {
+  opacity: 0.7;
+}
+
+.tracker-camera-link-glyph {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  -webkit-tap-highlight-color: transparent;
+  width: 14px;
+  height: 14px;
+  font-size: 0.875rem;
+  line-height: 1;
+  font-weight: 600;
+  /* Optical lift so the glyph centers against the label's x-height */
+  transform: translateY(-0.5px);
 }
 
-.tracker-camera-btn::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 1px dashed var(--text-tertiary);
-  pointer-events: none;
+.tracker-camera-link-label {
+  line-height: 1;
 }
 
-.tracker-camera-btn:hover {
-  opacity: 0.85;
-}
-
-.tracker-camera-btn:hover::after {
-  border-color: var(--text-secondary);
-}
-
-.tracker-camera-btn:active {
-  transform: scale(0.96);
-}
-
-.tracker-camera-btn.has-today {
-  opacity: 0.85;
-}
-
-.tracker-camera-btn.has-today::after {
-  border-style: solid;
-  border-color: var(--border);
-}
-
-.tracker-camera-icon {
-  width: 18px;
-  height: 18px;
-  color: var(--text-tertiary);
-  transition: color 200ms ease;
-}
-
-.tracker-camera-btn:hover .tracker-camera-icon,
-.tracker-camera-btn.has-today .tracker-camera-icon {
+/* Photo-captured state — green check + slightly brighter text so the
+   completed routine reads as confirmed without shouting. */
+.tracker-camera-link.has-today {
   color: var(--text-secondary);
+}
+
+.tracker-camera-link.has-today .tracker-camera-link-glyph {
+  color: var(--success);
+  font-size: 0.9375rem;
+}
+
+.tracker-camera-link.has-today:hover {
+  color: var(--text);
 }
 
 /* ============================================================
