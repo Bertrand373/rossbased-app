@@ -172,6 +172,8 @@ const AdminCockpit = () => {
   const [annVersion, setAnnVersion] = useState('');
   const [annTitle, setAnnTitle] = useState('');
   const [annBody, setAnnBody] = useState('');
+  const [annSlides, setAnnSlides] = useState([]);  // [{ image, title, body, cta: {label, route} }]
+  const [annSlideUploading, setAnnSlideUploading] = useState(false);
   const [annCommits, setAnnCommits] = useState('');
   const [annDrafting, setAnnDrafting] = useState(false);
   const [annPublishing, setAnnPublishing] = useState(false);
@@ -282,7 +284,9 @@ const AdminCockpit = () => {
   };
 
   const handlePublishAnnouncement = async () => {
-    if (!annVersion.trim() || !annBody.trim()) return;
+    const hasBody = annBody.trim().length > 0;
+    const hasSlides = annSlides.length > 0;
+    if (!annVersion.trim() || (!hasBody && !hasSlides)) return;
     setAnnPublishing(true);
     try {
       const token = localStorage.getItem('token');
@@ -293,7 +297,12 @@ const AdminCockpit = () => {
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ version: annVersion, title: annTitle, body: annBody })
+        body: JSON.stringify({
+          version: annVersion,
+          title: annTitle,
+          body: annBody,
+          slides: annSlides,
+        }),
       });
       if (res.ok) {
         const result = await res.json();
@@ -302,7 +311,6 @@ const AdminCockpit = () => {
         } else {
           setAnnouncements(prev => [result, ...prev]);
         }
-        // Reset form
         if (!isEdit) {
           const parts = annVersion.split('.').map(Number);
           parts[2] = (parts[2] || 0) + 1;
@@ -310,9 +318,9 @@ const AdminCockpit = () => {
         }
         setAnnTitle('');
         setAnnBody('');
+        setAnnSlides([]);
         setAnnCommits('');
         setAnnEditId(null);
-        // Clear seen key so admin sees the draft preview on next app load
         Object.keys(localStorage).filter(k => k.startsWith('titantrack-seen-announcement')).forEach(k => localStorage.removeItem(k));
       }
     } catch (err) {
@@ -320,6 +328,60 @@ const AdminCockpit = () => {
     } finally {
       setAnnPublishing(false);
     }
+  };
+
+  // ─── Slide builder handlers ────────────────────────────────────────────────
+  const handleSlideUpload = async (event) => {
+    const files = Array.from(event.target.files || []);
+    if (files.length === 0) return;
+    event.target.value = '';  // allow re-selecting the same file
+    setAnnSlideUploading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const uploads = await Promise.all(
+        files.map(async (file) => {
+          const form = new FormData();
+          form.append('image', file);
+          const res = await fetch(`${API}/api/announcements/upload-slide`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` },
+            body: form,
+          });
+          if (!res.ok) throw new Error('Upload failed');
+          const { url } = await res.json();
+          return { image: url, title: '', body: '', cta: { label: '', route: '' } };
+        })
+      );
+      setAnnSlides(prev => [...prev, ...uploads]);
+    } catch (err) {
+      console.error('Slide upload error:', err);
+      alert('Slide upload failed — check console');
+    } finally {
+      setAnnSlideUploading(false);
+    }
+  };
+
+  const handleSlideDelete = (index) => {
+    setAnnSlides(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSlideMove = (index, direction) => {
+    setAnnSlides(prev => {
+      const next = [...prev];
+      const target = index + direction;
+      if (target < 0 || target >= next.length) return prev;
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  };
+
+  const handleSlideFieldChange = (index, field, value) => {
+    setAnnSlides(prev => prev.map((s, i) => {
+      if (i !== index) return s;
+      if (field === 'cta.label') return { ...s, cta: { ...s.cta, label: value } };
+      if (field === 'cta.route') return { ...s, cta: { ...s.cta, route: value } };
+      return { ...s, [field]: value };
+    }));
   };
 
   const handleDeleteAnnouncement = async (id) => {
@@ -1325,7 +1387,7 @@ const AdminCockpit = () => {
             </div>
 
             <div className="ac-ann-row">
-              <label className="ac-ann-label">Body</label>
+              <label className="ac-ann-label">Body <span className="ac-ann-label-hint">(optional if slides below)</span></label>
               <textarea
                 className="ac-ann-textarea"
                 value={annBody}
@@ -1335,17 +1397,108 @@ const AdminCockpit = () => {
               />
             </div>
 
+            {/* ─── Visual slides (v2) ─────────────────────────────────────── */}
+            <div className="ac-ann-row">
+              <label className="ac-ann-label">
+                Slides <span className="ac-ann-label-hint">(image deck — overrides text body in the sheet if present)</span>
+              </label>
+              <div className="ac-ann-slides">
+                {annSlides.map((slide, idx) => (
+                  <div key={idx} className="ac-ann-slide-card">
+                    <div className="ac-ann-slide-card-top">
+                      <span className="ac-ann-slide-index">#{idx + 1}</span>
+                      <div className="ac-ann-slide-reorder">
+                        <button
+                          type="button"
+                          className="ac-ann-slide-move"
+                          onClick={() => handleSlideMove(idx, -1)}
+                          disabled={idx === 0}
+                          aria-label="Move up"
+                        >↑</button>
+                        <button
+                          type="button"
+                          className="ac-ann-slide-move"
+                          onClick={() => handleSlideMove(idx, 1)}
+                          disabled={idx === annSlides.length - 1}
+                          aria-label="Move down"
+                        >↓</button>
+                        <button
+                          type="button"
+                          className="ac-ann-slide-delete"
+                          onClick={() => handleSlideDelete(idx)}
+                          aria-label="Remove slide"
+                        >×</button>
+                      </div>
+                    </div>
+                    <img src={slide.image} alt={`Slide ${idx + 1}`} className="ac-ann-slide-preview" />
+                    <details className="ac-ann-slide-details">
+                      <summary>Optional text + CTA</summary>
+                      <input
+                        type="text"
+                        className="ac-ann-input"
+                        value={slide.title}
+                        onChange={e => handleSlideFieldChange(idx, 'title', e.target.value)}
+                        placeholder="Slide title (e.g. Voice Dictation)"
+                      />
+                      <input
+                        type="text"
+                        className="ac-ann-input"
+                        value={slide.body}
+                        onChange={e => handleSlideFieldChange(idx, 'body', e.target.value)}
+                        placeholder="Caption (one line)"
+                      />
+                      <input
+                        type="text"
+                        className="ac-ann-input"
+                        value={slide.cta?.label || ''}
+                        onChange={e => handleSlideFieldChange(idx, 'cta.label', e.target.value)}
+                        placeholder="CTA label (e.g. Open Journal)"
+                      />
+                      <input
+                        type="text"
+                        className="ac-ann-input"
+                        value={slide.cta?.route || ''}
+                        onChange={e => handleSlideFieldChange(idx, 'cta.route', e.target.value)}
+                        placeholder="CTA route (e.g. / or /profile)"
+                      />
+                    </details>
+                  </div>
+                ))}
+                <label className="ac-ann-slide-add">
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg"
+                    multiple
+                    onChange={handleSlideUpload}
+                    style={{ display: 'none' }}
+                    disabled={annSlideUploading}
+                  />
+                  <span>{annSlideUploading ? 'Uploading…' : '+ Add slide(s)'}</span>
+                </label>
+              </div>
+            </div>
+
             <button
               className="ac-ann-publish"
               onClick={handlePublishAnnouncement}
-              disabled={annPublishing || !annVersion.trim() || !annBody.trim()}
+              disabled={
+                annPublishing ||
+                !annVersion.trim() ||
+                (!annBody.trim() && annSlides.length === 0)
+              }
             >
               {annPublishing ? 'Saving...' : annEditId ? 'Update Draft' : 'Save Draft'}
             </button>
             {annEditId && (
               <button
                 className="ac-ann-draft-btn"
-                onClick={() => { setAnnEditId(null); setAnnTitle(''); setAnnBody(''); setAnnCommits(''); }}
+                onClick={() => {
+                  setAnnEditId(null);
+                  setAnnTitle('');
+                  setAnnBody('');
+                  setAnnSlides([]);
+                  setAnnCommits('');
+                }}
               >
                 Cancel Edit
               </button>
@@ -1390,7 +1543,12 @@ const AdminCockpit = () => {
                     </div>
                   </div>
                   <span className="ac-ann-card-title">{a.title}</span>
-                  <p className="ac-ann-card-body">{a.body}</p>
+                  {Array.isArray(a.slides) && a.slides.length > 0 && (
+                    <span className="ac-ann-card-slide-count">
+                      {a.slides.length} slide{a.slides.length === 1 ? '' : 's'}
+                    </span>
+                  )}
+                  {a.body && <p className="ac-ann-card-body">{a.body}</p>}
                   <div className="ac-ann-card-actions">
                     {a.status === 'draft' && (
                       <>
@@ -1398,7 +1556,8 @@ const AdminCockpit = () => {
                           setAnnEditId(a._id);
                           setAnnVersion(a.version);
                           setAnnTitle(a.title);
-                          setAnnBody(a.body);
+                          setAnnBody(a.body || '');
+                          setAnnSlides(Array.isArray(a.slides) ? a.slides : []);
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}>Edit</button>
                         <button className="ac-ann-card-preview" onClick={() => {

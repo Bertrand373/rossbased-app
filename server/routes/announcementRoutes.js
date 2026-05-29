@@ -3,7 +3,42 @@
 
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const admin = require('firebase-admin');
+const { randomUUID } = require('crypto');
 const Announcement = require('../models/Announcement');
+
+// Same bucket TTTV uses — already initialized in services/notificationService.js
+const STORAGE_BUCKET = 'titan-track-notifications.firebasestorage.app';
+
+// Slide images are PNG/JPEG, ≤ 5 MB. Smaller cap than TTTV because these
+// are downsized Canva exports, not 1080p video.
+const slideUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith('image/')) {
+      return cb(new Error('Slide must be an image (PNG or JPEG)'));
+    }
+    cb(null, true);
+  },
+});
+
+async function uploadSlideToStorage(buffer, contentType) {
+  const ext = contentType === 'image/jpeg' ? 'jpg' : 'png';
+  const filename = `announcements/slides/${randomUUID()}.${ext}`;
+  const bucket = admin.storage().bucket(STORAGE_BUCKET);
+  const file = bucket.file(filename);
+  await file.save(buffer, {
+    metadata: {
+      contentType,
+      cacheControl: 'public, max-age=31536000, immutable',
+    },
+    resumable: false,
+  });
+  await file.makePublic();
+  return `https://storage.googleapis.com/${STORAGE_BUCKET}/${filename}`;
+}
 
 // Auth middleware passed from app.js via init()
 let _authenticate;
@@ -78,22 +113,30 @@ router.get('/', authWrap, async (req, res) => {
 
 // ============================================
 // ADMIN: Create new announcement (as draft)
+// Accepts EITHER legacy `body` (markdown-ish text) OR `slides[]` (the new
+// visual deck) — at least one is required.
 // ============================================
 router.post('/', authWrap, async (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
   try {
-    const { version, title, body } = req.body;
-    if (!version || !body) {
-      return res.status(400).json({ error: 'Version and body are required' });
+    const { version, title, body, slides } = req.body;
+    if (!version) {
+      return res.status(400).json({ error: 'Version is required' });
+    }
+    const hasBody = body && body.trim().length > 0;
+    const hasSlides = Array.isArray(slides) && slides.length > 0;
+    if (!hasBody && !hasSlides) {
+      return res.status(400).json({ error: 'Announcement needs either body or at least one slide' });
     }
     const announcement = await Announcement.create({
       version: version.trim(),
       title: title ? title.trim() : '',
-      body: body.trim(),
+      body: hasBody ? body.trim() : '',
+      slides: hasSlides ? sanitizeSlides(slides) : [],
       status: 'draft',
-      publishedBy: req.user.username
+      publishedBy: req.user.username,
     });
-    console.log(`📝 Announcement draft created: v${announcement.version} — ${announcement.title}`);
+    console.log(`📝 Announcement draft created: v${announcement.version} — ${announcement.title || `${announcement.slides.length} slide(s)`}`);
     res.json(announcement);
   } catch (err) {
     console.error('Create announcement error:', err);
@@ -107,18 +150,39 @@ router.post('/', authWrap, async (req, res) => {
 router.put('/:id', authWrap, async (req, res) => {
   if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
   try {
-    const { version, title, body } = req.body;
+    const { version, title, body, slides } = req.body;
+    const patch = {};
+    if (version !== undefined) patch.version = version.trim();
+    if (title !== undefined) patch.title = title.trim();
+    if (body !== undefined) patch.body = body.trim();
+    if (slides !== undefined) patch.slides = sanitizeSlides(slides);
+
     const updated = await Announcement.findByIdAndUpdate(
-      req.params.id,
-      { version: version?.trim(), title: title?.trim(), body: body?.trim() },
-      { new: true }
+      req.params.id, patch, { new: true, runValidators: true }
     );
     if (!updated) return res.status(404).json({ error: 'Announcement not found' });
     res.json(updated);
   } catch (err) {
+    console.error('Update announcement error:', err);
     res.status(500).json({ error: 'Failed to update announcement' });
   }
 });
+
+// Strip unknown keys + coerce types so the client can't inject extras.
+function sanitizeSlides(slides) {
+  if (!Array.isArray(slides)) return [];
+  return slides
+    .filter((s) => s && typeof s.image === 'string' && s.image.trim().length > 0)
+    .map((s) => ({
+      image: s.image.trim(),
+      title: typeof s.title === 'string' ? s.title.trim() : '',
+      body: typeof s.body === 'string' ? s.body.trim() : '',
+      cta: {
+        label: typeof s.cta?.label === 'string' ? s.cta.label.trim() : '',
+        route: typeof s.cta?.route === 'string' ? s.cta.route.trim() : '',
+      },
+    }));
+}
 
 // ============================================
 // ADMIN: Go Live — flip draft → published
@@ -136,6 +200,25 @@ router.put('/:id/publish', authWrap, async (req, res) => {
     res.json(updated);
   } catch (err) {
     res.status(500).json({ error: 'Failed to publish announcement' });
+  }
+});
+
+// ============================================
+// ADMIN: Upload a single slide image — returns the public URL
+// Used by the AdminCockpit slide builder before saving the parent
+// announcement. The admin chooses N PNGs, each is uploaded individually,
+// and the resulting URLs are stored as `slides[i].image`.
+// ============================================
+router.post('/upload-slide', authWrap, slideUpload.single('image'), async (req, res) => {
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Admin only' });
+  if (!req.file) return res.status(400).json({ error: 'No image provided' });
+  try {
+    const url = await uploadSlideToStorage(req.file.buffer, req.file.mimetype);
+    console.log(`🖼️  Slide uploaded: ${url}`);
+    res.json({ url });
+  } catch (err) {
+    console.error('Slide upload error:', err);
+    res.status(500).json({ error: 'Failed to upload slide' });
   }
 });
 

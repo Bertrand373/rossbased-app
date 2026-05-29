@@ -2395,3 +2395,152 @@
 [data-theme="light"] .ac-ud-note-day { color: rgba(180,140,20,0.5); }
 [data-theme="light"] .ac-ud-note-text { color: rgba(0,0,0,0.5); }
 [data-theme="light"] .ac-ud-note-src { color: rgba(0,0,0,0.2); }
+
+/* =============================================================================
+   ANNOUNCEMENT SLIDE BUILDER (v2 — visual deck)
+   Sits inside the Updates tab between the Body textarea and the Save button.
+   Each slide = uploaded image preview + reorder/delete buttons + collapsible
+   optional title/body/CTA. Image deck overrides plain-text body when present.
+   ============================================================================= */
+
+.ac-ann-label-hint {
+  font-weight: 400;
+  color: var(--text-tertiary);
+  font-size: 0.7rem;
+  margin-left: 6px;
+}
+
+.ac-ann-slides {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ac-ann-slide-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
+}
+
+.ac-ann-slide-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ac-ann-slide-index {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.ac-ann-slide-reorder {
+  display: flex;
+  gap: 6px;
+}
+
+.ac-ann-slide-move,
+.ac-ann-slide-delete {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ac-ann-slide-move:hover:not(:disabled),
+.ac-ann-slide-delete:hover {
+  background: var(--surface-raised);
+  border-color: var(--text-secondary);
+  color: var(--text);
+}
+
+.ac-ann-slide-move:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.ac-ann-slide-delete {
+  color: rgba(220, 80, 80, 0.7);
+}
+
+.ac-ann-slide-delete:hover {
+  color: rgba(255, 100, 100, 1);
+  border-color: rgba(255, 100, 100, 0.4);
+}
+
+.ac-ann-slide-preview {
+  width: 100%;
+  max-width: 320px;
+  align-self: center;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: #000;
+}
+
+.ac-ann-slide-details {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.ac-ann-slide-details summary {
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 0;
+  font-weight: 500;
+}
+
+.ac-ann-slide-details summary:hover {
+  color: var(--text-secondary);
+}
+
+.ac-ann-slide-details > .ac-ann-input {
+  margin-top: 8px;
+}
+
+.ac-ann-slide-add {
+  align-self: stretch;
+  text-align: center;
+  padding: 14px 20px;
+  border: 1.5px dashed var(--border-prominent);
+  border-radius: 10px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 200ms ease, color 200ms ease, background 200ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ac-ann-slide-add:hover {
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+  background: var(--surface-overlay);
+}
+
+.ac-ann-slide-add input[type="file"]:disabled + span {
+  opacity: 0.5;
+}
+
+.ac-ann-card-slide-count {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
