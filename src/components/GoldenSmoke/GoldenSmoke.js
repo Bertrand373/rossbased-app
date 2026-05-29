@@ -85,6 +85,20 @@ const SCENES = {
     poster: '/videos/sanctum/autumn-poster.jpg',
     durationSec: 8,
   },
+
+  bluehour: {
+    type: 'video',
+    src: '/videos/sanctum/bluehour.mp4',
+    poster: '/videos/sanctum/bluehour-poster.jpg',
+    durationSec: 8,
+  },
+
+  quietrain: {
+    type: 'video',
+    src: '/videos/sanctum/quietrain.mp4',
+    poster: '/videos/sanctum/quietrain-poster.jpg',
+    durationSec: 8,
+  },
 };
 
 // Migration target for scenes that have been removed from the lineup.
@@ -109,6 +123,8 @@ export const SCENE_META = [
   { key: 'lastlight',  label: 'Last Light',   tag: 'Sun through ivy. Held breath.' },
   { key: 'firstlight', label: 'First Light',  tag: 'Sun through cedars. Forest waking.' },
   { key: 'autumn',     label: 'Autumn',       tag: 'Tatami stillness. Maple wind.' },
+  { key: 'bluehour',   label: 'Blue Hour',    tag: 'Empty street. Sky cools.' },
+  { key: 'quietrain',  label: 'Quiet Rain',   tag: 'Stone path. Paper lanterns.' },
 ];
 
 // Swatch colors for the picker thumbnails — sampled from each palette's brightest stop.
@@ -118,6 +134,8 @@ export const SCENE_SWATCH = {
   lastlight:  'rgb(220, 145, 65)',
   firstlight: 'rgb(160, 175, 105)',
   autumn:     'rgb(210, 80, 55)',
+  bluehour:   'rgb(110, 140, 195)',
+  quietrain:  'rgb(180, 75, 70)',
 };
 
 const resolveSceneKey = (sceneProp) => {
