@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth,
   isSameDay, subMonths, addMonths, differenceInDays, isAfter,
-  startOfWeek as getWeekStart, addWeeks, subWeeks } from 'date-fns';
+  startOfWeek as getWeekStart, addWeeks, subWeeks, parseISO } from 'date-fns';
 import toast from 'react-hot-toast';
 import { goldCheckIcon, GOLD_TOAST_CLASS } from '../Toast/ToastIcons';
 import './CalendarBase.css';
@@ -23,6 +23,7 @@ import { getPresignedUrl, invalidate as invalidatePhotoUrl } from '../../utils/p
 import PhotoCaptureSheet from '../Photo/PhotoCaptureSheet';
 import PhotoLightbox from '../Photo/PhotoLightbox';
 import JourneyView from '../Photo/JourneyView';
+import { JOURNEY_PHASES, phaseForDay } from '../Photo/MilestoneSheet';
 import ConfirmSheet from '../Shared/ConfirmSheet';
 import '../Photo/Photo.css';
 
@@ -172,12 +173,86 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [lastGridView, setLastGridView] = useState('month');
   const [viewFading, setViewFading] = useState(false);
 
-  // Total photos for the Journey header label. Recomputed only when
-  // notes change — listPhotoEntries walks the whole notes map.
-  const photoCount = useMemo(
-    () => listPhotoEntries(userData?.notes).length,
-    [userData?.notes]
+  // Visual Journey is paginated by streak phase (Baseline → One Week
+  // → First Month → ...). Group photos by phase here so the header
+  // can swap between phases via swipe / arrows, and JourneyView only
+  // has to render the currently-visible chapter.
+  const photosByPhase = useMemo(() => {
+    const photos = listPhotoEntries(userData?.notes);
+    if (photos.length === 0) return [];
+    const history = userData?.streakHistory || [];
+
+    // Replicates JourneyView's dayCountFor — derives streak-day from
+    // the relapse history. Kept here so we can compute phase per
+    // photo without round-tripping props back into JourneyView.
+    const dayCountFor = (dayStr, index) => {
+      const dayDate = parseISO(dayStr);
+      for (const seg of history) {
+        if (!seg.start) continue;
+        const start = typeof seg.start === 'string' ? parseISO(seg.start) : new Date(seg.start);
+        const end = seg.end
+          ? (typeof seg.end === 'string' ? parseISO(seg.end) : new Date(seg.end))
+          : new Date();
+        if (dayDate >= start && dayDate <= end) {
+          const diff = Math.floor((dayDate - start) / (1000 * 60 * 60 * 24)) + 1;
+          return Math.max(1, diff);
+        }
+      }
+      return index + 1;
+    };
+
+    // Bucket by phase id, preserving chronological order within.
+    const buckets = new Map();
+    photos.forEach((p, i) => {
+      const dayNumber = dayCountFor(p.dayStr, i);
+      const phase = phaseForDay(dayNumber);
+      if (!buckets.has(phase.id)) buckets.set(phase.id, { phase, photos: [] });
+      buckets.get(phase.id).photos.push({ ...p, dayNumber });
+    });
+
+    // Return phases in canonical order, excluding any with no photos.
+    return JOURNEY_PHASES
+      .map(p => buckets.get(p.id))
+      .filter(Boolean);
+  }, [userData?.notes, userData?.streakHistory]);
+
+  const totalPhotoCount = useMemo(
+    () => photosByPhase.reduce((sum, g) => sum + g.photos.length, 0),
+    [photosByPhase]
   );
+
+  // Current page within the journey. Defaults to the most recent
+  // phase (the one containing today's most recent photo) so users
+  // land on "now" when they open the journey.
+  const [journeyPhaseIndex, setJourneyPhaseIndex] = useState(0);
+  const journeyInitialized = useRef(false);
+
+  // Snap to most recent phase on first non-zero load, then preserve
+  // the user's navigation across re-renders.
+  useEffect(() => {
+    if (!journeyInitialized.current && photosByPhase.length > 0) {
+      setJourneyPhaseIndex(photosByPhase.length - 1);
+      journeyInitialized.current = true;
+    }
+  }, [photosByPhase.length]);
+
+  // Clamp the active index so a phase-list shrink (e.g. relapse
+  // wiping photos) doesn't leave us pointing past the end.
+  const clampedJourneyIndex = photosByPhase.length === 0
+    ? 0
+    : Math.min(journeyPhaseIndex, photosByPhase.length - 1);
+  const currentPhaseGroup = photosByPhase[clampedJourneyIndex];
+
+  const prevPhase = () => {
+    if (clampedJourneyIndex > 0) setJourneyPhaseIndex(clampedJourneyIndex - 1);
+  };
+  const nextPhase = () => {
+    if (clampedJourneyIndex < photosByPhase.length - 1) {
+      setJourneyPhaseIndex(clampedJourneyIndex + 1);
+    }
+  };
+  const canGoPrevPhase = clampedJourneyIndex > 0;
+  const canGoNextPhase = clampedJourneyIndex < photosByPhase.length - 1;
   const [selectedTrigger, setSelectedTrigger] = useState('');
   const [showTriggerSelection, setShowTriggerSelection] = useState(false);
   const [editingExistingTrigger, setEditingExistingTrigger] = useState(false);
@@ -500,8 +575,19 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     label: t.label
   }));
 
-  // Navigation with slide animation
+  // Navigation with slide animation. In journey mode the period
+  // arrows page between streak phases (Baseline → One Week → ...)
+  // instead of stepping through months/weeks.
   const prevPeriod = () => {
+    if (viewMode === 'journey') {
+      if (!canGoPrevPhase) return;
+      setSwipeAnim('right');
+      setTimeout(() => {
+        prevPhase();
+        setTimeout(() => setSwipeAnim(null), 300);
+      }, 10);
+      return;
+    }
     setSwipeAnim('right');
     setTimeout(() => {
       setCurrentDate(viewMode === 'month' ? subMonths(currentDate, 1) : subWeeks(currentDate, 1));
@@ -510,6 +596,15 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   };
 
   const nextPeriod = () => {
+    if (viewMode === 'journey') {
+      if (!canGoNextPhase) return;
+      setSwipeAnim('left');
+      setTimeout(() => {
+        nextPhase();
+        setTimeout(() => setSwipeAnim(null), 300);
+      }, 10);
+      return;
+    }
     setSwipeAnim('left');
     setTimeout(() => {
       setCurrentDate(viewMode === 'month' ? addMonths(currentDate, 1) : addWeeks(currentDate, 1));
@@ -538,6 +633,24 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     // Only trigger if horizontal swipe is dominant and exceeds threshold
     if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
       swipeLocked.current = true;
+      // Journey mode: swipe pages between streak phases instead of
+      // months/weeks. Boundaries clamp via canGoPrev/NextPhase.
+      if (viewMode === 'journey') {
+        if (deltaX < 0 && canGoNextPhase) {
+          setSwipeAnim('left');
+          setTimeout(() => {
+            nextPhase();
+            setTimeout(() => setSwipeAnim(null), 300);
+          }, 10);
+        } else if (deltaX > 0 && canGoPrevPhase) {
+          setSwipeAnim('right');
+          setTimeout(() => {
+            prevPhase();
+            setTimeout(() => setSwipeAnim(null), 300);
+          }, 10);
+        }
+        return;
+      }
       if (deltaX < 0) {
         // Swiped left → next period
         setSwipeAnim('left');
@@ -554,7 +667,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         }, 10);
       }
     }
-  }, [viewMode]);
+  }, [viewMode, canGoPrevPhase, canGoNextPhase, clampedJourneyIndex]);
 
   // Check if day is in the future
   const isFutureDay = (day) => {
@@ -2087,22 +2200,38 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     <div className={`calendar-container${initialAnimDone ? ' anim-done' : ''}`}>
       {/* Minimal Header - Landing page style.
           Month/Week share the period scrubber (arrows + date label).
-          Journey replaces the scrubber with a static "Visual Journey · N photos"
-          identity and hides the arrows — there's no month to step through. */}
+          Journey reuses the same scrubber to page between streak phases
+          (Baseline → One Week → First Month → ...). The arrows show
+          only when there's more than one phase to navigate; with a
+          single phase the label sits as a static identity. */}
       <div className={`calendar-header-minimal${viewMode === 'journey' ? ' journey-mode' : ''}`}>
         {/* Period Display - Typography focused */}
         <div className="calendar-period-display">
-          {viewMode !== 'journey' && (
-            <button className="period-arrow" onClick={prevPeriod} aria-label="Previous">
+          {(viewMode !== 'journey' || photosByPhase.length > 1) && (
+            <button
+              className={`period-arrow${viewMode === 'journey' && !canGoPrevPhase ? ' is-disabled' : ''}`}
+              onClick={prevPeriod}
+              aria-label="Previous"
+              disabled={viewMode === 'journey' && !canGoPrevPhase}
+            >
               <FaChevronLeft />
             </button>
           )}
           <div className="period-text">
             {viewMode === 'journey' ? (
-              <>
-                <span className="period-month">Visual Journey</span>
-                <span className="period-year">{photoCount} {photoCount === 1 ? 'photo' : 'photos'}</span>
-              </>
+              currentPhaseGroup ? (
+                <>
+                  <span className="period-month">{currentPhaseGroup.phase.name}</span>
+                  <span className="period-year">
+                    {currentPhaseGroup.photos.length} {currentPhaseGroup.photos.length === 1 ? 'photo' : 'photos'}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="period-month">Visual Journey</span>
+                  <span className="period-year">{totalPhotoCount} {totalPhotoCount === 1 ? 'photo' : 'photos'}</span>
+                </>
+              )
             ) : (
               <>
                 <span className="period-month">{viewMode === 'month' ? format(currentDate, 'MMMM') : format(getWeekRange(currentDate).weekStart, 'MMM d') + ' – ' + format(getWeekRange(currentDate).weekEnd, 'd')}</span>
@@ -2110,8 +2239,13 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
               </>
             )}
           </div>
-          {viewMode !== 'journey' && (
-            <button className="period-arrow" onClick={nextPeriod} aria-label="Next">
+          {(viewMode !== 'journey' || photosByPhase.length > 1) && (
+            <button
+              className={`period-arrow${viewMode === 'journey' && !canGoNextPhase ? ' is-disabled' : ''}`}
+              onClick={nextPeriod}
+              aria-label="Next"
+              disabled={viewMode === 'journey' && !canGoNextPhase}
+            >
               <FaChevronRight />
             </button>
           )}
@@ -2185,6 +2319,8 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           ? (
             <JourneyView
               userData={userData}
+              phasePhotos={currentPhaseGroup ? currentPhaseGroup.photos : []}
+              phaseKey={currentPhaseGroup?.phase?.id || 'empty'}
               onAddFirstPhoto={() => {
                 // No selected date yet — open today's capture flow.
                 setSelectedDate(new Date());
