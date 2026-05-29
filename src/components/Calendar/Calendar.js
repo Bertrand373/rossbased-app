@@ -23,7 +23,7 @@ import { getPresignedUrl, invalidate as invalidatePhotoUrl } from '../../utils/p
 import PhotoCaptureSheet from '../Photo/PhotoCaptureSheet';
 import PhotoLightbox from '../Photo/PhotoLightbox';
 import JourneyView from '../Photo/JourneyView';
-import { JOURNEY_PHASES, phaseForDay } from '../Photo/MilestoneSheet';
+import { phaseForDay } from '../Photo/MilestoneSheet';
 import ConfirmSheet from '../Shared/ConfirmSheet';
 import '../Photo/Photo.css';
 
@@ -210,10 +210,13 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       buckets.get(phase.id).photos.push({ ...p, dayNumber });
     });
 
-    // Return phases in canonical order, excluding any with no photos.
-    return JOURNEY_PHASES
-      .map(p => buckets.get(p.id))
-      .filter(Boolean);
+    // Return phases ordered by startDay. We can't just iterate over
+    // JOURNEY_PHASES anymore because year-based phases (Year One, Two,
+    // ...) are generated dynamically by phaseForDay and aren't in
+    // the static array. Sorting by startDay gives canonical order
+    // for both fixed milestones and year buckets.
+    return Array.from(buckets.values())
+      .sort((a, b) => a.phase.startDay - b.phase.startDay);
   }, [userData?.notes, userData?.streakHistory]);
 
   const totalPhotoCount = useMemo(
@@ -2074,10 +2077,14 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
             {hasData && !isFuture && (
               <span className="day-data-dash"></span>
             )}
-            {/* Photo indicator — quiet gold dot, signals the day has a
-                photo attached. Tap-through opens the day-info modal. */}
+            {/* Photo indicator — small FaImages glyph (same icon used by
+                the Visual Journey toggle in the header), so users can
+                spot photo days at a glance and the visual vocabulary is
+                consistent across surfaces. Tap-through opens day info. */}
             {dayHasPhoto && !isFuture && (
-              <span className="day-cell-photo-dot" aria-hidden="true"></span>
+              <span className="day-cell-photo-glyph" aria-hidden="true">
+                <FaImages />
+              </span>
             )}
             {/* Workout indicator - tiny dumbbell glyph (clickable → opens workout sheet) */}
             {hasWorkout && (
