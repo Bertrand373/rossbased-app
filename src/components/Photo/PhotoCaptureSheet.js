@@ -1,36 +1,34 @@
 // src/components/Photo/PhotoCaptureSheet.js
 //
-// Custom in-app camera flow for daily photo capture. A v1 of this
-// shipped with two iOS Safari bugs and was reverted (#113):
-//   1. `<video>` srcObject was attached inside an async useEffect,
-//      out of the user-activation window — iOS refused to play().
-//   2. `autoPlay` alone is insufficient on iOS when a stream is
-//      attached after mount; an explicit `.play()` is required.
-// Net result: camera permission was granted (Dynamic Island lit up
-// the orange "camera in use" indicator) but the preview stayed
-// black because the video element never started playback.
+// Custom in-app camera flow for daily photo capture. v3 adds
+// MediaPipe face detection on top of the v2 tap-to-start + explicit-
+// .play() iOS Safari fixes:
 //
-// This v2 fixes both:
-//   1. Camera doesn't start on sheet open. The sheet shows a "Tap
-//      to start camera" pill inside the viewport instead. The user's
-//      tap on that pill is what calls getUserMedia, preserving the
-//      Safari user-activation window for the same gesture.
-//   2. We `await videoRef.current.play()` immediately after setting
-//      srcObject. The promise is properly caught so we surface
-//      failures rather than silently leaving a black viewport.
+//   - Oval guide turns SAGE GREEN when a face is detected, centered
+//     within the oval, and adequately sized. White until then.
+//     "Hold still" instruction fades in once locked.
+//   - Auto-capture fires after 1.5s of continuous stable lock. User
+//     can override at any time by tapping the shutter.
+//   - White flash on capture for the premium-camera shutter feel.
+//   - Optional haptic on lock acquisition (iOS Vibration API support
+//     varies; fails silently where unsupported).
+//
+// MediaPipe is dynamically imported so the ~250KB runtime + ~190KB
+// model only load once the user actually opens the camera sheet —
+// keeps the initial CRA bundle clean.
+//
+// If MediaPipe fails to load (network blocked, older iOS Safari,
+// WASM disabled), we fall back to plain white-oval manual capture
+// — the entire face-detection layer is purely additive.
 //
 // State machine (`phase`):
-//   'ready'      → sheet open, camera not yet started, "Tap to start"
-//   'starting'   → user tapped, getUserMedia in flight
-//   'live'       → live preview + face oval + shutter
+//   'ready'      → "Tap to start camera" pill
+//   'starting'   → getUserMedia in flight
+//   'live'       → preview + face oval + shutter (detection runs here)
 //   'review'     → captured snapshot + Retake / Use Photo
 //   'uploading'  → posting to /api/photos/upload
 //   'denied'     → permission denied → fallback to native input
 //   'error'      → device-level failure → same fallback path
-//
-// Vocabulary stays TitanTrack — white face guide (NOT gold, gold is
-// reserved for milestone moments), tracked-caps copy, iconic round
-// white shutter as the only ornamental element.
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom';
@@ -54,6 +52,22 @@ const PHASES = {
   ERROR: 'error'
 };
 
+// Auto-capture delay once the face is continuously locked. Generous
+// enough that the user can opt out by moving, tight enough not to
+// feel like the user is waiting forever.
+const AUTO_CAPTURE_DELAY_MS = 1500;
+
+// Lock geometry — what counts as "face is in the oval." The oval is
+// drawn centered horizontally and slightly above middle (cy=0.45 of
+// the viewBox), so we check the face center near that point rather
+// than dead-center of the frame.
+const LOCK_TARGET_X = 0.5;
+const LOCK_TARGET_Y = 0.45;
+const LOCK_TOL_X = 0.16;
+const LOCK_TOL_Y = 0.18;
+const LOCK_MIN_AREA = 0.06;  // face must cover at least ~6% of frame
+const LOCK_MAX_AREA = 0.55;  // and no more than ~55% (too close)
+
 const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, targetDate }) => {
   const [sheetReady, setSheetReady] = useState(false);
   const [phase, setPhase] = useState(PHASES.READY);
@@ -62,11 +76,20 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
   const [capturedPreview, setCapturedPreview] = useState(null);
   const [guidanceUrl, setGuidanceUrl] = useState(null);
   const [showGhost, setShowGhost] = useState(false);
+  const [locked, setLocked] = useState(false);
+  const [flashing, setFlashing] = useState(false);
 
   const sheetPanelRef = useRef(null);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  // Face detection refs
+  const detectorRef = useRef(null);
+  const rafRef = useRef(null);
+  const lockStartTimeRef = useRef(0);   // when stable lock began (0 = not locked)
+  const autoCaptureScheduledRef = useRef(false);
+  const lastHapticRef = useRef(0);
 
   const today = useMemo(
     () => targetDate || format(new Date(), 'yyyy-MM-dd'),
@@ -81,9 +104,6 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
     [userData?.notes, today]
   );
 
-  // Guidance photo — used as the optional ghost overlay for angle
-  // matching. NOT today's photo (so we don't tell the user to "match"
-  // what they're about to retake).
   const guidanceKey = useMemo(() => {
     const photos = listPhotoEntries(userData?.notes);
     const priors = photos.filter(p => p.dayStr !== today);
@@ -93,7 +113,7 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
   const isFirstPhoto = !baseline;
   const isReplace = !!todayEntry.photoKey;
 
-  // Open animation + reset state
+  // Reset on open
   useEffect(() => {
     if (open) {
       setPhase(PHASES.READY);
@@ -101,13 +121,17 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
       setCapturedBlob(null);
       setCapturedPreview(null);
       setShowGhost(false);
+      setLocked(false);
+      setFlashing(false);
+      lockStartTimeRef.current = 0;
+      autoCaptureScheduledRef.current = false;
       requestAnimationFrame(() => requestAnimationFrame(() => setSheetReady(true)));
     } else {
       setSheetReady(false);
     }
   }, [open]);
 
-  // Resolve a presigned URL for the ghost-overlay guidance photo.
+  // Resolve guidance photo URL for ghost overlay
   useEffect(() => {
     let cancelled = false;
     if (!open || !guidanceKey) { setGuidanceUrl(null); return; }
@@ -117,9 +141,12 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
     return () => { cancelled = true; };
   }, [open, guidanceKey]);
 
-  // Stop the camera tracks whenever the sheet closes or unmounts.
-  // Critical: without this, the camera light stays on after dismiss.
+  // Stop the camera tracks + face detection on close/unmount
   const stopStream = useCallback(() => {
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(t => t.stop());
       streamRef.current = null;
@@ -144,10 +171,108 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
 
   useSheetSwipe(sheetPanelRef, open, () => closeSheet(() => onClose && onClose()));
 
-  // The KEY fix vs v1: getUserMedia + play() fire inside this tap
-  // handler, NOT in a useEffect. Safari treats this whole chain as
-  // one user-activation context, so play() is allowed and the
-  // preview actually starts.
+  // Lazy-load the MediaPipe face detector. ~250KB WASM + ~190KB model
+  // loaded from CDN on first camera open, cached thereafter. If load
+  // fails for any reason we proceed without auto-lock — the manual
+  // shutter still works, the oval just stays white.
+  const initDetector = useCallback(async () => {
+    if (detectorRef.current) return detectorRef.current;
+    try {
+      const { FilesetResolver, FaceDetector } = await import('@mediapipe/tasks-vision');
+      const vision = await FilesetResolver.forVisionTasks(
+        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm'
+      );
+      const detector = await FaceDetector.createFromOptions(vision, {
+        baseOptions: {
+          modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite',
+          delegate: 'GPU'
+        },
+        runningMode: 'VIDEO'
+      });
+      detectorRef.current = detector;
+      return detector;
+    } catch (err) {
+      console.warn('Face detector init failed (manual capture still works):', err);
+      return null;
+    }
+  }, []);
+
+  // The detection RAF loop. Runs while phase === 'live'. Reads
+  // frames from the video, computes whether a face is centered and
+  // sized correctly, updates locked state, and schedules auto-capture
+  // when continuous lock exceeds the threshold.
+  const detectLoop = useCallback(() => {
+    const video = videoRef.current;
+    const detector = detectorRef.current;
+    if (!video || !detector || video.readyState < 2) {
+      rafRef.current = requestAnimationFrame(detectLoop);
+      return;
+    }
+
+    let isGood = false;
+    try {
+      const result = detector.detectForVideo(video, performance.now());
+      if (result?.detections?.length > 0) {
+        // Pick the largest detection if multiple faces (closest user)
+        let best = result.detections[0];
+        let bestArea = best.boundingBox.width * best.boundingBox.height;
+        for (let i = 1; i < result.detections.length; i++) {
+          const det = result.detections[i];
+          const area = det.boundingBox.width * det.boundingBox.height;
+          if (area > bestArea) { best = det; bestArea = area; }
+        }
+        const box = best.boundingBox;
+        const vw = video.videoWidth || 1;
+        const vh = video.videoHeight || 1;
+        const cx = (box.originX + box.width / 2) / vw;
+        const cy = (box.originY + box.height / 2) / vh;
+        const area = (box.width * box.height) / (vw * vh);
+        const xOk = Math.abs(cx - LOCK_TARGET_X) < LOCK_TOL_X;
+        const yOk = Math.abs(cy - LOCK_TARGET_Y) < LOCK_TOL_Y;
+        const sizeOk = area >= LOCK_MIN_AREA && area <= LOCK_MAX_AREA;
+        isGood = xOk && yOk && sizeOk;
+      }
+    } catch (err) {
+      // Don't bring down the whole loop if a single frame fails
+      // (rare WASM hiccup) — just keep going.
+      console.warn('detectForVideo error:', err);
+    }
+
+    if (isGood) {
+      const now = performance.now();
+      if (lockStartTimeRef.current === 0) {
+        lockStartTimeRef.current = now;
+        setLocked(true);
+        // Brief haptic on lock acquisition (iOS support varies)
+        if ('vibrate' in navigator && now - lastHapticRef.current > 800) {
+          try { navigator.vibrate(15); } catch (_) {}
+          lastHapticRef.current = now;
+        }
+      }
+      // Schedule auto-capture once we've been continuously locked
+      // for the auto-capture delay.
+      if (!autoCaptureScheduledRef.current
+          && now - lockStartTimeRef.current >= AUTO_CAPTURE_DELAY_MS) {
+        autoCaptureScheduledRef.current = true;
+        // Use a microtask so React state catches up before capture
+        Promise.resolve().then(() => triggerCapture());
+      }
+    } else {
+      if (lockStartTimeRef.current !== 0) {
+        lockStartTimeRef.current = 0;
+        autoCaptureScheduledRef.current = false;
+        setLocked(false);
+      }
+    }
+
+    rafRef.current = requestAnimationFrame(detectLoop);
+  // triggerCapture is stable via the ref pattern below; eslint
+  // disable is fine here.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Tap-to-start: getUserMedia + .play() + detector init + detection
+  // loop all fire inside this single user-activation chain.
   const handleStartCamera = useCallback(async () => {
     if (phase === PHASES.STARTING || phase === PHASES.LIVE) return;
     setPhase(PHASES.STARTING);
@@ -170,15 +295,9 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        // CRITICAL on iOS: autoPlay alone won't start a stream that's
-        // attached after mount. Must call play() explicitly, and we
-        // must do it inside the same user-activation chain as the
-        // getUserMedia tap.
         try {
           await videoRef.current.play();
         } catch (playErr) {
-          // Some Safari versions reject the first .play() then accept
-          // a retry one tick later. Try once more before giving up.
           console.warn('First play() failed, retrying:', playErr);
           await new Promise(r => setTimeout(r, 80));
           try {
@@ -194,6 +313,13 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
         }
       }
       setPhase(PHASES.LIVE);
+      // Kick off face detector init in parallel with the live
+      // preview going up. Once it resolves, start the loop.
+      initDetector().then((detector) => {
+        if (detector && streamRef.current) {
+          rafRef.current = requestAnimationFrame(detectLoop);
+        }
+      });
     } catch (err) {
       console.warn('Camera open failed:', err);
       if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
@@ -203,22 +329,26 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
         setPhase(PHASES.ERROR);
       }
     }
-  }, [phase]);
+  }, [phase, initDetector, detectLoop]);
 
-  // Snapshot the current video frame to a JPEG blob. Mirrored
-  // horizontally so the saved image matches the preview the user saw.
-  const handleCapture = useCallback(() => {
+  // Capture core — used by both manual shutter tap and auto-capture.
+  // Mirrors the canvas so the saved JPEG matches the mirrored preview.
+  const triggerCapture = useCallback(() => {
     const video = videoRef.current;
     if (!video || video.readyState < 2) return;
     const w = video.videoWidth;
     const h = video.videoHeight;
     if (!w || !h) return;
 
+    // White flash for the shutter-feel feedback. Removed when phase
+    // moves to review below.
+    setFlashing(true);
+    setTimeout(() => setFlashing(false), 220);
+
     const canvas = document.createElement('canvas');
     canvas.width = w;
     canvas.height = h;
     const ctx = canvas.getContext('2d');
-    // Mirror so the saved frame matches the preview the user saw.
     ctx.translate(w, 0);
     ctx.scale(-1, 1);
     ctx.drawImage(video, 0, 0, w, h);
@@ -232,6 +362,14 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
       setCapturedBlob(blob);
       setCapturedPreview(url);
       setPhase(PHASES.REVIEW);
+      // Stop the detection loop — review screen doesn't need it.
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      lockStartTimeRef.current = 0;
+      autoCaptureScheduledRef.current = false;
+      setLocked(false);
     }, 'image/jpeg', 0.92);
   }, []);
 
@@ -239,8 +377,15 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
     if (capturedPreview) URL.revokeObjectURL(capturedPreview);
     setCapturedBlob(null);
     setCapturedPreview(null);
+    setLocked(false);
+    lockStartTimeRef.current = 0;
+    autoCaptureScheduledRef.current = false;
     setPhase(PHASES.LIVE);
-  }, [capturedPreview]);
+    // Restart the detection loop for the retake
+    if (detectorRef.current && !rafRef.current) {
+      rafRef.current = requestAnimationFrame(detectLoop);
+    }
+  }, [capturedPreview, detectLoop]);
 
   const handleConfirm = useCallback(async () => {
     if (!capturedBlob) return;
@@ -291,8 +436,7 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
     }
   }, [capturedBlob, capturedPreview, today, userData?.notes, todayEntry.photoKey, updateUserData, onSaved, onClose, closeSheet]);
 
-  // Permission-denied / error fallback — uses the original native
-  // camera input. Same upload path as the in-app capture.
+  // Native-camera fallback (permission denied or detector unavailable)
   const handleFallbackFile = useCallback(async (e) => {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -339,6 +483,9 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
       ? 'RETAKE TODAY'
       : 'TODAY’S SHOT';
 
+  // Instruction text adapts to lock state during live phase
+  const liveInstruction = locked ? 'Hold still' : 'Center your face inside the oval';
+
   return ReactDOM.createPortal(
     <div
       className={`sheet-backdrop${sheetReady ? ' open' : ''}`}
@@ -356,18 +503,7 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
         </div>
 
         <div className="photo-capture-body" data-no-swipe>
-          {/* 3:4 portrait viewport — every phase renders inside this
-              container so the surrounding sheet never jumps in size. */}
           <div className="capture-viewport">
-            {/* Video stays mounted across phases so the ref is stable
-                and we don't tear down/rebuild the element. The iOS-
-                critical attributes are all present:
-                  playsInline       → don't go fullscreen
-                  muted             → required for autoplay
-                  autoPlay          → background hint (we still call
-                                      .play() explicitly)
-                  disablePictureInPicture → no PiP native chrome
-                  disableRemotePlayback   → no AirPlay native chrome */}
             <video
               ref={videoRef}
               autoPlay
@@ -378,8 +514,6 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
               className={`capture-video${phase === PHASES.LIVE ? ' is-active' : ''}`}
             />
 
-            {/* Ghost overlay — previous photo at very low opacity,
-                gated behind the user-opt-in chip. Only shown in live. */}
             {phase === PHASES.LIVE && guidanceUrl && showGhost && (
               <img
                 className="capture-ghost"
@@ -389,13 +523,11 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
               />
             )}
 
-            {/* Face guide oval — restrained white, shown in ready and
-                live phases. In ready, it serves as a visual placeholder
-                so the user sees where their face will go before they
-                opt in to start the camera. */}
+            {/* Face guide oval — adds .is-locked when face is in
+                position; CSS swaps stroke from white to soft sage. */}
             {(phase === PHASES.READY || phase === PHASES.LIVE) && (
               <svg
-                className="capture-guide"
+                className={`capture-guide${locked ? ' is-locked' : ''}`}
                 viewBox="0 0 300 400"
                 preserveAspectRatio="xMidYMid meet"
                 aria-hidden="true"
@@ -404,10 +536,6 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
               </svg>
             )}
 
-            {/* Ready state — viewport sits dark behind the guide,
-                "Tap to start camera" pill centered. Critical: the
-                tap on THIS button is what fires getUserMedia, so
-                Safari sees a fresh user activation. */}
             {phase === PHASES.READY && (
               <div className="capture-ready">
                 <button
@@ -420,24 +548,20 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
               </div>
             )}
 
-            {/* Starting state — brief overlay while permission is
-                being requested and the stream is warming up. */}
             {phase === PHASES.STARTING && (
               <div className="capture-status">
                 <span className="capture-status-label">Starting camera…</span>
               </div>
             )}
 
-            {/* Live-state instruction chip */}
             {phase === PHASES.LIVE && (
-              <div className="capture-instruction">
+              <div className={`capture-instruction${locked ? ' is-locked' : ''}`}>
                 <span className="capture-instruction-label">
-                  Center your face inside the oval
+                  {liveInstruction}
                 </span>
               </div>
             )}
 
-            {/* Ghost overlay toggle — discreet pill, top-left */}
             {phase === PHASES.LIVE && guidanceUrl && (
               <button
                 type="button"
@@ -448,7 +572,6 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
               </button>
             )}
 
-            {/* Review snapshot */}
             {phase === PHASES.REVIEW && capturedPreview && (
               <img
                 className="capture-review-img"
@@ -457,7 +580,6 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
               />
             )}
 
-            {/* Permission-denied state */}
             {phase === PHASES.DENIED && (
               <div className="capture-status capture-status-denied">
                 <span className="capture-status-eyebrow">Camera blocked</span>
@@ -468,7 +590,6 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
               </div>
             )}
 
-            {/* Error state */}
             {phase === PHASES.ERROR && (
               <div className="capture-status capture-status-denied">
                 <span className="capture-status-eyebrow">Camera unavailable</span>
@@ -478,21 +599,24 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
               </div>
             )}
 
-            {/* Uploading overlay */}
             {phase === PHASES.UPLOADING && (
               <div className="capture-status capture-status-uploading">
                 <span className="capture-status-label">Saving…</span>
               </div>
             )}
+
+            {/* White flash on capture */}
+            {flashing && <div className="capture-flash" aria-hidden="true" />}
           </div>
 
-          {/* Phase-specific bottom controls. */}
+          {/* Live shutter — always tappable; auto-capture is on top
+              of, not instead of, the manual tap. */}
           {phase === PHASES.LIVE && (
             <div className="capture-controls">
               <button
                 type="button"
-                className="capture-shutter"
-                onClick={handleCapture}
+                className={`capture-shutter${locked ? ' is-locked' : ''}`}
+                onClick={triggerCapture}
                 aria-label="Capture photo"
               >
                 <span className="capture-shutter-inner" />
