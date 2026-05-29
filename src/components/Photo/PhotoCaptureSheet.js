@@ -52,10 +52,18 @@ const PHASES = {
   ERROR: 'error'
 };
 
-// Auto-capture delay once the face is continuously locked. Generous
-// enough that the user can opt out by moving, tight enough not to
-// feel like the user is waiting forever.
-const AUTO_CAPTURE_DELAY_MS = 1500;
+// Auto-capture delay once the face is continuously locked. Bumped
+// from 1.5s — at that speed the manual shutter felt useless and
+// users barely saw the sage transition before the white flash hit.
+// 3.5s gives time to register "lock acquired, capture imminent" and
+// either let it auto-fire or override with the shutter.
+const AUTO_CAPTURE_DELAY_MS = 3500;
+
+// Settle period — face must be continuously detected as "good" for
+// this long before we actually flip `locked` to true. Prevents the
+// sage <-> white flicker that happens when the face is on the
+// detection boundary (just barely in the oval).
+const LOCK_SETTLE_MS = 200;
 
 // Lock geometry — what counts as "face is in the oval." The oval is
 // drawn centered horizontally and slightly above middle (cy=0.45 of
@@ -63,10 +71,10 @@ const AUTO_CAPTURE_DELAY_MS = 1500;
 // than dead-center of the frame.
 const LOCK_TARGET_X = 0.5;
 const LOCK_TARGET_Y = 0.45;
-const LOCK_TOL_X = 0.16;
-const LOCK_TOL_Y = 0.18;
-const LOCK_MIN_AREA = 0.06;  // face must cover at least ~6% of frame
-const LOCK_MAX_AREA = 0.55;  // and no more than ~55% (too close)
+const LOCK_TOL_X = 0.18;
+const LOCK_TOL_Y = 0.20;
+const LOCK_MIN_AREA = 0.05;
+const LOCK_MAX_AREA = 0.60;
 
 const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, targetDate }) => {
   const [sheetReady, setSheetReady] = useState(false);
@@ -87,7 +95,8 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
   // Face detection refs
   const detectorRef = useRef(null);
   const rafRef = useRef(null);
-  const lockStartTimeRef = useRef(0);   // when stable lock began (0 = not locked)
+  const settleStartTimeRef = useRef(0); // when face first detected as "good"
+  const lockStartTimeRef = useRef(0);   // when stable lock began (post-settle)
   const autoCaptureScheduledRef = useRef(false);
   const lastHapticRef = useRef(0);
 
@@ -123,6 +132,7 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
       setShowGhost(false);
       setLocked(false);
       setFlashing(false);
+      settleStartTimeRef.current = 0;
       lockStartTimeRef.current = 0;
       autoCaptureScheduledRef.current = false;
       requestAnimationFrame(() => requestAnimationFrame(() => setSheetReady(true)));
@@ -184,8 +194,10 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
       );
       const detector = await FaceDetector.createFromOptions(vision, {
         baseOptions: {
-          modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite',
-          delegate: 'GPU'
+          modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite'
+          // No `delegate: 'GPU'` — WebGL acceleration via MediaPipe is
+          // unreliable on iOS Safari. CPU is the safer default and
+          // still runs at 30fps on anything iPhone X or newer.
         },
         runningMode: 'VIDEO'
       });
@@ -240,25 +252,33 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
 
     if (isGood) {
       const now = performance.now();
-      if (lockStartTimeRef.current === 0) {
+      // Start (or continue) the settle window. Lock only flips to
+      // true after LOCK_SETTLE_MS of continuous good detection — this
+      // kills the sage<->white flicker that happens when the face is
+      // right on the geometry boundary.
+      if (settleStartTimeRef.current === 0) {
+        settleStartTimeRef.current = now;
+      }
+      if (lockStartTimeRef.current === 0
+          && now - settleStartTimeRef.current >= LOCK_SETTLE_MS) {
         lockStartTimeRef.current = now;
         setLocked(true);
-        // Brief haptic on lock acquisition (iOS support varies)
         if ('vibrate' in navigator && now - lastHapticRef.current > 800) {
           try { navigator.vibrate(15); } catch (_) {}
           lastHapticRef.current = now;
         }
       }
-      // Schedule auto-capture once we've been continuously locked
-      // for the auto-capture delay.
-      if (!autoCaptureScheduledRef.current
+      // Auto-capture fires only after a full lock-stable window has
+      // elapsed past the actual lock moment.
+      if (lockStartTimeRef.current !== 0
+          && !autoCaptureScheduledRef.current
           && now - lockStartTimeRef.current >= AUTO_CAPTURE_DELAY_MS) {
         autoCaptureScheduledRef.current = true;
-        // Use a microtask so React state catches up before capture
         Promise.resolve().then(() => triggerCapture());
       }
     } else {
-      if (lockStartTimeRef.current !== 0) {
+      if (settleStartTimeRef.current !== 0 || lockStartTimeRef.current !== 0) {
+        settleStartTimeRef.current = 0;
         lockStartTimeRef.current = 0;
         autoCaptureScheduledRef.current = false;
         setLocked(false);
@@ -367,6 +387,7 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
         cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
       }
+      settleStartTimeRef.current = 0;
       lockStartTimeRef.current = 0;
       autoCaptureScheduledRef.current = false;
       setLocked(false);
@@ -378,6 +399,7 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
     setCapturedBlob(null);
     setCapturedPreview(null);
     setLocked(false);
+    settleStartTimeRef.current = 0;
     lockStartTimeRef.current = 0;
     autoCaptureScheduledRef.current = false;
     setPhase(PHASES.LIVE);
@@ -619,6 +641,19 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
                 onClick={triggerCapture}
                 aria-label="Capture photo"
               >
+                {/* Countdown ring — only rendered while locked. SVG
+                    re-mounts (and the CSS animation restarts) every
+                    time the lock is regained, so a partial ring left
+                    over from a previous attempt never sticks around. */}
+                {locked && (
+                  <svg
+                    className="capture-shutter-ring"
+                    viewBox="0 0 80 80"
+                    aria-hidden="true"
+                  >
+                    <circle cx="40" cy="40" r="38" />
+                  </svg>
+                )}
                 <span className="capture-shutter-inner" />
               </button>
             </div>
