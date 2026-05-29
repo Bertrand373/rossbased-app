@@ -2686,23 +2686,17 @@ const AIChat = ({ isLoggedIn, isOpen, onClose, openPlanModal }) => {
                         : 'Record voice message'
                     }
                   >
-                    {voiceState === 'recording' ? (
-                      // Steady ember dot. A literal stop-square reads as
-                      // "video editor stop button" — replacing it with a
-                      // small filled dot lets the glowing gold button read
-                      // as "the lamp is lit" instead. The pulse + the
-                      // adjacent cancel × carry the tap-to-stop affordance,
-                      // and the aria-label keeps the action explicit for AT.
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                        <circle cx="12" cy="12" r="4" />
-                      </svg>
-                    ) : voiceState === 'uploading' ? (
+                    {voiceState === 'uploading' ? (
                       // Spinner — CSS animates the rotation on .ai-chat-mic.uploading svg
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                         <path d="M21 12a9 9 0 1 1-6.3-8.6" />
                       </svg>
                     ) : (
-                      // Mic icon
+                      // Mic icon — used for BOTH idle and recording. The
+                      // recording state lights it up via CSS (gold stroke
+                      // + drop-shadow bloom on .ai-chat-mic.recording svg)
+                      // rather than swapping the glyph. Keeps affordance
+                      // continuous: the button always looks like a mic.
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                         <rect x="9" y="3" width="6" height="12" rx="3" />
                         <path d="M5 11a7 7 0 0 0 14 0" />
