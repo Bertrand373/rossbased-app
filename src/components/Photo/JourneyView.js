@@ -1,24 +1,27 @@
 // src/components/Photo/JourneyView.js
 //
-// The Visual Journey — a vertical, editorial-style photo strip that
-// lives inside Calendar as the third view (alongside Month and Week).
-// Each entry reads like a page in a personal photo book: the image is
-// the hero, captioned underneath with day count + date in tracked
-// caps, with an optional note in italic.
+// The Visual Journey — a scroll-less grid of every photo the user has
+// captured, ordered chronologically. Lives inside Calendar as the third
+// view alongside Month and Week, and intentionally borrows the Month
+// grid's vocabulary (gap-based rounded surfaces, restrained borders,
+// gold reserved for milestones) so it reads as the photographic
+// companion to the calendar — not a separate "feed."
 //
-// Milestone days (Day 7 / 30 / 60 / 90 / 180 / 365) get a gold-
-// accented eyebrow + the milestone's short title so they read as
-// chapter marks rather than just-another-row.
+// Each cell is a portrait photo with a small Day chip in the bottom-
+// left corner. Milestone days (7/30/60/90/180/365) get a gold ✦ in the
+// top-right and a gold-tinted day chip. Tap any cell to open the
+// PhotoLightbox at full size.
 //
 // Photos persist across relapses — this is the user's full visual
 // record, NOT the current-streak-only view. That's intentional; the
 // "before X relapse" photo IS the most valuable photo they own.
 
 import React, { useEffect, useState } from 'react';
-import { format, parseISO } from 'date-fns';
+import { parseISO } from 'date-fns';
 import { listPhotoEntries } from '../../utils/dayJournal';
 import { getPresignedUrl } from '../../utils/photoUrl';
-import { MILESTONE_DAYS, MILESTONE_TITLE } from './MilestoneSheet';
+import { MILESTONE_DAYS } from './MilestoneSheet';
+import PhotoLightbox from './PhotoLightbox';
 
 const MILESTONE_SET = new Set(MILESTONE_DAYS);
 
@@ -28,8 +31,6 @@ const MILESTONE_SET = new Set(MILESTONE_DAYS);
  * order if streakHistory is missing.
  */
 function dayCountFor(dayStr, userData, index) {
-  // First, try to derive from streakHistory — find the streak window
-  // this day falls into, then return the offset within it.
   const history = userData?.streakHistory || [];
   const dayDate = parseISO(dayStr);
 
@@ -38,18 +39,16 @@ function dayCountFor(dayStr, userData, index) {
     const start = typeof seg.start === 'string' ? parseISO(seg.start) : new Date(seg.start);
     const end = seg.end
       ? (typeof seg.end === 'string' ? parseISO(seg.end) : new Date(seg.end))
-      : new Date(); // open streak
+      : new Date();
     if (dayDate >= start && dayDate <= end) {
       const diff = Math.floor((dayDate - start) / (1000 * 60 * 60 * 24)) + 1;
       return Math.max(1, diff);
     }
   }
-
-  // Fallback: 1-indexed by chronological order in the photo list.
   return index + 1;
 }
 
-const PhotoEntry = ({ entry, dayNumber, isMilestone, rowIndex, onOpen }) => {
+const JourneyCell = ({ entry, dayNumber, isMilestone, cellIndex, onOpen }) => {
   const [url, setUrl] = useState(null);
 
   useEffect(() => {
@@ -58,63 +57,29 @@ const PhotoEntry = ({ entry, dayNumber, isMilestone, rowIndex, onOpen }) => {
     return () => { cancelled = true; };
   }, [entry.photoKey]);
 
-  let dateLabel = '';
-  let weekdayLabel = '';
-  try {
-    const parsed = parseISO(entry.dayStr);
-    dateLabel = format(parsed, 'MMM d, yyyy').toUpperCase();
-    weekdayLabel = format(parsed, 'EEEE').toUpperCase();
-  } catch { /* ignore */ }
-
-  const milestoneTitle = isMilestone ? MILESTONE_TITLE[dayNumber] : null;
-
-  // --row-i drives the staggered fade-in (see Photo.css). Capped in CSS.
-  const entryStyle = { '--row-i': rowIndex };
+  // --cell-i drives the staggered fade-in (see Photo.css). Capped in CSS.
+  const cellStyle = { '--cell-i': cellIndex };
 
   return (
-    <article
-      className={`journey-entry${isMilestone ? ' milestone' : ''}`}
-      style={entryStyle}
+    <button
+      type="button"
+      className={`journey-cell${isMilestone ? ' milestone' : ''}`}
+      style={cellStyle}
+      onClick={() => url && onOpen({ url, dayNumber, isMilestone })}
+      aria-label={`View Day ${dayNumber} photo`}
     >
+      {url ? <img src={url} alt={`Day ${dayNumber}`} /> : null}
       {isMilestone && (
-        <div className="journey-entry-eyebrow milestone">
-          <span className="journey-entry-eyebrow-glyph" aria-hidden="true">✦</span>
-          <span className="journey-entry-eyebrow-label">
-            Milestone · Day {dayNumber}{milestoneTitle ? ` — ${milestoneTitle}` : ''}
-          </span>
-        </div>
+        <span className="journey-cell-glyph" aria-hidden="true">✦</span>
       )}
-
-      <button
-        type="button"
-        className={`journey-entry-photo${isMilestone ? ' milestone' : ''}`}
-        onClick={() => onOpen(entry.dayStr)}
-        aria-label={`View photo from day ${dayNumber}`}
-      >
-        {url ? <img src={url} alt={`Day ${dayNumber}`} /> : null}
-        <span className="journey-entry-photo-inner" aria-hidden="true" />
-      </button>
-
-      <div className="journey-entry-caption">
-        <div className="journey-entry-caption-day">
-          <span className="journey-entry-caption-day-num">{dayNumber}</span>
-          <span className="journey-entry-caption-day-label">Day</span>
-        </div>
-        <div className="journey-entry-caption-meta">
-          <div className="journey-entry-caption-date">{dateLabel}</div>
-          <div className="journey-entry-caption-weekday">{weekdayLabel}</div>
-        </div>
-      </div>
-
-      {entry.text ? (
-        <p className="journey-entry-note">{entry.text}</p>
-      ) : null}
-    </article>
+      <span className="journey-cell-day">Day {dayNumber}</span>
+    </button>
   );
 };
 
-const JourneyView = ({ userData, onOpenDay, onAddFirstPhoto }) => {
+const JourneyView = ({ userData, onAddFirstPhoto }) => {
   const photos = listPhotoEntries(userData?.notes);
+  const [lightboxState, setLightboxState] = useState({ open: false, url: null });
 
   if (photos.length === 0) {
     return (
@@ -133,42 +98,32 @@ const JourneyView = ({ userData, onOpenDay, onAddFirstPhoto }) => {
     );
   }
 
-  // Compute the journey arc for the hero strip — Day 1 → Day {latest}.
-  // Uses the same dayCountFor logic as the entries so the numbers match.
-  const lastDayNumber = dayCountFor(
-    photos[photos.length - 1].dayStr,
-    userData,
-    photos.length - 1
-  );
-
   return (
-    <div className="journey-view" data-no-swipe>
-      <header className="journey-hero">
-        <div className="journey-hero-arc">
-          <span className="journey-hero-arc-from">Day 1</span>
-          <span className="journey-hero-arc-rule" aria-hidden="true" />
-          <span className="journey-hero-arc-to">Day {lastDayNumber}</span>
-        </div>
-        <div className="journey-hero-sub">
-          {photos.length} {photos.length === 1 ? 'moment' : 'moments'} captured
-        </div>
-      </header>
+    <>
+      <div className="journey-view" data-no-swipe>
+        {photos.map((entry, i) => {
+          const dayNumber = dayCountFor(entry.dayStr, userData, i);
+          const isMilestone = MILESTONE_SET.has(dayNumber);
+          return (
+            <JourneyCell
+              key={entry.dayStr}
+              entry={entry}
+              dayNumber={dayNumber}
+              isMilestone={isMilestone}
+              cellIndex={i}
+              onOpen={(payload) => setLightboxState({ open: true, ...payload })}
+            />
+          );
+        })}
+      </div>
 
-      {photos.map((entry, i) => {
-        const dayNumber = dayCountFor(entry.dayStr, userData, i);
-        const isMilestone = MILESTONE_SET.has(dayNumber);
-        return (
-          <PhotoEntry
-            key={entry.dayStr}
-            entry={entry}
-            dayNumber={dayNumber}
-            isMilestone={isMilestone}
-            rowIndex={i}
-            onOpen={onOpenDay}
-          />
-        );
-      })}
-    </div>
+      <PhotoLightbox
+        open={lightboxState.open}
+        src={lightboxState.url}
+        alt={lightboxState.dayNumber ? `Day ${lightboxState.dayNumber}` : ''}
+        onClose={() => setLightboxState({ open: false, url: null })}
+      />
+    </>
   );
 };
 
