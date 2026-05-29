@@ -2,7 +2,7 @@
 // Two CSS files: CalendarBase.css + CalendarModals.css
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth,
-  isSameDay, subMonths, addMonths, differenceInDays, isAfter, parseISO,
+  isSameDay, subMonths, addMonths, differenceInDays, isAfter,
   startOfWeek as getWeekStart, addWeeks, subWeeks } from 'date-fns';
 import toast from 'react-hot-toast';
 import { goldCheckIcon, GOLD_TOAST_CLASS } from '../Toast/ToastIcons';
@@ -2185,7 +2185,6 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           ? (
             <JourneyView
               userData={userData}
-              onOpenDay={(dayStr) => openDayInfo(parseISO(dayStr))}
               onAddFirstPhoto={() => {
                 // No selected date yet — open today's capture flow.
                 setSelectedDate(new Date());
