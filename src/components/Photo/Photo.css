@@ -907,26 +907,28 @@
    CALENDAR DAY-CELL PHOTO INDICATOR
    ============================================================ */
 
-/* Day-cell photo indicator. Tucked DIRECTLY UNDER the day number —
-   the one spot on the cell that's free even when every other
-   indicator fires (data-dash top-right, workout bottom-left, moon
-   bottom-right, oracle pin centered watermark, day number top-left).
+/* Day-cell photo indicator. Lives in the top-right COLUMN with the
+   data-dash, treating both as "data signals" with a unified white
+   vocabulary (gold is reserved for activity glyphs — workout, oracle
+   pin — and milestone moments).
 
-   The L-shaped visual cluster (number + glyph stacked vertically)
-   reads as "Day 29 has a photo" and never competes with another
-   indicator's space.
+   Placement rule:
+     - No data-dash on the day → glyph takes the dash's corner spot
+       (top: 6px; right: 6px)
+     - Data-dash present → glyph slips directly under the dash
+       (top: 14px; right: 6px), keeping both visible as a stacked
+       "this day has signals" cluster in the same column
 
-   Uses the same FaImages glyph as the Visual Journey toggle in the
-   header — a deliberate echo so users connect "filmstrip icon =
-   photo lives here" between the header affordance and the calendar. */
+   White at 0.78 opacity matches the dash's tone exactly, so the two
+   read as siblings instead of competing signals. */
 .day-cell .day-cell-photo-glyph {
   position: absolute;
-  top: 22px;
-  left: 7px;
+  top: 6px;
+  right: 6px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: rgba(212, 175, 55, 0.92);
+  color: rgba(255, 255, 255, 0.78);
   pointer-events: none;
   line-height: 0;
   z-index: 1;
@@ -937,10 +939,20 @@
   height: 12px;
 }
 
+/* When a data-dash is present on the cell, push the photo glyph
+   down so they stack vertically in the right column instead of
+   competing for the same corner pixel. */
+.day-cell:has(.day-data-dash) .day-cell-photo-glyph {
+  top: 14px;
+}
+
 @media (max-width: 480px) {
   .day-cell .day-cell-photo-glyph {
-    top: 19px;
-    left: 5px;
+    top: 5px;
+    right: 5px;
+  }
+  .day-cell:has(.day-data-dash) .day-cell-photo-glyph {
+    top: 12px;
   }
   .day-cell .day-cell-photo-glyph svg {
     width: 10px;
