@@ -254,6 +254,24 @@
   }
 }
 
+/* Mobile-only crop shift for the Quiet Rain scene — landscape source has the
+   most iconic "anime night rain street" composition (receding stone path +
+   hanging red lanterns going into the distance + diamond banner cluster) in
+   the right portion of the frame. Default center-crop on mobile portrait
+   showed only the cluttered central shop facade (shoji + bunting + banner
+   text), losing the vanishing-point depth that makes the source memorable.
+   78% center shifts the visible window to source pixels ~996-1496:
+     - End of central shop building as left-of-frame anchor
+     - Hanging red lanterns receding into the street's vanishing point
+     - Wet stone reflections of the depth carry through to the bottom
+   Streak number lands over the deeper-street section instead of the
+   busy shop-front signage. Desktop landscape unchanged. */
+@media (max-width: 767px) {
+  .sanctum-video-backplate[data-scene="quietrain"] .sanctum-video {
+    object-position: 70% center;
+  }
+}
+
 /* Smoke bleeds through header and nav on Tracker tab */
 /* transition-duration: 0ms = instant on entering tracker */
 /* Base 400ms transition on .app-header/.mobile-nav handles smooth fade back on leaving */
