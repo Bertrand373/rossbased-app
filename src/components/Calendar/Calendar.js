@@ -21,6 +21,7 @@ import { getLunarData } from '../../utils/lunarData';
 import { readEntry, writeEntry, hasPhoto as hasJournalPhoto } from '../../utils/dayJournal';
 import { getPresignedUrl, invalidate as invalidatePhotoUrl } from '../../utils/photoUrl';
 import PhotoCaptureSheet from '../Photo/PhotoCaptureSheet';
+import PhotoLightbox from '../Photo/PhotoLightbox';
 import JourneyView from '../Photo/JourneyView';
 import '../Photo/Photo.css';
 
@@ -186,6 +187,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   // image is ready when the journal panel renders.
   const [selectedDayPhotoUrl, setSelectedDayPhotoUrl] = useState(null);
   const [showCalendarPhotoCapture, setShowCalendarPhotoCapture] = useState(false);
+  const [showPhotoLightbox, setShowPhotoLightbox] = useState(false);
 
   // Oracle Pin states
   const [pinnedDates, setPinnedDates] = useState(new Set());
@@ -711,6 +713,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setNoteText('');
     setSelectedDayPhotoUrl(null);
     setShowCalendarPhotoCapture(false);
+    setShowPhotoLightbox(false);
     setSheetView('info');
     setShowTriggerSelection(false);
     setEditingExistingTrigger(false);
@@ -1350,52 +1353,61 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           </div>
         ) : (
           <>
+            {/* Journal text — always rendered. Entry box when text exists,
+                empty-state prompt otherwise. Photo presence never hides
+                the text affordance (used to — that was a bug). */}
             {noteText ? (
               <div className="calendar-journal-entry" onClick={startEditingNote}>
                 {noteText}
               </div>
-            ) : !hasPhoto ? (
+            ) : (
               <div className="calendar-journal-empty" onClick={startEditingNote}>
                 <p>Tap to add a journal entry</p>
               </div>
-            ) : null}
+            )}
 
-            {hasPhoto && (
-              <div className="calendar-journal-photo">
+            {/* Photo — always rendered. Thumbnail if attached (tap to
+                expand into lightbox), empty-state prompt otherwise.
+                Empty-state styling intentionally matches
+                .calendar-journal-empty so the two prompts read as a
+                consistent pair. */}
+            {hasPhoto ? (
+              <div
+                className="calendar-journal-photo-thumb"
+                onClick={() => selectedDayPhotoUrl && setShowPhotoLightbox(true)}
+                role="button"
+                aria-label="Expand photo"
+              >
                 {selectedDayPhotoUrl ? (
                   <img src={selectedDayPhotoUrl} alt="Captured for this day" />
                 ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                    Loading…
-                  </div>
+                  <div className="calendar-journal-photo-loading">Loading…</div>
                 )}
                 <div className="calendar-journal-photo-actions">
                   <button
                     type="button"
                     className="calendar-journal-photo-action"
-                    onClick={() => setShowCalendarPhotoCapture(true)}
+                    onClick={(e) => { e.stopPropagation(); setShowCalendarPhotoCapture(true); }}
                   >
                     Replace
                   </button>
                   <button
                     type="button"
                     className="calendar-journal-photo-action"
-                    onClick={handleRemoveDayPhoto}
+                    onClick={(e) => { e.stopPropagation(); handleRemoveDayPhoto(); }}
                   >
                     Remove
                   </button>
                 </div>
               </div>
-            )}
-
-            {!hasPhoto && (
-              <button
-                type="button"
-                className="calendar-journal-add-photo"
+            ) : (
+              <div
+                className="calendar-journal-empty calendar-journal-photo-empty"
                 onClick={() => setShowCalendarPhotoCapture(true)}
+                role="button"
               >
-                + Attach a photo for this day
-              </button>
+                <p>Tap to attach a photo</p>
+              </div>
             )}
           </>
         )}
@@ -2560,6 +2572,16 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           onSaved={handleCalendarPhotoSaved}
         />
       )}
+
+      {/* Fullscreen photo viewer — tap the thumbnail to open. Outside the
+          sheet vocabulary on purpose: covers everything, no sheet chrome,
+          dismissed by tap-outside / X / Esc. */}
+      <PhotoLightbox
+        open={showPhotoLightbox && !!selectedDayPhotoUrl}
+        src={selectedDayPhotoUrl}
+        alt="Photo for this day"
+        onClose={() => setShowPhotoLightbox(false)}
+      />
     </div>
   );
 };
