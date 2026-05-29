@@ -23,6 +23,7 @@ import { getPresignedUrl, invalidate as invalidatePhotoUrl } from '../../utils/p
 import PhotoCaptureSheet from '../Photo/PhotoCaptureSheet';
 import PhotoLightbox from '../Photo/PhotoLightbox';
 import JourneyView from '../Photo/JourneyView';
+import ConfirmSheet from '../Shared/ConfirmSheet';
 import '../Photo/Photo.css';
 
 const API_URL_FOR_PHOTOS = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
@@ -188,6 +189,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [selectedDayPhotoUrl, setSelectedDayPhotoUrl] = useState(null);
   const [showCalendarPhotoCapture, setShowCalendarPhotoCapture] = useState(false);
   const [showPhotoLightbox, setShowPhotoLightbox] = useState(false);
+  const [showRemovePhotoConfirm, setShowRemovePhotoConfirm] = useState(false);
 
   // Oracle Pin states
   const [pinnedDates, setPinnedDates] = useState(new Set());
@@ -714,6 +716,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     setSelectedDayPhotoUrl(null);
     setShowCalendarPhotoCapture(false);
     setShowPhotoLightbox(false);
+    setShowRemovePhotoConfirm(false);
     setSheetView('info');
     setShowTriggerSelection(false);
     setEditingExistingTrigger(false);
@@ -1054,13 +1057,22 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   // Remove the photo attached to the currently-selected day. Hits the
   // server (which unlinks the journal entry server-side AND nukes the
   // bytes), then mirrors that into local userData so the UI updates
-  // immediately.
+  // immediately. Confirmation comes from ConfirmSheet (not window.confirm)
+  // so the prompt feels like part of the app, not native iOS.
+  const requestRemoveDayPhoto = () => {
+    if (!selectedDate) return;
+    const dayStr = format(selectedDate, 'yyyy-MM-dd');
+    const entry = readEntry(userData.notes, dayStr);
+    if (!entry.photoKey) return;
+    setShowRemovePhotoConfirm(true);
+  };
+
   const handleRemoveDayPhoto = async () => {
+    setShowRemovePhotoConfirm(false);
     if (!selectedDate || !updateUserData) return;
     const dayStr = format(selectedDate, 'yyyy-MM-dd');
     const entry = readEntry(userData.notes, dayStr);
     if (!entry.photoKey) return;
-    if (!window.confirm('Remove this day\'s photo? This cannot be undone.')) return;
     const keyToRemove = entry.photoKey;
 
     try {
@@ -1394,7 +1406,7 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
                   <button
                     type="button"
                     className="calendar-journal-photo-action"
-                    onClick={(e) => { e.stopPropagation(); handleRemoveDayPhoto(); }}
+                    onClick={(e) => { e.stopPropagation(); requestRemoveDayPhoto(); }}
                   >
                     Remove
                   </button>
@@ -2581,6 +2593,20 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
         src={selectedDayPhotoUrl}
         alt="Photo for this day"
         onClose={() => setShowPhotoLightbox(false)}
+      />
+
+      {/* Branded confirmation for photo removal — replaces the native
+          window.confirm() that read as iOS stock UI. Uses the same
+          .confirm-modal vocabulary as the Tracker reset prompt. */}
+      <ConfirmSheet
+        open={showRemovePhotoConfirm}
+        title="Remove this photo?"
+        message="It will be deleted permanently. This can't be undone."
+        confirmLabel="Remove"
+        cancelLabel="Keep"
+        tone="danger"
+        onConfirm={handleRemoveDayPhoto}
+        onCancel={() => setShowRemovePhotoConfirm(false)}
       />
     </div>
   );

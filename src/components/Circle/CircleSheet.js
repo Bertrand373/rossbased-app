@@ -19,6 +19,7 @@ import useSheetSwipe from '../../hooks/useSheetSwipe';
 import { useCircle } from '../../hooks/useCircle';
 import { resolveAvatar } from '../../utils/avatar';
 import CircleEmptySheet from './CircleEmptySheet';
+import ConfirmSheet from '../Shared/ConfirmSheet';
 import '../../styles/BottomSheet.css';
 import './Circle.css';
 
@@ -35,6 +36,7 @@ const CircleSheet = ({ open, onClose, viewerUsername, currentStreak }) => {
   const [noteDraft, setNoteDraft] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [showManage, setShowManage] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
   // Capture "started in empty flow" at open time. Without this, the
   // moment a user finishes Create (which populates `circle` in context),
@@ -140,9 +142,15 @@ const CircleSheet = ({ open, onClose, viewerUsername, currentStreak }) => {
     await handleCopyCode();
   };
 
-  const handleLeave = async () => {
+  // Show the branded confirmation sheet instead of native window.confirm.
+  const requestLeave = () => {
     if (submitting) return;
-    if (!window.confirm(`Leave "${circle.name}"? You can join another circle anytime.`)) return;
+    setShowLeaveConfirm(true);
+  };
+
+  const handleLeave = async () => {
+    setShowLeaveConfirm(false);
+    if (submitting) return;
     setSubmitting(true);
     try {
       await leave();
@@ -156,6 +164,21 @@ const CircleSheet = ({ open, onClose, viewerUsername, currentStreak }) => {
   };
 
   // ─── Portal ─────────────────────────────────────────────────────
+  // Leave confirmation rendered as a sibling portal so it sits above
+  // the main CircleSheet panel cleanly.
+  const leaveConfirm = (
+    <ConfirmSheet
+      open={showLeaveConfirm}
+      title="Leave this circle?"
+      message={circle ? `You can join another anytime — but "${circle.name}" continues without you.` : 'You can join another anytime.'}
+      confirmLabel="Leave"
+      cancelLabel="Stay"
+      tone="danger"
+      onConfirm={handleLeave}
+      onCancel={() => setShowLeaveConfirm(false)}
+    />
+  );
+
   return ReactDOM.createPortal(
     <div
       className={`sheet-backdrop${sheetReady ? ' open' : ''}`}
@@ -299,7 +322,7 @@ const CircleSheet = ({ open, onClose, viewerUsername, currentStreak }) => {
                   <p className="circle-manage-hint">Up to {circle.maxSize - circle.memberCount} more can join.</p>
                 )}
               </div>
-              <button type="button" className="circle-manage-leave" onClick={handleLeave} disabled={submitting}>
+              <button type="button" className="circle-manage-leave" onClick={requestLeave} disabled={submitting}>
                 Leave circle
               </button>
               <button type="button" className="circle-manage-close" onClick={() => setShowManage(false)}>
@@ -313,6 +336,7 @@ const CircleSheet = ({ open, onClose, viewerUsername, currentStreak }) => {
           )}
         </div>
       </div>
+      {leaveConfirm}
     </div>,
     document.body
   );
