@@ -97,18 +97,29 @@
 }
 
 /* ============================================================
-   CAPTURE SHEET
+   CAPTURE SHEET — custom in-app camera
+
+   Replaces the earlier file-input handoff to the iOS native camera
+   (which dropped users into an unbranded white loading screen).
+   This is a getUserMedia-driven live preview with a soft white
+   face-oval guide and an optional ghost overlay of the previous
+   photo for angle matching.
+
+   Vocabulary stays TitanTrack — white guide (NOT gold), restrained
+   typography in tracked caps, dark viewport, iconic round white
+   shutter as the only ornamental element. Gold is reserved for
+   milestone moments and never appears in routine capture UI.
    ============================================================ */
 
 .photo-capture-sheet {
-  max-height: 80vh;
+  max-height: 92vh;
   display: flex;
   flex-direction: column;
 }
 
 .photo-capture-headline {
   flex-shrink: 0;
-  padding: 0 4px 14px;
+  padding: 0 4px 12px;
   text-align: center;
 }
 
@@ -118,52 +129,258 @@
   padding: 0 4px 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 18px;
   align-items: center;
 }
 
-.photo-capture-sub {
-  font-size: 0.9375rem;
-  color: var(--text-secondary);
-  text-align: center;
-  line-height: 1.5;
-  margin: 4px 12px 0;
-  letter-spacing: 0.005em;
-}
-
-.photo-capture-guidance {
+/* The 3:4 portrait viewport — every phase (live, review, denied,
+   error, uploading) renders inside this same container so the
+   surrounding sheet never jumps in size. Black background reads as
+   a real camera frame and reduces eye strain in low light. */
+.capture-viewport {
   position: relative;
   width: 100%;
-  max-width: 260px;
+  max-width: 320px;
   aspect-ratio: 3 / 4;
-  background: var(--surface-overlay);
-  border-radius: 14px;
+  background: #0a0a0a;
+  border-radius: 18px;
   overflow: hidden;
   border: 1px solid var(--border-subtle);
-  margin-top: 4px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 18px 44px rgba(0, 0, 0, 0.45);
+  flex-shrink: 0;
 }
 
-.photo-capture-guidance img {
+.capture-video {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  /* Mirror the preview so left = left for the user. The snapshot
+     itself is also mirrored in the canvas write to match. */
+  transform: scaleX(-1);
+  /* Hidden until the stream is actually live to avoid a green flash
+     on some Safari versions during permission warm-up. */
+  opacity: 0;
+  transition: opacity 220ms ease;
 }
 
-.photo-capture-guidance-label {
+.capture-video.is-active {
+  opacity: 1;
+}
+
+/* Ghost overlay — previous photo at very low opacity, behind the
+   guide. Only rendered when the user opts in via the toggle below. */
+.capture-ghost {
   position: absolute;
-  top: 10px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.22;
+  pointer-events: none;
+  /* Mirror to match the live preview's orientation */
+  transform: scaleX(-1);
+}
+
+/* Face guide oval — thin restrained white stroke. NOT gold (gold
+   is reserved for milestone moments). Soft outer glow gives it
+   premium depth without shouting. Centered slightly above middle
+   to leave room for the shutter affordance below. */
+.capture-guide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.capture-guide ellipse {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 1.25;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.18));
+  /* Very slow breathing animation — premium polish without
+     becoming distracting. */
+  animation: captureGuidePulse 4200ms ease-in-out infinite;
+}
+
+@keyframes captureGuidePulse {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 1; }
+}
+
+/* Live instruction — tracked-caps, bottom of viewport. Quiet. */
+.capture-instruction {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.capture-instruction-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+/* Ghost-overlay toggle — discreet pill, top-left of viewport.
+   "Show last shot" reveals the previous photo at low opacity for
+   angle matching; "Hide guide" turns it off. White only, no gold. */
+.capture-ghost-toggle {
+  position: absolute;
+  top: 12px;
   left: 12px;
+  appearance: none;
+  font-family: inherit;
   font-size: 0.5625rem;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.85);
-  background: rgba(0, 0, 0, 0.4);
-  padding: 4px 8px;
-  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.42);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 5px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.capture-ghost-toggle:hover {
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+.capture-ghost-toggle.is-on {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Review snapshot fills the viewport */
+.capture-review-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Status overlays — preparing / denied / error / uploading. Sit
+   centered on top of the black viewport, dim the camera if mid-
+   stream, read as restrained TitanTrack typography. */
+.capture-status {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px 24px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.capture-status-uploading {
+  background: rgba(0, 0, 0, 0.78);
+}
+
+.capture-status-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.capture-status-eyebrow {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.capture-status-message {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.5;
+  margin: 0;
+  max-width: 240px;
+}
+
+/* Bottom control area — for live phase, holds the round white
+   shutter. Centered with breathing room above and below so the
+   shutter feels like a deliberate moment, not a wedged button. */
+.capture-controls {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0 8px;
+}
+
+/* Iconic round white shutter — the universal capture vocabulary.
+   Only ornamental element in the entire flow. White outer ring,
+   white inner disc, scales down on press. */
+.capture-shutter {
+  appearance: none;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: transparent;
+  border: 2.5px solid rgba(255, 255, 255, 0.92);
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: transform 120ms ease, border-color 200ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.capture-shutter:hover {
+  border-color: #fff;
+}
+
+.capture-shutter:active {
+  transform: scale(0.94);
+}
+
+.capture-shutter-inner {
+  display: block;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  transition: transform 120ms ease, background-color 150ms ease;
+}
+
+.capture-shutter:active .capture-shutter-inner {
+  transform: scale(0.88);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.capture-shutter:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 4px;
 }
 
 .photo-capture-actions {
