@@ -640,15 +640,37 @@
    CALENDAR DAY-CELL PHOTO INDICATOR
    ============================================================ */
 
-.day-cell .day-cell-photo-dot {
+/* Day-cell photo indicator. Replaces the earlier 6px gold dot with
+   a small FaImages glyph — same icon used by the Visual Journey
+   toggle in the calendar header, so the visual vocabulary stays
+   consistent across surfaces. Gold-tinted, sits in the bottom-right
+   corner mirroring where the workout glyph sits (bottom-left). */
+.day-cell .day-cell-photo-glyph {
   position: absolute;
   bottom: 6px;
   right: 6px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(212, 175, 55, 0.7);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(212, 175, 55, 0.78);
   pointer-events: none;
+  line-height: 0;
+}
+
+.day-cell .day-cell-photo-glyph svg {
+  width: 11px;
+  height: 11px;
+}
+
+@media (max-width: 480px) {
+  .day-cell .day-cell-photo-glyph {
+    bottom: 5px;
+    right: 5px;
+  }
+  .day-cell .day-cell-photo-glyph svg {
+    width: 9px;
+    height: 9px;
+  }
 }
 
 /* ============================================================

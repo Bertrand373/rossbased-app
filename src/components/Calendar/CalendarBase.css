@@ -141,40 +141,34 @@
   touch-action: manipulation;
 }
 
-/* Lock ancestors when month view is active */
-.app-content:has(.calendar-display) {
+/* Lock ancestors when ANY calendar view is active — Month, Week,
+   and Visual Journey. Without these, the page itself scrolls when
+   the journey grid fills the viewport, which breaks the app-wide
+   "everything fits, nothing scrolls" rhythm. The grid still keeps
+   its own internal `overflow-y: auto` as a fallback for the rare
+   user with hundreds of photos in a single phase. */
+.app-content:has(.calendar-display),
+.app-content:has(.week-view-grid),
+.app-content:has(.journey-view) {
   overflow: hidden !important;
   overscroll-behavior: none;
   touch-action: manipulation;
 }
 
-.main-content-wrapper:has(.calendar-display) {
+.main-content-wrapper:has(.calendar-display),
+.main-content-wrapper:has(.week-view-grid),
+.main-content-wrapper:has(.journey-view) {
   overflow: hidden !important;
   overscroll-behavior: none;
   touch-action: manipulation;
 }
 
 html:has(.calendar-display),
-body:has(.calendar-display) {
-  overflow: hidden !important;
-  overscroll-behavior: none;
-}
-
-/* Lock ancestors when week view is active — same as month view */
-.app-content:has(.week-view-grid) {
-  overflow: hidden !important;
-  overscroll-behavior: none;
-  touch-action: manipulation;
-}
-
-.main-content-wrapper:has(.week-view-grid) {
-  overflow: hidden !important;
-  overscroll-behavior: none;
-  touch-action: manipulation;
-}
-
 html:has(.week-view-grid),
-body:has(.week-view-grid) {
+html:has(.journey-view),
+body:has(.calendar-display),
+body:has(.week-view-grid),
+body:has(.journey-view) {
   overflow: hidden !important;
   overscroll-behavior: none;
 }

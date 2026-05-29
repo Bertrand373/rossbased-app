@@ -48,24 +48,47 @@ export const MILESTONE_TITLE = {
 };
 
 // Phases of the Visual Journey — each is a swipeable "chapter" in
-// the photo grid. Boundaries align with MILESTONE_DAYS so the gold
-// milestone celebration always lives inside the phase it earned.
-// "Baseline" is the foundational phase before any milestone has
-// been reached.
+// the photo grid. The first six phases are fixed (Baseline through
+// Half a Year) and align with MILESTONE_DAYS so the gold milestone
+// celebration always lives inside the phase it earned. Beyond Day
+// 364 we generate one phase per year ("Year One", "Year Two", ...)
+// so long-term users (e.g. Day 2602 = Year Seven) get a meaningful
+// chapter label rather than being lumped into a single "365+" bucket.
 export const JOURNEY_PHASES = [
   { id: 'baseline',  name: 'Baseline',     startDay: 1,   endDay: 6 },
   { id: 'week',      name: 'One Week',     startDay: 7,   endDay: 29 },
   { id: 'month',     name: 'First Month',  startDay: 30,  endDay: 59 },
   { id: 'twomonths', name: 'Two Months',   startDay: 60,  endDay: 89 },
   { id: 'ninety',    name: 'Ninety Days',  startDay: 90,  endDay: 179 },
-  { id: 'halfyear',  name: 'Half a Year',  startDay: 180, endDay: 364 },
-  { id: 'year',      name: 'One Year',     startDay: 365, endDay: Infinity }
+  { id: 'halfyear',  name: 'Half a Year',  startDay: 180, endDay: 364 }
 ];
 
-/** Find the phase a given streak-day-number belongs to. */
+const YEAR_ORDINALS = [
+  null, 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven',
+  'Eight', 'Nine', 'Ten'
+];
+
+/**
+ * Find the phase a given streak-day-number belongs to.
+ *
+ * Days 1–364 fall into one of the six named milestone phases above.
+ * Day 365+ are bucketed into year phases — Year One covers Day
+ * 365–729 (the celebratory year that begins at the One Year mark),
+ * Year Two covers 730–1094, and so on. For year 11+ we drop the
+ * ordinal word and just use the numeral ("Year 11", "Year 12").
+ */
 export function phaseForDay(dayNumber) {
-  return JOURNEY_PHASES.find(p => dayNumber >= p.startDay && dayNumber <= p.endDay)
-    || JOURNEY_PHASES[0];
+  for (const p of JOURNEY_PHASES) {
+    if (dayNumber >= p.startDay && dayNumber <= p.endDay) return p;
+  }
+  // Year-based phase. Day 365 -> Year One, Day 730 -> Year Two, etc.
+  // Year N covers days [N*365, (N+1)*365 - 1].
+  const year = Math.floor(dayNumber / 365);
+  const startDay = year * 365;
+  const endDay = (year + 1) * 365 - 1;
+  const ordinal = YEAR_ORDINALS[year];
+  const name = ordinal ? `Year ${ordinal}` : `Year ${year}`;
+  return { id: `year${year}`, name, startDay, endDay };
 }
 
 /**
