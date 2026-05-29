@@ -7,6 +7,11 @@
 // gold reserved for milestones) so it reads as the photographic
 // companion to the calendar — not a separate "feed."
 //
+// Pagination is driven by Calendar (the parent owns phase state). This
+// component receives the current phase's photos as a prop, and re-runs
+// its stagger entrance whenever the phase key changes — so swiping
+// between Baseline → One Week → First Month feels like turning chapters.
+//
 // Each cell is a portrait photo with a small Day chip in the bottom-
 // left corner. Milestone days (7/30/60/90/180/365) get a gold ✦ in the
 // top-right and a gold-tinted day chip. Tap any cell to open the
@@ -17,36 +22,11 @@
 // "before X relapse" photo IS the most valuable photo they own.
 
 import React, { useEffect, useState } from 'react';
-import { parseISO } from 'date-fns';
-import { listPhotoEntries } from '../../utils/dayJournal';
 import { getPresignedUrl } from '../../utils/photoUrl';
 import { MILESTONE_DAYS } from './MilestoneSheet';
 import PhotoLightbox from './PhotoLightbox';
 
 const MILESTONE_SET = new Set(MILESTONE_DAYS);
-
-/**
- * Compute the streak-day-count for a given dayStr relative to the
- * user's start date and any relapse history. Falls back to absolute
- * order if streakHistory is missing.
- */
-function dayCountFor(dayStr, userData, index) {
-  const history = userData?.streakHistory || [];
-  const dayDate = parseISO(dayStr);
-
-  for (const seg of history) {
-    if (!seg.start) continue;
-    const start = typeof seg.start === 'string' ? parseISO(seg.start) : new Date(seg.start);
-    const end = seg.end
-      ? (typeof seg.end === 'string' ? parseISO(seg.end) : new Date(seg.end))
-      : new Date();
-    if (dayDate >= start && dayDate <= end) {
-      const diff = Math.floor((dayDate - start) / (1000 * 60 * 60 * 24)) + 1;
-      return Math.max(1, diff);
-    }
-  }
-  return index + 1;
-}
 
 const JourneyCell = ({ entry, dayNumber, isMilestone, cellIndex, onOpen }) => {
   const [url, setUrl] = useState(null);
@@ -77,10 +57,14 @@ const JourneyCell = ({ entry, dayNumber, isMilestone, cellIndex, onOpen }) => {
   );
 };
 
-const JourneyView = ({ userData, onAddFirstPhoto }) => {
-  const photos = listPhotoEntries(userData?.notes);
+const JourneyView = ({ phasePhotos, phaseKey, onAddFirstPhoto }) => {
+  const photos = phasePhotos || [];
   const [lightboxState, setLightboxState] = useState({ open: false, url: null });
 
+  // Empty state — only reached when the user has no photos at all.
+  // Phases with zero photos are filtered out by the parent before
+  // they reach this component, so an empty phasePhotos here means
+  // userData has no captured photos yet.
   if (photos.length === 0) {
     return (
       <div className="journey-view journey-empty" data-no-swipe>
@@ -100,9 +84,11 @@ const JourneyView = ({ userData, onAddFirstPhoto }) => {
 
   return (
     <>
-      <div className="journey-view" data-no-swipe>
+      {/* phaseKey on the grid re-mounts cells when the phase changes so
+          the stagger entrance plays fresh on each chapter swipe. */}
+      <div className="journey-view" data-no-swipe key={phaseKey}>
         {photos.map((entry, i) => {
-          const dayNumber = dayCountFor(entry.dayStr, userData, i);
+          const dayNumber = entry.dayNumber;
           const isMilestone = MILESTONE_SET.has(dayNumber);
           return (
             <JourneyCell

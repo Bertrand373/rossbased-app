@@ -47,6 +47,27 @@ export const MILESTONE_TITLE = {
   365: 'One Year'
 };
 
+// Phases of the Visual Journey — each is a swipeable "chapter" in
+// the photo grid. Boundaries align with MILESTONE_DAYS so the gold
+// milestone celebration always lives inside the phase it earned.
+// "Baseline" is the foundational phase before any milestone has
+// been reached.
+export const JOURNEY_PHASES = [
+  { id: 'baseline',  name: 'Baseline',     startDay: 1,   endDay: 6 },
+  { id: 'week',      name: 'One Week',     startDay: 7,   endDay: 29 },
+  { id: 'month',     name: 'First Month',  startDay: 30,  endDay: 59 },
+  { id: 'twomonths', name: 'Two Months',   startDay: 60,  endDay: 89 },
+  { id: 'ninety',    name: 'Ninety Days',  startDay: 90,  endDay: 179 },
+  { id: 'halfyear',  name: 'Half a Year',  startDay: 180, endDay: 364 },
+  { id: 'year',      name: 'One Year',     startDay: 365, endDay: Infinity }
+];
+
+/** Find the phase a given streak-day-number belongs to. */
+export function phaseForDay(dayNumber) {
+  return JOURNEY_PHASES.find(p => dayNumber >= p.startDay && dayNumber <= p.endDay)
+    || JOURNEY_PHASES[0];
+}
+
 /**
  * Compute the next un-celebrated milestone the user qualifies for.
  * Returns null if there isn't one to celebrate right now.

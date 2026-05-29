@@ -242,6 +242,15 @@ body:has(.week-view-grid) {
   color: var(--text);
 }
 
+/* Disabled arrow — used at the first/last phase of the Visual Journey
+   so the user can see the boundary without the arrow disappearing. */
+.period-arrow.is-disabled,
+.period-arrow:disabled {
+  opacity: 0.25;
+  cursor: default;
+  pointer-events: none;
+}
+
 .period-arrow svg {
   width: 12px;
   height: 12px;
