@@ -640,36 +640,51 @@
    CALENDAR DAY-CELL PHOTO INDICATOR
    ============================================================ */
 
-/* Day-cell photo indicator. Replaces the earlier 6px gold dot with
-   a small FaImages glyph — same icon used by the Visual Journey
-   toggle in the calendar header, so the visual vocabulary stays
-   consistent across surfaces. Gold-tinted, sits in the bottom-right
-   corner mirroring where the workout glyph sits (bottom-left). */
+/* Day-cell photo indicator. Sits in the top-right area of the cell,
+   to the LEFT of the data-dash so it doesn't collide with the
+   bottom-right moon-phase indicator (which it did when positioned
+   bottom-right; the moon's z-index 2 was painting over it).
+
+   Uses the same FaImages glyph as the Visual Journey toggle in the
+   header — a deliberate echo so users connect "filmstrip icon =
+   photo lives here" between the header affordance and the calendar
+   cells. Gold-tinted, sized slightly larger than the data-dash so
+   it reads as the primary indicator on photo days. */
 .day-cell .day-cell-photo-glyph {
   position: absolute;
-  bottom: 6px;
-  right: 6px;
+  top: 5px;
+  right: 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: rgba(212, 175, 55, 0.78);
+  color: rgba(212, 175, 55, 0.92);
   pointer-events: none;
   line-height: 0;
+  z-index: 1;
 }
 
 .day-cell .day-cell-photo-glyph svg {
-  width: 11px;
-  height: 11px;
+  width: 12px;
+  height: 12px;
+}
+
+/* When no data-dash is present (untracked day with a photo), pull
+   the glyph back into the corner so it doesn't read as floating. */
+.day-cell:not(:has(.day-data-dash)) .day-cell-photo-glyph {
+  right: 6px;
 }
 
 @media (max-width: 480px) {
   .day-cell .day-cell-photo-glyph {
-    bottom: 5px;
+    top: 4px;
+    right: 18px;
+  }
+  .day-cell:not(:has(.day-data-dash)) .day-cell-photo-glyph {
     right: 5px;
   }
   .day-cell .day-cell-photo-glyph svg {
-    width: 9px;
-    height: 9px;
+    width: 10px;
+    height: 10px;
   }
 }
 
