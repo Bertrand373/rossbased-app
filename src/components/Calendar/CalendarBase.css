@@ -127,8 +127,14 @@
   border-bottom: 1px solid var(--border-subtle);
 }
 
-/* Month view: no container top gap, prevent scroll at all levels */
-.calendar-container:has(.calendar-display) {
+/* All calendar views: no container top gap, prevent scroll at all
+   levels. Covers Month (.calendar-display), Week (.week-view-grid),
+   and Journey (.journey-view) so the calendar-header-minimal sits
+   flush against the top nav in every mode — preserving visual
+   congruence with the eyebrow rows in Tracker/Stats. */
+.calendar-container:has(.calendar-display),
+.calendar-container:has(.week-view-grid),
+.calendar-container:has(.journey-view) {
   padding-top: 0;
   overflow: hidden !important;
   overscroll-behavior: none;
@@ -212,14 +218,16 @@ body:has(.week-view-grid) {
   letter-spacing: 0.02em;
 }
 
-/* Subtle arrow buttons */
+/* Subtle arrow buttons — padding sized so the arrow's intrinsic
+   height matches the toggle option's, keeping the header row tight
+   and visually congruent with the eyebrow rows in Tracker/Stats. */
 .period-arrow {
   background: transparent;
   border: none;
   color: var(--text-tertiary);
   font-size: 0.75rem;
   cursor: pointer;
-  padding: 12px;
+  padding: 8px;
   transition: color 200ms ease;
   display: flex;
   align-items: center;
@@ -294,62 +302,42 @@ body:has(.week-view-grid) {
   color: var(--text);
 }
 
-/* Journey toggle icon — sibling of the gear, sits in the view-toggle
-   group. Inactive: ghost outline circle matching the tracker camera
-   button language. Active (Journey mode): solid neutral fill so it
-   reads as a third "tab" without crowding the Month|Week binary. */
+/* Journey toggle icon — flush sibling of the gear button. No fixed
+   width/height and no background ring; sizing comes from the icon +
+   padding so the whole header row stays the same intrinsic height as
+   in Tracker/Stats (visual congruence across tabs). Active state is
+   carried by color weight, not by a filled chip. */
 .journey-toggle-icon {
   appearance: none;
   background: transparent;
   border: none;
   cursor: pointer;
-  margin-left: 6px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+  margin-left: 4px;
+  padding: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  position: relative;
   color: var(--text-tertiary);
-  transition: color 180ms ease, background-color 180ms ease, transform 150ms ease;
+  font-size: 0.75rem;
+  transition: color 150ms ease;
   -webkit-tap-highlight-color: transparent;
-}
-
-.journey-toggle-icon::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 1px solid var(--border-subtle);
-  pointer-events: none;
-  transition: border-color 180ms ease;
 }
 
 .journey-toggle-icon:hover {
   color: var(--text-secondary);
 }
 
-.journey-toggle-icon:hover::after {
-  border-color: var(--border);
-}
-
 .journey-toggle-icon:active {
-  transform: scale(0.94);
+  color: var(--text);
 }
 
 .journey-toggle-icon.active {
   color: var(--text);
-  background: var(--surface-overlay);
-}
-
-.journey-toggle-icon.active::after {
-  border-color: var(--border-prominent);
 }
 
 .journey-toggle-icon svg {
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
 }
 
 /* Journey-mode header — period display becomes a static identity card.
@@ -1268,19 +1256,24 @@ body:has(.week-view-grid) {
     max-width: 1400px;
   }
   
-  /* Minimal header - desktop */
+  /* Minimal header - desktop. Vertical padding matches the
+     tracker-meta-strip's 10px so the calendar's first content row
+     sits at the same y as the eyebrow row on Tracker/Stats. */
   .calendar-header-minimal {
     gap: 20px;
     margin-bottom: 8px;
-    padding: 0 12px;
+    padding: 10px 12px;
   }
-  
+
+  /* Period month at desktop — kept at the base 1.125rem (instead of
+     bumping to 1.375rem) so the calendar header's content height stays
+     close to the Tracker eyebrow's, preserving visual congruence. */
   .period-month {
-    font-size: 1.375rem;
+    font-size: 1.125rem;
   }
-  
+
   .period-year {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
   }
   
   .toggle-option {
