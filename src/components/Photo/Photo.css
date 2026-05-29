@@ -97,18 +97,33 @@
 }
 
 /* ============================================================
-   CAPTURE SHEET
+   CAPTURE SHEET — custom in-app camera (v2)
+
+   Replaces the file-input handoff to iOS native camera. v1 of this
+   (PR #112, reverted in #113) had two iOS Safari bugs: srcObject
+   was attached inside an async useEffect (out of user-activation
+   window) and there was no explicit .play() call. Net result: cam
+   permission granted but preview stayed black.
+
+   v2 fixes both via a "Tap to start camera" gate — getUserMedia and
+   .play() both fire inside the same tap handler, preserving Safari's
+   user-activation context.
+
+   Vocabulary stays TitanTrack — white face guide (NOT gold, gold is
+   reserved for milestone moments and would dilute its meaning if used
+   on routine capture chrome), tracked-caps copy, iconic round white
+   shutter as the only ornamental element.
    ============================================================ */
 
 .photo-capture-sheet {
-  max-height: 80vh;
+  max-height: 92vh;
   display: flex;
   flex-direction: column;
 }
 
 .photo-capture-headline {
   flex-shrink: 0;
-  padding: 0 4px 14px;
+  padding: 0 4px 12px;
   text-align: center;
 }
 
@@ -118,52 +133,304 @@
   padding: 0 4px 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 18px;
   align-items: center;
 }
 
-.photo-capture-sub {
-  font-size: 0.9375rem;
-  color: var(--text-secondary);
-  text-align: center;
-  line-height: 1.5;
-  margin: 4px 12px 0;
-  letter-spacing: 0.005em;
-}
-
-.photo-capture-guidance {
+/* The 3:4 portrait viewport — every phase (ready, starting, live,
+   review, denied, error, uploading) renders inside this container
+   so the surrounding sheet never jumps in size. Black background
+   reads as a real camera frame. */
+.capture-viewport {
   position: relative;
   width: 100%;
-  max-width: 260px;
+  max-width: 320px;
   aspect-ratio: 3 / 4;
-  background: var(--surface-overlay);
-  border-radius: 14px;
+  background: #0a0a0a;
+  border-radius: 18px;
   overflow: hidden;
   border: 1px solid var(--border-subtle);
-  margin-top: 4px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 18px 44px rgba(0, 0, 0, 0.45);
+  flex-shrink: 0;
 }
 
-.photo-capture-guidance img {
+.capture-video {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  /* Mirror the preview so left = left for the user. The snapshot
+     itself is also mirrored in the canvas write to match. */
+  transform: scaleX(-1);
+  /* Hidden until phase=LIVE so we don't show a green/black flash on
+     iOS Safari during the brief window between stream-attach and
+     first frame. */
+  opacity: 0;
+  transition: opacity 220ms ease;
 }
 
-.photo-capture-guidance-label {
+.capture-video.is-active {
+  opacity: 1;
+}
+
+/* Ghost overlay — previous photo at very low opacity, behind the
+   guide. Only rendered when the user opts in via the toggle. */
+.capture-ghost {
   position: absolute;
-  top: 10px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.22;
+  pointer-events: none;
+  transform: scaleX(-1);
+}
+
+/* Face guide oval — thin restrained white stroke. NOT gold (gold
+   is reserved for milestone moments). Soft outer glow gives it
+   depth without shouting. Centered slightly above middle to leave
+   room for the shutter affordance below. */
+.capture-guide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.capture-guide ellipse {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.55);
+  stroke-width: 1.25;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.18));
+  animation: captureGuidePulse 4200ms ease-in-out infinite;
+}
+
+@keyframes captureGuidePulse {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 1; }
+}
+
+/* Ready state — sits centered over the dark viewport with the face
+   oval visible behind it as a placeholder. The button's tap is what
+   fires getUserMedia, preserving Safari user activation. */
+.capture-ready {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 24px 28px;
+}
+
+.capture-start-btn {
+  appearance: none;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  padding: 11px 22px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.capture-start-btn:hover {
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.capture-start-btn:active {
+  transform: scale(0.98);
+}
+
+.capture-ready-sub {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 0 16px;
+  max-width: 320px;
+}
+
+.capture-ready-sub-label {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  letter-spacing: 0.005em;
+}
+
+/* Live instruction chip — tracked-caps pill, bottom-center */
+.capture-instruction {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.capture-instruction-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+/* Ghost-overlay toggle — discreet pill, top-left of viewport */
+.capture-ghost-toggle {
+  position: absolute;
+  top: 12px;
   left: 12px;
+  appearance: none;
+  font-family: inherit;
   font-size: 0.5625rem;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.85);
-  background: rgba(0, 0, 0, 0.4);
-  padding: 4px 8px;
-  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.42);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 5px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.capture-ghost-toggle:hover {
+  border-color: rgba(255, 255, 255, 0.32);
+}
+
+.capture-ghost-toggle.is-on {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Review snapshot fills the viewport */
+.capture-review-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Status overlays — starting / denied / error / uploading. Centered
+   over the viewport with restrained TitanTrack typography. */
+.capture-status {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px 24px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.capture-status-uploading {
+  background: rgba(0, 0, 0, 0.78);
+}
+
+.capture-status-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.capture-status-eyebrow {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.capture-status-message {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.5;
+  margin: 0;
+  max-width: 240px;
+}
+
+/* Bottom control area — holds the round white shutter in live phase */
+.capture-controls {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0 8px;
+}
+
+/* Iconic round white shutter — universal capture vocabulary, the
+   only ornamental element in the entire flow. */
+.capture-shutter {
+  appearance: none;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: transparent;
+  border: 2.5px solid rgba(255, 255, 255, 0.92);
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: transform 120ms ease, border-color 200ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.capture-shutter:hover {
+  border-color: #fff;
+}
+
+.capture-shutter:active {
+  transform: scale(0.94);
+}
+
+.capture-shutter-inner {
+  display: block;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  transition: transform 120ms ease, background-color 150ms ease;
+}
+
+.capture-shutter:active .capture-shutter-inner {
+  transform: scale(0.88);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.capture-shutter:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 4px;
 }
 
 .photo-capture-actions {
