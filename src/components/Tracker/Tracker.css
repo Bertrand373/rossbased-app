@@ -137,6 +137,48 @@
   );
 }
 
+.sanctum-video-backplate[data-scene="bluehour"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  /* Shinkai night-street composition — deep blue sky upper half, vanishing-
+     point street center, empty road lower half. The brightest tiny spot is
+     the distant traffic light at the vanishing point — small enough that
+     it doesn't need overlay help. Heaviest dim across the middle band where
+     the streak number lands (over the road's horizon line). Lighter at top
+     (already dim blue sky) and bottom (empty asphalt — naturally darker). */
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.38) 0%,
+    rgba(0, 0, 0, 0.55) 42%,
+    rgba(0, 0, 0, 0.48) 70%,
+    rgba(0, 0, 0, 0.40) 100%
+  );
+}
+
+.sanctum-video-backplate[data-scene="quietrain"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  /* Japanese rain street composition — visually busy with red lanterns,
+     banners, traditional shopfronts. Brightest spots: hanging chōchin
+     lanterns (warm red) scattered through the middle band, wet stone path
+     in lower half (reflective grey-blue). Sustained heavier dim through
+     the middle to tame the lantern + sign chaos under the streak number;
+     bottom kept moderate so the wet-stone reflections still glow through. */
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.50) 0%,
+    rgba(0, 0, 0, 0.65) 40%,
+    rgba(0, 0, 0, 0.60) 70%,
+    rgba(0, 0, 0, 0.48) 100%
+  );
+}
+
 /* ===========================================================================
    LIGHT-MODE VIDEO OVERLAYS
    ===========================================================================
@@ -173,6 +215,26 @@
     rgba(244, 237, 224, 0.65) 40%,
     rgba(244, 237, 224, 0.55) 70%,
     rgba(244, 237, 224, 0.48) 100%
+  );
+}
+
+[data-theme="light"] .sanctum-video-backplate[data-scene="bluehour"]::after {
+  background: linear-gradient(
+    180deg,
+    rgba(244, 237, 224, 0.45) 0%,
+    rgba(244, 237, 224, 0.62) 42%,
+    rgba(244, 237, 224, 0.55) 70%,
+    rgba(244, 237, 224, 0.48) 100%
+  );
+}
+
+[data-theme="light"] .sanctum-video-backplate[data-scene="quietrain"]::after {
+  background: linear-gradient(
+    180deg,
+    rgba(244, 237, 224, 0.55) 0%,
+    rgba(244, 237, 224, 0.70) 40%,
+    rgba(244, 237, 224, 0.65) 70%,
+    rgba(244, 237, 224, 0.55) 100%
   );
 }
 
@@ -545,6 +607,39 @@
   flex-direction: column;
   gap: 4px;
   margin-bottom: 12px;
+  /* Scrollable with fade edges — kicks in naturally when the list grows past
+     the cap. iOS Mail / Notes / Settings pattern: soft fade at top + bottom
+     of the visible scroll area hints "there's more above/below" without
+     needing a visible scrollbar. Stays scrollable on iOS via momentum touch. */
+  max-height: min(58vh, 360px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  /* 18px soft fade at top + bottom of the scroll viewport. The mask hides
+     the scene rows that are scrolled off-view by fading them out before they
+     touch the container edge. */
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0,
+    #000 18px,
+    #000 calc(100% - 18px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0,
+    #000 18px,
+    #000 calc(100% - 18px),
+    transparent 100%
+  );
+  /* Hide the scrollbar — the fade IS the affordance. WebKit hides via the
+     pseudo-element, Firefox via the property. */
+  scrollbar-width: none;
+}
+.scene-picker-list::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 /* Each option behaves like a pill-shaped sheet button — label + tag stacked,
