@@ -640,20 +640,22 @@
    CALENDAR DAY-CELL PHOTO INDICATOR
    ============================================================ */
 
-/* Day-cell photo indicator. Sits in the top-right area of the cell,
-   to the LEFT of the data-dash so it doesn't collide with the
-   bottom-right moon-phase indicator (which it did when positioned
-   bottom-right; the moon's z-index 2 was painting over it).
+/* Day-cell photo indicator. Tucked DIRECTLY UNDER the day number —
+   the one spot on the cell that's free even when every other
+   indicator fires (data-dash top-right, workout bottom-left, moon
+   bottom-right, oracle pin centered watermark, day number top-left).
+
+   The L-shaped visual cluster (number + glyph stacked vertically)
+   reads as "Day 29 has a photo" and never competes with another
+   indicator's space.
 
    Uses the same FaImages glyph as the Visual Journey toggle in the
    header — a deliberate echo so users connect "filmstrip icon =
-   photo lives here" between the header affordance and the calendar
-   cells. Gold-tinted, sized slightly larger than the data-dash so
-   it reads as the primary indicator on photo days. */
+   photo lives here" between the header affordance and the calendar. */
 .day-cell .day-cell-photo-glyph {
   position: absolute;
-  top: 5px;
-  right: 20px;
+  top: 22px;
+  left: 7px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -668,19 +670,10 @@
   height: 12px;
 }
 
-/* When no data-dash is present (untracked day with a photo), pull
-   the glyph back into the corner so it doesn't read as floating. */
-.day-cell:not(:has(.day-data-dash)) .day-cell-photo-glyph {
-  right: 6px;
-}
-
 @media (max-width: 480px) {
   .day-cell .day-cell-photo-glyph {
-    top: 4px;
-    right: 18px;
-  }
-  .day-cell:not(:has(.day-data-dash)) .day-cell-photo-glyph {
-    right: 5px;
+    top: 19px;
+    left: 5px;
   }
   .day-cell .day-cell-photo-glyph svg {
     width: 10px;
