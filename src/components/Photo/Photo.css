@@ -204,100 +204,477 @@
 }
 
 /* ============================================================
-   JOURNEY VIEW (Calendar toggle)
+   VISUAL JOURNEY — editorial photo spread
+
+   Architecture: single centered column. Each entry is a "page" —
+   photo as hero, day-count + date caption beneath in magazine style,
+   optional note in italic. Milestones (Day 7/30/60/90/180/365) get
+   a gold eyebrow naming the moment ("Milestone · Day 30 — First
+   Month"), an inset gold glow on the photo, and extra breathing
+   room above so they read as chapter marks.
+
+   Spacing rhythm is intentionally generous — 56px between entries,
+   80px above milestones. This is the user's most personal record;
+   it should read like a coffee-table book, not a feed.
+
+   Entrance is staggered via --row-i (capped at 12 to keep long
+   strips feeling tight). Hero strip enters first.
    ============================================================ */
 
 .journey-view {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 12px 16px 40px;
+  align-items: center;
+  gap: 56px;
+  padding: 4px 20px 72px;
   overflow-y: auto;
+  /* Fill the calendar-main-section so the inner scroll has a bounded
+     height to scroll against, rather than the page scrolling. */
+  flex: 1;
+  min-height: 0;
 }
 
-.journey-empty {
-  text-align: center;
-  padding: 60px 24px;
-  color: var(--text-muted);
-  font-size: 0.9375rem;
-  line-height: 1.5;
-}
+/* ----- Hero strip: the journey arc "Day 1 → Day N" ----- */
 
-.journey-empty-cta {
-  margin-top: 16px;
-}
-
-.journey-row {
-  display: grid;
-  grid-template-columns: 60px 1fr;
-  gap: 16px;
-  align-items: start;
+.journey-hero {
+  width: 100%;
+  max-width: 440px;
+  padding: 28px 0 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 36px;
   opacity: 0;
-  animation: journeyRowIn 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: journeyHeroIn 520ms cubic-bezier(0.16, 1, 0.3, 1) 60ms forwards;
 }
 
-@keyframes journeyRowIn {
-  from { opacity: 0; transform: translateY(4px); }
+@keyframes journeyHeroIn {
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.journey-row-meta {
-  text-align: right;
-  padding-top: 4px;
-}
-
-.journey-row-day {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text);
+.journey-hero-arc {
+  display: flex;
+  align-items: center;
+  gap: 18px;
   font-feature-settings: 'tnum' 1;
 }
 
-.journey-row-day.milestone {
-  color: rgba(212, 175, 55, 0.9);
+.journey-hero-arc-from,
+.journey-hero-arc-to {
+  font-size: 1.625rem;
+  font-weight: 300;
+  letter-spacing: -0.025em;
+  line-height: 1;
 }
 
-.journey-row-date {
-  font-size: 0.625rem;
+.journey-hero-arc-from {
+  color: var(--text-tertiary);
+}
+
+.journey-hero-arc-to {
+  color: var(--text);
+}
+
+.journey-hero-arc-rule {
+  width: 28px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    var(--border-prominent) 0%,
+    var(--border) 100%);
+  opacity: 0.7;
+}
+
+.journey-hero-sub {
+  font-size: 0.6875rem;
   color: var(--text-muted);
-  letter-spacing: 0.1em;
   text-transform: uppercase;
-  margin-top: 4px;
+  letter-spacing: 0.22em;
+  font-weight: 500;
 }
 
-.journey-row-photo {
+/* ----- Entry: photo + caption block, optional note ----- */
+
+.journey-entry {
   width: 100%;
-  aspect-ratio: 3 / 4;
-  border-radius: 14px;
-  overflow: hidden;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  animation: journeyEntryIn 480ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  /* Stagger via inline --row-i, capped in CSS. Adds the hero's delay
+     baseline (140ms) so entries arrive after the hero settles. */
+  animation-delay: calc(140ms + min(var(--row-i, 0), 12) * 70ms);
+}
+
+/* Milestones get extra top breathing room so the eye registers a
+   chapter break before reading the gold eyebrow. */
+.journey-entry.milestone {
+  margin-top: 24px;
+}
+
+@keyframes journeyEntryIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ----- Milestone eyebrow — gold, tracked caps, sits above photo ----- */
+
+.journey-entry-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 16px;
+  padding: 0 2px;
+}
+
+.journey-entry-eyebrow.milestone {
+  color: rgba(212, 175, 55, 0.95);
+}
+
+.journey-entry-eyebrow-glyph {
+  font-size: 0.75rem;
+  line-height: 1;
+  color: rgba(212, 175, 55, 0.9);
+  transform: translateY(-0.5px);
+}
+
+.journey-entry-eyebrow-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ----- Photo card — the hero element. Layered shadows + inner
+   highlight border give it a "paper depth" quality. Resets button
+   styles since we render it as a <button> for keyboard a11y. ----- */
+
+.journey-entry-photo {
+  appearance: none;
   background: var(--surface-overlay);
   border: 1px solid var(--border-subtle);
+  padding: 0;
+  margin: 0;
   cursor: pointer;
-  transition: transform 200ms ease, border-color 200ms ease;
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.25),
+    0 14px 36px rgba(0, 0, 0, 0.32);
+  transition:
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 240ms ease,
+    box-shadow 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-tap-highlight-color: transparent;
 }
 
-.journey-row-photo:hover {
-  border-color: var(--border);
-  transform: translateY(-2px);
-}
-
-.journey-row-photo img {
+.journey-entry-photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.journey-row-photo.milestone {
-  border-color: rgba(212, 175, 55, 0.5);
+/* Inner highlight — 1px white at very low opacity, inset by 1px.
+   Reads as a fine "matte" inside the outer border, the kind of
+   detail that separates premium from polished. */
+.journey-entry-photo-inner {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
-.journey-row-note {
-  font-size: 0.8125rem;
+.journey-entry-photo:hover {
+  border-color: var(--border);
+  transform: translateY(-3px);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 24px 56px rgba(0, 0, 0, 0.42);
+}
+
+.journey-entry-photo:active {
+  transform: translateY(-1px);
+  transition-duration: 120ms;
+}
+
+.journey-entry-photo:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 3px;
+}
+
+/* Milestone photo — gold tint on the outer border + a richer
+   inner glow. The glow uses two stacked insets: a hairline gold
+   ring + a soft warm bloom that reads as candlelight. */
+.journey-entry-photo.milestone {
+  border-color: rgba(212, 175, 55, 0.55);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.25),
+    0 14px 36px rgba(0, 0, 0, 0.32),
+    0 0 0 1px rgba(212, 175, 55, 0.18) inset,
+    0 0 60px rgba(212, 175, 55, 0.04);
+}
+
+.journey-entry-photo.milestone:hover {
+  border-color: rgba(212, 175, 55, 0.75);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 24px 56px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(212, 175, 55, 0.28) inset,
+    0 0 80px rgba(212, 175, 55, 0.06);
+}
+
+.journey-entry-photo.milestone .journey-entry-photo-inner {
+  box-shadow: inset 0 0 0 1px rgba(212, 175, 55, 0.08);
+}
+
+/* ----- Caption — magazine-style: big day number on the left,
+   date + weekday on the right. Sits underneath the photo with a
+   refined hairline separating it from the next entry. ----- */
+
+.journey-entry-caption {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 22px;
+  padding: 0 4px;
+}
+
+.journey-entry-caption-day {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-feature-settings: 'tnum' 1;
+}
+
+.journey-entry-caption-day-num {
+  font-size: 2.5rem;
+  font-weight: 200;
+  color: var(--text);
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+}
+
+.journey-entry.milestone .journey-entry-caption-day-num {
+  color: rgba(212, 175, 55, 0.95);
+  font-weight: 300;
+}
+
+.journey-entry-caption-day-label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.journey-entry-caption-meta {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-top: 6px;
+}
+
+.journey-entry-caption-date {
+  font-size: 0.75rem;
+  font-weight: 500;
   color: var(--text-secondary);
-  margin-top: 8px;
-  line-height: 1.5;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.journey-entry-caption-weekday {
+  font-size: 0.625rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* ----- Note — italic, restrained, sits below the caption ----- */
+
+.journey-entry-note {
+  width: 100%;
+  margin: 18px 0 0;
+  padding: 16px 4px 0;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.9375rem;
   font-style: italic;
+  font-weight: 400;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  letter-spacing: 0.005em;
+}
+
+/* ----- Empty state — frames an aspect-ratio placeholder that
+   mirrors the entry photo so the user reads "this is where your
+   first photo will live" instead of looking at a generic block. ----- */
+
+.journey-empty {
+  padding: 48px 24px 64px;
+  align-items: center;
+  text-align: center;
+  /* Reset gap from .journey-view since empty state stacks its own
+     elements at their own rhythm. */
+  gap: 0;
+}
+
+.journey-empty-frame {
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 3 / 4;
+  border-radius: 18px;
+  border: 1px dashed var(--border);
+  background:
+    radial-gradient(120% 80% at 50% 0%,
+      color-mix(in srgb, var(--surface-overlay) 70%, transparent) 0%,
+      transparent 60%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+.journey-empty-frame-glyph {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+
+.journey-empty-headline {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+  line-height: 1.3;
+}
+
+.journey-empty-sub {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin: 0 0 24px;
+  max-width: 300px;
+}
+
+/* Empty-state CTA — pill button matching the photo-capture-actions
+   primary treatment so the visual journey's onboarding moment feels
+   like it lives in the same product as the capture sheet. */
+.journey-empty-cta-btn {
+  appearance: none;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  padding: 13px 28px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: border-color 150ms ease, transform 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.journey-empty-cta-btn:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.journey-empty-cta-btn:active {
+  transform: scale(0.98);
+}
+
+/* ----- Mobile tuning — slightly smaller typography, tighter
+   spacing, but keep the hierarchy intact. ----- */
+@media (max-width: 480px) {
+  .journey-view {
+    gap: 48px;
+    padding: 4px 16px 64px;
+  }
+
+  .journey-hero {
+    padding: 22px 0 30px;
+    gap: 12px;
+  }
+
+  .journey-hero-arc-from,
+  .journey-hero-arc-to {
+    font-size: 1.375rem;
+  }
+
+  .journey-hero-arc-rule {
+    width: 22px;
+  }
+
+  .journey-entry.milestone {
+    margin-top: 16px;
+  }
+
+  .journey-entry-caption {
+    margin-top: 18px;
+  }
+
+  .journey-entry-caption-day-num {
+    font-size: 2.125rem;
+  }
+
+  .journey-entry-eyebrow {
+    margin-bottom: 14px;
+  }
+
+  .journey-entry-eyebrow-label {
+    font-size: 0.625rem;
+    letter-spacing: 0.18em;
+  }
+
+  .journey-entry-note {
+    font-size: 0.875rem;
+    margin-top: 14px;
+    padding-top: 14px;
+  }
+}
+
+/* Desktop — give the photos more room to breathe on wider viewports
+   so the editorial scale doesn't feel cramped at 1024+. */
+@media (min-width: 1024px) {
+  .journey-view {
+    padding: 12px 24px 80px;
+    gap: 64px;
+  }
+
+  .journey-hero,
+  .journey-entry {
+    max-width: 480px;
+  }
+
+  .journey-hero-arc-from,
+  .journey-hero-arc-to {
+    font-size: 1.875rem;
+  }
+
+  .journey-entry-caption-day-num {
+    font-size: 2.75rem;
+  }
 }
 
 /* ============================================================
@@ -542,33 +919,41 @@
   cursor: default;
 }
 
+/* Close X — matches the system X used in modals (.sheet-close-desktop) and
+   in TVFeed's fullscreen exit. Same size (32×32), same shape (circle), same
+   18×18 SVG glyph. The only difference vs. the modal X: a subtle dark scrim
+   + blur is needed here because the underlying surface is a photo (variable
+   brightness) rather than a dark sheet panel — pure transparent would lose
+   legibility on bright shots. Unlike sheet-close-desktop, this stays visible
+   on mobile because the lightbox has no swipe-down dismiss; the X IS the
+   primary mobile affordance. */
 .photo-lightbox-close {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 40px;
-  height: 40px;
+  top: calc(env(safe-area-inset-top, 0px) + 14px);
+  right: 14px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 150ms ease, transform 150ms ease;
+  background: rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: none;
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  padding: 0;
+  transition: background 150ms ease, color 150ms ease;
   -webkit-tap-highlight-color: transparent;
+  z-index: 5;
 }
 
 .photo-lightbox-close:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.5);
+  color: #ffffff;
 }
 
 .photo-lightbox-close:active {
-  transform: scale(0.95);
+  background: rgba(0, 0, 0, 0.6);
 }

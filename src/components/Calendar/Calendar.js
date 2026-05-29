@@ -1,6 +1,6 @@
 // components/Calendar/Calendar.js - TITANTRACK ELITE
 // Two CSS files: CalendarBase.css + CalendarModals.css
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth,
   isSameDay, subMonths, addMonths, differenceInDays, isAfter, parseISO,
   startOfWeek as getWeekStart, addWeeks, subWeeks } from 'date-fns';
@@ -10,7 +10,7 @@ import './CalendarBase.css';
 import './CalendarModals.css';
 import '../../styles/BottomSheet.css';
 
-import { FaChevronLeft, FaChevronRight, FaCog } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaCog, FaImages } from 'react-icons/fa';
 
 // NEW: Import InterventionService for ML feedback loop
 import interventionService from '../../services/InterventionService';
@@ -18,7 +18,7 @@ import interventionService from '../../services/InterventionService';
 // UNIFIED TRIGGER SYSTEM
 import { getAllTriggers, getTriggerLabel } from '../../constants/triggerConstants';
 import { getLunarData } from '../../utils/lunarData';
-import { readEntry, writeEntry, hasPhoto as hasJournalPhoto } from '../../utils/dayJournal';
+import { readEntry, writeEntry, hasPhoto as hasJournalPhoto, listPhotoEntries } from '../../utils/dayJournal';
 import { getPresignedUrl, invalidate as invalidatePhotoUrl } from '../../utils/photoUrl';
 import PhotoCaptureSheet from '../Photo/PhotoCaptureSheet';
 import PhotoLightbox from '../Photo/PhotoLightbox';
@@ -167,7 +167,17 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
   const [dayInfoModal, setDayInfoModal] = useState(false);
   const [sheetView, setSheetView] = useState('info'); // 'info' | 'edit' | 'workout'
   const [viewMode, setViewMode] = useState('month');
+  // Remembers which time-grid view to return to when the user exits Journey
+  // via the icon toggle. Defaults to 'month' on first load.
+  const [lastGridView, setLastGridView] = useState('month');
   const [viewFading, setViewFading] = useState(false);
+
+  // Total photos for the Journey header label. Recomputed only when
+  // notes change — listPhotoEntries walks the whole notes map.
+  const photoCount = useMemo(
+    () => listPhotoEntries(userData?.notes).length,
+    [userData?.notes]
+  );
   const [selectedTrigger, setSelectedTrigger] = useState('');
   const [showTriggerSelection, setShowTriggerSelection] = useState(false);
   const [editingExistingTrigger, setEditingExistingTrigger] = useState(false);
@@ -306,14 +316,22 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Smooth view toggle with fade transition
+  // Smooth view toggle with fade transition. Tracks the last time-grid
+  // mode (month|week) so the Journey icon can act as a true toggle —
+  // tapping it while in Journey returns to whichever grid the user came
+  // from, not always 'month'.
   const handleViewToggle = (newMode) => {
     if (newMode === viewMode || viewFading) return;
+    if (newMode === 'month' || newMode === 'week') setLastGridView(newMode);
     setViewFading(true);
     setTimeout(() => {
       setViewMode(newMode);
       setViewFading(false);
     }, 180);
+  };
+
+  const toggleJourney = () => {
+    handleViewToggle(viewMode === 'journey' ? lastGridView : 'journey');
   };
   // Sheet animation: trigger .open class for Day Info + Moon Detail
   useEffect(() => {
@@ -2067,23 +2085,42 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
 
   return (
     <div className={`calendar-container${initialAnimDone ? ' anim-done' : ''}`}>
-      {/* Minimal Header - Landing page style - ORIGINAL STRUCTURE */}
-      <div className="calendar-header-minimal">
+      {/* Minimal Header - Landing page style.
+          Month/Week share the period scrubber (arrows + date label).
+          Journey replaces the scrubber with a static "Visual Journey · N photos"
+          identity and hides the arrows — there's no month to step through. */}
+      <div className={`calendar-header-minimal${viewMode === 'journey' ? ' journey-mode' : ''}`}>
         {/* Period Display - Typography focused */}
         <div className="calendar-period-display">
-          <button className="period-arrow" onClick={prevPeriod} aria-label="Previous">
-            <FaChevronLeft />
-          </button>
+          {viewMode !== 'journey' && (
+            <button className="period-arrow" onClick={prevPeriod} aria-label="Previous">
+              <FaChevronLeft />
+            </button>
+          )}
           <div className="period-text">
-            <span className="period-month">{viewMode === 'month' ? format(currentDate, 'MMMM') : format(getWeekRange(currentDate).weekStart, 'MMM d') + ' – ' + format(getWeekRange(currentDate).weekEnd, 'd')}</span>
-            <span className="period-year">{format(currentDate, 'yyyy')}</span>
+            {viewMode === 'journey' ? (
+              <>
+                <span className="period-month">Visual Journey</span>
+                <span className="period-year">{photoCount} {photoCount === 1 ? 'photo' : 'photos'}</span>
+              </>
+            ) : (
+              <>
+                <span className="period-month">{viewMode === 'month' ? format(currentDate, 'MMMM') : format(getWeekRange(currentDate).weekStart, 'MMM d') + ' – ' + format(getWeekRange(currentDate).weekEnd, 'd')}</span>
+                <span className="period-year">{format(currentDate, 'yyyy')}</span>
+              </>
+            )}
           </div>
-          <button className="period-arrow" onClick={nextPeriod} aria-label="Next">
-            <FaChevronRight />
-          </button>
+          {viewMode !== 'journey' && (
+            <button className="period-arrow" onClick={nextPeriod} aria-label="Next">
+              <FaChevronRight />
+            </button>
+          )}
         </div>
-        
-        {/* View Toggle - Text only, like landing stats */}
+
+        {/* View Toggle - Month | Week, with the journey icon as a sibling
+            affordance. Journey is conceptually a different surface (a
+            chronological photo strip, not a time grid), so it gets its
+            own icon button rather than crowding the binary toggle. */}
         <div className="view-toggle-minimal">
           <button
             className={`toggle-option ${viewMode === 'month' ? 'active' : ''}`}
@@ -2098,18 +2135,19 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           >
             Week
           </button>
-          <span className="toggle-divider" />
-          <button
-            className={`toggle-option ${viewMode === 'journey' ? 'active' : ''}`}
-            onClick={() => handleViewToggle('journey')}
-          >
-            Journey
-          </button>
           {viewMode === 'week' && (
             <button className="week-metrics-gear" onClick={openMetricsSheet} aria-label="Choose week metrics">
               <FaCog />
             </button>
           )}
+          <button
+            className={`journey-toggle-icon ${viewMode === 'journey' ? 'active' : ''}`}
+            onClick={toggleJourney}
+            aria-label={viewMode === 'journey' ? 'Exit visual journey' : 'Open visual journey'}
+            aria-pressed={viewMode === 'journey'}
+          >
+            <FaImages />
+          </button>
         </div>
       </div>
 
