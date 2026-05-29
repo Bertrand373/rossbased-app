@@ -34,13 +34,20 @@ const PhotoLightbox = ({ open, src, alt = '', onClose }) => {
 
   return ReactDOM.createPortal(
     <div className="photo-lightbox" onClick={() => onClose && onClose()}>
+      {/* Close X — same 18×18 SVG used in sheet-close-desktop across the app
+          (CircleSheet, Tracker, TVFeed, AIChat, NotesLibrary). Inlined to
+          match the existing pattern rather than introducing a shared
+          component for a single glyph. */}
       <button
         type="button"
         className="photo-lightbox-close"
         onClick={(e) => { e.stopPropagation(); onClose && onClose(); }}
         aria-label="Close photo"
       >
-        ×
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
       </button>
       <img
         className="photo-lightbox-img"

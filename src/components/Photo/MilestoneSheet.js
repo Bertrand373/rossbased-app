@@ -34,6 +34,19 @@ const MILESTONE_BLURB = {
   365: 'A full year. The proof in the pictures speaks for itself.'
 };
 
+// Short milestone titles used in the Visual Journey caption — sit
+// underneath the milestone photo as a "chapter name" in the strip.
+// Distinct from MILESTONE_BLURB (longer celebration copy used in the
+// share sheet).
+export const MILESTONE_TITLE = {
+  7: 'One Week',
+  30: 'First Month',
+  60: 'Two Months',
+  90: 'Ninety Days',
+  180: 'Half a Year',
+  365: 'One Year'
+};
+
 /**
  * Compute the next un-celebrated milestone the user qualifies for.
  * Returns null if there isn't one to celebrate right now.

@@ -186,6 +186,15 @@ body:has(.week-view-grid) {
   align-items: baseline;
   gap: 7px;
   min-width: auto;
+  /* Lock to a single line — the header is a tight flex row and any
+     overflow should clip/ellipsize the year, not stack onto two lines. */
+  white-space: nowrap;
+  flex-wrap: nowrap;
+}
+
+.period-text > .period-month,
+.period-text > .period-year {
+  white-space: nowrap;
 }
 
 .period-month {
@@ -283,6 +292,79 @@ body:has(.week-view-grid) {
 
 .week-metrics-gear:active {
   color: var(--text);
+}
+
+/* Journey toggle icon — sibling of the gear, sits in the view-toggle
+   group. Inactive: ghost outline circle matching the tracker camera
+   button language. Active (Journey mode): solid neutral fill so it
+   reads as a third "tab" without crowding the Month|Week binary. */
+.journey-toggle-icon {
+  appearance: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  margin-left: 6px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  color: var(--text-tertiary);
+  transition: color 180ms ease, background-color 180ms ease, transform 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.journey-toggle-icon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+  pointer-events: none;
+  transition: border-color 180ms ease;
+}
+
+.journey-toggle-icon:hover {
+  color: var(--text-secondary);
+}
+
+.journey-toggle-icon:hover::after {
+  border-color: var(--border);
+}
+
+.journey-toggle-icon:active {
+  transform: scale(0.94);
+}
+
+.journey-toggle-icon.active {
+  color: var(--text);
+  background: var(--surface-overlay);
+}
+
+.journey-toggle-icon.active::after {
+  border-color: var(--border-prominent);
+}
+
+.journey-toggle-icon svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* Journey-mode header — period display becomes a static identity card.
+   Center the text since the arrows are gone; nudge the toggle group so
+   the icon sits cleanly on the right edge. */
+.calendar-header-minimal.journey-mode .calendar-period-display {
+  gap: 0;
+}
+
+.calendar-header-minimal.journey-mode .period-text {
+  padding-left: 4px;
+}
+
+.calendar-header-minimal.journey-mode .period-month {
+  letter-spacing: -0.02em;
 }
 
 /* =============================================================================
