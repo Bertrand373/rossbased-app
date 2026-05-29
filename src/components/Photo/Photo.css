@@ -436,33 +436,56 @@
 }
 
 /* ============================================================
-   CALENDAR JOURNAL PHOTO PREVIEW
+   CALENDAR JOURNAL — PHOTO THUMB + EMPTY STATE
+   Same visual rhythm as the journal text section: when present,
+   a compact thumbnail sits below the entry box; when absent, the
+   prompt box inherits .calendar-journal-empty exactly so the pair
+   reads as one consistent journal/photo unit.
    ============================================================ */
 
-.calendar-journal-photo {
-  margin-top: 12px;
+.calendar-journal-photo-thumb {
+  margin-top: 10px;
   border-radius: 12px;
   overflow: hidden;
   background: var(--surface-overlay);
   border: 1px solid var(--border-subtle);
   position: relative;
-  aspect-ratio: 3 / 4;
-  max-width: 260px;
+  aspect-ratio: 4 / 5;
+  max-width: 160px;
+  cursor: pointer;
+  transition: border-color 150ms ease, transform 150ms ease;
 }
 
-.calendar-journal-photo img {
+.calendar-journal-photo-thumb:hover {
+  border-color: var(--border);
+  transform: translateY(-1px);
+}
+
+.calendar-journal-photo-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
+.calendar-journal-photo-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .calendar-journal-photo-actions {
   position: absolute;
-  bottom: 8px;
-  right: 8px;
+  bottom: 6px;
+  right: 6px;
   display: flex;
-  gap: 6px;
+  gap: 4px;
 }
 
 .calendar-journal-photo-action {
@@ -472,32 +495,80 @@
   -webkit-backdrop-filter: blur(8px);
   border: none;
   color: rgba(255, 255, 255, 0.9);
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 500;
   letter-spacing: 0.04em;
-  padding: 6px 10px;
+  padding: 5px 9px;
   border-radius: 999px;
   cursor: pointer;
 }
 
-.calendar-journal-add-photo {
-  appearance: none;
-  width: 100%;
-  padding: 10px 14px;
-  background: transparent;
-  border: 1px dashed var(--border-prominent);
-  border-radius: 12px;
-  color: var(--text-secondary);
-  font-size: 0.8125rem;
-  font-family: inherit;
-  font-weight: 500;
-  cursor: pointer;
-  letter-spacing: 0.02em;
+/* Empty-state photo prompt — inherits .calendar-journal-empty's
+   border / padding / hover so the two prompts (text + photo) look
+   like siblings, not strangers. The modifier just adds top spacing. */
+.calendar-journal-photo-empty {
   margin-top: 10px;
-  transition: border-color 150ms ease, color 150ms ease;
 }
 
-.calendar-journal-add-photo:hover {
-  border-color: var(--text-secondary);
-  color: var(--text);
+/* ============================================================
+   PHOTO LIGHTBOX — tap-to-expand fullscreen viewer
+   Sits above all other surfaces. Dismissed by tap-outside / X / Esc.
+   ============================================================ */
+
+.photo-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  cursor: pointer;
+  animation: photoLightboxIn 200ms ease forwards;
+}
+
+@keyframes photoLightboxIn {
+  from { background-color: rgba(0, 0, 0, 0); }
+  to   { background-color: rgba(0, 0, 0, 0.92); }
+}
+
+.photo-lightbox-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+  cursor: default;
+}
+
+.photo-lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 150ms ease, transform 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.photo-lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.photo-lightbox-close:active {
+  transform: scale(0.95);
 }
