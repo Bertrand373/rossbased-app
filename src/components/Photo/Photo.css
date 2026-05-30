@@ -143,17 +143,25 @@
   align-items: center;
 }
 
-/* The 3:4 portrait viewport — every phase (ready, starting, live,
-   review, denied, error, uploading) renders inside this container
-   so the surrounding sheet never jumps in size. Black background
+/* The viewport — every phase (ready, starting, live, review,
+   denied, error, uploading) renders inside this container so the
+   surrounding sheet never jumps in size. Edge-to-edge full width
+   of the sheet now (was max-width: 320px); 3:4 portrait aspect
+   keeps the face oval geometry honest while giving the camera
+   real estate proper to "this is the thing." Black background
    reads as a real camera frame. */
 .capture-viewport {
   position: relative;
   width: 100%;
-  max-width: 320px;
   aspect-ratio: 3 / 4;
+  /* Cap at 60vh so on very tall sheets (large iPhones / tablets)
+     the viewport doesn't push the shutter controls off the bottom
+     of the visible area. */
+  max-height: 60vh;
   background: #0a0a0a;
-  border-radius: 18px;
+  /* Smaller border-radius than before — the viewport now reads more
+     like the screen of a camera body than a small card. */
+  border-radius: 14px;
   overflow: hidden;
   border: 1px solid var(--border-subtle);
   box-shadow:
@@ -474,32 +482,47 @@
     transform 120ms ease;
 }
 
-/* Countdown is communicated by the shutter's inner disc itself —
-   it transitions from white to sage over AUTO_CAPTURE_DELAY_MS.
-   When the disc is fully sage, capture fires.
+/* Progress bar divider — horizontal line that sits between the
+   camera viewport and the shutter controls deck. Doubles as a
+   visual divider AND the auto-capture countdown indicator.
 
-   Why this instead of an SVG progress ring: iOS Safari has a
-   well-documented quirk with animating stroke-dashoffset, so the
-   ring would render "imperfectly" or not at all on some iPhones.
-   Animating background-color is universally reliable.
+   In idle state: a faint hairline (just enough to separate the
+   two regions of the sheet).
+   When .is-locked is on: the sage fill animates left-to-right
+   over AUTO_CAPTURE_DELAY_MS (3500ms).
 
-   Animation duration must stay in sync with AUTO_CAPTURE_DELAY_MS
-   in PhotoCaptureSheet.js (currently 3500ms). The `key={locked}`
-   prop on the inner span re-mounts the element on each lock
-   acquire so the animation restarts cleanly. */
-.capture-shutter.is-locked .capture-shutter-inner {
-  animation: shutterCountdownFill 3500ms linear forwards;
+   Animating transform: scaleX is bulletproof on iOS Safari
+   (unlike SVG stroke-dashoffset which was the v1 approach and
+   failed on iOS). The `key={locked}` on the fill div re-mounts
+   the element so the animation restarts from 0 cleanly. */
+.capture-progress {
+  position: relative;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
-@keyframes shutterCountdownFill {
-  0% {
-    background: rgba(255, 255, 255, 0.95);
-    box-shadow: inset 0 0 0 0 rgba(140, 200, 150, 0);
-  }
-  100% {
-    background: rgba(140, 200, 150, 0.95);
-    box-shadow: inset 0 0 18px 2px rgba(120, 185, 135, 0.5);
-  }
+.capture-progress-fill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(140, 200, 150, 0.85),
+    rgba(140, 200, 150, 1)
+  );
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.capture-progress.is-locked .capture-progress-fill {
+  animation: progressFill 3500ms linear forwards;
+  box-shadow: 0 0 6px rgba(140, 200, 150, 0.4);
+}
+
+@keyframes progressFill {
+  to { transform: scaleX(1); }
 }
 
 /* White flash on capture — premium-camera shutter feel. Brief
