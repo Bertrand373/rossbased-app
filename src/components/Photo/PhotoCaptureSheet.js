@@ -631,8 +631,27 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
             {flashing && <div className="capture-flash" aria-hidden="true" />}
           </div>
 
+          {/* Progress bar divider — sits between the camera viewport
+              and the controls deck. Does double duty: visual
+              separator + countdown indicator. When .is-locked is on,
+              the sage fill animates left-to-right over
+              AUTO_CAPTURE_DELAY_MS. `key={locked}` re-mounts the
+              fill on each lock acquire so the CSS animation restarts
+              cleanly from 0. Animating transform: scaleX is
+              bulletproof on iOS Safari (unlike SVG stroke-dashoffset). */}
+          {phase === PHASES.LIVE && (
+            <div className={`capture-progress${locked ? ' is-locked' : ''}`}>
+              <div
+                className="capture-progress-fill"
+                key={locked ? 'locked' : 'unlocked'}
+              />
+            </div>
+          )}
+
           {/* Live shutter — always tappable; auto-capture is on top
-              of, not instead of, the manual tap. */}
+              of, not instead of, the manual tap. The shutter stays
+              pure white now; the progress bar above is the countdown
+              indicator instead of the inner disc. */}
           {phase === PHASES.LIVE && (
             <div className="capture-controls">
               <button
@@ -641,17 +660,7 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
                 onClick={triggerCapture}
                 aria-label="Capture photo"
               >
-                {/* Inner disc — also acts as the countdown indicator
-                    when .is-locked is added: background animates from
-                    white to sage over AUTO_CAPTURE_DELAY_MS. Replaces
-                    an earlier SVG ring approach that animated
-                    stroke-dashoffset, a known iOS Safari weak spot.
-                    `key={locked}` forces re-mount on lock acquire so
-                    the CSS animation restarts cleanly each time. */}
-                <span
-                  className="capture-shutter-inner"
-                  key={locked ? 'locked' : 'unlocked'}
-                />
+                <span className="capture-shutter-inner" />
               </button>
             </div>
           )}
