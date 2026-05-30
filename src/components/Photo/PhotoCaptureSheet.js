@@ -641,25 +641,17 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
                 onClick={triggerCapture}
                 aria-label="Capture photo"
               >
-                {/* Countdown ring — two stacked circles: a faint
-                    ghost background showing the full circle outline,
-                    then the green progress ring that fills clockwise
-                    on top of it. Without the ghost, the partial green
-                    arc looked "imperfectly loaded" because there was
-                    no complete reference circle for the eye to anchor
-                    against. SVG re-mounts on each lock so the
-                    animation restarts cleanly. */}
-                {locked && (
-                  <svg
-                    className="capture-shutter-ring"
-                    viewBox="0 0 96 96"
-                    aria-hidden="true"
-                  >
-                    <circle className="ring-bg" cx="48" cy="48" r="44" />
-                    <circle className="ring-progress" cx="48" cy="48" r="44" />
-                  </svg>
-                )}
-                <span className="capture-shutter-inner" />
+                {/* Inner disc — also acts as the countdown indicator
+                    when .is-locked is added: background animates from
+                    white to sage over AUTO_CAPTURE_DELAY_MS. Replaces
+                    an earlier SVG ring approach that animated
+                    stroke-dashoffset, a known iOS Safari weak spot.
+                    `key={locked}` forces re-mount on lock acquire so
+                    the CSS animation restarts cleanly each time. */}
+                <span
+                  className="capture-shutter-inner"
+                  key={locked ? 'locked' : 'unlocked'}
+                />
               </button>
             </div>
           )}
