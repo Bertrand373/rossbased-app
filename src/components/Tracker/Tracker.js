@@ -19,7 +19,7 @@ import OraclePulse from '../OraclePulse/OraclePulse';
 import RecoveryFlow from '../Recovery/RecoveryFlow';
 import CheckInSheet from '../Circle/CheckInSheet';
 import { useCircle } from '../../hooks/useCircle';
-import TrackerCameraButton from '../Photo/TrackerCameraButton';
+import TrackerLogPill from './TrackerLogPill';
 import PhotoCaptureSheet from '../Photo/PhotoCaptureSheet';
 import MilestoneSheet, { pendingMilestone } from '../Photo/MilestoneSheet';
 import { getBaselinePhoto, readEntry } from '../../utils/dayJournal';
@@ -1917,32 +1917,22 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
           <span className={`streak-num${userData.streakColorGold ? ' oracle-gold' : ''}`}>{streak}</span>
         </button>
 
-        {/* ONBOARDING TARGET: benefits-trigger — grouped with hero */}
-        <div className="tracker-log-wrap">
-          <button
-            className={`${todayLogged ? 'btn-logged' : 'btn-primary'} benefits-trigger`}
-            onClick={() => canLogBenefits ? setShowBenefits(true) : setShowLogLock(true)}
-          >
-            {todayLogged ? (
-              <>
-                {todayScore}
-                {/* Green check — matches the success vocabulary used by
-                    toasts and the "✓ Photo captured" affordance below.
-                    Creates a consistent two-state story across the app:
-                    gold "+" = needs action, green "✓" = done. */}
-                <span className="btn-logged-check" aria-hidden="true"> ✓</span>
-              </>
-            ) : 'Log Today'}
-          </button>
+        {/* ONBOARDING TARGET: benefits-trigger — consolidated log pill.
+            Replaces the earlier separate Log Today button + Snap
+            Today's Photo ghost link. Vitals and Photo both live
+            inside the pill; expand-in-place doesn't shift surrounding
+            content (Oracle quote stays put). */}
+        <div className="tracker-log-wrap benefits-trigger">
+          <TrackerLogPill
+            userData={userData}
+            todayScore={todayScore}
+            vitalsLogged={todayLogged}
+            onOpenVitals={() =>
+              canLogBenefits ? setShowBenefits(true) : setShowLogLock(true)
+            }
+            onOpenPhoto={() => setShowPhotoCaptureSheet(true)}
+          />
         </div>
-
-        {/* Photo affordance — ghost camera button. Subordinate to Log Today.
-            Visual sits in the breathing room between Log Today and the
-            Oracle quote at the bottom. */}
-        <TrackerCameraButton
-          userData={userData}
-          onClick={() => setShowPhotoCaptureSheet(true)}
-        />
 
       </main>
 
