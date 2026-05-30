@@ -641,17 +641,22 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
                 onClick={triggerCapture}
                 aria-label="Capture photo"
               >
-                {/* Countdown ring — only rendered while locked. SVG
-                    re-mounts (and the CSS animation restarts) every
-                    time the lock is regained, so a partial ring left
-                    over from a previous attempt never sticks around. */}
+                {/* Countdown ring — two stacked circles: a faint
+                    ghost background showing the full circle outline,
+                    then the green progress ring that fills clockwise
+                    on top of it. Without the ghost, the partial green
+                    arc looked "imperfectly loaded" because there was
+                    no complete reference circle for the eye to anchor
+                    against. SVG re-mounts on each lock so the
+                    animation restarts cleanly. */}
                 {locked && (
                   <svg
                     className="capture-shutter-ring"
-                    viewBox="0 0 80 80"
+                    viewBox="0 0 96 96"
                     aria-hidden="true"
                   >
-                    <circle cx="40" cy="40" r="38" />
+                    <circle className="ring-bg" cx="48" cy="48" r="44" />
+                    <circle className="ring-progress" cx="48" cy="48" r="44" />
                   </svg>
                 )}
                 <span className="capture-shutter-inner" />

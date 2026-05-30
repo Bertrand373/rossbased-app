@@ -75,6 +75,12 @@
   font-weight: 600;
   /* Optical lift so the glyph centers against the label's x-height */
   transform: translateY(-0.5px);
+  /* Soft gold "+" — signals "premium action worth taking" without
+     screaming. Red would read as warning/error; neutral gray would
+     blend into the label. Gold creates a clear two-state visual
+     story: gold "+" before capture, green "✓" after. */
+  color: rgba(212, 175, 55, 0.85);
+  transition: color 200ms ease;
 }
 
 .tracker-camera-link-label {
@@ -468,36 +474,54 @@
     transform 120ms ease;
 }
 
-/* Countdown ring — SVG circle around the outside of the shutter
-   that fills clockwise over AUTO_CAPTURE_DELAY_MS. Gives the user
-   a clear visual cue that auto-capture is approaching and shows
-   exactly how much time they have to tap manually instead.
+/* Countdown ring — two stacked SVG circles for a premium-camera
+   feel. The faint ghost ring (`.ring-bg`) is always a complete
+   circle so the eye has a reference outline. The progress ring
+   (`.ring-progress`) fills clockwise over AUTO_CAPTURE_DELAY_MS
+   on top of it.
 
-   Keep this animation duration in sync with AUTO_CAPTURE_DELAY_MS
+   Geometry: SVG is 96×96, sits at top:-12 left:-12 around the
+   72px shutter (centered, 12px outer margin). Circle r=44 in
+   viewBox 96×96 → outer ring sits ~8px outside the shutter edge
+   with the stroke-width accounted for.
+
+   Keep the animation duration in sync with AUTO_CAPTURE_DELAY_MS
    in PhotoCaptureSheet.js (currently 3500ms). */
 .capture-shutter-ring {
   position: absolute;
-  top: -6px;
-  left: -6px;
-  width: 84px;
-  height: 84px;
+  top: -12px;
+  left: -12px;
+  width: 96px;
+  height: 96px;
   pointer-events: none;
   overflow: visible;
 }
 
-.capture-shutter-ring circle {
+.capture-shutter-ring .ring-bg,
+.capture-shutter-ring .ring-progress {
   fill: none;
-  stroke: rgba(140, 200, 150, 0.92);
   stroke-width: 3;
-  stroke-linecap: round;
-  /* Circumference of r=38 is ~238.76. Start fully hidden, animate
-     to fully visible. Rotated -90deg so the fill starts at 12 o'clock. */
-  stroke-dasharray: 238.76;
-  stroke-dashoffset: 238.76;
+}
+
+/* Ghost ring — always a complete circle, faint sage so the user
+   sees the FULL outline regardless of progress. No animation. */
+.capture-shutter-ring .ring-bg {
+  stroke: rgba(140, 200, 150, 0.18);
+}
+
+/* Progress ring — fills clockwise from 12 o'clock. butt linecap
+   keeps the leading edge crisp instead of leaving a rounded "blob"
+   that reads as a sloppy partial fill. */
+.capture-shutter-ring .ring-progress {
+  stroke: rgba(140, 200, 150, 0.92);
+  stroke-linecap: butt;
+  /* Circumference of r=44 is 2π × 44 ≈ 276.46 */
+  stroke-dasharray: 276.46;
+  stroke-dashoffset: 276.46;
   transform: rotate(-90deg);
-  transform-origin: center;
+  transform-origin: 50% 50%;
   animation: captureCountdown 3500ms linear forwards;
-  filter: drop-shadow(0 0 6px rgba(140, 200, 150, 0.4));
+  filter: drop-shadow(0 0 6px rgba(140, 200, 150, 0.42));
 }
 
 @keyframes captureCountdown {
@@ -523,23 +547,23 @@
 .photo-capture-actions {
   flex-shrink: 0;
   display: flex;
-  gap: 10px;
+  gap: 16px;
   margin-top: 8px;
 }
 
 .photo-capture-actions .btn-primary,
 .photo-capture-actions .btn-ghost {
-  flex: 1;
+  /* flex: 1 1 0 explicitly (not the shorthand `1`) so both buttons
+     stay EXACTLY equal width regardless of content. With just `flex: 1`,
+     "Set baseline" (longest label) would push wider than "Retake",
+     breaking the visual balance the symmetry depends on. */
+  flex: 1 1 0;
   min-width: 0;
   padding: 14px 14px;
   border-radius: 9999px;
   font-size: 0.9375rem;
   font-family: inherit;
   cursor: pointer;
-  /* "Set baseline" is the longest of the three possible primary
-     labels (Set baseline / Replace / Use photo) and was wrapping
-     onto two lines inside the flex:1 column. nowrap + the tighter
-     horizontal padding above keeps every label on a single line. */
   white-space: nowrap;
   text-align: center;
   transition: border-color 150ms ease, color 150ms ease, background-color 150ms ease, opacity 150ms ease;
