@@ -520,18 +520,20 @@
 
 .photo-capture-actions {
   flex-shrink: 0;
-  display: flex;
+  /* CSS Grid with two equal-width columns. Flexbox + nowrap was
+     letting "Set baseline" (longer label) push wider than "Retake"
+     on iOS Safari even with flex: 1 1 0 + min-width: 0. Grid's
+     1fr 1fr is mathematically deterministic — each cell is exactly
+     half the available space minus gap, regardless of content. */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-top: 8px;
 }
 
 .photo-capture-actions .btn-primary,
 .photo-capture-actions .btn-ghost {
-  /* flex: 1 1 0 explicitly (not the shorthand `1`) so both buttons
-     stay EXACTLY equal width regardless of content. With just `flex: 1`,
-     "Set baseline" (longest label) would push wider than "Retake",
-     breaking the visual balance the symmetry depends on. */
-  flex: 1 1 0;
+  width: 100%;
   min-width: 0;
   padding: 14px 14px;
   border-radius: 9999px;
@@ -556,7 +558,10 @@
 
 .photo-capture-actions .btn-primary {
   background: var(--surface-overlay);
-  border: 1px solid var(--border);
+  /* Match the ghost button's border weight exactly so both pills
+     share the same shape geometry — the filled background is what
+     signals "primary action," not a heavier outline. */
+  border: 1px solid var(--border-subtle);
   color: var(--text);
   font-weight: 600;
 }
