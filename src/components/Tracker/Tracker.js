@@ -1923,7 +1923,16 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
             className={`${todayLogged ? 'btn-logged' : 'btn-primary'} benefits-trigger`}
             onClick={() => canLogBenefits ? setShowBenefits(true) : setShowLogLock(true)}
           >
-            {todayLogged ? `${todayScore} ✓` : 'Log Today'}
+            {todayLogged ? (
+              <>
+                {todayScore}
+                {/* Green check — matches the success vocabulary used by
+                    toasts and the "✓ Photo captured" affordance below.
+                    Creates a consistent two-state story across the app:
+                    gold "+" = needs action, green "✓" = done. */}
+                <span className="btn-logged-check" aria-hidden="true"> ✓</span>
+              </>
+            ) : 'Log Today'}
           </button>
         </div>
 

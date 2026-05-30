@@ -903,6 +903,15 @@
   color: var(--text);
 }
 
+/* Green check on the logged-state pill — matches the app's success
+   vocabulary (--success: #22c55e) used by toasts and the "✓ Photo
+   captured" affordance. Slightly bolder than the surrounding number
+   so the "done" signal reads at a glance. */
+.btn-logged-check {
+  color: var(--success);
+  font-weight: 600;
+}
+
 /* ============================================================
    OVERLAY - Matches app-wide standard
    ============================================================ */
