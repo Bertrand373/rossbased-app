@@ -14,9 +14,13 @@
 //     card). NOT locked at 9999px: in the ~219px-wide column a 9999px
 //     radius clamps to a circle once the box goes near-square.
 //   - Background goes from rgba(255,255,255,0.05) (collapsed)
-//     to rgba(255,255,255,0.08) (expanded). Never opaque dark.
-//   - Heavy backdrop-filter (blur 24px + saturate 180%) does the
-//     visual containment work; opacity stays subtle.
+//     to rgba(255,255,255,0.18) (expanded). Never opaque dark. The
+//     expanded 18% tint gives the card frosted BODY that renders the
+//     same on every engine — not reliant on the blur, which Chrome
+//     draws far weaker than iOS Safari (the desktop-looked-transparent
+//     bug).
+//   - Heavy backdrop-filter (blur 30px + saturate 180%) adds the live
+//     glass on top; opacity stays subtle.
 //   - One transition curve for everything: 380ms ease-out cubic-
 //     bezier(0.22, 1, 0.36, 1). All animated properties on the same
 //     timing so the eye reads ONE motion both directions.
