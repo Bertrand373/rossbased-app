@@ -19,7 +19,7 @@ import OraclePulse from '../OraclePulse/OraclePulse';
 import RecoveryFlow from '../Recovery/RecoveryFlow';
 import CheckInSheet from '../Circle/CheckInSheet';
 import { useCircle } from '../../hooks/useCircle';
-import TrackerCameraButton from '../Photo/TrackerCameraButton';
+import TrackerLogPill from './TrackerLogPill';
 import PhotoCaptureSheet from '../Photo/PhotoCaptureSheet';
 import MilestoneSheet, { pendingMilestone } from '../Photo/MilestoneSheet';
 import { getBaselinePhoto, readEntry } from '../../utils/dayJournal';
@@ -1917,32 +1917,24 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
           <span className={`streak-num${userData.streakColorGold ? ' oracle-gold' : ''}`}>{streak}</span>
         </button>
 
-        {/* ONBOARDING TARGET: benefits-trigger — grouped with hero */}
+        {/* ONBOARDING TARGET: benefits-trigger (via .tracker-log-pill)
+            Consolidated Log Today pill — Metrics + Photo as sub-actions
+            inside one glass pill that expands in-place. The slot height
+            is fixed (56px), so expansion overlays content below without
+            pushing the streak number above or the Oracle bar below.
+            Paywall gate is preserved: free users past the limit hit the
+            log-lock sheet when they tap the Metrics row.
+            Wrapped in `.tracker-log-wrap` so the existing entrance
+            fade-in (Tracker.css) keeps firing on mount. */}
         <div className="tracker-log-wrap">
-          <button
-            className={`${todayLogged ? 'btn-logged' : 'btn-primary'} benefits-trigger`}
-            onClick={() => canLogBenefits ? setShowBenefits(true) : setShowLogLock(true)}
-          >
-            {todayLogged ? (
-              <>
-                {todayScore}
-                {/* Green check — matches the success vocabulary used by
-                    toasts and the "✓ Photo captured" affordance below.
-                    Creates a consistent two-state story across the app:
-                    gold "+" = needs action, green "✓" = done. */}
-                <span className="btn-logged-check" aria-hidden="true"> ✓</span>
-              </>
-            ) : 'Log Today'}
-          </button>
+          <TrackerLogPill
+            userData={userData}
+            todayScore={todayScore}
+            vitalsLogged={todayLogged}
+            onOpenVitals={() => canLogBenefits ? setShowBenefits(true) : setShowLogLock(true)}
+            onOpenPhoto={() => setShowPhotoCaptureSheet(true)}
+          />
         </div>
-
-        {/* Photo affordance — ghost camera button. Subordinate to Log Today.
-            Visual sits in the breathing room between Log Today and the
-            Oracle quote at the bottom. */}
-        <TrackerCameraButton
-          userData={userData}
-          onClick={() => setShowPhotoCaptureSheet(true)}
-        />
 
       </main>
 

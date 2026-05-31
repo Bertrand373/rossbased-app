@@ -55,7 +55,12 @@ const OnboardingGuide = ({ onComplete }) => {
       radius: '20px'
     },
     {
-      target: '.benefits-trigger',
+      // Consolidated Log Today pill (Metrics + Photo). Same selector
+      // strategy as before — the pill rests at 56px height, radius
+      // locked at 9999px, so the spotlight ring matches the resting
+      // shape exactly. The expand-on-tap motion happens after the
+      // tutorial closes.
+      target: '.tracker-log-pill',
       title: 'Track daily benefits',
       message: 'Log how you feel each day. This powers your AI insights.',
       position: 'top',

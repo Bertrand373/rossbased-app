@@ -1,0 +1,258 @@
+/* TrackerLogPill.css
+ *
+ * Glass pill that expands in-place to reveal Metrics + Photo as
+ * sub-actions. Mirrors .claude/log-pill-mock.html exactly — any drift
+ * from the mock is a bug.
+ *
+ * Animation model
+ * ---------------
+ * One transition curve (380ms cubic-bezier(0.22, 1, 0.36, 1)) runs on
+ * every animated property of the pill: height, background, border,
+ * box-shadow, caret rotation. So the eye reads ONE motion both
+ * directions. Rows themselves have no entrance animation — overflow:
+ * hidden on the pill clips them when collapsed.
+ *
+ * Shape locking
+ * -------------
+ * border-radius: 9999px is held through every state. At collapsed
+ * h=56 it clamps to 28 (h/2 = capsule). At expanded h≈170 it clamps
+ * to ~85 (h/2 = still a capsule, taller). The shape stays PILL
+ * throughout; only the height changes.
+ */
+
+/* ---- Slot: reserves 56px so expanding doesn't push the page ---- */
+.tracker-log-pill-slot {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  height: 56px;
+  margin: 0 auto;
+}
+
+/* ---- The pill itself ---- */
+.tracker-log-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Height is JS-controlled via inline style. 56 default, expanded =
+     56 + measured drawer height. */
+  background: rgba(255, 255, 255, 0.05);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 9999px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  transition:
+    height 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    background 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 380ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* Suppress iOS tap highlight — the row's :active scale handles
+     visual confirmation. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tracker-log-pill:focus {
+  outline: none;
+}
+
+.tracker-log-pill:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.28);
+  outline-offset: 2px;
+}
+
+.tracker-log-pill.is-expanded {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 14px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* ---- Header (always visible top 56px) ---- */
+.tlp-header {
+  position: relative;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 26px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.tlp-label {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  color: #f5f5f5;
+  line-height: 1;
+}
+
+.tlp-sep {
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 2px;
+  font-size: 0.7rem;
+}
+
+.tlp-meta {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  font-feature-settings: 'tnum' 1;
+  line-height: 1;
+}
+
+.tlp-progress {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.01em;
+  font-feature-settings: 'tnum' 1;
+  line-height: 1;
+}
+
+.tlp-check {
+  display: inline-flex;
+  color: #22c55e;
+  margin-right: 2px;
+}
+
+/* Chevron — tap affordance. Rotates 180° on expand. */
+.tlp-caret {
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.4);
+  transition:
+    transform 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 180ms ease;
+  pointer-events: none;
+  display: inline-flex;
+}
+
+.tracker-log-pill.is-expanded .tlp-caret {
+  transform: translateY(-50%) rotate(180deg);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.tracker-log-pill.is-complete .tlp-caret {
+  color: rgba(255, 255, 255, 0.18);
+}
+
+/* ---- Drawer ---- */
+/* 16px bottom safety so rows never clip mid-collapse */
+.tlp-drawer {
+  padding: 6px 10px 16px;
+}
+
+/* ---- Rows ---- */
+/* 14px radius (vs the parent pill's 28px clamped radius) follows the
+   iOS Notes / Reminders nested-rounded pattern. Reads as architectural
+   hierarchy. */
+.tlp-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  color: inherit;
+  transition: background 180ms ease, transform 100ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tlp-row:hover {
+  /* Matches expanded pill bg — glass on glass. */
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tlp-row:active {
+  background: rgba(255, 255, 255, 0.05);
+  transform: scale(0.99);
+}
+
+.tlp-row:focus {
+  outline: none;
+}
+
+.tlp-row:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.32);
+  outline-offset: -2px;
+}
+
+.tlp-row-icon {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+}
+
+.tlp-row-label {
+  flex: 1;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #f5f5f5;
+  line-height: 1;
+}
+
+.tlp-row-meta {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.4);
+  font-feature-settings: 'tnum' 1;
+  line-height: 1;
+}
+
+.tlp-row-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-left: 4px;
+  flex-shrink: 0;
+  transition: color 180ms ease;
+}
+
+.tlp-row:hover .tlp-row-chevron {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ---- Completed row state ---- */
+.tlp-row.is-done .tlp-row-icon {
+  color: #22c55e;
+}
+
+.tlp-row.is-done .tlp-row-label {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.tlp-row.is-done .tlp-row-meta {
+  color: #22c55e;
+}
+
+/* ---- Reduced motion: kill the spring, keep the state change ---- */
+@media (prefers-reduced-motion: reduce) {
+  .tracker-log-pill,
+  .tlp-caret,
+  .tlp-row {
+    transition-duration: 0.01ms !important;
+  }
+}
