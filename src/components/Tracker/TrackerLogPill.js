@@ -119,18 +119,24 @@ const TrackerLogPill = ({
   });
 
   const pillStyle = {
+    // Height is the ONLY size that changes. Border-radius stays at
+    // 9999px throughout the animation — the pill shape is preserved
+    // (top semicircle anchored, bottom semicircle drops down, straight
+    // side walls grow to fill the middle). No "pill → rounded card"
+    // morph; it's just the same pill, taller.
     height: spring.progress.to(p => COLLAPSED_PILL_HEIGHT + drawerHeight * p),
-    borderRadius: spring.progress.to(p => 9999 - (9999 - 22) * p),
-    backgroundColor: spring.progress.to(p => {
-      // Glass → slightly more opaque dark when expanded so content
-      // behind doesn't bleed through the drawer.
-      const a = 0.04 + 0.82 * p;
-      const c = 255 - (255 - 22) * p;
-      return `rgba(${c}, ${c}, ${c}, ${a})`;
-    }),
-    borderColor: spring.progress.to(p => `rgba(255, 255, 255, ${0.08 + 0.10 * p})`),
+    backgroundColor: spring.progress.to(p =>
+      // Translucent white tint throughout — backdrop-filter does the
+      // visual containment, NOT background opacity. Goes from very
+      // subtle (collapsed) to slightly more visible (expanded), but
+      // never opaque. Stays iOS-frosted-glass throughout.
+      `rgba(255, 255, 255, ${0.05 + 0.04 * p})`
+    ),
+    borderColor: spring.progress.to(p => `rgba(255, 255, 255, ${0.10 + 0.08 * p})`),
     boxShadow: spring.progress.to(p =>
-      `0 1px 2px rgba(0, 0, 0, 0.3), 0 ${18 * p}px ${40 * p}px rgba(0, 0, 0, ${0.45 * p})`
+      // Soft lift when expanded — gives the glass pill a subtle
+      // hover-off-the-page presence without darkening it.
+      `0 1px 2px rgba(0, 0, 0, 0.3), 0 ${14 * p}px ${32 * p}px rgba(0, 0, 0, ${0.35 * p})`
     )
   };
 
