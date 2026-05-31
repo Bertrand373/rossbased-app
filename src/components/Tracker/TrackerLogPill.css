@@ -35,21 +35,15 @@
   cursor: pointer;
   overflow: hidden;
   z-index: 10;
-  /* Border-radius is locked at 9999px — the pill shape is preserved
-     across expand/collapse (top stays anchored, bottom semicircle
-     drops down with straight sides extending between them). NO
-     pill → rounded-rectangle morph. */
-  border-radius: 9999px;
-  /* Heavy backdrop blur + saturation boost = iOS frosted-glass effect.
-     This is what gives the pill its glass feel regardless of how
-     translucent the background-color is — the blur darkens AND
-     enriches whatever's behind it. */
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  /* Backdrop blur — softens whatever's behind the pill when it's
+     expanded, so the drawer reads as elevated glass rather than a
+     translucent panel competing with text below. */
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
   border-style: solid;
   border-width: 1px;
-  /* Height, background, border-color, and shadow all driven by
-     react-spring inline-style — kept out of this file. */
+  /* All sizing / radius / fill / shadow animations are driven by
+     react-spring inline-style — keep this file out of those. */
   -webkit-tap-highlight-color: transparent;
 }
 
