@@ -27,6 +27,16 @@
   max-width: 300px;
   height: 56px;
   margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Force border-box on every descendant so iOS Safari can't pad the
+   pill into a giant tower (the v3 ship rendered ~280px tall on
+   iOS because <button> elements were taking webkit's default
+   min-height + font metrics on top of my padding). */
+.tracker-log-pill-slot,
+.tracker-log-pill-slot * {
+  box-sizing: border-box;
 }
 
 /* ---- The pill itself ---- */
@@ -157,6 +167,18 @@
    iOS Notes / Reminders nested-rounded pattern. Reads as architectural
    hierarchy. */
 .tlp-row {
+  /* Aggressive iOS button reset — webkit's intrinsic <button> styling
+     (min-height, font shorthand, line-height, vertical-align) was
+     making every row ~70px tall on iPhone instead of the ~48px the
+     CSS specifies. The full reset below brings the row back to a
+     plain flex box that obeys padding/gap exactly. */
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+  min-height: 0;
+  font: inherit;
+  line-height: 1;
+
   width: 100%;
   display: flex;
   align-items: center;
