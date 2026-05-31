@@ -12,12 +12,16 @@
  * directions. Rows themselves have no entrance animation — overflow:
  * hidden on the pill clips them when collapsed.
  *
- * Shape locking
- * -------------
- * border-radius: 9999px is held through every state. At collapsed
- * h=56 it clamps to 28 (h/2 = capsule). At expanded h≈170 it clamps
- * to ~85 (h/2 = still a capsule, taller). The shape stays PILL
- * throughout; only the height changes.
+ * Shape morph
+ * -----------
+ * Corner radius is a small, near-constant value (28 collapsed → 24
+ * expanded), NOT a locked 9999px. Locking at 9999 only looks like a
+ * pill when the box is far wider than tall; in the real ~219px-wide
+ * tracker column the expanded 188px-tall box is nearly square, so 9999
+ * clamps to ~94 (min(w,h)/2) and renders as a CIRCLE. A fixed ~24px
+ * stays a clean rounded card at any width — capsule when collapsed
+ * (28 = h/2 at h56), iOS-style card when expanded. This is the mock's
+ * own documented intent ("border-radius morphs 9999 → 24").
  */
 
 /* ---- Slot: reserves 56px so expanding doesn't push the page ---- */
@@ -53,13 +57,19 @@
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.10);
-  border-radius: 9999px;
+  /* 28px = h/2 at the collapsed 56px height, so the resting pill is a
+     true capsule — visually identical to the old 9999px, but a small
+     finite value the radius can smoothly morph FROM on expand. (9999px
+     would stay clamped to a capsule for ~99% of the animation then snap
+     to the card radius at the very end, and flash a circle on collapse.) */
+  border-radius: 28px;
   overflow: hidden;
   cursor: pointer;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   z-index: 10;
   transition:
     height 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 380ms cubic-bezier(0.22, 1, 0.36, 1),
     background 380ms cubic-bezier(0.22, 1, 0.36, 1),
     border-color 380ms cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 380ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -83,6 +93,10 @@
      1-of-2 / complete) have 46px rows, so this constant holds for every
      state. */
   height: 188px;
+  /* Flatten the corners to a clean iOS-card radius. Fixed value, so it
+     never depends on the box's width/height ratio the way a clamped
+     9999px does — no circle in the narrow tracker column. */
+  border-radius: 24px;
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.16);
   box-shadow:

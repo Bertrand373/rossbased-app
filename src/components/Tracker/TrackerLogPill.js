@@ -2,15 +2,17 @@
 //
 // The consolidated "Log Today" pill on Tracker — Metrics + Photo
 // rolled into a single glass surface that expands in-place to reveal
-// both sub-actions. Stays a pill shape through the entire animation
-// (border-radius locked at 9999px), so the only thing the eye reads
-// changing is the height.
+// both sub-actions. A capsule when collapsed; its corners flatten to a
+// rounded card as it grows, so the eye reads the height change and a
+// gentle corner morph as one motion.
 //
 // Design contract — every detail in here was nailed in the mock
 // before writing this file (.claude/log-pill-mock.html). Don't drift
 // from these without re-checking the mock:
 //
-//   - Border-radius locked at 9999px (rendered as pill at any height)
+//   - Corner radius morphs 28px (collapsed capsule) → 24px (expanded
+//     card). NOT locked at 9999px: in the ~219px-wide column a 9999px
+//     radius clamps to a circle once the box goes near-square.
 //   - Background goes from rgba(255,255,255,0.05) (collapsed)
 //     to rgba(255,255,255,0.08) (expanded). Never opaque dark.
 //   - Heavy backdrop-filter (blur 24px + saturate 180%) does the
