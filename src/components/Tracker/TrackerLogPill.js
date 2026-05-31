@@ -19,9 +19,10 @@
 //     bezier(0.22, 1, 0.36, 1). All animated properties on the same
 //     timing so the eye reads ONE motion both directions.
 //   - Rows are 14px rounded rectangles inside the pill (nested
-//     iOS-style hierarchy), not pills.
-//   - Drawer height measured live via ResizeObserver — animates to
-//     the exact pixel value, no rubber-banding.
+//     iOS-style hierarchy), not pills. Plain <div role="button">, not
+//     <button> — a div has no UA metrics for iOS Safari to inflate.
+//   - Height is constant per state (56 collapsed / 188 expanded),
+//     driven purely by CSS like the mock — no live measurement.
 //   - Outside pointerdown collapses. Keyboard: Enter/Space to
 //     toggle, Escape to close.
 //
@@ -31,13 +32,10 @@
 //   - Photo done ← derived from userData.notes[today].photoKey
 //   - Score ← prop `todayScore` (string)
 
-import React, { useState, useRef, useEffect, useCallback, useLayoutEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { format } from 'date-fns';
 import { hasPhoto } from '../../utils/dayJournal';
 import './TrackerLogPill.css';
-
-const COLLAPSED_HEIGHT = 56;
-const DRAWER_HEIGHT_FALLBACK = 116;
 
 // Inline SVG glyphs — no icon-library dependency. Kept small so they
 // inherit color via currentColor and stay GPU-friendly.
@@ -82,25 +80,6 @@ const TrackerLogPill = ({
 }) => {
   const [expanded, setExpanded] = useState(false);
 
-  // Live drawer measurement — ResizeObserver covers the case where
-  // content shrinks/grows (e.g. row meta switches between "9.0" and
-  // "Captured" widths, or the chevron column appears).
-  const drawerRef = useRef(null);
-  const [drawerHeight, setDrawerHeight] = useState(DRAWER_HEIGHT_FALLBACK);
-
-  useLayoutEffect(() => {
-    if (!drawerRef.current) return undefined;
-    const measure = () => {
-      if (drawerRef.current) {
-        setDrawerHeight(drawerRef.current.scrollHeight);
-      }
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(drawerRef.current);
-    return () => observer.disconnect();
-  }, []);
-
   // Photo state derived live from notes so the pill reflects updates
   // the instant a capture lands.
   const today = useMemo(() => format(new Date(), 'yyyy-MM-dd'), []);
@@ -108,14 +87,6 @@ const TrackerLogPill = ({
 
   const doneCount = (vitalsLogged ? 1 : 0) + (photoCaptured ? 1 : 0);
   const allDone = doneCount === 2;
-
-  // The pill is one element with a single height transition. Inline
-  // style here so the React state controls the exact target. All the
-  // other animated properties (background, border-color, box-shadow)
-  // are in CSS and share the same timing.
-  const pillStyle = {
-    height: expanded ? `${COLLAPSED_HEIGHT + drawerHeight}px` : `${COLLAPSED_HEIGHT}px`
-  };
 
   const pillRef = useRef(null);
 
@@ -195,7 +166,6 @@ const TrackerLogPill = ({
       <div
         ref={pillRef}
         className={`tracker-log-pill${expanded ? ' is-expanded' : ''}${allDone ? ' is-complete' : ''}`}
-        style={pillStyle}
         role="button"
         tabIndex={0}
         aria-expanded={expanded}
@@ -215,12 +185,18 @@ const TrackerLogPill = ({
           </span>
         </div>
 
-        <div className="tlp-drawer" ref={drawerRef}>
-          <button
-            type="button"
+        <div className="tlp-drawer">
+          <div
             className={`tlp-row${vitalsLogged ? ' is-done' : ''}`}
-            onClick={handleVitalsClick}
+            role="button"
             tabIndex={expanded ? 0 : -1}
+            onClick={handleVitalsClick}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleVitalsClick(e);
+              }
+            }}
           >
             <span className="tlp-row-icon">
               {vitalsLogged ? <CheckGlyph /> : <PulseGlyph />}
@@ -232,13 +208,19 @@ const TrackerLogPill = ({
                 <span className="tlp-row-chevron"><ChevronRightGlyph /></span>
               </>
             )}
-          </button>
+          </div>
 
-          <button
-            type="button"
+          <div
             className={`tlp-row${photoCaptured ? ' is-done' : ''}`}
-            onClick={handlePhotoClick}
+            role="button"
             tabIndex={expanded ? 0 : -1}
+            onClick={handlePhotoClick}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handlePhotoClick(e);
+              }
+            }}
           >
             <span className="tlp-row-icon">
               {photoCaptured ? <CheckGlyph /> : <CameraGlyph />}
@@ -250,7 +232,7 @@ const TrackerLogPill = ({
                 <span className="tlp-row-chevron"><ChevronRightGlyph /></span>
               </>
             )}
-          </button>
+          </div>
         </div>
       </div>
     </div>

@@ -45,8 +45,10 @@
   top: 0;
   left: 0;
   right: 0;
-  /* Height is JS-controlled via inline style. 56 default, expanded =
-     56 + measured drawer height. */
+  /* Height is CSS-driven, constant per state, exactly like the mock —
+     56 collapsed, 188 expanded. No JS measurement, so it can't come up
+     short of the approved 188 or balloon if a child mis-measures. */
+  height: 56px;
   background: rgba(255, 255, 255, 0.05);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   backdrop-filter: blur(24px) saturate(180%);
@@ -76,6 +78,11 @@
 }
 
 .tracker-log-pill.is-expanded {
+  /* 188px is the approved mock height: 56 header + 114 drawer content
+     + 18 breathing room below the Photo row. All three states (empty /
+     1-of-2 / complete) have 46px rows, so this constant holds for every
+     state. */
+  height: 188px;
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.16);
   box-shadow:
@@ -167,18 +174,10 @@
    iOS Notes / Reminders nested-rounded pattern. Reads as architectural
    hierarchy. */
 .tlp-row {
-  /* Aggressive iOS button reset — webkit's intrinsic <button> styling
-     (min-height, font shorthand, line-height, vertical-align) was
-     making every row ~70px tall on iPhone instead of the ~48px the
-     CSS specifies. The full reset below brings the row back to a
-     plain flex box that obeys padding/gap exactly. */
-  -webkit-appearance: none;
-  appearance: none;
-  margin: 0;
-  min-height: 0;
-  font: inherit;
-  line-height: 1;
-
+  /* Plain <div role="button"> rows, exactly like the mock. A div has
+     no intrinsic UA metrics, so iOS Safari can't inflate row height the
+     way it did with <button> (min-height / font shorthand /
+     line-height: normal). No reset needed. */
   width: 100%;
   display: flex;
   align-items: center;
@@ -189,6 +188,7 @@
   border: none;
   cursor: pointer;
   font-family: inherit;
+  line-height: 1;
   text-align: left;
   color: inherit;
   transition: background 180ms ease, transform 100ms ease;
