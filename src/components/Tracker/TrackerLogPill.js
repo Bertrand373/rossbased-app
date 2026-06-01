@@ -19,8 +19,11 @@
 //     same on every engine — not reliant on the blur, which Chrome
 //     draws far weaker than iOS Safari (the desktop-looked-transparent
 //     bug).
-//   - Heavy backdrop-filter (blur 30px + saturate 180%) adds the live
-//     glass on top; opacity stays subtle.
+//   - Light backdrop-filter (blur 8px, NO saturate). A heavy blur +
+//     saturate(180%) made iOS Safari flood the pill opaque and tint it
+//     to whatever the hero photo was (green over a forest); Chrome drew
+//     the same filter weakly, so it looked clear there. Small blur + no
+//     saturate renders as clear glass on both engines.
 //   - One transition curve for everything: 380ms ease-out cubic-
 //     bezier(0.22, 1, 0.36, 1). All animated properties on the same
 //     timing so the eye reads ONE motion both directions.
