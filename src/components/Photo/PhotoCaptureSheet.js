@@ -36,7 +36,7 @@ import toast from 'react-hot-toast';
 import useSheetSwipe from '../../hooks/useSheetSwipe';
 import { readEntry, writeEntry, getBaselinePhoto, listPhotoEntries } from '../../utils/dayJournal';
 import { getPresignedUrl } from '../../utils/photoUrl';
-import { format } from 'date-fns';
+import { format, differenceInCalendarDays, parseISO } from 'date-fns';
 import '../../styles/BottomSheet.css';
 import './Photo.css';
 
@@ -65,12 +65,17 @@ const AUTO_CAPTURE_DELAY_MS = 3500;
 // detection boundary (just barely in the oval).
 const LOCK_SETTLE_MS = 200;
 
-// Lock geometry — what counts as "face is in the oval." The oval is
-// drawn centered horizontally and slightly above middle (cy=0.45 of
-// the viewBox), so we check the face center near that point rather
-// than dead-center of the frame.
+// Lock geometry — what counts as "face is in the oval." With the v4
+// full-bleed layout the feed fills the whole sheet: object-fit:cover
+// crops the sides and shows the full frame height, and the oval guide
+// sits in the camera area above the glass deck — visually ~0.32 down
+// the frame. We target that point so the lock zone stays centered on
+// the oval instead of biasing low (the old 3:4 viewport used 0.45,
+// when the oval and the frame's 0.45 line coincided). LOCK_TOL_Y
+// (0.20) comfortably absorbs the small per-device variance in where
+// the fixed-height deck puts the oval.
 const LOCK_TARGET_X = 0.5;
-const LOCK_TARGET_Y = 0.45;
+const LOCK_TARGET_Y = 0.32;
 const LOCK_TOL_X = 0.18;
 const LOCK_TOL_Y = 0.20;
 const LOCK_MIN_AREA = 0.05;
@@ -119,6 +124,28 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
     return priors.length > 0 ? priors[priors.length - 1].photoKey : null;
   }, [userData?.notes, today]);
 
+  // Day number = calendar days since the baseline shot (inclusive), so
+  // the very first shot reads as Day 1. Falls back to a photo count if
+  // the baseline date can't be parsed for any reason.
+  const dayCount = useMemo(() => {
+    const photos = listPhotoEntries(userData?.notes);
+    if (!photos.length) return 1;
+    try {
+      const diff = differenceInCalendarDays(parseISO(today), parseISO(photos[0].dayStr));
+      return Math.max(1, diff + 1);
+    } catch (_) {
+      return photos.length + (todayEntry.photoKey ? 0 : 1);
+    }
+  }, [userData?.notes, today, todayEntry.photoKey]);
+
+  // Zero-pad to 3 ("014") for the odometer feel; switch to grouped
+  // thousands ("2,000" / "10,000") past 999 so the chip never overflows
+  // and the shutter stays centered in the deck grid.
+  const dayLabel = useMemo(() => {
+    const n = Math.max(1, dayCount);
+    return n >= 1000 ? n.toLocaleString('en-US') : String(n).padStart(3, '0');
+  }, [dayCount]);
+
   const isFirstPhoto = !baseline;
   const isReplace = !!todayEntry.photoKey;
 
@@ -129,7 +156,11 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
       setErrorMessage('');
       setCapturedBlob(null);
       setCapturedPreview(null);
-      setShowGhost(false);
+      // Ghost-align is the hero interaction now: default the prior-shot
+      // overlay ON so the user lines up to their last angle. It only
+      // actually renders when a guidance photo exists (never on the
+      // baseline shot), and the deck thumbnail can still toggle it off.
+      setShowGhost(true);
       setLocked(false);
       setFlashing(false);
       settleStartTimeRef.current = 0;
@@ -518,127 +549,134 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
         className={`sheet-panel photo-capture-sheet${sheetReady ? ' open' : ''}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sheet-header" />
+        {/* Full-bleed camera feed — backs the entire sheet; the glass
+            deck below is translucent so the feed frosts through it. */}
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          disablePictureInPicture
+          disableRemotePlayback
+          className={`capture-video${phase === PHASES.LIVE ? ' is-active' : ''}`}
+        />
 
-        <div className="photo-capture-headline">
-          <span className="oracle-pulse-label">{headline}</span>
+        {/* Ghost of the prior shot — default-on so you align to your
+            last angle. Renders only when a guidance photo exists, so it
+            never appears on the baseline shot. */}
+        {phase === PHASES.LIVE && guidanceUrl && showGhost && (
+          <img
+            className="capture-ghost"
+            src={guidanceUrl}
+            alt=""
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Captured still during review — fills the sheet behind the
+            glass deck's Retake / Use-photo actions. */}
+        {phase === PHASES.REVIEW && capturedPreview && (
+          <img
+            className="capture-review-img"
+            src={capturedPreview}
+            alt="Captured frame"
+          />
+        )}
+
+        {/* Legibility scrim under the floating top chrome. */}
+        <div className="capture-scrim" aria-hidden="true" />
+
+        {/* Swipe-to-dismiss handle + floating title. NOT data-no-swipe,
+            so a downward drag here still closes the sheet (the camera
+            stage and deck below opt out so framing taps don't dismiss). */}
+        <div className="capture-handle">
+          <span className="capture-grip" aria-hidden="true" />
+          <span className="capture-title oracle-pulse-label">{headline}</span>
+          {!isFirstPhoto && (phase === PHASES.READY || phase === PHASES.LIVE) && (
+            <span className="capture-subtitle">Align to your baseline</span>
+          )}
         </div>
 
-        <div className="photo-capture-body" data-no-swipe>
-          <div className="capture-viewport">
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              disablePictureInPicture
-              disableRemotePlayback
-              className={`capture-video${phase === PHASES.LIVE ? ' is-active' : ''}`}
-            />
+        {/* CAMERA STAGE — full-bleed feed area; chrome floats on top. */}
+        <div className="capture-stage" data-no-swipe>
+          {/* Guide: registration brackets + face oval + eye-line. All
+              go sage together on lock. */}
+          {(phase === PHASES.READY || phase === PHASES.LIVE) && (
+            <svg
+              className={`capture-guide${locked ? ' is-locked' : ''}`}
+              viewBox="0 0 300 400"
+              preserveAspectRatio="xMidYMid meet"
+              aria-hidden="true"
+            >
+              <path className="capture-bracket" d="M58 78 L58 60 L76 60" />
+              <path className="capture-bracket" d="M242 78 L242 60 L224 60" />
+              <path className="capture-bracket" d="M58 282 L58 300 L76 300" />
+              <path className="capture-bracket" d="M242 282 L242 300 L224 300" />
+              <ellipse cx="150" cy="180" rx="92" ry="120" />
+              <line className="capture-eyeline" x1="80" y1="150" x2="220" y2="150" />
+            </svg>
+          )}
 
-            {phase === PHASES.LIVE && guidanceUrl && showGhost && (
-              <img
-                className="capture-ghost"
-                src={guidanceUrl}
-                alt=""
-                aria-hidden="true"
-              />
-            )}
-
-            {/* Face guide oval — adds .is-locked when face is in
-                position; CSS swaps stroke from white to soft sage. */}
-            {(phase === PHASES.READY || phase === PHASES.LIVE) && (
-              <svg
-                className={`capture-guide${locked ? ' is-locked' : ''}`}
-                viewBox="0 0 300 400"
-                preserveAspectRatio="xMidYMid meet"
-                aria-hidden="true"
-              >
-                <ellipse cx="150" cy="180" rx="92" ry="120" />
-              </svg>
-            )}
-
-            {phase === PHASES.READY && (
-              <div className="capture-ready">
-                <button
-                  type="button"
-                  className="capture-start-btn"
-                  onClick={handleStartCamera}
-                >
-                  Tap to start camera
-                </button>
-              </div>
-            )}
-
-            {phase === PHASES.STARTING && (
-              <div className="capture-status">
-                <span className="capture-status-label">Starting camera…</span>
-              </div>
-            )}
-
-            {phase === PHASES.LIVE && (
-              <div className={`capture-instruction${locked ? ' is-locked' : ''}`}>
-                <span className="capture-instruction-label">
-                  {liveInstruction}
-                </span>
-              </div>
-            )}
-
-            {phase === PHASES.LIVE && guidanceUrl && (
+          {phase === PHASES.READY && (
+            <div className="capture-ready">
               <button
                 type="button"
-                className={`capture-ghost-toggle${showGhost ? ' is-on' : ''}`}
-                onClick={() => setShowGhost(s => !s)}
+                className="capture-start-btn"
+                onClick={handleStartCamera}
               >
-                {showGhost ? 'Hide guide' : 'Show last shot'}
+                Tap to start camera
               </button>
-            )}
+            </div>
+          )}
 
-            {phase === PHASES.REVIEW && capturedPreview && (
-              <img
-                className="capture-review-img"
-                src={capturedPreview}
-                alt="Captured frame"
-              />
-            )}
+          {phase === PHASES.LIVE && (
+            <div className={`capture-instruction${locked ? ' is-locked' : ''}`}>
+              <span className="capture-instruction-label">
+                {liveInstruction}
+              </span>
+            </div>
+          )}
 
-            {phase === PHASES.DENIED && (
-              <div className="capture-status capture-status-denied">
-                <span className="capture-status-eyebrow">Camera blocked</span>
-                <p className="capture-status-message">
-                  Allow camera access in Safari to use the in-app
-                  capture. Or use your device camera below.
-                </p>
-              </div>
-            )}
+          {phase === PHASES.STARTING && (
+            <div className="capture-status">
+              <span className="capture-status-label">Starting camera…</span>
+            </div>
+          )}
 
-            {phase === PHASES.ERROR && (
-              <div className="capture-status capture-status-denied">
-                <span className="capture-status-eyebrow">Camera unavailable</span>
-                <p className="capture-status-message">
-                  {errorMessage || 'Could not start the camera on this device.'}
-                </p>
-              </div>
-            )}
+          {phase === PHASES.DENIED && (
+            <div className="capture-status capture-status-denied">
+              <span className="capture-status-eyebrow">Camera blocked</span>
+              <p className="capture-status-message">
+                Allow camera access in Safari to use the in-app
+                capture. Or use your device camera below.
+              </p>
+            </div>
+          )}
 
-            {phase === PHASES.UPLOADING && (
-              <div className="capture-status capture-status-uploading">
-                <span className="capture-status-label">Saving…</span>
-              </div>
-            )}
+          {phase === PHASES.ERROR && (
+            <div className="capture-status capture-status-denied">
+              <span className="capture-status-eyebrow">Camera unavailable</span>
+              <p className="capture-status-message">
+                {errorMessage || 'Could not start the camera on this device.'}
+              </p>
+            </div>
+          )}
 
-            {/* White flash on capture */}
-            {flashing && <div className="capture-flash" aria-hidden="true" />}
-          </div>
+          {phase === PHASES.UPLOADING && (
+            <div className="capture-status capture-status-uploading">
+              <span className="capture-status-label">Saving…</span>
+            </div>
+          )}
+        </div>
 
-          {/* Progress bar divider — sits between the camera viewport
-              and the controls deck. Does double duty: visual
-              separator + countdown indicator. When .is-locked is on,
-              the sage fill animates left-to-right over
-              AUTO_CAPTURE_DELAY_MS. `key={locked}` re-mounts the
-              fill on each lock acquire so the CSS animation restarts
-              cleanly from 0. Animating transform: scaleX is
-              bulletproof on iOS Safari (unlike SVG stroke-dashoffset). */}
+        {/* FROSTED GLASS DECK — the sheet's own material; controls live
+            here on top of the feed frosting through from above. */}
+        <div className="capture-deck" data-no-swipe>
+          {/* Auto-capture countdown rides the camera→glass seam. When
+              .is-locked is on, the sage fill animates left-to-right over
+              AUTO_CAPTURE_DELAY_MS. key={locked} re-mounts the fill on
+              each lock so the CSS animation restarts cleanly from 0.
+              transform: scaleX is bulletproof on iOS Safari. */}
           {phase === PHASES.LIVE && (
             <div className={`capture-progress${locked ? ' is-locked' : ''}`}>
               <div
@@ -648,12 +686,16 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
             </div>
           )}
 
-          {/* Live shutter — always tappable; auto-capture is on top
-              of, not instead of, the manual tap. The shutter stays
-              pure white now; the progress bar above is the countdown
-              indicator instead of the inner disc. */}
+          {/* Live controls — 3-zone grid (day-count · shutter · last
+              shot). Shutter is the fixed center column so it stays
+              optically centered no matter how wide the count grows. */}
           {phase === PHASES.LIVE && (
-            <div className="capture-controls">
+            <div className="capture-deck-row">
+              <div className="capture-daycount">
+                <span className="capture-daycount-k">Day</span>
+                <span className="capture-daycount-v">{dayLabel}</span>
+              </div>
+
               <button
                 type="button"
                 className={`capture-shutter${locked ? ' is-locked' : ''}`}
@@ -662,6 +704,31 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
               >
                 <span className="capture-shutter-inner" />
               </button>
+
+              {guidanceUrl ? (
+                <button
+                  type="button"
+                  className={`capture-thumb${showGhost ? ' is-on' : ''}`}
+                  onClick={() => setShowGhost(s => !s)}
+                  aria-pressed={showGhost}
+                  aria-label={showGhost ? 'Hide last shot' : 'Show last shot'}
+                >
+                  <img src={guidanceUrl} alt="" aria-hidden="true" />
+                  <span className="capture-thumb-label">Last shot</span>
+                </button>
+              ) : (
+                <span className="capture-thumb-spacer" aria-hidden="true" />
+              )}
+            </div>
+          )}
+
+          {phase === PHASES.READY && (
+            <div className="capture-deck-message">
+              <span className="capture-ready-sub-label">
+                {isFirstPhoto
+                  ? 'Your first shot becomes the baseline every future photo lines up against.'
+                  : 'Same angle as your last shot. Quick and consistent.'}
+              </span>
             </div>
           )}
 
@@ -710,17 +777,10 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
               />
             </div>
           )}
-
-          {phase === PHASES.READY && (
-            <div className="capture-ready-sub">
-              <span className="capture-ready-sub-label">
-                {isFirstPhoto
-                  ? 'Your first shot becomes the baseline every future photo lines up against.'
-                  : 'Same angle as your last shot. Quick and consistent.'}
-              </span>
-            </div>
-          )}
         </div>
+
+        {/* White flash on capture — full-sheet, above all chrome. */}
+        {flashing && <div className="capture-flash" aria-hidden="true" />}
       </div>
     </div>,
     document.body
