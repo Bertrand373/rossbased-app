@@ -13,12 +13,10 @@
 //   - Corner radius morphs 28px (collapsed capsule) → 24px (expanded
 //     card). NOT locked at 9999px: in the ~219px-wide column a 9999px
 //     radius clamps to a circle once the box goes near-square.
-//   - Background goes from rgba(255,255,255,0.05) (collapsed)
-//     to rgba(255,255,255,0.18) (expanded). Never opaque dark. The
-//     expanded 18% tint gives the card frosted BODY that renders the
-//     same on every engine — not reliant on the blur, which Chrome
-//     draws far weaker than iOS Safari (the desktop-looked-transparent
-//     bug).
+//   - Background is a constant rgba(255,255,255,0.05) — the SAME clear
+//     glass collapsed and expanded. Expanding changes height, corner
+//     radius, and adds a drop shadow; it does NOT shift the fill tone
+//     (the earlier two-tone 5% -> 18% read as jarring).
 //   - Light backdrop-filter (blur 8px, NO saturate). A heavy blur +
 //     saturate(180%) made iOS Safari flood the pill opaque and tint it
 //     to whatever the hero photo was (green over a forest); Chrome drew

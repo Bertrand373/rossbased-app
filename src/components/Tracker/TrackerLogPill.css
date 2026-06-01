@@ -106,14 +106,10 @@
      never depends on the box's width/height ratio the way a clamped
      9999px does — no circle in the narrow tracker column. */
   border-radius: 24px;
-  /* 18% white fill (up from 8%) gives the expanded card real frosted
-     BODY instead of relying on backdrop-filter alone. The blur renders
-     differently per browser engine (strong on iOS Safari, weak on
-     desktop Chrome); a solid-ish tint renders identically everywhere,
-     so the card reads as frosted glass on both instead of see-through
-     on desktop. */
-  background: rgba(255, 255, 255, 0.18);
-  border-color: rgba(255, 255, 255, 0.16);
+  /* No tone change on expand — the fill stays the same clear glass as
+     collapsed (base 5% white). Expanding only grows the height, flattens
+     the corners, and drops the shadow below for lift. We deliberately do
+     NOT bump the fill when open; that two-tone shift read as jarring. */
   box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.3),
     0 14px 32px rgba(0, 0, 0, 0.35);
@@ -126,8 +122,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 0 26px;
+  /* Tight gap + 22px side padding keeps the longest header ("✓ 9.3 ·
+     Logged today") from colliding with the absolutely-positioned caret
+     on the narrow 219px desktop pill. */
+  gap: 6px;
+  padding: 0 22px;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -142,7 +141,7 @@
 
 .tlp-sep {
   color: rgba(255, 255, 255, 0.4);
-  margin: 0 2px;
+  margin: 0;
   font-size: 0.7rem;
 }
 
@@ -172,7 +171,9 @@
 /* Chevron — tap affordance. Rotates 180° on expand. */
 .tlp-caret {
   position: absolute;
-  right: 22px;
+  /* 14px (not 22): buys clearance from the completed-state label on the
+     narrow desktop pill so the chevron doesn't hug "today". */
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
   color: rgba(255, 255, 255, 0.4);
