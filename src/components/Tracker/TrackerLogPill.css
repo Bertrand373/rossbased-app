@@ -54,17 +54,13 @@
      short of the approved 188 or balloon if a child mis-measures. */
   height: 56px;
   background: rgba(255, 255, 255, 0.05);
-  /* Light blur, NO saturate — this is the whole "why is it green on my
-     phone" fix. saturate(180%) super-charged the saturation of whatever
-     sat behind the pill, so over a green hero photo iOS Safari flooded the
-     entire pill green. A heavy blur(30) was the other half: Safari renders
-     backdrop-filter far stronger than Chrome, frosting it opaque on phone
-     while it stayed clear on desktop. blur(8) with no saturate reads as
-     light, see-through glass on BOTH engines. The collapsed pill stays
-     clear; the expanded drawer's body comes from the white tint below
-     (engine-independent), not from this filter. */
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  /* NO backdrop-filter — on purpose. Any blur, even a light one, is
+     composited by iOS Safari a frame AFTER the first paint, so the pill
+     rendered clear and then visibly "popped" to frosted on load. That
+     one-frame shift read as unprofessional. A plain translucent tint +
+     border paints in a single pass: identical on the first frame and
+     forever after — one render, no shift, same on every engine. (Trade-off
+     is no live background blur, but the clear look is the one we want.) */
   border: 1px solid rgba(255, 255, 255, 0.10);
   /* 28px = h/2 at the collapsed 56px height, so the resting pill is a
      true capsule — visually identical to the old 9999px, but a small

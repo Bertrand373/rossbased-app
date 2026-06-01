@@ -17,11 +17,11 @@
 //     glass collapsed and expanded. Expanding changes height, corner
 //     radius, and adds a drop shadow; it does NOT shift the fill tone
 //     (the earlier two-tone 5% -> 18% read as jarring).
-//   - Light backdrop-filter (blur 8px, NO saturate). A heavy blur +
-//     saturate(180%) made iOS Safari flood the pill opaque and tint it
-//     to whatever the hero photo was (green over a forest); Chrome drew
-//     the same filter weakly, so it looked clear there. Small blur + no
-//     saturate renders as clear glass on both engines.
+//   - NO backdrop-filter. Even a light blur is composited by iOS Safari a
+//     frame after first paint, so the pill popped clear -> frosted on load
+//     (an unprofessional shift). A plain translucent tint + border paints
+//     in one pass: one stable render, no shift. (A heavy blur + saturate
+//     also used to flood it green over a green photo — gone too.)
 //   - One transition curve for everything: 380ms ease-out cubic-
 //     bezier(0.22, 1, 0.36, 1). All animated properties on the same
 //     timing so the eye reads ONE motion both directions.
