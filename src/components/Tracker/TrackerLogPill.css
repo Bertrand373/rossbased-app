@@ -196,9 +196,9 @@
 }
 
 /* ---- Rows ---- */
-/* 14px radius (vs the parent pill's 28px clamped radius) follows the
-   iOS Notes / Reminders nested-rounded pattern. Reads as architectural
-   hierarchy. */
+/* Rows are pill-shaped: border-radius 9999px clamps to h/2 = 23px at the
+   46px row height, a true capsule. So the hover / active / focus highlight
+   reads as a pill that echoes the parent surface, not a rounded square. */
 .tlp-row {
   /* Plain <div role="button"> rows, exactly like the mock. A div has
      no intrinsic UA metrics, so iOS Safari can't inflate row height the
@@ -209,7 +209,7 @@
   align-items: center;
   gap: 14px;
   padding: 12px 14px;
-  border-radius: 14px;
+  border-radius: 9999px;
   background: transparent;
   border: none;
   cursor: pointer;

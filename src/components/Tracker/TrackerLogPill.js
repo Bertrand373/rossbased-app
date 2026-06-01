@@ -25,9 +25,10 @@
 //   - One transition curve for everything: 380ms ease-out cubic-
 //     bezier(0.22, 1, 0.36, 1). All animated properties on the same
 //     timing so the eye reads ONE motion both directions.
-//   - Rows are 14px rounded rectangles inside the pill (nested
-//     iOS-style hierarchy), not pills. Plain <div role="button">, not
-//     <button> — a div has no UA metrics for iOS Safari to inflate.
+//   - Rows are pill-shaped (border-radius 9999px → 23px capsule at the
+//     46px row height), so the hover/active highlight is a pill, not a
+//     rounded square. Plain <div role="button">, not <button> — a div has
+//     no UA metrics for iOS Safari to inflate.
 //   - Height is constant per state (56 collapsed / 188 expanded),
 //     driven purely by CSS like the mock — no live measurement.
 //   - Outside pointerdown collapses. Keyboard: Enter/Space to
