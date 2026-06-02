@@ -2326,6 +2326,8 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
           ? (
             <JourneyView
               userData={userData}
+              isPremium={isPremium}
+              openPlanModal={openPlanModal}
               phasePhotos={currentPhaseGroup ? currentPhaseGroup.photos : []}
               phaseKey={currentPhaseGroup?.phase?.id || 'empty'}
               onAddFirstPhoto={() => {

@@ -885,6 +885,8 @@ function AppContent({
               onClose={() => setShowCircleSheet(false)}
               viewerUsername={userData?.username}
               currentStreak={userData?.currentStreak || 0}
+              isPremium={effectivePremium}
+              openPlanModal={openPlanModal}
             />
 
             <MeSheet

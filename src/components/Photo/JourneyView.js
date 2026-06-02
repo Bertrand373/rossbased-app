@@ -23,6 +23,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { getPresignedUrl } from '../../utils/photoUrl';
+import { listPhotoEntries } from '../../utils/dayJournal';
 import { MILESTONE_DAYS } from './MilestoneSheet';
 import PhotoLightbox from './PhotoLightbox';
 
@@ -57,7 +58,7 @@ const JourneyCell = ({ entry, dayNumber, isMilestone, cellIndex, onOpen }) => {
   );
 };
 
-const JourneyView = ({ phasePhotos, phaseKey, onAddFirstPhoto }) => {
+const JourneyView = ({ userData, phasePhotos, phaseKey, onAddFirstPhoto, isPremium, openPlanModal }) => {
   const photos = phasePhotos || [];
   const [lightboxState, setLightboxState] = useState({ open: false, url: null });
 
@@ -77,6 +78,34 @@ const JourneyView = ({ phasePhotos, phaseKey, onAddFirstPhoto }) => {
         </p>
         <button type="button" className="journey-empty-cta-btn" onClick={onAddFirstPhoto}>
           Set your baseline
+        </button>
+      </div>
+    );
+  }
+
+  // Premium gate — capturing daily photos is free (it builds the habit
+  // and the record), but the transformation TIMELINE is the payoff and
+  // lives behind Premium. Free users see how much they've banked + the
+  // path to unlock it (the milestone share stays free elsewhere).
+  if (!isPremium) {
+    const totalShots = listPhotoEntries(userData?.notes).length;
+    return (
+      <div className="journey-view journey-empty journey-locked" data-no-swipe>
+        <div className="journey-empty-frame" aria-hidden="true">
+          <span className="journey-empty-frame-glyph">✦</span>
+        </div>
+        <h3 className="journey-empty-headline">Your transformation timeline</h3>
+        <p className="journey-empty-sub">
+          {totalShots > 0
+            ? `You've banked ${totalShots} ${totalShots === 1 ? 'shot' : 'shots'}. Unlock the timeline to see every day side by side — and watch yourself change.`
+            : 'See every shot side by side and watch yourself change over time.'}
+        </p>
+        <button
+          type="button"
+          className="journey-empty-cta-btn"
+          onClick={() => openPlanModal && openPlanModal()}
+        >
+          Unlock with Premium
         </button>
       </div>
     );

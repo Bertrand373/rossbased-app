@@ -20,7 +20,7 @@ import './Circle.css';
 const NAME_MAX = 40;
 const CODE_LENGTH = 6;
 
-const CircleEmptySheet = ({ open, onClose }) => {
+const CircleEmptySheet = ({ open, onClose, isPremium, openPlanModal }) => {
   const { createCircle, joinByCode } = useCircle();
   const [sheetReady, setSheetReady] = useState(false);
   const sheetPanelRef = useRef(null);
@@ -136,7 +136,13 @@ const CircleEmptySheet = ({ open, onClose }) => {
               Private. Three to five people you invite. Daily check-ins visible only inside the circle.
             </p>
             <div className="circle-empty-actions">
-              <button className="btn-primary" type="button" onClick={() => setMode('create')}>
+              <button
+                className="btn-primary"
+                type="button"
+                onClick={() => isPremium
+                  ? setMode('create')
+                  : closeSheet(() => { onClose && onClose(); openPlanModal && openPlanModal(); })}
+              >
                 Create a Circle
               </button>
               <button className="btn-ghost" type="button" onClick={() => setMode('join')}>

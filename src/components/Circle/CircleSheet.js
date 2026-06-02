@@ -25,7 +25,7 @@ import './Circle.css';
 
 const NOTE_MAX = 140;
 
-const CircleSheet = ({ open, onClose, viewerUsername, currentStreak }) => {
+const CircleSheet = ({ open, onClose, viewerUsername, currentStreak, isPremium, openPlanModal }) => {
   const { circle, submitCheckIn, removeCheckIn, leave, refresh } = useCircle();
 
   const [sheetReady, setSheetReady] = useState(false);
@@ -77,7 +77,7 @@ const CircleSheet = ({ open, onClose, viewerUsername, currentStreak }) => {
   // the user started there — that lets the post-create "code reveal"
   // step render without being unmounted by the context refresh.
   if (open && (startedEmpty || !circle)) {
-    return <CircleEmptySheet open={open} onClose={onClose} />;
+    return <CircleEmptySheet open={open} onClose={onClose} isPremium={isPremium} openPlanModal={openPlanModal} />;
   }
 
   if (!open || !circle) return null;

@@ -22,6 +22,7 @@ const mongoose = require('mongoose');
 const Circle = require('../models/Circle');
 const CircleCheckIn = require('../models/CircleCheckIn');
 const User = require('../models/User');
+const { checkPremiumAccess } = require('../middleware/subscriptionMiddleware');
 
 const NAME_MAX = Circle.NAME_MAX;
 const MAX_MEMBERS = Circle.MAX_MEMBERS;
@@ -177,9 +178,17 @@ router.post('/', async (req, res) => {
     if (!rawName) return res.status(400).json({ error: 'Name is required' });
     if (rawName.length > NAME_MAX) return res.status(400).json({ error: `Name must be ${NAME_MAX} chars or fewer` });
 
+    // Pay-to-create: creating a circle is a Premium action (joining stays
+    // free). checkPremiumAccess respects the PAYWALL_ENABLED switch + test
+    // users, so this is a no-op pre-launch and for grandfathered/active subs.
+    const actor = await User.findOne({ username }, { circleId: 1, subscription: 1, username: 1 }).lean();
+    const { hasPremium } = checkPremiumAccess(actor || { username });
+    if (!hasPremium) {
+      return res.status(403).json({ error: 'Creating a circle is a Premium feature', code: 'PREMIUM_REQUIRED' });
+    }
+
     // Already in a circle? Block — one circle per user.
-    const existing = await User.findOne({ username }, { circleId: 1 }).lean();
-    if (existing?.circleId) {
+    if (actor?.circleId) {
       return res.status(409).json({ error: 'You are already in a circle', code: 'ALREADY_IN_CIRCLE' });
     }
 
