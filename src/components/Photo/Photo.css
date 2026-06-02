@@ -358,37 +358,22 @@
   opacity: 1;
 }
 
-/* Registration brackets + eye-line — the signature alignment layer.
-   Same hairline vocabulary as the oval: white at rest, sage on lock
-   (in sync with the ellipse). The eye-line is what you match daily so
-   head height/angle stays consistent shot to shot. */
-.capture-bracket,
+/* Eye-line — the one alignment signature. A restrained hairline you
+   match daily so head height/angle stays consistent shot to shot.
+   Finer and lower-opacity now the brackets are gone; sage on lock,
+   in sync with the oval. */
 .capture-eyeline {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.5);
-  stroke-width: 1.5;
+  stroke: rgba(255, 255, 255, 0.22);
+  stroke-width: 1;
   vector-effect: non-scaling-stroke;
+  stroke-dasharray: 2 8;
+  stroke-linecap: round;
   transition: stroke 320ms ease;
 }
 
-.capture-bracket {
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.capture-eyeline {
-  stroke: rgba(255, 255, 255, 0.3);
-  stroke-width: 1;
-  stroke-dasharray: 2 7;
-  stroke-linecap: round;
-}
-
-.capture-guide.is-locked .capture-bracket {
-  stroke: rgba(140, 200, 150, 0.95);
-}
-
 .capture-guide.is-locked .capture-eyeline {
-  stroke: rgba(140, 200, 150, 0.5);
+  stroke: rgba(140, 200, 150, 0.42);
 }
 
 /* Ready state — sits centered over the dark viewport with the face
@@ -641,7 +626,9 @@
    still tap to override at any point during the countdown. */
 .capture-shutter.is-locked {
   border-color: rgba(140, 200, 150, 0.92);
-  box-shadow: 0 0 22px rgba(140, 200, 150, 0.42);
+  /* Whisper of glow, not a halo — the countdown bar and the sage oval
+     already carry the "locked" signal; the shutter shouldn't shout. */
+  box-shadow: 0 0 8px rgba(140, 200, 150, 0.22);
   transition:
     box-shadow 320ms ease,
     border-color 320ms ease,

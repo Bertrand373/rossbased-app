@@ -124,19 +124,28 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
     return priors.length > 0 ? priors[priors.length - 1].photoKey : null;
   }, [userData?.notes, today]);
 
-  // Day number = calendar days since the baseline shot (inclusive), so
-  // the very first shot reads as Day 1. Falls back to a photo count if
-  // the baseline date can't be parsed for any reason.
+  // Day number for the shot — the user's JOURNEY day, matching the big
+  // counter everywhere else in the app (not days since the first photo).
+  // currentStreak is the app's source of truth "for consistency across
+  // all tabs", so we use it for today's shot. A back-dated retake
+  // (targetDate) derives that specific day's number from startDate.
   const dayCount = useMemo(() => {
-    const photos = listPhotoEntries(userData?.notes);
-    if (!photos.length) return 1;
-    try {
-      const diff = differenceInCalendarDays(parseISO(today), parseISO(photos[0].dayStr));
-      return Math.max(1, diff + 1);
-    } catch (_) {
-      return photos.length + (todayEntry.photoKey ? 0 : 1);
+    if (targetDate && userData?.startDate) {
+      try {
+        const d = differenceInCalendarDays(parseISO(targetDate), parseISO(userData.startDate)) + 1;
+        if (Number.isFinite(d) && d >= 1) return d;
+      } catch (_) { /* fall through to stored streak */ }
     }
-  }, [userData?.notes, today, todayEntry.photoKey]);
+    const streak = Number(userData?.currentStreak);
+    if (Number.isFinite(streak) && streak >= 1) return streak;
+    if (userData?.startDate) {
+      try {
+        const d = differenceInCalendarDays(parseISO(today), parseISO(userData.startDate)) + 1;
+        if (Number.isFinite(d) && d >= 1) return d;
+      } catch (_) { /* fall through */ }
+    }
+    return 1;
+  }, [targetDate, today, userData?.currentStreak, userData?.startDate]);
 
   // Zero-pad to 3 ("014") for the odometer feel; switch to grouped
   // thousands ("2,000" / "10,000") past 999 so the chip never overflows
@@ -156,11 +165,11 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
       setErrorMessage('');
       setCapturedBlob(null);
       setCapturedPreview(null);
-      // Ghost-align is the hero interaction now: default the prior-shot
-      // overlay ON so the user lines up to their last angle. It only
-      // actually renders when a guidance photo exists (never on the
-      // baseline shot), and the deck thumbnail can still toggle it off.
-      setShowGhost(true);
+      // Ghost overlay defaults OFF for a clean, crisp feed — a faint
+      // double-exposure of your last shot over your face reads muddy.
+      // Tap the deck thumbnail to ghost-on when you want to align to
+      // your baseline angle. Never shows on the baseline shot anyway.
+      setShowGhost(false);
       setLocked(false);
       setFlashing(false);
       settleStartTimeRef.current = 0;
@@ -592,15 +601,16 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
         <div className="capture-handle">
           <span className="capture-grip" aria-hidden="true" />
           <span className="capture-title oracle-pulse-label">{headline}</span>
-          {!isFirstPhoto && (phase === PHASES.READY || phase === PHASES.LIVE) && (
+          {!isFirstPhoto && phase === PHASES.READY && (
             <span className="capture-subtitle">Align to your baseline</span>
           )}
         </div>
 
         {/* CAMERA STAGE — full-bleed feed area; chrome floats on top. */}
         <div className="capture-stage" data-no-swipe>
-          {/* Guide: registration brackets + face oval + eye-line. All
-              go sage together on lock. */}
+          {/* Face guide — oval + one hairline eye-line you match daily.
+              Both go sage on lock. (Corner brackets removed: the oval
+              already frames the face; brackets just added HUD noise.) */}
           {(phase === PHASES.READY || phase === PHASES.LIVE) && (
             <svg
               className={`capture-guide${locked ? ' is-locked' : ''}`}
@@ -608,12 +618,8 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
               preserveAspectRatio="xMidYMid meet"
               aria-hidden="true"
             >
-              <path className="capture-bracket" d="M58 78 L58 60 L76 60" />
-              <path className="capture-bracket" d="M242 78 L242 60 L224 60" />
-              <path className="capture-bracket" d="M58 282 L58 300 L76 300" />
-              <path className="capture-bracket" d="M242 282 L242 300 L224 300" />
               <ellipse cx="150" cy="180" rx="92" ry="120" />
-              <line className="capture-eyeline" x1="80" y1="150" x2="220" y2="150" />
+              <line className="capture-eyeline" x1="92" y1="150" x2="208" y2="150" />
             </svg>
           )}
 
@@ -714,7 +720,6 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
                   aria-label={showGhost ? 'Hide last shot' : 'Show last shot'}
                 >
                   <img src={guidanceUrl} alt="" aria-hidden="true" />
-                  <span className="capture-thumb-label">Last shot</span>
                 </button>
               ) : (
                 <span className="capture-thumb-spacer" aria-hidden="true" />
