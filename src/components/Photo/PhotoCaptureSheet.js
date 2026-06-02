@@ -623,18 +623,6 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
             </svg>
           )}
 
-          {phase === PHASES.READY && (
-            <div className="capture-ready">
-              <button
-                type="button"
-                className="capture-start-btn"
-                onClick={handleStartCamera}
-              >
-                Tap to start camera
-              </button>
-            </div>
-          )}
-
           {phase === PHASES.LIVE && (
             <div className={`capture-instruction${locked ? ' is-locked' : ''}`}>
               <span className="capture-instruction-label">
@@ -728,12 +716,19 @@ const PhotoCaptureSheet = ({ open, onClose, userData, updateUserData, onSaved, t
           )}
 
           {phase === PHASES.READY && (
-            <div className="capture-deck-message">
+            <div className="capture-deck-ready">
               <span className="capture-ready-sub-label">
                 {isFirstPhoto
                   ? 'Your first shot becomes the baseline every future photo lines up against.'
                   : 'Same angle as your last shot. Quick and consistent.'}
               </span>
+              <button
+                type="button"
+                className="capture-start-btn"
+                onClick={handleStartCamera}
+              >
+                Tap to start camera
+              </button>
             </div>
           )}
 
