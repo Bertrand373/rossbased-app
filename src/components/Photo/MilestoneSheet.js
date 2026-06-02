@@ -92,12 +92,42 @@ export function phaseForDay(dayNumber) {
 }
 
 /**
+ * Day-number of the user's baseline PHOTO — days from streak start to the
+ * baseline shot (inclusive). Returns 0 when there's no baseline yet. This
+ * anchors milestone eligibility to when the user actually started taking
+ * photos, not their raw streak day.
+ */
+function baselinePhotoDay(userData) {
+  const baseline = getBaselinePhoto(userData?.notes);
+  if (!baseline?.dayStr) return 0;
+  if (!userData?.startDate) return 1;
+  try {
+    const start = typeof userData.startDate === 'string'
+      ? parseISO(userData.startDate)
+      : new Date(userData.startDate);
+    const baselineDate = parseISO(baseline.dayStr);
+    const diff = Math.floor((baselineDate - start) / (1000 * 60 * 60 * 24)) + 1;
+    return Math.max(1, diff);
+  } catch (_) {
+    return 1;
+  }
+}
+
+/**
  * Compute the next un-celebrated milestone the user qualifies for.
  * Returns null if there isn't one to celebrate right now.
+ *
+ * Skips any milestone the user already passed BEFORE their baseline photo.
+ * You can't celebrate "Day 7" for someone who started photos at Day 2601 —
+ * there's no Day-1 shot to compare against, and firing it would show a
+ * nonsensical "DAY 2601 vs DAY 7" composite. This is what keeps the
+ * celebration from misfiring for long-streak users who join photos late.
  */
 export function pendingMilestone(userData, currentStreak) {
   const celebrated = new Set(userData?.milestonesCelebrated || []);
+  const baselineDay = baselinePhotoDay(userData);
   for (const d of MILESTONE_DAYS) {
+    if (d <= baselineDay) continue;
     if (currentStreak >= d && !celebrated.has(d)) return d;
   }
   return null;
