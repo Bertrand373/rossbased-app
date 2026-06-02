@@ -58,6 +58,29 @@ const JourneyCell = ({ entry, dayNumber, isMilestone, cellIndex, onOpen }) => {
   );
 };
 
+// Free-tier taste — the user's most recent shot, shown inside the locked
+// journey so capturing never feels like a black hole. Tap to view it full
+// screen; the full side-by-side timeline stays Premium.
+const LockedLatest = ({ photoKey, onOpen }) => {
+  const [url, setUrl] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    getPresignedUrl(photoKey).then((u) => { if (!cancelled) setUrl(u); });
+    return () => { cancelled = true; };
+  }, [photoKey]);
+  return (
+    <button
+      type="button"
+      className="journey-locked-preview"
+      onClick={() => url && onOpen(url)}
+      aria-label="View your latest photo"
+    >
+      {url ? <img src={url} alt="Your latest photo" /> : null}
+      <span className="journey-locked-tag">Latest</span>
+    </button>
+  );
+};
+
 const JourneyView = ({ userData, phasePhotos, phaseKey, onAddFirstPhoto, isPremium, openPlanModal }) => {
   const photos = phasePhotos || [];
   const [lightboxState, setLightboxState] = useState({ open: false, url: null });
@@ -83,31 +106,49 @@ const JourneyView = ({ userData, phasePhotos, phaseKey, onAddFirstPhoto, isPremi
     );
   }
 
-  // Premium gate — capturing daily photos is free (it builds the habit
-  // and the record), but the transformation TIMELINE is the payoff and
-  // lives behind Premium. Free users see how much they've banked + the
-  // path to unlock it (the milestone share stays free elsewhere).
+  // Premium gate — capturing daily photos stays free (the habit + the
+  // record). Free users get a TASTE here: their most recent shot, tappable
+  // to full screen. The full transformation timeline — every shot side by
+  // side — is the payoff and lives behind Premium.
   if (!isPremium) {
-    const totalShots = listPhotoEntries(userData?.notes).length;
+    const all = listPhotoEntries(userData?.notes);
+    const totalShots = all.length;
+    const latest = totalShots ? all[totalShots - 1] : null;
     return (
-      <div className="journey-view journey-empty journey-locked" data-no-swipe>
-        <div className="journey-empty-frame" aria-hidden="true">
-          <span className="journey-empty-frame-glyph">✦</span>
+      <>
+        <div className="journey-view journey-empty journey-locked" data-no-swipe>
+          {latest ? (
+            <LockedLatest
+              photoKey={latest.photoKey}
+              onOpen={(url) => setLightboxState({ open: true, url, dayNumber: null })}
+            />
+          ) : (
+            <div className="journey-empty-frame" aria-hidden="true">
+              <span className="journey-empty-frame-glyph">✦</span>
+            </div>
+          )}
+          <h3 className="journey-empty-headline">Your transformation timeline</h3>
+          <p className="journey-empty-sub">
+            {totalShots > 1
+              ? `That's your latest. Unlock Premium to line up all ${totalShots} shots side by side — and watch yourself change.`
+              : 'Keep capturing daily. Unlock Premium to see your full transformation over time.'}
+          </p>
+          <button
+            type="button"
+            className="journey-empty-cta-btn"
+            onClick={() => openPlanModal && openPlanModal()}
+          >
+            Unlock with Premium
+          </button>
         </div>
-        <h3 className="journey-empty-headline">Your transformation timeline</h3>
-        <p className="journey-empty-sub">
-          {totalShots > 0
-            ? `You've banked ${totalShots} ${totalShots === 1 ? 'shot' : 'shots'}. Unlock the timeline to see every day side by side — and watch yourself change.`
-            : 'See every shot side by side and watch yourself change over time.'}
-        </p>
-        <button
-          type="button"
-          className="journey-empty-cta-btn"
-          onClick={() => openPlanModal && openPlanModal()}
-        >
-          Unlock with Premium
-        </button>
-      </div>
+
+        <PhotoLightbox
+          open={lightboxState.open}
+          src={lightboxState.url}
+          alt=""
+          onClose={() => setLightboxState({ open: false, url: null })}
+        />
+      </>
     );
   }
 
