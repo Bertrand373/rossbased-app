@@ -77,6 +77,39 @@ export default defineConfig(({ mode }) => {
       outDir: 'build',
       assetsDir: 'static',
       sourcemap: false,
+      rollupOptions: {
+        output: {
+          // Peel heavy, independent vendor libs into their own chunks. They
+          // cache separately (a deploy that doesn't touch tfjs/firebase won't
+          // force a re-download) and the initial JS parse is spread across
+          // files instead of one ~3 MB monolith. Group by whole package so a
+          // single library is never split across chunks.
+          manualChunks(id) {
+            if (!id.includes('node_modules')) return undefined;
+            if (id.includes('@tensorflow')) return 'vendor-tfjs';
+            if (id.includes('@mediapipe')) return 'vendor-mediapipe';
+            if (id.includes('firebase') || id.includes('@firebase')) return 'vendor-firebase';
+            if (
+              id.includes('chart.js') ||
+              id.includes('recharts') ||
+              id.includes('react-chartjs-2') ||
+              id.includes('d3-') ||
+              id.includes('victory-vendor')
+            ) {
+              return 'vendor-charts';
+            }
+            if (
+              id.includes('/react/') ||
+              id.includes('/react-dom/') ||
+              id.includes('/scheduler/') ||
+              id.includes('react-router')
+            ) {
+              return 'vendor-react';
+            }
+            return undefined;
+          },
+        },
+      },
     },
   };
 });
