@@ -470,15 +470,16 @@ function App() {
   });
   const [loadingMessage, setLoadingMessage] = useState('Loading...');
   
-  // Minimum loading screen duration for smooth UX (prevents flash).
-  //   PWA standalone: 3800ms (~800ms iOS splash + ~3000ms / ~1.5 pulses).
-  //   Browser/desktop: 1800ms — no splash to cover, but still long enough
-  //     for one clean pulse cycle to be visually perceivable. 600ms (the
-  //     original value) showed so little of the 2s pulse that it read as
-  //     static.
+  // Minimum loading-screen duration — just a floor so the loader never
+  // flickers sub-frame on a fast/cached load. The REAL gate is the data
+  // fetch below (useUserData / useSubscription), which holds the loader
+  // until the app is genuinely ready; this is not padding on top of it.
+  // Kept short so the app opens the instant its data lands. The service
+  // worker now serves the cached shell instantly (stale-while-revalidate),
+  // so there's no blank window left that needs masking with a long hold.
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches
     || window.navigator.standalone === true;
-  const MIN_LOADING_MS = isStandalone ? 3800 : 1800;
+  const MIN_LOADING_MS = isStandalone ? 1000 : 600;
   
   const [minLoadingComplete, setMinLoadingComplete] = useState(false);
   
@@ -538,7 +539,10 @@ function App() {
 
   useEffect(() => {
     if (isRefreshLoading) {
-      const timer = setTimeout(() => setIsRefreshLoading(false), 1200);
+      // Brief hold for the "we think you're logged in" case so returning
+      // users don't flash logged-out UI before userData resolves. useUserData's
+      // own isLoading is the real gate, so this only needs to be a short floor.
+      const timer = setTimeout(() => setIsRefreshLoading(false), 600);
       return () => clearTimeout(timer);
     }
   }, [isRefreshLoading]);

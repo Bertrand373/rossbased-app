@@ -5,7 +5,7 @@
 // skipWaiting + clients.claim) — the surest way to flush a browser that's
 // holding a stale bundle (e.g. Safari showing an old deploy). Bump it on
 // any deploy where clients must not keep serving cached assets.
-const CACHE_NAME = 'titantrack-v9';
+const CACHE_NAME = 'titantrack-v10';
 
 // Only precache files with STABLE names (not hashed by CRA)
 const SHELL_URLS = [
@@ -99,17 +99,35 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // STRATEGY 3: Navigation requests (HTML) — network first, cache fallback
-  // This ensures PWA always gets fresh HTML but works offline
+  // STRATEGY 3: Navigation requests (HTML) — stale-while-revalidate.
+  // Serve the cached app shell INSTANTLY (zero network wait → the black
+  // pulsing loader paints immediately, with no blank/white gap for iOS to
+  // flash during the native-splash handoff), then refresh the cached shell
+  // in the background so the next launch is up to date. Deploys are picked
+  // up on the next open; bump CACHE_NAME to force an immediate update.
   if (event.request.mode === 'navigate') {
+    // OAuth callbacks must always hit the network — serving a cached shell
+    // here would bypass the server-side handshake and break sign-in.
+    if (url.pathname.startsWith('/auth/')) {
+      event.respondWith(
+        fetch(event.request).catch(() => caches.match('/index.html'))
+      );
+      return;
+    }
+
     event.respondWith(
-      fetch(event.request)
-        .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          return response;
-        })
-        .catch(() => caches.match('/index.html'))
+      caches.match('/index.html').then((cached) => {
+        const networkFetch = fetch(event.request)
+          .then((response) => {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put('/index.html', clone));
+            return response;
+          })
+          .catch(() => cached);
+        // Cached shell first for an instant paint; fall through to the
+        // network only on a true cold cache (first ever load / post-purge).
+        return cached || networkFetch;
+      })
     );
     return;
   }
