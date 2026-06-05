@@ -184,6 +184,13 @@ body:has(.ut-page) {
   .ut-view-based30 {
     padding: 0;
   }
+  /* Desktop: cap the player to a centered column instead of stretching
+     edge-to-edge. The ambient backdrop stays full-bleed (it's on
+     ::before/::after); only the controls/progress/button column is capped —
+     mirrors the Intervene view's max-width treatment. */
+  .ut-view-based30 > .mp-section {
+    max-width: 440px;
+  }
 }
 
 /* =============================================================================
