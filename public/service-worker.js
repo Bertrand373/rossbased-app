@@ -5,7 +5,7 @@
 // skipWaiting + clients.claim) — the surest way to flush a browser that's
 // holding a stale bundle (e.g. Safari showing an old deploy). Bump it on
 // any deploy where clients must not keep serving cached assets.
-const CACHE_NAME = 'titantrack-v10';
+const CACHE_NAME = 'titantrack-v11';
 
 // Only precache files with STABLE names (not hashed by CRA)
 const SHELL_URLS = [
