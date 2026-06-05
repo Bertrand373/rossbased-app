@@ -71,6 +71,18 @@ body:has(.sheet-backdrop.open) {
 .sheet-panel *::-webkit-scrollbar { display: none; }
 .sheet-panel * { scrollbar-width: none; }
 
+/* ============================================================
+   NO-BACKDROP-FILTER FALLBACK
+   iOS "Reduce Transparency" and some Android WebViews disable
+   backdrop-filter. Without it the 68%-opaque panel + 0.45 backdrop
+   let the app bleed straight through the sheet. Fall back to
+   near-solid surfaces so content behind stays hidden.
+   ============================================================ */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .sheet-backdrop.open { background-color: var(--overlay-bg-strong); }
+  .sheet-panel { background: var(--sheet-bg-solid); }
+}
+
 /* Restore native scroll for any element explicitly opted out of swipe interception.
    touch-action: none on the panel blocks all native gestures — re-enable pan-y here
    so inner scrollable zones (benefit sliders, long content) still scroll natively. */

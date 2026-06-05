@@ -102,6 +102,16 @@
   pointer-events: auto;
 }
 
+/* No-backdrop-filter fallback (iOS "Reduce Transparency", some WebViews) —
+   keep the panel + sticky header near-solid so the app can't bleed through.
+   Note: on the landing the backdrop is already hardened to 0.92 (higher
+   specificity), so this only strengthens the in-app case. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .auth-backdrop.open { background-color: var(--overlay-bg-strong, rgba(0, 0, 0, 0.82)); }
+  .auth-panel,
+  .auth-sheet-top { background: var(--sheet-bg-solid, rgba(20, 20, 22, 0.98)); }
+}
+
 /* =============================================================================
    STICKY TOP — drag handle + icon + heading
    Stays visible when form content scrolls underneath
@@ -149,11 +159,12 @@
   opacity: 0.7;
 }
 
-/* Icon */
+/* Icon — uses the shared modal brand token so every sheet matches */
 .auth-sheet-icon {
-  width: 36px;
-  height: 36px;
-  opacity: 0.7;
+  width: var(--modal-brand-size);
+  height: var(--modal-brand-size);
+  object-fit: contain;
+  opacity: var(--modal-brand-opacity);
   margin-bottom: 16px;
 }
 
@@ -529,7 +540,7 @@
   }
   .auth-sheet-title { font-size: 1.375rem; }
   .auth-sheet-sub { font-size: 0.8125rem; }
-  .auth-sheet-icon { width: 32px; height: 32px; margin-bottom: 12px; }
+  .auth-sheet-icon { margin-bottom: 12px; }
   .auth-social { margin-bottom: 20px; }
   .auth-social-btn { padding: 14px 10px; font-size: 0.8125rem; }
   .auth-divider { margin-bottom: 20px; }
@@ -559,7 +570,8 @@
 @media (max-height: 600px) and (orientation: landscape) {
   .auth-panel { max-height: 100dvh; border-radius: 0; }
   .auth-drag-zone { padding: 8px 0 10px; }
-  .auth-sheet-icon { width: 28px; height: 28px; margin-bottom: 10px; }
+  /* Landscape-short: shrink the icon to reclaim vertical space (auth-only constraint) */
+  .auth-sheet-icon { width: 36px; height: 36px; margin-bottom: 10px; }
   .auth-sheet-title { font-size: 1.25rem; }
   .auth-sheet-top { padding-bottom: 8px; }
   .auth-social { margin-bottom: 16px; }

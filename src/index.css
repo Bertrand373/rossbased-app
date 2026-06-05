@@ -39,13 +39,22 @@
   
   /* Bottom sheet glass surface */
   --sheet-bg: rgba(18, 18, 20, 0.68);
+  /* Near-solid fallback for when backdrop-filter is unavailable
+     (iOS "Reduce Transparency", some Android WebViews) so the app can't bleed through */
+  --sheet-bg-solid: rgba(20, 20, 22, 0.98);
   --sheet-border: rgba(255, 255, 255, 0.06);
   --sheet-highlight: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 40%);
-  
+
+  /* Modal/sheet brand icon — single source of truth so every sheet matches */
+  --modal-brand-size: 44px;
+  --modal-brand-opacity: 0.8;
+
   /* Header, Nav, and Overlay backgrounds */
   --header-bg: rgba(0, 0, 0, 0.9);
   --nav-bg: rgba(0, 0, 0, 0.95);
   --overlay-bg: rgba(0, 0, 0, 0.45);
+  /* Stronger overlay for the no-backdrop-filter fallback */
+  --overlay-bg-strong: rgba(0, 0, 0, 0.82);
   
   /* Borders */
   --border: rgba(255, 255, 255, 0.08);
@@ -118,6 +127,7 @@
      Higher opacity than dark mode because cream-on-cream needs more presence
      than dark-glass-on-black. */
   --sheet-bg: rgba(244, 237, 224, 0.82);
+  --sheet-bg-solid: rgba(245, 238, 226, 0.98);
   --sheet-border: rgba(58, 46, 28, 0.12);
   --sheet-highlight: linear-gradient(180deg, rgba(255, 250, 240, 0.4) 0%, transparent 40%);
 
@@ -125,6 +135,7 @@
   --header-bg: rgba(244, 237, 224, 0.92);
   --nav-bg: rgba(244, 237, 224, 0.95);
   --overlay-bg: rgba(58, 46, 28, 0.42);
+  --overlay-bg-strong: rgba(58, 46, 28, 0.74);
 
   /* Borders - warm ink, low opacity */
   --border: rgba(58, 46, 28, 0.10);

@@ -38,9 +38,10 @@
 }
 
 .plan-icon {
-  width: 44px;
-  height: 44px;
-  opacity: 0.8;
+  width: var(--modal-brand-size);
+  height: var(--modal-brand-size);
+  object-fit: contain;
+  opacity: var(--modal-brand-opacity);
   margin-bottom: 20px;
 }
 
