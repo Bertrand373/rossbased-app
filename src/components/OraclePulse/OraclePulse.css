@@ -232,6 +232,25 @@
   color: var(--text-secondary);
 }
 
+/* Micro-echo — already-seen loads: the whole quote resurfaces in one
+   quick blur-in. No eye wake, no wisps, no stagger; just a breath. */
+.oracle-pulse.echo .oracle-pulse-text {
+  animation: oracleEcho 420ms ease-out;
+}
+
+@keyframes oracleEcho {
+  from {
+    opacity: 0.3;
+    filter: blur(4px);
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
 /* Word condensation — mist becoming ink. Inline-block so transform
    applies; the space lives outside the span (sibling text node). */
 .oracle-pulse-word {
@@ -417,6 +436,9 @@
   }
   .oracle-pulse[data-phase] .oracle-pulse-text {
     transition: none;
+  }
+  .oracle-pulse.echo .oracle-pulse-text {
+    animation: none;
   }
 }
 

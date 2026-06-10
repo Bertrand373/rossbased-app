@@ -73,6 +73,9 @@ const OraclePulse = ({ userData, openOracle, scene } = {}) => {
   const [complete, setComplete] = useState(false);
   // Breath ceremony phase — drives label/text/aurora styling via data-phase
   const [phase, setPhase] = useState('hidden');
+  // Micro-echo: on already-seen loads the whole quote does one quick
+  // all-at-once blur-in — the thought resurfaces rather than being born.
+  const [echo, setEcho] = useState(false);
   // Stage occupancy — Log Today pill expanded overlays this slot, so the
   // ceremony waits for a clear stage (TrackerLogPill dispatches the event)
   const [logExpanded, setLogExpanded] = useState(false);
@@ -261,6 +264,7 @@ const OraclePulse = ({ userData, openOracle, scene } = {}) => {
       setRevealCount(observation.split(' ').length);
       setComplete(true);
       setPhase('settled');
+      setEcho(!reduce);
       if (reduce && seenKey && !alreadySeen) localStorage.setItem(seenKey, 'true');
       return;
     }
@@ -271,6 +275,7 @@ const OraclePulse = ({ userData, openOracle, scene } = {}) => {
     // Adaptive stagger: long observations condense at the same total tempo
     const stepMs = Math.max(60, Math.min(110, Math.round(2200 / words.length)));
     setAnimating(true);
+    setEcho(false);
     setPhase('wake');
     document.dispatchEvent(new CustomEvent('oracle-breath', { detail: { phase: 'wake', voice } }));
     const wispTimer = setTimeout(spawnWisps, 350);
@@ -343,7 +348,7 @@ const OraclePulse = ({ userData, openOracle, scene } = {}) => {
   return (
     <>
       <div
-        className={`oracle-pulse${complete ? ' revealed' : ''}${isTappable ? ' tappable' : ''}`}
+        className={`oracle-pulse${complete ? ' revealed' : ''}${isTappable ? ' tappable' : ''}${echo ? ' echo' : ''}`}
         data-phase={phase}
         data-voice={voice}
         data-bg={bgType}
