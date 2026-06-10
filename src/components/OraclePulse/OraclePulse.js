@@ -227,6 +227,7 @@ const OraclePulse = ({ userData, openOracle, scene } = {}) => {
     const layer = document.createElement('div');
     layer.className = 'oracle-breath-wisps';
     layer.dataset.voice = voice;
+    layer.dataset.bg = bgType;
     layer.setAttribute('aria-hidden', 'true');
     const offsets = fromOrb
       ? [[0, 0], [-26, 16], [20, -12]]
@@ -246,7 +247,7 @@ const OraclePulse = ({ userData, openOracle, scene } = {}) => {
       layer.remove();
       if (wispLayerRef.current === layer) wispLayerRef.current = null;
     }, 3800);
-  }, [voice]);
+  }, [voice, bgType]);
 
   // Word-by-word reveal — plays once per unique pulse.
   // Unseen pulse + clear stage → full breath ceremony. If the Log pill is

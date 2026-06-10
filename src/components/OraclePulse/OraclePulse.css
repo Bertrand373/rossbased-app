@@ -30,11 +30,13 @@
   --breath-rgb: 226, 152, 92;
 }
 
-/* Video Sanctum scenes carry their own atmosphere — aurora to a whisper */
+/* Video Sanctum scenes carry their own atmosphere — aurora glow to a
+   whisper, but the smoke shadow works HARDER: footage has bright bands
+   (Autumn's lake strip) that eat half-condensed words without it. */
 .oracle-pulse[data-bg="video"] {
   --aurora-a: 0.05;
   --aurora-b: 0.03;
-  --aurora-shadow: 0.22;
+  --aurora-shadow: 0.32;
 }
 
 /* ============================================================
@@ -153,6 +155,16 @@
   100% { opacity: 0; transform: translate(var(--bw-dx), var(--bw-dy)) scale(1.3); }
 }
 
+/* Warm/bright footage mutes gold mist — the exhale gets one more notch */
+.oracle-breath-wisps[data-bg="video"] i {
+  background: radial-gradient(
+    closest-side,
+    rgba(var(--breath-rgb), 0.5),
+    rgba(var(--breath-rgb), 0.17) 55%,
+    transparent 78%
+  );
+}
+
 [data-theme="light"] .oracle-breath-wisps {
   display: none;
 }
@@ -179,6 +191,11 @@
 .oracle-pulse[data-phase="wake"] .oracle-pulse-label {
   opacity: 0;
   letter-spacing: 0.4em;
+}
+
+/* Over footage the tag needs one more notch of presence */
+.oracle-pulse[data-bg="video"] .oracle-pulse-label {
+  color: rgba(var(--breath-rgb), 0.7);
 }
 
 .oracle-pulse-label.gold {
