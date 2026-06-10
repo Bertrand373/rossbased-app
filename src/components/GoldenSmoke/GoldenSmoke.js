@@ -155,6 +155,11 @@ const resolveSceneKey = (sceneProp) => {
   return DEFAULT_SCENE;
 };
 
+// Scene kind for consumers that adapt to the backdrop (e.g. OraclePulse
+// dials its aurora down over video scenes — footage supplies the dream).
+// Runs through resolveSceneKey so URL overrides and migrations agree.
+export const getSceneType = (sceneProp) => SCENES[resolveSceneKey(sceneProp)].type;
+
 const readThemeAttr = () => {
   if (typeof document === 'undefined') return 'dark';
   return document.documentElement.getAttribute('data-theme') || 'dark';

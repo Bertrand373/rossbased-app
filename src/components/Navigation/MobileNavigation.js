@@ -1,14 +1,28 @@
 // MobileNavigation.js - TITANTRACK
 // Text-only nav: left tabs | Oracle center | right tabs + sliding dash
+// The Oracle eye is a living presence: it breathes on the same 8s cycle as
+// the streak counter, blooms when OraclePulse reveals a new observation
+// (`oracle-breath` document event), and heralds unread Oracle notes.
 import React, { useRef, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import './MobileNavigation.css';
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Negative delay locks every 8s breath on the page to one shared metronome
+const breathePhase = () => `-${(performance.now() / 1000) % 8}s`;
 
 const MobileNavigation = ({ onOracleClick, isOracleActive, oracleHasUnread }) => {
   const location = useLocation();
   const navRef = useRef(null);
   const dashRef = useRef(null);
   const initialized = useRef(false);
+  const eyeRef = useRef(null);
+  const oracleBtnRef = useRef(null);
+  const wakeTimerRef = useRef(null);
 
   // Position the dash under the active route tab
   useEffect(() => {
@@ -84,6 +98,58 @@ const MobileNavigation = ({ onOracleClick, isOracleActive, oracleHasUnread }) =>
     };
   }, []);
 
+  // Oracle eye idle breathing — phase-locked to the page's 8s metronome
+  useEffect(() => {
+    const img = eyeRef.current;
+    if (!img || prefersReducedMotion()) return undefined;
+    if (document.documentElement.getAttribute('data-theme') === 'light') return undefined;
+    img.style.animationDelay = breathePhase();
+    img.classList.add('breath-idle');
+    return () => img.classList.remove('breath-idle');
+  }, []);
+
+  // Wake bloom + expanding ring when OraclePulse exhales a new observation
+  useEffect(() => {
+    const onBreath = () => {
+      const img = eyeRef.current;
+      const btn = oracleBtnRef.current;
+      if (!img || !btn || prefersReducedMotion()) return;
+      if (document.documentElement.getAttribute('data-theme') === 'light') return;
+      img.classList.remove('breath-idle');
+      img.style.animationDelay = '0s';
+      img.offsetHeight; // eslint-disable-line no-unused-expressions
+      img.classList.add('breath-wake');
+      btn.classList.add('breath-wake-ring');
+      if (wakeTimerRef.current) clearTimeout(wakeTimerRef.current);
+      wakeTimerRef.current = setTimeout(() => {
+        img.classList.remove('breath-wake');
+        btn.classList.remove('breath-wake-ring');
+        img.style.animationDelay = breathePhase();
+        img.classList.add('breath-idle');
+      }, 2100);
+    };
+    document.addEventListener('oracle-breath', onBreath);
+    return () => {
+      document.removeEventListener('oracle-breath', onBreath);
+      if (wakeTimerRef.current) clearTimeout(wakeTimerRef.current);
+    };
+  }, []);
+
+  // Herald — a single bloom when an unread Oracle note arrives ("I watched
+  // you log; I have words"). The dot still marks the unread state.
+  useEffect(() => {
+    if (!oracleHasUnread) return undefined;
+    const img = eyeRef.current;
+    if (!img || prefersReducedMotion()) return undefined;
+    if (document.documentElement.getAttribute('data-theme') === 'light') return undefined;
+    img.classList.add('breath-herald');
+    const t = setTimeout(() => img.classList.remove('breath-herald'), 1900);
+    return () => {
+      clearTimeout(t);
+      img.classList.remove('breath-herald');
+    };
+  }, [oracleHasUnread]);
+
   return (
     <nav className="mobile-nav">
       <div className="mobile-nav-inner" ref={navRef}>
@@ -92,13 +158,13 @@ const MobileNavigation = ({ onOracleClick, isOracleActive, oracleHasUnread }) =>
 
         {/* Left group */}
         <div className="mobile-nav-group">
-          <NavLink 
+          <NavLink
             to="/"
             className={({ isActive }) => `mobile-nav-item ${isActive ? 'active' : ''}`}
           >
             <span className="mobile-nav-label">Track</span>
           </NavLink>
-          <NavLink 
+          <NavLink
             to="/calendar"
             className={({ isActive }) => `mobile-nav-item ${isActive ? 'active' : ''}`}
           >
@@ -107,24 +173,26 @@ const MobileNavigation = ({ onOracleClick, isOracleActive, oracleHasUnread }) =>
         </div>
 
         {/* Center — Oracle eye */}
-        <button 
+        <button
+          ref={oracleBtnRef}
           className={`mobile-nav-oracle ${isOracleActive ? 'active' : ''}`}
           onClick={onOracleClick}
           aria-label="Open The Oracle"
         >
-          <img src="/The_Oracle.png" alt="" className="mobile-nav-oracle-img" />
+          <span className="mobile-nav-oracle-ring" aria-hidden="true" />
+          <img ref={eyeRef} src="/The_Oracle.png" alt="" className="mobile-nav-oracle-img" />
           {oracleHasUnread && !isOracleActive && <span className="mobile-nav-oracle-dot" />}
         </button>
 
         {/* Right group */}
         <div className="mobile-nav-group">
-          <NavLink 
+          <NavLink
             to="/stats"
             className={({ isActive }) => `mobile-nav-item ${isActive ? 'active' : ''}`}
           >
             <span className="mobile-nav-label">Stats</span>
           </NavLink>
-          <NavLink 
+          <NavLink
             to="/urge-toolkit"
             className={({ isActive }) => `mobile-nav-item ${isActive ? 'active' : ''}`}
           >

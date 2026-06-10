@@ -229,12 +229,99 @@
   .mobile-nav-item {
     transition: none;
   }
-  
+
   .mobile-nav-oracle-img {
     transition: none;
   }
-  
+
   .mobile-nav-dash {
     transition: none;
   }
+
+  .mobile-nav-oracle-img.breath-idle,
+  .mobile-nav-oracle-img.breath-wake,
+  .mobile-nav-oracle-img.breath-herald,
+  .mobile-nav-oracle.breath-wake-ring .mobile-nav-oracle-ring {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   ORACLE'S BREATH — the eye is alive
+   idle: 8s glow breathing, phase-locked to the streak counter
+   wake: bloom + expanding ring when a new observation reveals
+   herald: same bloom when an unread Oracle note arrives
+   ============================================================ */
+
+.mobile-nav-oracle-img.breath-idle {
+  animation: oracleEyeBreathe 8s ease-in-out infinite;
+}
+
+@keyframes oracleEyeBreathe {
+  0%, 100% {
+    opacity: 0.5;
+    filter: drop-shadow(0 0 0 rgba(212, 175, 55, 0));
+  }
+  50% {
+    opacity: 0.8;
+    filter: drop-shadow(0 0 9px rgba(212, 175, 55, 0.45));
+  }
+}
+
+.mobile-nav-oracle-img.breath-wake,
+.mobile-nav-oracle-img.breath-herald {
+  animation: oracleEyeWake 2s ease forwards;
+}
+
+@keyframes oracleEyeWake {
+  0% {
+    opacity: 0.5;
+  }
+  30% {
+    opacity: 1;
+    filter: drop-shadow(0 0 14px rgba(212, 175, 55, 0.95)) drop-shadow(0 0 32px rgba(212, 175, 55, 0.5));
+  }
+  100% {
+    opacity: 0.9;
+    filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.4));
+  }
+}
+
+.mobile-nav-oracle-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 46px;
+  height: 46px;
+  margin: -23px 0 0 -23px;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 175, 55, 0.55);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mobile-nav-oracle.breath-wake-ring .mobile-nav-oracle-ring {
+  animation: oracleRingOut 1.6s ease-out forwards;
+}
+
+@keyframes oracleRingOut {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+
+/* Light theme: ink eye on parchment — no glow */
+[data-theme="light"] .mobile-nav-oracle-img.breath-idle,
+[data-theme="light"] .mobile-nav-oracle-img.breath-wake,
+[data-theme="light"] .mobile-nav-oracle-img.breath-herald {
+  animation: none;
+}
+
+[data-theme="light"] .mobile-nav-oracle-ring {
+  display: none;
 }

@@ -1,39 +1,205 @@
 /* src/components/OraclePulse/OraclePulse.css */
-/* Oracle's community observation — lives below Log button on Tracker */
+/* Oracle's community observation — lives below Log button on Tracker.
+   Breath ceremony styling is driven by data attributes on .oracle-pulse:
+     data-phase  hidden | wake | condense | fresh | settled
+     data-voice  oracle | almanac | anchor   (tint of the breath)
+     data-bg     wisp | video                (aurora intensity)
+     data-suppressed                          (Log pill expanded — dim) */
 
 .oracle-pulse {
+  position: relative;
   max-width: 340px;
   text-align: center;
   margin-top: 24px;
   padding-bottom: 16px;
   opacity: 0;
   animation: pulseIn 600ms ease 200ms forwards;
+
+  /* Voice tint — the Oracle's light. Gold by default. */
+  --breath-rgb: 212, 175, 55;
+  --aurora-a: 0.12;
+  --aurora-b: 0.09;
+  --aurora-shadow: 0.34;
 }
 
-/* Label: ORACLE OBSERVES */
+.oracle-pulse[data-voice="almanac"] {
+  --breath-rgb: 172, 194, 226;
+}
+
+.oracle-pulse[data-voice="anchor"] {
+  --breath-rgb: 226, 152, 92;
+}
+
+/* Video Sanctum scenes carry their own atmosphere — aurora to a whisper */
+.oracle-pulse[data-bg="video"] {
+  --aurora-a: 0.05;
+  --aurora-b: 0.03;
+  --aurora-shadow: 0.22;
+}
+
+/* ============================================================
+   AURORA — ambient mist behind the text, always breathing.
+   Pre-blurred gradients animated with transform only.
+   ============================================================ */
+
+.oracle-breath-aurora {
+  position: absolute;
+  inset: -30px 0 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 600ms ease;
+}
+
+.oracle-pulse[data-suppressed="true"] .oracle-breath-aurora {
+  opacity: 0.25;
+}
+
+.oracle-breath-aurora i {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+}
+
+/* Smoke shadow — darkens the text zone so the words gain contrast
+   while the mist drifts (and over bright video moments) */
+.oracle-breath-aurora .bsh {
+  left: 50%;
+  top: 38%;
+  width: min(560px, 96%);
+  height: 120px;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(0, 0, 0, var(--aurora-shadow)), transparent 75%);
+  filter: blur(22px);
+}
+
+/* Voice glow — drifts on the long cycle */
+.oracle-breath-aurora .bg1 {
+  left: 50%;
+  top: 28%;
+  width: min(420px, 84%);
+  height: 110px;
+  margin-left: max(-210px, -42%);
+  background: radial-gradient(closest-side, rgba(var(--breath-rgb), var(--aurora-a)), transparent 70%);
+  filter: blur(28px);
+  animation: breathDrift1 18s ease-in-out infinite alternate;
+}
+
+/* Jade companion — the temple's own air, counter-drifting */
+.oracle-breath-aurora .bg2 {
+  right: 12%;
+  top: 0;
+  width: 300px;
+  height: 120px;
+  background: radial-gradient(closest-side, rgba(112, 152, 126, var(--aurora-b)), transparent 70%);
+  filter: blur(28px);
+  animation: breathDrift2 24s ease-in-out infinite alternate;
+}
+
+@keyframes breathDrift1 {
+  from { transform: translate(-16px, 6px) scale(0.92); }
+  to   { transform: translate(20px, -8px) scale(1.1); }
+}
+
+@keyframes breathDrift2 {
+  from { transform: translate(14px, -5px) scale(1.07); }
+  to   { transform: translate(-18px, 9px) scale(0.88); }
+}
+
+/* Light theme: parchment is clean, not animated */
+[data-theme="light"] .oracle-breath-aurora {
+  display: none;
+}
+
+/* ============================================================
+   WISPS — the exhale. Fixed-position layer appended to body by
+   OraclePulse.spawnWisps(); travels eye → quote then dissipates.
+   z 80: above content, below mobile nav (90) and the orb (90).
+   ============================================================ */
+
+.oracle-breath-wisps {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 80;
+  --breath-rgb: 212, 175, 55;
+}
+
+.oracle-breath-wisps[data-voice="almanac"] { --breath-rgb: 172, 194, 226; }
+.oracle-breath-wisps[data-voice="anchor"]  { --breath-rgb: 226, 152, 92; }
+
+.oracle-breath-wisps i {
+  position: absolute;
+  display: block;
+  width: 56px;
+  height: 84px;
+  margin: -42px 0 0 -28px;
+  border-radius: 50%;
+  filter: blur(13px);
+  opacity: 0;
+  background: radial-gradient(
+    closest-side,
+    rgba(var(--breath-rgb), 0.4),
+    rgba(var(--breath-rgb), 0.13) 55%,
+    transparent 78%
+  );
+  animation: breathWisp 2.6s cubic-bezier(0.3, 0.6, 0.4, 1) forwards;
+}
+
+@keyframes breathWisp {
+  0%   { opacity: 0; transform: translate(0, 0) scale(0.5); }
+  14%  { opacity: 0.5; }
+  55%  { opacity: 0.3; transform: translate(calc(var(--bw-dx) * 0.5), calc(var(--bw-dy) * 0.72)) scale(1.05); }
+  100% { opacity: 0; transform: translate(var(--bw-dx), var(--bw-dy)) scale(1.3); }
+}
+
+[data-theme="light"] .oracle-breath-wisps {
+  display: none;
+}
+
+/* ============================================================
+   LABEL: ORACLE OBSERVES — condenses with the ceremony
+   ============================================================ */
+
 .oracle-pulse-label {
+  position: relative;
+  z-index: 1;
   display: block;
   font-size: 0.5625rem;
   font-weight: 600;
-  color: var(--text-muted);
+  color: rgba(var(--breath-rgb), 0.55);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   margin-bottom: 8px;
+  transition: letter-spacing 900ms ease, opacity 900ms ease, color 900ms ease;
+}
+
+/* Pre-ceremony: the label hasn't condensed yet */
+.oracle-pulse[data-phase="hidden"] .oracle-pulse-label,
+.oracle-pulse[data-phase="wake"] .oracle-pulse-label {
+  opacity: 0;
+  letter-spacing: 0.4em;
 }
 
 .oracle-pulse-label.gold {
   color: rgba(212, 175, 55, 0.45);
 }
 
+[data-theme="light"] .oracle-pulse-label,
 [data-theme="light"] .oracle-pulse-label.gold {
-  /* Was rgba(160, 130, 0, 0.4) — darker gold but still gold, still illegible
-     on cream. Match the muted-text palette so the Oracle "tag" reads as a
-     subtle italic label, not a gold accent (gold-on-cream just disappears). */
+  /* Gold-on-cream disappears — match the muted-text palette so the Oracle
+     "tag" reads as a subtle label, not a gold accent. */
   color: var(--text-tertiary);
 }
 
-/* Observation text */
+/* ============================================================
+   OBSERVATION TEXT — luminance choreography
+   fresh (just condensed) holds bright, settled relaxes to whisper
+   ============================================================ */
+
 .oracle-pulse-text {
+  position: relative;
+  z-index: 1;
   font-size: 0.8125rem;
   font-weight: 400;
   font-style: italic;
@@ -42,6 +208,17 @@
   margin: 0 0 6px 0;
   letter-spacing: 0.01em;
   min-height: 1.6em;
+  transition: color 2s ease;
+}
+
+.oracle-pulse[data-phase="condense"] .oracle-pulse-text,
+.oracle-pulse[data-phase="fresh"] .oracle-pulse-text {
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 600ms ease;
+}
+
+.oracle-pulse[data-phase="settled"] .oracle-pulse-text {
+  color: rgba(255, 255, 255, 0.3);
 }
 
 /* Oracle Gold — premium text color */
@@ -49,21 +226,26 @@
   color: rgba(212, 175, 55, 0.7);
 }
 
-[data-theme="light"] .oracle-pulse-text.oracle-gold {
-  /* Oracle "premium voice" text — was rgba(160, 130, 0, 0.65) (darker gold,
-     still illegible). Match secondary text so the italic still feels
-     "Oracle-spoken" without leaning on gold that disappears into cream. */
+[data-theme="light"] .oracle-pulse-text,
+[data-theme="light"] .oracle-pulse[data-phase] .oracle-pulse-text {
+  /* Ink on parchment — no luminance play in light mode */
   color: var(--text-secondary);
 }
 
-/* Word-by-word fade — each word starts invisible, fades in */
+/* Word condensation — mist becoming ink. Inline-block so transform
+   applies; the space lives outside the span (sibling text node). */
 .oracle-pulse-word {
+  display: inline-block;
   opacity: 0;
-  transition: opacity 320ms ease;
+  filter: blur(7px);
+  transform: translateY(6px);
+  transition: opacity 600ms ease, filter 600ms ease, transform 600ms ease;
 }
 
 .oracle-pulse-word.visible {
   opacity: 1;
+  filter: blur(0);
+  transform: none;
 }
 
 /* Timestamp */
@@ -215,11 +397,26 @@
   }
   .oracle-pulse-word {
     opacity: 1;
+    filter: none;
+    transform: none;
     transition: none;
   }
   .oracle-pulse-time {
     animation: none;
     opacity: 1;
+  }
+  .oracle-breath-aurora .bg1,
+  .oracle-breath-aurora .bg2 {
+    animation: none;
+  }
+  .oracle-breath-wisps {
+    display: none;
+  }
+  .oracle-pulse-label {
+    transition: none;
+  }
+  .oracle-pulse[data-phase] .oracle-pulse-text {
+    transition: none;
   }
 }
 

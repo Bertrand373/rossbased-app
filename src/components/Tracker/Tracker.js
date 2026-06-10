@@ -1946,6 +1946,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
           key={`pulse-${userData?.recoveryHistory?.length || 0}`}
           userData={userData}
           openOracle={openOracle}
+          scene={activeScene}
         />
       </div>
       

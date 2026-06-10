@@ -837,13 +837,24 @@
 }
 
 .tracker-oracle-bar .oracle-pulse-text {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   margin-bottom: 3px;
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Desktop: slightly larger voice, capped line length so the quote never
+   crowds the OracleOrb in the bottom-right corner */
+@media (min-width: 768px) {
+  .tracker-oracle-bar .oracle-pulse-text {
+    font-size: 0.875rem;
+    max-width: 68ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 .tracker-oracle-bar .oracle-pulse-time {

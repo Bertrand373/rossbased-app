@@ -25,6 +25,7 @@ import AuthModal from './components/Auth/AuthModal';
 import DiscordCallback from './components/Auth/DiscordCallback';
 import ResetPassword from './components/Auth/ResetPassword';
 import MobileNavigation from './components/Navigation/MobileNavigation';
+import OracleOrb from './components/OracleOrb/OracleOrb';
 import InstallPrompt from './components/InstallPrompt/InstallPrompt';
 import AIChat from './components/AIChat/AIChat';
 import AdminCockpit from './components/Admin/AdminCockpit';
@@ -168,10 +169,11 @@ const HeaderNavigation = ({ onOracleClick }) => {
   const dashRef = useRef(null);
   const deskInitialized = useRef(false);
 
+  // The Oracle no longer lives between the tabs — on desktop it floats
+  // bottom-right as the OracleOrb. One being, one body per platform.
   const navItems = [
     { path: '/', label: 'Tracker' },
     { path: '/calendar', label: 'Calendar' },
-    { type: 'oracle', label: 'Oracle' },
     { path: '/stats', label: 'Stats' },
     { path: '/urge-toolkit', label: 'Urges' }
   ];
@@ -781,10 +783,20 @@ function AppContent({
             {isMobile && <ScrollIndicator />}
             
             {isMobile && (
-              <MobileNavigation 
+              <MobileNavigation
                 onOracleClick={openOracle}
                 isOracleActive={showAIChat}
                 oracleHasUnread={oracleHasUnread}
+              />
+            )}
+
+            {/* Desktop Oracle presence — floating orb, bottom-right.
+                Replaces the eye that lived in the header nav. */}
+            {!isMobile && (
+              <OracleOrb
+                onOpen={openOracle}
+                hasUnread={oracleHasUnread}
+                isOracleActive={showAIChat}
               />
             )}
             

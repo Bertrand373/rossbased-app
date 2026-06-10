@@ -1,0 +1,177 @@
+/* src/components/OracleOrb/OracleOrb.css */
+/* Floating Oracle presence — desktop bottom-right. Gold halo + eye,
+   breathing on the same 8s cycle as the streak counter. All motion is
+   transform/opacity/box-shadow on a single composited element. */
+
+.oracle-orb {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 175, 55, 0.26);
+  background: radial-gradient(
+    closest-side,
+    rgba(212, 175, 55, 0.13),
+    rgba(212, 175, 55, 0.03) 62%,
+    transparent
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  z-index: 90;
+  -webkit-tap-highlight-color: transparent;
+  animation: orbBreathe 8s ease-in-out infinite;
+  transition: border-color 200ms ease;
+}
+
+@keyframes orbBreathe {
+  0%, 100% {
+    box-shadow: 0 0 10px 0 rgba(212, 175, 55, 0.07);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 22px 4px rgba(212, 175, 55, 0.18);
+    transform: scale(1.03);
+  }
+}
+
+.oracle-orb-eye {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  opacity: 0.7;
+  animation: orbEyeGlow 8s ease-in-out infinite;
+  transition: opacity 250ms ease;
+}
+
+@keyframes orbEyeGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.18));
+    opacity: 0.65;
+  }
+  50% {
+    filter: drop-shadow(0 0 9px rgba(212, 175, 55, 0.55));
+    opacity: 0.95;
+  }
+}
+
+@media (hover: hover) {
+  .oracle-orb:hover {
+    border-color: rgba(212, 175, 55, 0.5);
+  }
+  .oracle-orb:hover .oracle-orb-eye {
+    opacity: 1;
+  }
+}
+
+.oracle-orb:active .oracle-orb-eye {
+  transform: scale(0.92);
+}
+
+.oracle-orb.is-active .oracle-orb-eye {
+  opacity: 1;
+}
+
+/* Expanding ring — fired on wake/herald */
+.oracle-orb-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.oracle-orb.is-waking,
+.oracle-orb.is-herald {
+  animation: orbWake 2s ease forwards;
+}
+
+.oracle-orb.is-waking .oracle-orb-ring,
+.oracle-orb.is-herald .oracle-orb-ring {
+  animation: orbRingOut 1.7s ease-out forwards;
+}
+
+@keyframes orbWake {
+  30% {
+    box-shadow: 0 0 40px 6px rgba(212, 175, 55, 0.32);
+    border-color: rgba(212, 175, 55, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 18px 2px rgba(212, 175, 55, 0.14);
+    border-color: rgba(212, 175, 55, 0.38);
+  }
+}
+
+@keyframes orbRingOut {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.3);
+  }
+}
+
+/* Unread dot — ember, matches the mobile nav dot vocabulary */
+.oracle-orb-dot {
+  position: absolute;
+  top: 4px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(212, 160, 80, 0.95);
+  box-shadow: 0 0 8px rgba(212, 160, 80, 0.5);
+  pointer-events: none;
+}
+
+/* Light theme — ink on parchment, no glow theatrics */
+[data-theme="light"] .oracle-orb {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(58, 46, 28, 0.25);
+  box-shadow: 0 4px 16px rgba(58, 46, 28, 0.12);
+  animation: none;
+}
+
+[data-theme="light"] .oracle-orb-eye {
+  filter: brightness(0);
+  opacity: 0.8;
+  animation: none;
+}
+
+[data-theme="light"] .oracle-orb-ring {
+  display: none;
+}
+
+[data-theme="light"] .oracle-orb-dot {
+  background: rgba(160, 130, 0, 0.8);
+  box-shadow: 0 0 8px rgba(160, 130, 0, 0.3);
+}
+
+/* Mobile never shows the orb — the nav eye is the Oracle's body there */
+@media (max-width: 767px) {
+  .oracle-orb {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oracle-orb,
+  .oracle-orb-eye,
+  .oracle-orb.is-waking,
+  .oracle-orb.is-herald,
+  .oracle-orb.is-waking .oracle-orb-ring,
+  .oracle-orb.is-herald .oracle-orb-ring {
+    animation: none;
+  }
+}

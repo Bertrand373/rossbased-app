@@ -88,6 +88,13 @@ const TrackerLogPill = ({
 }) => {
   const [expanded, setExpanded] = useState(false);
 
+  // Stage occupancy broadcast — OraclePulse holds its breath ceremony while
+  // the expanded card overlays the quote zone (same document-event idiom as
+  // openAlmanac / oracle-breath).
+  useEffect(() => {
+    document.dispatchEvent(new CustomEvent('tracker-log-expand', { detail: { expanded } }));
+  }, [expanded]);
+
   // Photo state derived live from notes so the pill reflects updates
   // the instant a capture lands.
   const today = useMemo(() => format(new Date(), 'yyyy-MM-dd'), []);
