@@ -164,7 +164,10 @@
   margin-right: 2px;
 }
 
-/* Chevron — tap affordance. Rotates 180° on expand. */
+/* Chevron — tap affordance. Rotates 180° on expand.
+   State-aware presence: invites while the day is unlogged (the pill is the
+   page's primary action then), recedes once complete. 0.4 was dust over
+   bright video scenes. */
 .tlp-caret {
   position: absolute;
   /* 14px (not 22): buys clearance from the completed-state label on the
@@ -172,7 +175,7 @@
   right: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.68);
   transition:
     transform 380ms cubic-bezier(0.22, 1, 0.36, 1),
     color 180ms ease;
@@ -182,11 +185,17 @@
 
 .tracker-log-pill.is-expanded .tlp-caret {
   transform: translateY(-50%) rotate(180deg);
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .tracker-log-pill.is-complete .tlp-caret {
-  color: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+@media (hover: hover) {
+  .tracker-log-pill:hover .tlp-caret {
+    color: rgba(255, 255, 255, 0.9);
+  }
 }
 
 /* ---- Drawer ---- */
