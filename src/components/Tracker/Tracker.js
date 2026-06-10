@@ -405,7 +405,7 @@ const Tracker = ({ userData, updateUserData, isPremium, onUpgrade, openOracle })
 
   // Swipe-to-dismiss — non-passive native listeners so iOS respects preventDefault
   const isEditingDate = showDatePicker && !!userData.startDate;
-  const trackerSheetVisible = showStreakOptions || showResetConfirm || showLogLock || showPeakPrompt || showPatternAlert || isEditingDate || showScenePicker;
+  const trackerSheetVisible = showStreakOptions || showResetConfirm || showLogLock || showBenefits || showPeakPrompt || showPatternAlert || isEditingDate || showScenePicker;
   const handleSwipeDismiss = useCallback(() => {
     setShowStreakOptions(false);
     setShowResetConfirm(false);

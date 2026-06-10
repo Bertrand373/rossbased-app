@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import './UrgeToolkit.css';
 import '../../styles/BottomSheet.css';
 import MindProgram from './MindProgram';
+import useSheetSwipe from '../../hooks/useSheetSwipe';
 
 // Icons
 import { FaBrain, FaExclamationTriangle, FaClock, FaMeh, FaHeart, 
@@ -107,6 +108,8 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
   const [modalAnimOpen, setModalAnimOpen] = useState(false);
   
   // Refs
+  // Shared panel ref for swipe-to-dismiss — only one sheet renders at a time
+  const utSheetPanelRef = useRef(null);
   const breathingIntervalRef = useRef(null);
   const orbitIntervalRef = useRef(null);
   const coldIntervalRef = useRef(null);
@@ -212,6 +215,29 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
       if (cleanup) cleanup();
     }, 300);
   };
+
+  // Swipe-to-dismiss for every toolkit sheet — one shared ref since only
+  // one renders at a time. Mirrors each backdrop's close exactly, including
+  // the active-exercise gates: mid-breathing/orbit/cold the backdrop
+  // refuses to dismiss, so swipe stays off too.
+  const utSwipeEnabled =
+    showProtocolSheet ||
+    (showBreathingModal && !breathingActive) ||
+    (showOrbitModal && !orbitActive) ||
+    showGroundingModal ||
+    (showColdModal && !coldActive) ||
+    !!mpInfoSheet;
+
+  const dismissOpenSheet = () => {
+    if (showProtocolSheet) animateModalClose(setShowProtocolSheet);
+    else if (showBreathingModal && !breathingActive) animateModalClose(setShowBreathingModal);
+    else if (showOrbitModal && !orbitActive) animateModalClose(setShowOrbitModal);
+    else if (showGroundingModal) animateModalClose(setShowGroundingModal, () => setGroundingStep(0));
+    else if (showColdModal && !coldActive) animateModalClose(setShowColdModal);
+    else if (mpInfoSheet) animateModalClose(() => setMpInfoSheet(null));
+  };
+
+  useSheetSwipe(utSheetPanelRef, utSwipeEnabled, dismissOpenSheet);
 
   // ============================================================
   // INTENSITY & PROTOCOL SELECTION
@@ -917,7 +943,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
       {showProtocolSheet && (
         <div className={`sheet-backdrop${modalAnimOpen ? ' open' : ''}`}
           onClick={() => animateModalClose(setShowProtocolSheet)}>
-          <div className={`sheet-panel ut-sheet${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+          <div ref={utSheetPanelRef} className={`sheet-panel ut-sheet${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div className="sheet-header" />
 
             <div className="ut-modal-header">
@@ -959,7 +985,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
       {showBreathingModal && (
         <div className={`sheet-backdrop${modalAnimOpen ? ' open' : ''}`}
           onClick={!breathingActive ? () => animateModalClose(setShowBreathingModal) : undefined}>
-          <div className={`sheet-panel ut-sheet${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+          <div ref={utSheetPanelRef} className={`sheet-panel ut-sheet${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div className="sheet-header" />
 
             <div className="ut-modal-header">
@@ -1029,7 +1055,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
       {showOrbitModal && (
         <div className={`sheet-backdrop${modalAnimOpen ? ' open' : ''}`}
           onClick={!orbitActive ? () => animateModalClose(setShowOrbitModal) : undefined}>
-          <div className={`sheet-panel ut-sheet ut-sheet-orbit${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+          <div ref={utSheetPanelRef} className={`sheet-panel ut-sheet ut-sheet-orbit${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div className="sheet-header" />
 
             <div className="ut-modal-header">
@@ -1181,7 +1207,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
       {showGroundingModal && (
         <div className={`sheet-backdrop${modalAnimOpen ? ' open' : ''}`}
           onClick={() => animateModalClose(setShowGroundingModal, () => setGroundingStep(0))}>
-          <div className={`sheet-panel ut-sheet${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+          <div ref={utSheetPanelRef} className={`sheet-panel ut-sheet${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div className="sheet-header" />
 
             <div className="ut-modal-header">
@@ -1231,7 +1257,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
       {showColdModal && (
         <div className={`sheet-backdrop${modalAnimOpen ? ' open' : ''}`}
           onClick={!coldActive ? () => animateModalClose(setShowColdModal) : undefined}>
-          <div className={`sheet-panel ut-sheet${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+          <div ref={utSheetPanelRef} className={`sheet-panel ut-sheet${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div className="sheet-header" />
 
             <div className="ut-modal-header">
@@ -1301,7 +1327,7 @@ const UrgeToolkit = ({ userData, isPremium, updateUserData, openPlanModal }) => 
       {mpInfoSheet && (
         <div className={`sheet-backdrop${modalAnimOpen ? ' open' : ''}`}
           onClick={() => animateModalClose(() => setMpInfoSheet(null))}>
-          <div className={`sheet-panel ut-sheet${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
+          <div ref={utSheetPanelRef} className={`sheet-panel ut-sheet${modalAnimOpen ? ' open' : ''}`} onClick={e => e.stopPropagation()}>
             <div className="sheet-header" />
 
             <div className="ut-modal-header">

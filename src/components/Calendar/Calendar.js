@@ -25,6 +25,7 @@ import PhotoLightbox from '../Photo/PhotoLightbox';
 import JourneyView from '../Photo/JourneyView';
 import { phaseForDay } from '../Photo/MilestoneSheet';
 import ConfirmSheet from '../Shared/ConfirmSheet';
+import useSheetSwipe from '../../hooks/useSheetSwipe';
 import '../Photo/Photo.css';
 
 const API_URL_FOR_PHOTOS = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
@@ -429,6 +430,10 @@ const Calendar = ({ userData, isPremium, updateUserData, openPlanModal }) => {
       callback();
     }, 300);
   }, []);
+
+  // Metrics sheet swipe-to-dismiss — the day-info/moon sheets use the
+  // bespoke effect below; the metrics editor ref was never wired.
+  useSheetSwipe(metricsSheetPanelRef, metricsSheetOpen, closeMetricsSheet);
 
   // Swipe-to-close for cal sheets — full panel, smart scroll disambiguation
   // Attaches non-passive touchmove so we can preventDefault when dragging sheet down
