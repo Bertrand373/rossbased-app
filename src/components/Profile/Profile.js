@@ -10,6 +10,7 @@ import './Profile.css';
 import '../../styles/BottomSheet.css';
 import useSheetSwipe from '../../hooks/useSheetSwipe';
 import { COUNTRIES } from '../../utils/countries';
+import { createOAuthState } from '../../utils/oauthState';
 import { getTriggerLabel } from '../../constants/triggerConstants';
 import { useNotifications } from '../../hooks/useNotifications';
 // Theme context
@@ -791,7 +792,8 @@ const Profile = ({
                       const redirectUri = encodeURIComponent(
                         window.location.origin + '/auth/discord/link-callback'
                       );
-                      window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=identify%20email`;
+                      const state = createOAuthState('discord_link');
+                      window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=identify%20email&state=${state}`;
                     }}
                   >
                     Link Discord Account
@@ -823,6 +825,7 @@ const Profile = ({
                         window.location.origin + '/auth/youtube/link-callback'
                       );
                       const scope = encodeURIComponent('https://www.googleapis.com/auth/youtube.readonly');
+                      const state = createOAuthState('youtube_link');
                       window.location.href =
                         `https://accounts.google.com/o/oauth2/v2/auth` +
                         `?client_id=${clientId}` +
@@ -831,7 +834,8 @@ const Profile = ({
                         `&scope=${scope}` +
                         `&access_type=online` +
                         `&prompt=select_account%20consent` +
-                        `&include_granted_scopes=true`;
+                        `&include_granted_scopes=true` +
+                        `&state=${state}`;
                     }}
                   >
                     Link YouTube Account

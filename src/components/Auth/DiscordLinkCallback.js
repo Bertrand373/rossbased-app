@@ -5,6 +5,7 @@
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { goldCheckIcon, GOLD_TOAST_CLASS } from '../Toast/ToastIcons';
+import { consumeOAuthState } from '../../utils/oauthState';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
@@ -14,13 +15,14 @@ const DiscordLinkCallback = ({ onLinkComplete }) => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
-    
+    const returnedState = params.get('state');
+
     if (!code) {
       toast.error('Discord linking failed');
       window.location.href = '/profile';
       return;
     }
-    
+
     // Guard: prevent the same code from being used twice
     // (React mounts this component in both auth/unauth route trees)
     const codeKey = `discord_link_${code}`;
@@ -29,6 +31,16 @@ const DiscordLinkCallback = ({ onLinkComplete }) => {
       return;
     }
     sessionStorage.setItem(codeKey, 'processing');
+
+    // CSRF guard: the state Discord echoes back must match the one we set when
+    // this browser started the link flow. Runs after the codeKey guard so
+    // StrictMode's second mount doesn't double-consume the stored state.
+    if (!consumeOAuthState('discord_link', returnedState)) {
+      sessionStorage.removeItem(codeKey);
+      toast.error('Security check failed. Please try linking again.');
+      window.location.href = '/profile';
+      return;
+    }
     
     const linkDiscord = async () => {
       try {

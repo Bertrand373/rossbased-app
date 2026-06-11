@@ -82,13 +82,17 @@ router.post('/discord', async (req, res) => {
     const discordUser = await userResponse.json();
     console.log('Discord auth for:', discordUser.username, '| Display name:', discordUser.global_name);
 
-    // Check if user exists by discordId or email
-    let user = await User.findOne({ 
-      $or: [
-        { discordId: discordUser.id },
-        { email: discordUser.email }
-      ]
-    });
+    // Find the existing account by the stable Discord identity first. Fall back
+    // to an email match ONLY when Discord has VERIFIED that email — Discord
+    // returns `email` even when it's unverified, so without this gate an
+    // attacker could set their Discord email to a victim's address and take
+    // over the victim's password account. The discordId match is always safe,
+    // and because it's set on account creation, returning users still resolve
+    // by id (no duplicate accounts) even when their email is unverified.
+    let user = await User.findOne({ discordId: discordUser.id });
+    if (!user && discordUser.verified === true && discordUser.email) {
+      user = await User.findOne({ email: discordUser.email });
+    }
     const isNewUser = !user;  // Track if this is a new user for Mixpanel
 
     if (!user) {
@@ -117,7 +121,11 @@ router.post('/discord', async (req, res) => {
 
       user = new User({
         username,
-        email: discordUser.email || '',
+        // Only persist the email when Discord verified it — storing an
+        // unverified email would let an attacker squat a victim's address and
+        // could wrongly match later. Unverified Discord users simply get no
+        // email on file (they can add one later).
+        email: (discordUser.verified === true && discordUser.email) ? discordUser.email : '',
         password: `discord_${discordUser.id}`,
         discordId: discordUser.id,
         discordUsername: discordUser.username,

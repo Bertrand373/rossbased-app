@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { trackLogin, trackSignup } from '../../utils/mixpanel';
+import { consumeOAuthState } from '../../utils/oauthState';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
@@ -19,9 +20,16 @@ const DiscordCallback = ({ onLogin }) => {
     if (hasProcessed.current) return;
     
     const code = searchParams.get('code');
-    
+    const returnedState = searchParams.get('state');
+
     if (code) {
       hasProcessed.current = true;
+      // CSRF / login-fixation guard: the state Discord echoes back must match
+      // the one we generated when this browser started the sign-in flow.
+      if (!consumeOAuthState('discord_login', returnedState)) {
+        setError('Security validation failed. Please try signing in again.');
+        return;
+      }
       handleDiscordAuth(code);
     } else {
       setError('No authorization code received');

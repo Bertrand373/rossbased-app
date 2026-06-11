@@ -5,6 +5,7 @@
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { goldCheckIcon, GOLD_TOAST_CLASS } from '../Toast/ToastIcons';
+import { consumeOAuthState } from '../../utils/oauthState';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
@@ -15,6 +16,7 @@ const YouTubeLinkCallback = ({ onLinkComplete }) => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
     const error = params.get('error');
+    const returnedState = params.get('state');
 
     if (error) {
       toast.error('YouTube linking canceled');
@@ -31,6 +33,16 @@ const YouTubeLinkCallback = ({ onLinkComplete }) => {
     const codeKey = `youtube_link_${code}`;
     if (sessionStorage.getItem(codeKey)) return;
     sessionStorage.setItem(codeKey, 'processing');
+
+    // CSRF guard: the state Google echoes back must match the one we set when
+    // this browser started the link flow. After the codeKey guard so
+    // StrictMode's second mount doesn't double-consume the stored state.
+    if (!consumeOAuthState('youtube_link', returnedState)) {
+      sessionStorage.removeItem(codeKey);
+      toast.error('Security check failed. Please try linking again.');
+      window.location.href = '/profile';
+      return;
+    }
 
     const linkYouTube = async () => {
       try {

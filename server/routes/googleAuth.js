@@ -31,12 +31,20 @@ router.post('/google', async (req, res) => {
     });
     
     const payload = ticket.getPayload();
-    const { email, name, sub: googleId } = payload;
-    
+    const { email, name, sub: googleId, email_verified: emailVerified } = payload;
+
     console.log('Google auth for:', email);
 
-    // Check if user exists
-    let user = await User.findOne({ email });
+    // Resolve the account by the stable Google identity first. Fall back to an
+    // email match ONLY when Google asserts the email is verified — otherwise an
+    // account with email_verified:false could adopt a victim's password account.
+    // googleId is set on creation, so returning users resolve by id regardless
+    // (no duplicate accounts even when email_verified is false).
+    const isEmailVerified = emailVerified === true || emailVerified === 'true';
+    let user = await User.findOne({ googleId });
+    if (!user && isEmailVerified) {
+      user = await User.findOne({ email });
+    }
     const isNewUser = !user;  // Track if this is a new user for Mixpanel
     
     if (!user) {

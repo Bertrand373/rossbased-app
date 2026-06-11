@@ -9,6 +9,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { BsDiscord } from 'react-icons/bs';
 import useBodyScrollLock from '../../hooks/useBodyScrollLock';
 import { trackLogin, trackSignup } from '../../utils/mixpanel';
+import { createOAuthState } from '../../utils/oauthState';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://rossbased-app.onrender.com';
 
@@ -340,8 +341,9 @@ const AuthModal = ({ onClose, onLogin, loadingMessage }) => {
           : 'https://titantrack.app/auth/discord/callback'
       );
       const scope = encodeURIComponent('identify email');
-      
-      window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${scope}`;
+      const state = createOAuthState('discord_login');
+
+      window.location.href = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${scope}&state=${state}`;
     }
   };
   
