@@ -260,7 +260,10 @@ const Profile = ({
 
   const loadNotificationPreferences = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/notification-preferences/${userData.username}`);
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/api/notification-preferences/${userData.username}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (response.ok) {
         const prefs = await response.json();
         setQuietHoursEnabled(prefs.quietHoursEnabled || false);
@@ -293,9 +296,10 @@ const Profile = ({
     };
     
     try {
+      const token = localStorage.getItem('token');
       await fetch(`${API_URL}/api/notification-preferences/${userData.username}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(preferences)
       });
       localStorage.setItem(`notificationPrefs_${userData.username}`, JSON.stringify(preferences));
@@ -1043,13 +1047,15 @@ const Profile = ({
 
               {(subscriptionStatus?.subscription?.status === 'canceled' || subscriptionStatus?.subscription?.cancelAtPeriodEnd) && isPremium && (
                 <div className="billing-note">
-                  You still have access until your billing period ends. Resubscribe anytime.
+                  You've got full access until {subscriptionStatus?.subscription?.currentPeriodEnd
+                    ? new Date(subscriptionStatus.subscription.currentPeriodEnd).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+                    : 'your billing period ends'}. No hard feelings, no pressure — the path's here whenever you want back in. Resubscribe anytime. See you soon.
                 </div>
               )}
 
-              {isPremium && !isGrandfathered && !isTrial && (
+              {isPremium && !isGrandfathered && (
                 <button className="billing-manage-btn" onClick={onManageBilling}>
-                  Manage Billing
+                  {isTrial ? 'Manage or Cancel Trial' : 'Manage Billing'}
                 </button>
               )}
 

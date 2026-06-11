@@ -248,6 +248,8 @@ async function calculateRiskScore(userId) {
 
     const profile = await UserRiskProfile.findOne({ userId }).lean();
 
+    const now = new Date();
+
     // Compute current streak
     const currentDay = calcStreakDay(user.startDate);
 
@@ -395,8 +397,8 @@ async function calculateRiskScore(userId) {
     return { score, factors, trend, interventionNeeded, currentDay, dayRange };
 
   } catch (err) {
-    console.error(`[RiskEngine] Score calculation error:`, err.message);
-    return { score: 0, factors: [], interventionNeeded: false };
+    console.error(`[RiskEngine] Score calculation error:`, err.stack || err.message);
+    return { score: 0, factors: [], interventionNeeded: false, error: true };
   }
 }
 
@@ -421,6 +423,7 @@ async function dailyRiskScan() {
     const interventionQueue = [];
     let profilesBuilt = 0;
     let profilesUpdated = 0;
+    let scoreErrors = 0;
 
     for (const user of activeUsers) {
       // Build/update profile if stale (older than 24h) or missing
@@ -434,7 +437,8 @@ async function dailyRiskScan() {
 
       // Calculate current risk
       const risk = await calculateRiskScore(user._id);
-      
+      if (risk.error) scoreErrors++;
+
       if (risk.interventionNeeded) {
         interventionQueue.push({
           userId: user._id,
@@ -448,6 +452,9 @@ async function dailyRiskScan() {
     }
 
     console.log(`[RiskEngine] Scan complete: ${profilesBuilt} new profiles, ${profilesUpdated} updated, ${interventionQueue.length} interventions needed`);
+    if (scoreErrors > 0) {
+      console.error(`[RiskEngine] ${scoreErrors}/${activeUsers.length} risk score calculations errored — predictive layer degraded, see errors above`);
+    }
     return interventionQueue;
 
   } catch (err) {

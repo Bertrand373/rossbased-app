@@ -615,6 +615,53 @@ const authenticate = (req, res, next) => {
 };
 
 // ============================================
+// AUTHORIZATION HELPERS
+// ============================================
+// Admin is determined solely by username — these are the only privileged
+// accounts. Mirrors the inline checks used elsewhere (account deletion, admin
+// ban routes) so every gate agrees on who counts as admin.
+const ADMIN_USERNAMES = ['ross', 'rossbased'];
+
+// Authorize that the caller owns the :username route param (or is an admin).
+// Returns true when allowed; otherwise responds 403 and returns false, so call
+// sites can simply: `if (!authorizeUserParam(req, res)) return;`
+// (Audit 2026-06-11: GET/PUT /api/user/:username trusted the param with no
+// ownership check — any logged-in user could read or overwrite any account.)
+function authorizeUserParam(req, res) {
+  const caller = req.user?.username?.toLowerCase();
+  const target = req.params.username?.toLowerCase();
+  if (caller && (caller === target || ADMIN_USERNAMES.includes(caller))) return true;
+  res.status(403).json({ error: 'Forbidden' });
+  return false;
+}
+
+// Fields a client may NEVER set through the generic profile-update route.
+// Each is owned by a trusted server path only: the Stripe webhook (billing /
+// tier), the OAuth exchanges (identity links), the auth endpoints (password),
+// admin tooling (ban / mentor), or server-side counters (AI quota). Without
+// this guard, `$set: req.body` let any caller grant themselves premium, reset a
+// password, or claim another Discord identity for OG perks.
+const PROTECTED_USER_FIELDS = new Set([
+  'password', 'resetPasswordToken', 'resetPasswordExpires',
+  'isPremium', 'subscription',
+  'banned', 'bannedAt', 'bannedReason',
+  'discordId', 'googleId', 'youtubeChannelId', 'youtubeChannelTitle', 'youtubeLinkedAt',
+  'mentorEligible', 'verifiedMentor',
+  'recoveryBypassRemaining', 'freeAccessUntil', 'aiUsage', 'discordOracleLifetime',
+  'mlRiskSnapshot', 'feedbackReplies',
+  '_id', '__v', 'createdAt', 'updatedAt', 'hasPremiumAccess'
+]);
+
+// Return a copy of a profile-update body with protected fields removed.
+function stripProtectedUserFields(body) {
+  const cleaned = {};
+  for (const key of Object.keys(body || {})) {
+    if (!PROTECTED_USER_FIELDS.has(key)) cleaned[key] = body[key];
+  }
+  return cleaned;
+}
+
+// ============================================
 // AUTH ENDPOINTS
 // ============================================
 
@@ -774,8 +821,10 @@ app.post('/api/signup', authLimiter, async (req, res) => {
 
 // Get user data
 app.get('/api/user/:username', authenticate, async (req, res) => {
+  if (!authorizeUserParam(req, res)) return; // own account or admin only
   try {
-    const user = await User.findOne({ username: req.params.username });
+    const user = await User.findOne({ username: req.params.username })
+      .select('-password -resetPasswordToken -resetPasswordExpires');
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -788,6 +837,7 @@ app.get('/api/user/:username', authenticate, async (req, res) => {
 
 // Update user data
 app.put('/api/user/:username', authenticate, async (req, res) => {
+  if (!authorizeUserParam(req, res)) return; // own account or admin only
   try {
     // ── Free-tier benefit log enforcement (14 lifetime logs) ──
     if (req.body.benefitTracking) {
@@ -816,7 +866,7 @@ app.put('/api/user/:username', authenticate, async (req, res) => {
 
     const user = await User.findOneAndUpdate(
       { username: req.params.username },
-      { $set: req.body },
+      { $set: stripProtectedUserFields(req.body) },
       { new: true }
     );
     if (!user) {
@@ -858,6 +908,9 @@ app.put('/api/user/:username', authenticate, async (req, res) => {
 
     console.log('User updated:', user.username);
     const responseData = user.toObject();
+    delete responseData.password;
+    delete responseData.resetPasswordToken;
+    delete responseData.resetPasswordExpires;
     if (newToken) {
       responseData.newToken = newToken;
     }
@@ -873,6 +926,7 @@ app.put('/api/user/:username', authenticate, async (req, res) => {
 // Updates lastSeen for real-time admin tracking
 // ============================================
 app.put('/api/user/:username/heartbeat', authenticate, async (req, res) => {
+  if (!authorizeUserParam(req, res)) return; // own account or admin only
   try {
     await User.updateOne(
       { username: req.params.username },
@@ -912,13 +966,96 @@ app.delete('/api/user/:username', authenticate, async (req, res) => {
   }
   
   try {
+    // Delete the account itself first. Once this succeeds the user is gone
+    // from their POV (can't log in). findOneAndDelete returns the doc so we
+    // can use its ids for downstream cleanup.
     const user = await User.findOneAndDelete({ username: req.params.username });
-    
+
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-    
-    console.log('✅ Account deleted:', req.params.username);
+
+    const username = user.username;
+    const userId = user._id;
+
+    // Everything below is best-effort: the account is already gone, so a
+    // cleanup hiccup must never turn into a 500 for the user. We log failures
+    // so anything left behind can be swept manually.
+    try {
+      // 1) Stop billing. A deleted account must never keep getting charged.
+      if (user.subscription?.stripeSubscriptionId) {
+        try {
+          const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+          await stripe.subscriptions.cancel(user.subscription.stripeSubscriptionId);
+          console.log('   ↳ Stripe subscription canceled for', username);
+        } catch (stripeErr) {
+          // Already-canceled subs throw — that's fine. Log anything else.
+          console.error('   ↳ Stripe cancel failed for', username, '-', stripeErr.message);
+        }
+      }
+
+      // 2) Purge personally-identifiable data scattered across collections.
+      //    AggregatePattern is intentionally LEFT ALONE: it holds only
+      //    anonymized, user-agnostic ML patterns (no username/userId), so the
+      //    collective knowledge survives while the person is erased.
+      //    ProtocolPurchase is also left alone (financial record kept for
+      //    accounting; keyed by email, not username).
+      const purges = [
+        require('./models/OracleChatHistory').deleteMany({ username }),
+        require('./models/OracleThread').deleteMany({ username }),
+        require('./models/OracleNote').deleteMany({ username }),
+        require('./models/OracleOutcome').deleteMany({ username }),
+        require('./models/OraclePin').deleteMany({ username }),
+        require('./models/OracleShare').deleteMany({ username }),
+        require('./models/OracleInteraction').deleteMany({ $or: [{ username }, { userId }] }),
+        require('./models/OracleTransmission').deleteMany({ $or: [{ username }, { userId }] }),
+        require('./models/UserRiskProfile').deleteMany({ $or: [{ username }, { userId }] }),
+        require('./models/YouTubeOracleReply').deleteMany({ $or: [{ username }, { userId }] }),
+        require('./models/NotificationSubscription').deleteMany({ username }),
+        require('./models/CircleCheckIn').deleteMany({ username }),
+        require('./models/PageView').deleteMany({ userId: username }) // PageView.userId stores the username string
+      ];
+
+      // DiscordMemory is keyed by Discord username, not the app username.
+      if (user.discordUsername) {
+        purges.push(require('./models/DiscordMemory').deleteMany({ username: user.discordUsername }));
+      }
+
+      // Run independently so one failure can't abort the rest.
+      const results = await Promise.allSettled(purges);
+      const failed = results.filter(r => r.status === 'rejected');
+      if (failed.length) {
+        console.error(`   ↳ ${failed.length} data-purge step(s) failed for ${username}:`,
+          failed.map(f => f.reason?.message).join('; '));
+      }
+
+      // 3) Circles need care — don't nuke a group just because one member left.
+      const Circle = require('./models/Circle');
+      const circles = await Circle.find({ 'members.username': username });
+      for (const circle of circles) {
+        const wasCreator = circle.createdBy === username ||
+          circle.members.some(m => m.username === username && m.role === 'creator');
+        circle.members = circle.members.filter(m => m.username !== username);
+
+        if (circle.members.length === 0) {
+          await Circle.deleteOne({ _id: circle._id }); // empty group — remove it
+        } else {
+          if (wasCreator) {
+            // Promote the longest-standing remaining member so the group lives on.
+            const heir = circle.members
+              .slice()
+              .sort((a, b) => new Date(a.joinedAt) - new Date(b.joinedAt))[0];
+            heir.role = 'creator';
+            circle.createdBy = heir.username;
+          }
+          await circle.save();
+        }
+      }
+    } catch (cleanupErr) {
+      console.error('   ↳ Post-deletion cleanup error for', username, '-', cleanupErr.message);
+    }
+
+    console.log('✅ Account deleted + data purged:', username);
     res.json({ success: true, message: 'Account successfully deleted' });
   } catch (err) {
     console.error('Error deleting user:', err);
@@ -1685,6 +1822,10 @@ function getClientIP(req) {
 // AI Chat Streaming Endpoint
 app.post('/api/ai/chat/stream', authenticate, oracleLimiter, async (req, res) => {
   const { message, conversationHistory, timezone, useRecoveryBypass } = req.body;
+  // Server-validated recovery-bypass state. The client may REQUEST a bypass via
+  // useRecoveryBypass, but it is only honored once a real credit is claimed
+  // below. Declared out here so the catch / early-bail paths can refund it.
+  let usedRecoveryBypass = false;
 
   // --- PERF TIMING (temporary — remove once bottleneck identified) ---
   // Logs each major step so we can see exactly where the pre-stream latency is.
@@ -1797,8 +1938,22 @@ app.post('/api/ai/chat/stream', authenticate, oracleLimiter, async (req, res) =>
       }
     }
 
+    // One-shot recovery bypass: honor it only if the user actually holds a
+    // credit, claimed atomically so a forged `useRecoveryBypass: true` can't
+    // skip rate limits and concurrent requests can't double-spend one credit.
+    // (Audit 2026-06-11: the flag was trusted from the body and the stored
+    // counter was never checked — every request could bypass all quotas free.)
+    if (useRecoveryBypass === true) {
+      const claimed = await User.findOneAndUpdate(
+        { username: req.user.username, recoveryBypassRemaining: { $gt: 0 } },
+        { $inc: { recoveryBypassRemaining: -1 } },
+        { new: true }
+      );
+      usedRecoveryBypass = !!claimed;
+    }
+
     // Admin, free-access credit, or one-shot recovery bypass — skip all rate limits
-    if (isAdminUser || hasFreeAccess || useRecoveryBypass) {
+    if (isAdminUser || hasFreeAccess || usedRecoveryBypass) {
       // no-op: fall through to Oracle response
     } else if (isBetaPeriod && currentCount >= BETA_DAILY_LIMIT) {
       return res.status(429).json({ 
@@ -1832,7 +1987,7 @@ app.post('/api/ai/chat/stream', authenticate, oracleLimiter, async (req, res) =>
     if (isAdminUser || hasFreeAccess) {
       preStreamRemaining = 999;
       userTier = isAdminUser ? 'admin' : (isAscended ? 'ascended' : userHasPremium ? 'premium' : isPureOG ? 'grandfathered' : 'free');
-    } else if (useRecoveryBypass) {
+    } else if (usedRecoveryBypass) {
       preStreamRemaining = 999;
       userTier = 'recovery';
     } else if (isBetaPeriod) {
@@ -2101,6 +2256,11 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
     // Treat as a transient failure: do NOT burn the user's daily slot — surface a
     // retryable error and bail before the usage increment below.
     if (!fullResponse.trim()) {
+      // Stream produced nothing — refund the recovery credit claimed up front so
+      // a server hiccup doesn't silently eat the user's earned bonus message.
+      if (usedRecoveryBypass) {
+        await User.updateOne({ username: req.user.username }, { $inc: { recoveryBypassRemaining: 1 } }).catch(() => {});
+      }
       res.write(`data: ${JSON.stringify({ type: 'error', message: 'Stream interrupted' })}\n\n`);
       res.end();
       return;
@@ -2109,7 +2269,9 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
     // Update usage after successful stream.
     // Recovery bypass: don't burn a daily/weekly slot — only decrement the bypass
     // counter and bump lifetimeCount/lastUsed. The bonus message is truly extra.
-    if (useRecoveryBypass) {
+    if (usedRecoveryBypass) {
+      // Credit already claimed atomically up front — here we only record usage
+      // (don't burn a daily/weekly slot; the bonus message is truly extra).
       await User.findOneAndUpdate(
         { username: req.user.username },
         {
@@ -2118,8 +2280,7 @@ Use this awareness naturally. Reference calendar events, zodiac energy, and seas
             'aiUsage.lifetimeCount': currentLifetime + 1,
             'aiUsage.lastUsed': now,
             'aiUsage.lastIP': clientIP || ''
-          },
-          $inc: { recoveryBypassRemaining: -1 }
+          }
         }
       );
     } else {
@@ -2332,7 +2493,7 @@ Examples:
       effectiveUsed = currentCount + 1;
       effectiveLimit = 999;
       messagesRemaining = 999;
-    } else if (useRecoveryBypass) {
+    } else if (usedRecoveryBypass) {
       // Bypass doesn't burn a slot — report today's count unchanged.
       effectiveUsed = currentCount;
       effectiveLimit = 999;
@@ -2375,6 +2536,10 @@ Examples:
 
   } catch (err) {
     console.error('AI Chat Stream error:', err);
+    // Refund a claimed recovery credit on hard failure so it isn't lost.
+    if (usedRecoveryBypass) {
+      await User.updateOne({ username: req.user.username }, { $inc: { recoveryBypassRemaining: 1 } }).catch(() => {});
+    }
     // Alert admin if model-related failure
     if (err.status === 404 || err.status === 400 || err.message?.toLowerCase().includes('model')) {
       try {
@@ -2593,16 +2758,17 @@ app.get('/api/ai-usage/:username', authenticate, async (req, res) => {
 // ============================================
 
 // Get notification preferences
-app.get('/api/notification-preferences/:username', async (req, res) => {
+app.get('/api/notification-preferences/:username', authenticate, async (req, res) => {
+  if (!authorizeUserParam(req, res)) return; // own account or admin only
   const { username } = req.params;
-  
+
   try {
     const user = await User.findOne({ username });
-    
+
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
-    
+
     // Return preferences or defaults
     const prefs = user.notificationPreferences || {
       quietHoursEnabled: false,
@@ -2626,7 +2792,8 @@ app.get('/api/notification-preferences/:username', async (req, res) => {
 });
 
 // Save/Update notification preferences
-app.post('/api/notification-preferences/:username', async (req, res) => {
+app.post('/api/notification-preferences/:username', authenticate, async (req, res) => {
+  if (!authorizeUserParam(req, res)) return; // own account or admin only
   const { username } = req.params;
   const preferences = req.body;
   
@@ -2861,6 +3028,7 @@ app.post('/api/feedback', feedbackUploadMiddleware, async (req, res) => {
 // Save ML risk snapshot (called by frontend when prediction updates)
 // ============================================
 app.put('/api/user/:username/ml-risk', authenticate, async (req, res) => {
+  if (!authorizeUserParam(req, res)) return; // own account or admin only
   try {
     const { riskScore, riskLevel, topFactors } = req.body;
     await User.findOneAndUpdate(
