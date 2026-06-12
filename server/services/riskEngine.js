@@ -11,21 +11,7 @@ const UserRiskProfile = require('../models/UserRiskProfile');
 const OracleInteraction = require('../models/OracleInteraction');
 const OracleOutcome = require('../models/OracleOutcome');
 const { getLunarData } = require('../utils/lunarData');
-
-// Timezone-safe streak calculation — handles "yyyy-MM-dd" strings AND legacy Date objects
-function calcStreakDay(startDate) {
-  if (!startDate) return 0;
-  let y, m, d;
-  if (typeof startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
-    [y, m, d] = startDate.split('-').map(Number);
-  } else {
-    const dt = new Date(startDate);
-    y = dt.getUTCFullYear(); m = dt.getUTCMonth() + 1; d = dt.getUTCDate();
-  }
-  const startMid = new Date(y, m - 1, d);
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  return Math.max(1, Math.floor((today - startMid) / (1000 * 60 * 60 * 24)) + 1);
-}
+const { calcStreakFromStartDate, resolveUserTimezone } = require('../utils/streakCalc');
 
 /**
  * Build or update a user's risk profile from their full history
@@ -250,8 +236,8 @@ async function calculateRiskScore(userId) {
 
     const now = new Date();
 
-    // Compute current streak
-    const currentDay = calcStreakDay(user.startDate);
+    // Compute current streak (timezone-aware — matches the frontend / app.js)
+    const currentDay = calcStreakFromStartDate(user.startDate, resolveUserTimezone(user));
 
     let score = 0;
     const factors = [];

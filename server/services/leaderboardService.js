@@ -4,6 +4,7 @@
 
 const User = require('../models/User');
 const mongoose = require('mongoose');
+const { calcStreakFromStartDate, resolveUserTimezone } = require('../utils/streakCalc');
 
 // Simple schema to store Discord message IDs
 const settingsSchema = new mongoose.Schema({
@@ -46,27 +47,14 @@ async function getSetting(key) {
  * Calculate current streak from start date
  * This ensures accuracy even if user hasn't opened the app
  */
-function calculateStreakFromStartDate(startDate) {
+// Timezone-aware — delegates to the shared util. When `timezone` is omitted
+// (the leaderboard ranking callers) it falls back to server-local, i.e. the
+// original behavior. The milestone write-back passes the user's timezone so
+// persisted streaks and Discord milestone announcements match the in-app "Day N"
+// rather than firing a day early for non-UTC users.
+function calculateStreakFromStartDate(startDate, timezone) {
   if (!startDate) return 0;
-  
-  // Handle "yyyy-MM-dd" date strings (new format) vs legacy Date/ISO strings
-  let y, m, d;
-  if (typeof startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
-    [y, m, d] = startDate.split('-').map(Number);
-  } else {
-    // Legacy Date/ISO string — extract date in UTC
-    const dt = new Date(startDate);
-    y = dt.getUTCFullYear();
-    m = dt.getUTCMonth() + 1;
-    d = dt.getUTCDate();
-  }
-  
-  const startMidnight = new Date(y, m - 1, d);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  const daysDiff = Math.floor((today - startMidnight) / (1000 * 60 * 60 * 24));
-  return Math.max(1, daysDiff + 1); // Day 1 = start day
+  return calcStreakFromStartDate(startDate, timezone);
 }
 
 /**
@@ -603,8 +591,10 @@ async function runScheduledMilestoneCheck() {
     let announcedCount = 0;
     
     for (const user of users) {
-      // Calculate their actual current streak from startDate
-      const currentStreak = calculateStreakFromStartDate(user.startDate);
+      // Calculate their actual current streak from startDate (timezone-aware:
+      // this value is announced to Discord and persisted, so it must match
+      // what the user sees in-app — not the server's UTC day).
+      const currentStreak = calculateStreakFromStartDate(user.startDate, resolveUserTimezone(user));
       const lastAnnounced = user.lastMilestoneAnnounced || 0;
       
       // Check each milestone threshold

@@ -14,6 +14,7 @@ const OracleOutcome = require('../models/OracleOutcome');
 const UserRiskProfile = require('../models/UserRiskProfile');
 const { sendNotificationToUser } = require('./notificationService');
 const { getLunarData } = require('../utils/lunarData');
+const { calcStreakFromStartDate, resolveUserTimezone } = require('../utils/streakCalc');
 const { getCommunityPulse } = require('./communityPulse');
 const { calculateRiskScore, generateIntervention } = require('./riskEngine');
 
@@ -32,16 +33,9 @@ const GRANDFATHERED_CUTOFF = new Date('2026-02-17T00:00:00Z'); // OG Discord mem
  */
 function getActualStreakDay(user) {
   if (!user.startDate) return user.currentStreak || 0;
-  let y, m, d;
-  if (typeof user.startDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(user.startDate)) {
-    [y, m, d] = user.startDate.split('-').map(Number);
-  } else {
-    const dt = new Date(user.startDate);
-    y = dt.getUTCFullYear(); m = dt.getUTCMonth() + 1; d = dt.getUTCDate();
-  }
-  const startMid = new Date(y, m - 1, d);
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  return Math.max(1, Math.floor((today - startMid) / (1000 * 60 * 60 * 24)) + 1);
+  // Timezone-aware so the push notification's "Day N" matches what the user
+  // sees in-app. Falls back to server-local when no timezone is stored.
+  return calcStreakFromStartDate(user.startDate, resolveUserTimezone(user));
 }
 
 /**
