@@ -9,6 +9,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
+const { ipKeyGenerator } = rateLimit; // normalizes IPv6 to a subnet for rate-limit keys
 const multer = require('multer');
 const { Resend } = require('resend');
 
@@ -173,6 +174,16 @@ app.use((err, req, res, next) => {
 // ============================================
 // RATE LIMITING
 // ============================================
+// Shared key: the real client IP behind Render's proxy, normalized via
+// ipKeyGenerator so IPv6 clients are bucketed by /56 subnet rather than per
+// address — otherwise an IPv6 user could rotate within their subnet to bypass
+// the limit. IPv4 passes through unchanged.
+const rateLimitKeyByIp = (req) => {
+  const forwarded = req.headers['x-forwarded-for'];
+  const ip = forwarded ? forwarded.split(',')[0].trim() : req.ip;
+  return ipKeyGenerator(ip);
+};
+
 // Auth endpoints: tight limits to prevent brute-force
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -180,11 +191,7 @@ const authLimiter = rateLimit({
   message: { error: 'Too many attempts. Please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => {
-    // Use X-Forwarded-For behind Render's proxy
-    const forwarded = req.headers['x-forwarded-for'];
-    return forwarded ? forwarded.split(',')[0].trim() : req.ip;
-  }
+  keyGenerator: rateLimitKeyByIp
 });
 
 // Oracle endpoint: moderate limits to protect Anthropic API spend
@@ -194,10 +201,7 @@ const oracleLimiter = rateLimit({
   message: { error: 'Oracle is processing too many requests. Please wait a moment.' },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => {
-    const forwarded = req.headers['x-forwarded-for'];
-    return forwarded ? forwarded.split(',')[0].trim() : req.ip;
-  }
+  keyGenerator: rateLimitKeyByIp
 });
 
 // General API: generous but prevents abuse
@@ -207,10 +211,7 @@ const apiLimiter = rateLimit({
   message: { error: 'Too many requests. Please slow down.' },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => {
-    const forwarded = req.headers['x-forwarded-for'];
-    return forwarded ? forwarded.split(',')[0].trim() : req.ip;
-  }
+  keyGenerator: rateLimitKeyByIp
 });
 
 // Apply general rate limit to all API routes

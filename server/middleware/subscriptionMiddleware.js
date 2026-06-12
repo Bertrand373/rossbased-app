@@ -362,7 +362,19 @@ const syncStripeSubscriptions = async () => {
           }
 
           if (!user) {
-            console.log(`⚠️ Stripe sync: orphan sub ${sub.id} (${status}) — no user found (metadata: ${username || 'none'}, customer: ${customerId})`);
+            // No TitanTrack account for this sub. Two very different cases:
+            //  - cancel_at_period_end: the user left (canceled / deleted their
+            //    account) and the sub is winding down — benign, it drops off the
+            //    active list on its own at period end. Log quietly.
+            //  - otherwise: an active, NON-canceling sub with no account means
+            //    someone may be getting charged with nothing to show for it —
+            //    that warrants a real warning for follow-up.
+            if (sub.cancel_at_period_end) {
+              const endsOn = new Date(sub.current_period_end * 1000).toISOString().split('T')[0];
+              console.log(`ℹ️ Stripe sync: winding-down orphan ${sub.id} (canceled, ends ${endsOn}; metadata: ${username || 'none'}) — ignoring`);
+            } else {
+              console.warn(`⚠️ Stripe sync: ACTIVE orphan sub ${sub.id} (${status}) — no user found and NOT canceling (metadata: ${username || 'none'}, customer: ${customerId}). Possible charge with no account.`);
+            }
             continue;
           }
 
